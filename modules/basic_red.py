@@ -4,6 +4,7 @@ Prepares the data: bad pixel masking, background-subtraction, etc.
 ## ## find_background_limit.ipynb
 ## ## subtract stray y illumination gradient parallel.py
 ## ## make_pca_basis_cube_altair.py
+## ## pca_background_subtraction.ipynb
 '''
 
 
@@ -36,8 +37,10 @@ class BasicRed():
 
     def remove_stray_ramp(self):
         '''
-        Removes an electronic artifact illumination ramp at the top of the LMIRcam
-        readouts (see J. Leisenring)
+        Removes an additive electronic artifact illumination ramp in y at the top of the 
+        LMIRcam readouts. (The ramp has something to do with resetting of the detector while 
+        using the 2018A-era electronics; i.e., before MACIE overhaul in summer 2018-- see 
+        emails from J. Leisenring and J. Stone, Sept. 5/6 2018)
         '''
 
         pass

@@ -1,7 +1,24 @@
+'''
+Initialization
+'''
+
+import os
 import numpy as np
 import scipy
 from scipy import ndimage, sqrt, stats, misc, signal
+import git
 
+def get_git_hash():
+    '''
+    Returns the hash for the current version of the code on Git
+    '''
+
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
+
+    print(sha)
+
+'''
 # mask for weird regions of the detector where I don't care about the background subtraction
 def make_first_pass_mask(quadChoice):
     mask_weird = np.ones((511,2048))
@@ -44,3 +61,4 @@ def channels_PCA_cube():
         channel_vars_PCA[chNum,:,chNum*64:(chNum+1)*64] = 1.
         
     return channel_vars_PCA
+'''

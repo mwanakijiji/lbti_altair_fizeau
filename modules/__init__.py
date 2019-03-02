@@ -34,10 +34,9 @@ def make_dirs():
     '''
 
     # loop over all directory paths we will need
-    for vals in config["data_dir_leaves"]:
-        abs_path_name = str(config["data_dir_stem"]["STEM"]) + \
-          str(config["data_dir_leaves"]["DIR_CALIB_FRAMES_LEAF"])
-        
+    for vals in config["data_dirs"]:
+        abs_path_name = str(config["data_dirs"][vals])
+        print(abs_path_name)
         # if directory does not exist, create it
         if not os.path.exists(abs_path_name):
             os.makedirs(abs_path_name)

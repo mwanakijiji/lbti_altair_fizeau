@@ -18,6 +18,40 @@ def get_git_hash():
 
     print(sha)
 
+    
+def make_dirs():
+    '''
+    Make directories for housing files/info if they don't already exist
+    '''
+    
+    if unsat:
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/bcponlm/'+side+'/')
+
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/xsxbcponlm/'+side+'_0/')
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/xsxbcponlm/'+side+'_1/')
+
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/master/'+side)
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/fake_planets/'+side+'_0')
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/fake_planets/'+side+'_1')
+
+    else:
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/bcponlm/'+side+'/')
+
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/xsxbcponlm/'+side+'_0/')
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/xsxbcponlm/'+side+'_1/')
+
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/cxsxbcponlm/'+side+'_0/')
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/cxsxbcponlm/'+side+'_1/')
+
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/PCA/'+side+'_0/')
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/PCA/'+side+'_1/')
+        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/inspect_ims/')
+
+    fo=open(save_trunk+srcName+'/'+date+'/git_hash.txt','w')
+    fo.write(get_git_hash())
+    fo.write('\n')
+    fo.close()
+
 '''
 # mask for weird regions of the detector where I don't care about the background subtraction
 def make_first_pass_mask(quadChoice):

@@ -7,6 +7,7 @@ import numpy as np
 import scipy
 from scipy import ndimage, sqrt, stats, misc, signal
 import git
+import configparser
 
 def get_git_hash():
     '''
@@ -23,34 +24,15 @@ def make_dirs():
     '''
     Make directories for housing files/info if they don't already exist
     '''
-    
-    if unsat:
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/bcponlm/'+side+'/')
 
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/xsxbcponlm/'+side+'_0/')
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/xsxbcponlm/'+side+'_1/')
+    config = configparser.ConfigParser() # for parsing values in .init file
+    config.read("modules/altair_config.ini")
 
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/master/'+side)
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/fake_planets/'+side+'_0')
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/unsat/fake_planets/'+side+'_1')
+    # loop over all directory paths we will need
+    for path_num in range(0,len(config["data_dirs"])):
 
-    else:
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/bcponlm/'+side+'/')
-
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/xsxbcponlm/'+side+'_0/')
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/xsxbcponlm/'+side+'_1/')
-
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/cxsxbcponlm/'+side+'_0/')
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/cxsxbcponlm/'+side+'_1/')
-
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/PCA/'+side+'_0/')
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/PCA/'+side+'_1/')
-        os.makedirs(save_trunk+srcName+'/'+date+'/Lp/processed_data/sat/inspect_ims/')
-
-    fo=open(save_trunk+srcName+'/'+date+'/git_hash.txt','w')
-    fo.write(get_git_hash())
-    fo.write('\n')
-    fo.close()
+        # check/make a needed directory, skipping the stem itself
+        os.makedirs(config["data_dirs"]["STEM"] + config["data_dirs"][1+path_num])
 
 '''
 # mask for weird regions of the detector where I don't care about the background subtraction

@@ -29,11 +29,16 @@ def make_dirs():
     config.read("modules/altair_config.ini")
 
     # loop over all directory paths we will need
-    for path_num in range(0,len(config["data_dirs"])):
-
-        # check/make a needed directory, skipping the stem itself
-        os.makedirs(config["data_dirs"]["STEM"] + config["data_dirs"][1+path_num])
-
+    for vals in config["data_dir_leaves"]:
+        print(vals)
+        print(str(config["data_dir_leaves"][vals]))
+        abs_path_name = str(config["data_dir_stem"]["STEM"]) + str(config["data_dir_leaves"][vals])
+        print(abs_path_name)
+        print('0000')
+        if not os.path.exists(abs_path_name):
+            os.makedirs(abs_path_name)
+            print("printed" + abs_path_name)
+        
 '''
 # mask for weird regions of the detector where I don't care about the background subtraction
 def make_first_pass_mask(quadChoice):

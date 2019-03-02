@@ -8,6 +8,14 @@ import scipy
 from scipy import ndimage, sqrt, stats, misc, signal
 import git
 import configparser
+import multiprocessing
+
+# number of CPUs for parallelization
+ncpu = multiprocessing.cpu_count()
+
+# configuration data
+config = configparser.ConfigParser() # for parsing values in .init file
+config.read("modules/altair_config.ini")
 
 def get_git_hash():
     '''
@@ -25,19 +33,15 @@ def make_dirs():
     Make directories for housing files/info if they don't already exist
     '''
 
-    config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/altair_config.ini")
-
     # loop over all directory paths we will need
     for vals in config["data_dir_leaves"]:
-        print(vals)
-        print(str(config["data_dir_leaves"][vals]))
-        abs_path_name = str(config["data_dir_stem"]["STEM"]) + str(config["data_dir_leaves"][vals])
-        print(abs_path_name)
-        print('0000')
+        abs_path_name = str(config["data_dir_stem"]["STEM"]) + \
+          str(config["data_dir_leaves"]["DIR_CALIB_FRAMES_LEAF"])
+        
+        # if directory does not exist, create it
         if not os.path.exists(abs_path_name):
             os.makedirs(abs_path_name)
-            print("printed" + abs_path_name)
+            print("Made directory " + abs_path_name)
         
 '''
 # mask for weird regions of the detector where I don't care about the background subtraction

@@ -7,69 +7,63 @@ Prepares the data: bad pixel masking, background-subtraction, etc.
 ## ## pca_background_subtraction.ipynb
 '''
 
+from modules import *
+from astropy.io import fits
+import multiprocessing
+import configparser
+import glob
 
-class BasicRed():
+
+def dark_subt_parallel():
     '''
-    Carry out basic cleaning of the data
+    Generalized dark subtraction
+
+    INPUTS:
+    none; list of science frame filenames is generated internally
+
+    OUTPUTS:
+    none; dark-subtracted files are written out
     '''
 
-    def __init__(self):
+    # make a list of the science array files
+    sci_directory = str(config["data_dir_stem"]["DATA_DIR_STEM"]) + \
+              str(config["data_dir_leaves"]["DIR_RAW_DATA_LEAF"])
+    sci_name_array = list(glob.glob(os.path.join(sci_directory,"*.fits")))
 
-        pass
+    #dark_subt = BasicRed().dark_subt_single()
 
-    def __call__(self):
-
-        pass
-
-    def dark_subt_gen(self):
+    def dark_subt_single(abs_sci_name):
         '''
-        Generalized dark subtraction
-        '''
+        Actual subtraction, for a single frame so as to parallelize job
 
-        pass
-
-    def fix_pix_gen(self):
+        INPUTS:
+        sci_name: science array filename 
         '''
-        Interpolates over bad pixels ## ## VANESSAS ALGORITHM?
-        '''
+            
+        # read in the science frame from raw data directory
+        print(abs_sci_name)
 
-        pass
+        sci, header_sci = fits.getdata(abs_sci_name,0,header=True)
+        print(np.shape(sci))
 
-    def remove_stray_ramp(self):
-        '''
-        Removes an additive electronic artifact illumination ramp in y at the top of the 
-        LMIRcam readouts. (The ramp has something to do with resetting of the detector while 
-        using the 2018A-era electronics; i.e., before MACIE overhaul in summer 2018-- see 
-        emails from J. Leisenring and J. Stone, Sept. 5/6 2018)
-        '''
+        # subtract from image; data type should allow negative numbers
+        image_dark_subtd = np.subtract(sci,dark).astype(np.int32)
 
-        pass
+        # add a line to the header indicating last reduction step
+        header_sci["LAST_REDUCT_STEP"] = "dark-subtraction"
 
-    def pca_background_decomp(self):
-        '''
-        Generates a PCA cube based on the backgrounds in the science frames.
-        '''
+        # write file out
+        abs_image_dark_subtd_name = str(self.config["data_dir_stem"]["DATA_DIR_STEM"]) + \
+              str(self.config["data_dir_leaves"]["DIR_DARK_SUBTED_LEAF"] + sci_name)
+        fits.writeto(filename = abs_image_dark_subtd_name,
+                         data = image_dark_subt,
+                         header = header_sci,
+                         overwrite=False)
+        print("Write out dark-subtracted frame " + sci_name)
 
-        pass
-
-    def pca_background_subt(self):
-        '''
-        Does a PCA decomposition of a given frame, and subtracts the background
-        ## ## N.b. remaining pedestal should be photons alone; how smooth is it?
-        '''
-
-        pass
-
-    def calc_noise(self):
-        '''
-        Finds noise characteristics: where is the background limit? etc.
-        '''
-
-        pass
-
-    def cookie_cutout(self):
-        '''
-        Cuts out region around PSF commensurate with the AO control radius
-        '''
-
-        pass
+    # subtract darks in parallel
+    print("Subtracting darks with " + str(ncpu) + " CPUs...")
+    pool = multiprocessing.Pool(ncpu)
+    outdat = pool.map(dark_subt_single, sci_name_array)
+        
+    return

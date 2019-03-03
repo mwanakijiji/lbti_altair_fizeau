@@ -111,8 +111,7 @@ class FixPixSingle:
                      overwrite=True)
         print("Writing out bad-pixel-fixed frame " + os.path.basename(abs_image_fixpixed_name))
 
-        pass
-
+    
 class RemoveStrayRamp:
     '''
     Removes an additive electronic artifact illumination ramp in y at the top of the 
@@ -126,7 +125,7 @@ class RemoveStrayRamp:
 
     def __call__(self, abs_sci_name):
         '''
-        Bad pix fixing, for a single frame so as to parallelize job
+        Remove stray ramp, for a single frame so as to parallelize job
 
         INPUTS:
         sci_name: science array filename
@@ -170,32 +169,122 @@ class RemoveStrayRamp:
                      overwrite=True)
         print("Writing out ramp-removed-fixed frame " + os.path.basename(abs_image_ramp_subted_name))
 
-class PCABackgroundDecomp:
+        
+class PCABackgroundCubeMaker:
+    '''
+    Generates a PCA cube based on the backgrounds in the science frames.
+    N.b. The user has to input a beginning and ending frame number for
+    calculating a PCA basis (need to have common filter, integ time, etc.)
+    '''
+    
+    def __init__(self, file_list, n_PCA, config_data = config):
         '''
-        Generates a PCA cube based on the backgrounds in the science frames.
+        INPUTS:
+        file_list: list of filenames in the directory
+        n_PCA: number of PCA components to save in the cube
+        config_data: configuration data, as usual
         '''
 
-        pass
+        self.file_list = file_list
+        self.n_PCA = n_PCA
+        self.config_data = config_data
 
+    def __call__(self,
+                 start_frame_num,
+                 stop_frame_num,
+                 quad_choice,
+                 indiv_channel=False):
+        '''
+        Make PCA cube to reconstruct background (PSF is masked)
+
+        INPUTS:
+        start_frame_num: starting frame number to use in PCA basis generation
+        stop_frame_num: stopping [ditto], inclusive
+        quad_choice: quadrant (1 to 4) of the array we are interested in making a background for
+        indivChannel: do you want to append PCA components that involve individual channel pedestals?
+        '''
+
+        # read in a first file to get the shape
+        test_img, header = fits.getdata(self.file_list[0], 0, header=True)
+        shape_img = np.shape(test_img)
+        
+        print("Initializing a PCA cube...")
+        training_cube = np.nan*np.ones((stop_frame_num-start_frame_num+1,shape_img[0],shape_img[1]), dtype = np.int64)
+
+        mask_weird = make_first_pass_mask(quad_choice) # make the right mask
+
+        for frame_num in range(start_frame_num, stop_frame_num+1):
+
+            # get name of file that this number corresponds to
+            abs_matching_file_array = [s for s in self.file_list if str("{:0>6d}".format(frame_num)) in s]
+            abs_matching_file = abs_matching_file_array[0] # get the name
+            
+            # if there was a match
+            if (len(abs_matching_file) != 0):
+
+                # read in the science frame from raw data directory
+                sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
+
+                # add to cube
+                training_cube[frame_num-start_frame_num,:,:] = sci
+
+            # if there was no match
+            elif (len(abs_matching_file) == 0):
+
+                print("Frame " + os.path.basename(abs_matching_file) + " not found.")
+
+            # if there were multiple matches
+            else:
+
+                print("Something is amiss with your frame number choice.")
+                break
+
+        # mask the raw training set
+        fits.writeto('junkmask.fits', mask_weird, overwrite = True)
+        training_cube_masked_weird = np.multiply(training_cube,mask_weird)
+        del training_cube
+
+        # at this point, test_cube holds the (masked) background frames to be used as a training set
+
+        # find the 2D median across all background arrays, and subtract it from each individual background array
+        # (N.b. the region of the PSF itself will look funny, but we'll mask this in due course)
+        median_2d_bckgrd = np.nanmedian(training_cube_masked_weird, axis=0)    
+        for t in range(0,stop_frame_num-start_frame_num+1):
+            training_cube_masked_weird[t,:,:] = np.subtract(training_cube_masked_weird[t,:,:],median_2d_bckgrd)
+
+        # at this point, test_cube holds the background frames which are dark- and 2D median-subtracted 
+
+        ######################
+        # write out cube
+        cube_file_name = 'junkcube.fits'
+        abs_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                                        os.path.basename(cube_file_name))
+        fits.writeto(filename=abs_cube_name,
+                     data=training_cube_masked_weird,
+                     overwrite=True)
+        print("Wrote out background PCA cube for frames " + os.path.basename(abs_cube_name))
+        
+        
 class PCABackgroundSubt:
-        '''
-        Does a PCA decomposition of a given frame, and subtracts the background
-        ## ## N.b. remaining pedestal should be photons alone; how smooth is it?
-        '''
+    '''
+    Does a PCA decomposition of a given frame, and subtracts the background
+    ## ## N.b. remaining pedestal should be photons alone; how smooth is it?
+    '''
 
-        pass
+    pass
 
+    
 class CalcNoise:
-        '''
-        Finds noise characteristics: where is the background limit? etc.
-        '''
+    '''
+    Finds noise characteristics: where is the background limit? etc.
+    '''
 
-        pass
+    pass
 
 class CookieCutout:
-        '''
-        Cuts out region around PSF commensurate with the AO control radius
-        '''
+    '''
+    Cuts out region around PSF commensurate with the AO control radius
+    '''
 
 
 def main():
@@ -210,6 +299,7 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
+    '''
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -236,3 +326,16 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
+    '''
+    
+    # make a list of the ramp-removed files
+    ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
+    ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
+
+    # generate PCA cubes for backgrounds
+    pca_back_maker = PCABackgroundCubeMaker(file_list = ramp_subted_03_name_array,
+                                            n_PCA = 3) # create instance
+    pca_back_maker(start_frame_num = 9000,
+                   stop_frame_num = 9009,
+                   quad_choice = 3,
+                   indiv_channel = True)

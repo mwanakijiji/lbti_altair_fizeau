@@ -36,19 +36,21 @@ def make_dirs():
     # loop over all directory paths we will need
     for vals in config["data_dirs"]:
         abs_path_name = str(config["data_dirs"][vals])
-        print(abs_path_name)
+        print("Directory exists: " + abs_path_name)
+        
         # if directory does not exist, create it
         if not os.path.exists(abs_path_name):
             os.makedirs(abs_path_name)
             print("Made directory " + abs_path_name)
         
-'''
+
 # mask for weird regions of the detector where I don't care about the background subtraction
+# (This comes in when generating PCA basis of the background)
 def make_first_pass_mask(quadChoice):
-    mask_weird = np.ones((511,2048))
-    mask_weird[0:4,:] = np.nan # edge
-    mask_weird[-4:,:] = np.nan # edge
-    mask_weird[:,0:4] = np.nan # edge
+    mask_weird = np.ones((512,2048))
+    mask_weird[0:10,:] = np.nan # edge
+    mask_weird[-9:,:] = np.nan # edge
+    mask_weird[:,0:10] = np.nan # edge
     mask_weird[260:,1046:1258] = np.nan # bullet hole
     mask_weird[:,1500:] = np.nan # unreliable bad pixel mask
     mask_weird[:,:440] = np.nan # unreliable bad pixel mask
@@ -61,7 +63,9 @@ def make_first_pass_mask(quadChoice):
     
     return mask_weird
 
+
 # find star and return coordinates [y,x]
+# (This comes in when generating PCA basis of the background)
 def find_airy_psf(image):
 
     # replace NaNs with zeros to get the Gaussian filter to work
@@ -76,6 +80,9 @@ def find_airy_psf(image):
 
     return [cy, cx]
 
+
+# generate PCA vector elements representing channel bias changes
+# (This comes in when generating PCA basis of the background)
 def channels_PCA_cube():
     
     channel_vars_PCA = np.zeros((64,511,2048))
@@ -85,4 +92,3 @@ def channels_PCA_cube():
         channel_vars_PCA[chNum,:,chNum*64:(chNum+1)*64] = 1.
         
     return channel_vars_PCA
-'''

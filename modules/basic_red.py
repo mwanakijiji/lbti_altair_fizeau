@@ -10,8 +10,9 @@ Prepares the data: bad pixel masking, background-subtraction, etc.
 import multiprocessing
 import configparser
 import glob
+import matplotlib.pyplot as plt
 from astropy.io import fits
-from astropy.convolution import interpolate_replace_nans
+from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from modules import *
 
 
@@ -113,15 +114,14 @@ class FixPixSingle:
         pass
 
 class RemoveStrayRamp:
-        '''
-        Removes an additive electronic artifact illumination ramp in y at the top of the 
-        LMIRcam readouts. (The ramp has something to do with resetting of the detector while 
-        using the 2018A-era electronics; i.e., before MACIE overhaul in summer 2018-- see 
-        emails from J. Leisenring and J. Stone, Sept. 5/6 2018)
-        '''
+    '''
+    Removes an additive electronic artifact illumination ramp in y at the top of the 
+    LMIRcam readouts. (The ramp has something to do with resetting of the detector while 
+    using the 2018A-era electronics; i.e., before MACIE overhaul in summer 2018-- see 
+    emails from J. Leisenring and J. Stone, Sept. 5/6 2018)
+    '''
 
     def __init__(self, config_data=config):
-
         self.config_data = config_data
 
     def __call__(self, abs_sci_name):
@@ -135,21 +135,40 @@ class RemoveStrayRamp:
         # read in the science frame from raw data directory
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
-        # fix bad pixels
-        sci_badnan = np.multiply(sci,self.badpix)
-        image_fixpixed = interpolate_replace_nans(array=sci_badnan, kernel=self.kernel)#.astype(np.int32)
+        # initialize kernel (for smoothing in y)
+        num_pix_y = 5
+        gauss_kernel = Gaussian1DKernel(num_pix_y)
+
+        # find the median in x across the whole array as a function of y
+        # (N.b. offsets in the channels shouldn't be a problem, since both
+        # the ramp and the channel offsets should be additive)
+        stray_ramp = np.nanmedian(sci[:,:],axis=1)
+
+        # smooth it
+        smoothed_stray_ramp = convolve(stray_ramp, gauss_kernel)
+
+        ## TEST HERE
+        #plt.plot(stray_ramp)
+        #plt.plot(smoothed_stray_ramp)
+        #plt.savefig('junk.png')
+
+        # subtract from the whole array, after tiling across all pixels in x
+        # (N.b., again, there will still be residual channel pedestals. These
+        # are a mix of sky background and detector bias.)
+        image_ramp_subted = np.subtract(sci,
+                                        np.tile(smoothed_stray_ramp,(np.shape(sci)[1],1)).T)
 
         # add a line to the header indicating last reduction step
-        header_sci["RED_STEP"] = "bad-pixel-fixed"
+        header_sci["RED_STEP"] = "ramp_removed"
 
         # write file out
-        abs_image_fixpixed_name = str(self.config_data["data_dirs"]["DIR_PIXL_CORRTD"] + \
+        abs_image_ramp_subted_name = str(self.config_data["data_dirs"]["DIR_RAMP_REMOVD"] + \
                                         os.path.basename(abs_sci_name))
-        fits.writeto(filename=abs_image_fixpixed_name,
-                     data=image_fixpixed,
+        fits.writeto(filename=abs_image_ramp_subted_name,
+                     data=image_ramp_subted,
                      header=header_sci,
                      overwrite=True)
-        print("Writing out bad-pixel-fixed frame " + os.path.basename(abs_image_fixpixed_name))
+        print("Writing out ramp-removed-fixed frame " + os.path.basename(abs_image_ramp_subted_name))
 
 class PCABackgroundDecomp:
         '''
@@ -188,6 +207,9 @@ def main():
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/altair_config.ini")
 
+    # multiprocessing instance
+    pool = multiprocessing.Pool(ncpu)
+
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -195,7 +217,6 @@ def main():
     # subtract darks in parallel
     print("Subtracting darks with " + str(ncpu) + " CPUs...")
     do_dark_subt = DarkSubtSingle(config)
-    pool = multiprocessing.Pool(ncpu)
     pool.map(do_dark_subt, raw_00_name_array)
 
     # make a list of the dark-subtracted files
@@ -205,9 +226,13 @@ def main():
     # fix bad pixels in parallel
     print("Fixing bad pixels with " + str(ncpu) + " CPUs...")
     do_fixpix = FixPixSingle(config)
-    pool = multiprocessing.Pool(ncpu)
     pool.map(do_fixpix, darksubt_01_name_array)
 
     # make a list of the bad-pix-fixed files
     fixpixed_02_directory = str(config["data_dirs"]["DIR_PIXL_CORRTD"])
     fixpixed_02_name_array = list(glob.glob(os.path.join(fixpixed_02_directory, "*.fits")))
+
+    # subtract ramps in parallel
+    print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
+    do_ramp_subt = RemoveStrayRamp(config)
+    pool.map(do_ramp_subt, fixpixed_02_name_array)

@@ -72,8 +72,9 @@ def find_airy_psf(image):
     nanMask = np.where(np.isnan(image) == True)
     image[nanMask] = 0
     
-    # Gaussian filter
-    imageG = ndimage.filters.gaussian_filter(image, 6) # further remove effect of bad pixels (somewhat redundant?)
+    # Gaussian filter for further removing effect
+    # of bad pixels (somewhat redundant?)
+    imageG = ndimage.filters.gaussian_filter(image, 6) 
     loc = np.argwhere(imageG==np.max(imageG))
     cx = loc[0,1]
     cy = loc[0,0]
@@ -84,11 +85,13 @@ def find_airy_psf(image):
 # generate PCA vector elements representing channel bias changes
 # (This comes in when generating PCA basis of the background)
 def channels_PCA_cube():
-    
-    channel_vars_PCA = np.zeros((64,511,2048))
+
+    # 32 channels, each 64 pixels wide
+    total_channels = 32
+    channel_vars_PCA = np.zeros((total_channels,512,2048))
     
     # in each slice, make one channel ones and leave the other pixels zero
-    for chNum in range(0,64):
+    for chNum in range(0,total_channels):
         channel_vars_PCA[chNum,:,chNum*64:(chNum+1)*64] = 1.
         
     return channel_vars_PCA

@@ -10,7 +10,7 @@ Prepares the data: bad pixel masking, background-subtraction, etc.
 import multiprocessing
 import configparser
 import glob
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from regions import PixCoord, CircleSkyRegion, CirclePixelRegion, PolygonPixelRegion
@@ -97,9 +97,9 @@ class FixPixSingle:
         # read in the science frame from raw data directory
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
-        # fix bad pixels
+        # fix bad pixels (note conversion to 32-bit signed ints)
         sci_badnan = np.multiply(sci,self.badpix)
-        image_fixpixed = interpolate_replace_nans(array=sci_badnan, kernel=self.kernel)#.astype(np.int32)
+        image_fixpixed = interpolate_replace_nans(array=sci_badnan, kernel=self.kernel).astype(np.int32)
 
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "bad-pixel-fixed"
@@ -157,7 +157,7 @@ class RemoveStrayRamp:
         # (N.b., again, there will still be residual channel pedestals. These
         # are a mix of sky background and detector bias.)
         image_ramp_subted = np.subtract(sci,
-                                        np.tile(smoothed_stray_ramp,(np.shape(sci)[1],1)).T)
+                                        np.tile(smoothed_stray_ramp,(np.shape(sci)[1],1)).T).astype(np.float32)
 
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "ramp_removed"
@@ -375,7 +375,7 @@ class PCABackgroundSubtSingle:
                                 str("{:0>2d}".format(self.quad_choice))+
                                 '_seqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
                                 '_seqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+'.fits')
-        self.pca_cube = fits.getdata(cube_string,0,header=False)
+        self.pca_cube = fits.getdata(cube_string,0,header=False)#.astype(np.float32)
 
         # apply mask over weird detector regions to PCA cube
         #pca_cube = np.multiply(pca_cube,mask_weird)
@@ -399,7 +399,7 @@ class PCABackgroundSubtSingle:
         # define region
         psf_loc = find_airy_psf(sciImg) # center of science PSF
         print("PSF location in " + os.path.basename(abs_sci_name) + ": [" + str(psf_loc[0]) + ", " + str(psf_loc[1]) + "]")
-        radius = 30.
+        radius = 30. # radius around PSF that will be masked
         center = PixCoord(x=psf_loc[1], y=psf_loc[0])
         region = CirclePixelRegion(center, radius)
         mask_psf_region = region.to_mask()
@@ -417,23 +417,95 @@ class PCABackgroundSubtSingle:
         sciImg_psf_not_masked = np.subtract(sciImg,np.nanmedian(sciImg_masked)) # where PSF is not masked
         
         # apply the PSF mask to PCA slices, with which we will do the fitting
-        pca_cube_masked = np.multiply(pca_cube,psf_mask) 
+        pca_cube_masked = np.multiply(self.pca_cube,psf_mask) 
 
-        fits.writeto('junk_pca_cube_masked.fits', pca_cube_masked)
+        #fits.writeto('junk_pca_cube_masked.fits', pca_cube_masked.astype(np.float32))
 
-        #################
-        # add a line to the header indicating last reduction step
-        '''
+
+        ## PCA-decompose
+        
+        # flatten the science array and PCA cube 
+        pca_not_masked_1ds = np.reshape(self.pca_cube,(np.shape(self.pca_cube)[0],np.shape(self.pca_cube)[1]*np.shape(self.pca_cube)[2]))
+        sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_masked)[0]*np.shape(sciImg_masked)[1]))
+        pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
+    
+        ## remove nans from the linear algebra
+        
+        # indices of finite elements over a single flattened frame
+        idx = np.logical_and(np.isfinite(pca_masked_1ds[0,:]), np.isfinite(sci_masked_1d))
+        
+        # reconstitute only the finite elements together in another PCA cube and a science image
+        pca_masked_1ds_noNaN = np.nan*np.ones((len(pca_masked_1ds[:,0]),np.sum(idx))) # initialize array with slices the length of number of finite elements
+        for t in range(0,len(pca_masked_1ds[:,0])): # for each PCA component, populate the arrays without nans with the finite elements
+            pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
+        sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
+        sci_masked_1d_noNaN = sci_masked_1d[idx] 
+        
+        # the vector of component amplitudes
+        soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:self.n_PCA,:].T, sci_masked_1d_noNaN)
+        
+        # reconstruct the background based on that vector
+        # note that the PCA components WITHOUT masking of the PSF location is being
+        # used to reconstruct the background
+        recon_backgrnd_2d = np.dot(self.pca_cube[0:self.n_PCA,:,:].T, soln_vector[0]).T
+        
+        # do the actual subtraction
+        sciImg_subtracted = np.subtract(sciImg_psf_not_masked,recon_backgrnd_2d)
+
+        # add reduction step info to header
         header_sci["RED_STEP"] = "pca_background_subtracted"
+        
+        # save reconstructed background for checking
+        abs_recon_bkgd = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
+                                'recon_bkgd_quad_'+
+                                str("{:0>2d}".format(self.quad_choice))+
+                                '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
+                                '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+
+                                             os.path.basename(abs_sci_name))
+        fits.writeto(filename=abs_recon_bkgd,
+                     data=recon_backgrnd_2d,
+                     overwrite=True)
+        '''
+        # save masked science frame BEFORE background-subtraction
+        abs_masked_sci_before_bkd_subt = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
+                                'masked_sci_before_bkd_subt_quad_'+
+                                str("{:0>2d}".format(self.quad_choice))+
+                                '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
+                                '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+
+                                             os.path.basename(abs_sci_name))
+        fits.writeto(filename=abs_masked_sci_before_bkd_subt,
+                     data=sciImg_psf_masked,
+                     overwrite=True)
 
-        # write file out
-        abs_image_ramp_subted_name = str(self.config_data["data_dirs"]["DIR_RAMP_REMOVD"] + \
-                                        os.path.basename(abs_sci_name))
-        fits.writeto(filename=abs_image_ramp_subted_name,
-                     data=image_ramp_subtedpca_cube_masked,
+        # save masked, background-subtracted science frame
+        background_subtracted_masked = np.multiply(sciImg_subtracted,mask_weird)
+        background_subtracted_masked = np.multiply(background_subtracted_masked,psf_mask)
+        abs_masked_sci_after_bkd_subt = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
+                                'masked_sci_after_bkd_subt_quad_'+
+                                str("{:0>2d}".format(self.quad_choice))+
+                                '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
+                                '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+
+                                             os.path.basename(abs_sci_name))
+        fits.writeto(filename=abs_masked_sci_after_bkd_subt,
+                     data=background_subtracted_masked,
+                     overwrite=True)
+            
+        
+        # save background-subtracted science frame
+        sciImg_subtracted_name = str(self.config_data["data_dirs"]["DIR_PCAB_SUBTED"] +
+                                os.path.basename(abs_sci_name))
+        fits.writeto(filename=sciImg_subtracted_name,
+                     data=sciImg_subtracted,
                      header=header_sci,
                      overwrite=True)
-        print("Writing out ramp-removed-fixed frame " + os.path.basename(abs_image_ramp_subted_name))
+        print('Background-subtracted frame '+
+              os.path.basename(abs_sci_name)+
+              ' written out. PCA = '+str(self.n_PCA))
+        
+        print('Elapsed time:')
+        elapsed_time = time.time() - start_time
+        print('--------------------------------------------------------------')
+        print(elapsed_time)
         '''
 
     def return_array_one_block(sliceArray):
@@ -500,7 +572,6 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
-    '''
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -527,7 +598,6 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
-    '''
     
     # make a list of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
@@ -535,17 +605,16 @@ def main():
 
     # generate PCA cubes for backgrounds
     # (N.b. n_PCA needs to be larger that the number of frames being used)
-    '''
     pca_backg_maker = PCABackgroundCubeMaker(file_list = ramp_subted_03_name_array,
                                             n_PCA = 100) # create instance
     pca_backg_maker(start_frame_num = 9000,
                    stop_frame_num = 9099,
                    quad_choice = 2,
                    indiv_channel = True)
-    '''
     
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
     param_array = [9000, 9099, 4900, 100, 2]
     do_pca_back_subt = PCABackgroundSubtSingle(param_array, config)
-    pool.map(do_pca_back_subt, ramp_subted_03_name_array[0:5])
+    do_pca_back_subt(ramp_subted_03_name_array[0])
+    #pool.map(do_pca_back_subt, ramp_subted_03_name_array[0:5])

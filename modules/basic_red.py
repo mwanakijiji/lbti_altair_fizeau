@@ -10,7 +10,8 @@ Prepares the data: bad pixel masking, background-subtraction, etc.
 import multiprocessing
 import configparser
 import glob
-#import matplotlib.pyplot as plt
+import time
+import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from regions import PixCoord, CircleSkyRegion, CirclePixelRegion, PolygonPixelRegion
@@ -184,6 +185,8 @@ class PCABackgroundCubeMaker:
         INPUTS:
         file_list: list of filenames in the directory
         n_PCA: number of PCA components to save in the cube
+        -> (does NOT include possible separate components representing
+        -> individual channel variations)
         config_data: configuration data, as usual
         '''
 
@@ -355,7 +358,8 @@ class PCABackgroundSubtSingle:
         -> [0]: cube_start_framenum: starting frame number of the PCA component cube
         -> [1]: cube_stop_framenum: stopping frame number (inclusive)  "  "
         -> [2]: sci_framenum: science images to subtract from
-        -> [3]: n_PCA: number of PCA components to reconstruct the background with
+        -> [3]: n_PCA: number of PCA components to reconstruct the background with,
+        --------> out of the total number of components in the cube
         -> [4]: background quadrant choice (2 or 3)
         config_data: configuration data, as usual
         '''
@@ -378,7 +382,8 @@ class PCABackgroundSubtSingle:
         self.pca_cube = fits.getdata(cube_string,0,header=False)#.astype(np.float32)
 
         # apply mask over weird detector regions to PCA cube
-        #pca_cube = np.multiply(pca_cube,mask_weird)
+        # (N.b. otherwise the PCA wont converge!)
+        self.pca_cube = np.multiply(self.pca_cube,make_first_pass_mask(self.quad_choice))
     
     def __call__(self, abs_sci_name):
         '''
@@ -388,6 +393,9 @@ class PCABackgroundSubtSingle:
         abs_sci_name: science array filename
         '''
 
+        # start the timer
+        start_time = time.time()
+        
         # read in the science frame from raw data directory
         sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
@@ -417,10 +425,8 @@ class PCABackgroundSubtSingle:
         sciImg_psf_not_masked = np.subtract(sciImg,np.nanmedian(sciImg_masked)) # where PSF is not masked
         
         # apply the PSF mask to PCA slices, with which we will do the fitting
-        pca_cube_masked = np.multiply(self.pca_cube,psf_mask) 
-
-        #fits.writeto('junk_pca_cube_masked.fits', pca_cube_masked.astype(np.float32))
-
+        pca_cube_masked = np.multiply(self.pca_cube,psf_mask)
+        
 
         ## PCA-decompose
         
@@ -454,6 +460,11 @@ class PCABackgroundSubtSingle:
 
         # add reduction step info to header
         header_sci["RED_STEP"] = "pca_background_subtracted"
+
+        ## INCORPORATE MORE FANCY PLOTTING LIKE FROM THE PAST HERE
+        plt.plot(np.array(soln_vector[0]))
+        plt.savefig("junk.pdf")
+        plt.clf()
         
         # save reconstructed background for checking
         abs_recon_bkgd = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
@@ -465,7 +476,7 @@ class PCABackgroundSubtSingle:
         fits.writeto(filename=abs_recon_bkgd,
                      data=recon_backgrnd_2d,
                      overwrite=True)
-        '''
+        
         # save masked science frame BEFORE background-subtraction
         abs_masked_sci_before_bkd_subt = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'masked_sci_before_bkd_subt_quad_'+
@@ -478,7 +489,7 @@ class PCABackgroundSubtSingle:
                      overwrite=True)
 
         # save masked, background-subtracted science frame
-        background_subtracted_masked = np.multiply(sciImg_subtracted,mask_weird)
+        background_subtracted_masked = np.multiply(sciImg_subtracted,make_first_pass_mask(self.quad_choice))
         background_subtracted_masked = np.multiply(background_subtracted_masked,psf_mask)
         abs_masked_sci_after_bkd_subt = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'masked_sci_after_bkd_subt_quad_'+
@@ -506,7 +517,7 @@ class PCABackgroundSubtSingle:
         elapsed_time = time.time() - start_time
         print('--------------------------------------------------------------')
         print(elapsed_time)
-        '''
+        
 
     def return_array_one_block(sliceArray):
         '''
@@ -572,6 +583,7 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
+    '''
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -598,23 +610,28 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
+    '''
     
     # make a list of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
 
+    '''
     # generate PCA cubes for backgrounds
-    # (N.b. n_PCA needs to be larger that the number of frames being used)
+    # (N.b. n_PCA needs to be larger that the number of frames being used, and
+    # this number does NOT include possible elements representing individual
+    # channel bias variations)
     pca_backg_maker = PCABackgroundCubeMaker(file_list = ramp_subted_03_name_array,
-                                            n_PCA = 100) # create instance
+                                            n_PCA = 10) # create instance
     pca_backg_maker(start_frame_num = 9000,
                    stop_frame_num = 9099,
                    quad_choice = 2,
                    indiv_channel = True)
-    
+    '''
+                   
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
-    param_array = [9000, 9099, 4900, 100, 2]
+    param_array = [9000, 9099, 4900, 42, 2]
     do_pca_back_subt = PCABackgroundSubtSingle(param_array, config)
     do_pca_back_subt(ramp_subted_03_name_array[0])
     #pool.map(do_pca_back_subt, ramp_subted_03_name_array[0:5])

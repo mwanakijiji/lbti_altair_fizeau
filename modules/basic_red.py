@@ -331,6 +331,7 @@ class PCABackgroundCubeMaker:
                                 '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'.fits')
         fits.writeto(filename=abs_pca_cube_name,
                      data=pca_comp_cube,
+                     header=None,
                      overwrite=True)
         print("Wrote out background PCA cube " + os.path.basename(abs_pca_cube_name))
         
@@ -470,7 +471,7 @@ class PCABackgroundSubtSingle:
         sciImg_subtracted_channels_only_psf_masked = np.subtract(sciImg_psf_masked,
                                                                  np.multiply(recon_backgrnd_2d_channels_only_psf_masked,np.multiply(self.pca_cube,psf_mask))) 
 
-        # add reduction step info to header
+        # add last reduction step to header
         header_sci["RED_STEP"] = "pca_background_subtracted"
         
         # save reconstructed background for checking
@@ -697,6 +698,9 @@ class CookieCutout:
         cookie_cut_out = sciImg[psf_loc[0]-int(self.buffer_fac*self.ao_ctrl_pix):psf_loc[0]+int(self.buffer_fac*self.ao_ctrl_pix),
                                 psf_loc[1]-int(self.buffer_fac*self.ao_ctrl_pix):psf_loc[1]+int(self.buffer_fac*self.ao_ctrl_pix)]
 
+        # add a line to the header indicating last reduction step
+        header_sci["RED_STEP"] = "cookie_cutout"
+
         # write out
         print("Writing out squares of half-width " + str(self.buffer_fac)+\
               " of the control radius for " + os.path.basename(abs_sci_name))
@@ -704,6 +708,7 @@ class CookieCutout:
                                   os.path.basename(abs_sci_name))
         fits.writeto(filename=abs_cookie_subarray,
                      data=cookie_cut_out,
+                     header=header_sci,
                      overwrite=True)
         
     
@@ -780,8 +785,10 @@ def main():
     '''
     
     # make a list of the PCA-background-subtracted files
-    pcab_subted_05_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
-    pcab_subted_05_name_array = list(glob.glob(os.path.join(pcab_subted_05_directory, "*.fits")))
-    
+    pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
+    pcab_subted_04_name_array = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))
+
+    # make cookie cutouts of the PSFs
+    ## ## might add functionality to override the found 'center' of the PSF
     make_cookie_cuts = CookieCutout(quad_choice = 2)
-    pool.map(make_cookie_cuts, pcab_subted_05_name_array)    
+    pool.map(make_cookie_cuts, pcab_subted_04_name_array)    

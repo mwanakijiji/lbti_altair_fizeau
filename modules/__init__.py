@@ -10,12 +10,21 @@ import git
 import configparser
 import multiprocessing
 
+
+## SOME VARIABLES
 # number of CPUs for parallelization
 ncpu = multiprocessing.cpu_count()
 
 # configuration data
 config = configparser.ConfigParser() # for parsing values in .init file
-config.read("modules/altair_config.ini")
+config.read("modules/config.ini")
+
+# arcsec per radian
+global asec_per_rad
+asec_per_rad = np.divide(3600.*180.,np.pi)
+
+
+## FUNCTIONS
 
 def get_git_hash():
     '''

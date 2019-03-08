@@ -11,12 +11,15 @@ import multiprocessing
 import configparser
 import glob
 import time
-import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from regions import PixCoord, CircleSkyRegion, CirclePixelRegion, PolygonPixelRegion
 from sklearn.decomposition import PCA
 from modules import *
+
+import matplotlib
+matplotlib.use('agg') # avoids some crashes when multiprocessing
+import matplotlib.pyplot as plt
 
 
 class DarkSubtSingle:
@@ -148,11 +151,6 @@ class RemoveStrayRamp:
 
         # smooth it
         smoothed_stray_ramp = convolve(stray_ramp, gauss_kernel)
-
-        ## TEST HERE
-        #plt.plot(stray_ramp)
-        #plt.plot(smoothed_stray_ramp)
-        #plt.savefig('junk.png')
 
         # subtract from the whole array, after tiling across all pixels in x
         # (N.b., again, there will still be residual channel pedestals. These
@@ -357,10 +355,9 @@ class PCABackgroundSubtSingle:
         inputArray: a 1D array with 
         -> [0]: cube_start_framenum: starting frame number of the PCA component cube
         -> [1]: cube_stop_framenum: stopping frame number (inclusive)  "  "
-        -> [2]: sci_framenum: science images to subtract from
-        -> [3]: n_PCA: number of PCA components to reconstruct the background with,
+        -> [2]: n_PCA: number of PCA components to reconstruct the background with,
         --------> out of the total number of components in the cube
-        -> [4]: background quadrant choice (2 or 3)
+        -> [3]: background quadrant choice (2 or 3)
         config_data: configuration data, as usual
         '''
         
@@ -369,9 +366,8 @@ class PCABackgroundSubtSingle:
         # unpack values
         self.cube_start_framenum = inputArray[0]
         self.cube_stop_framenum = inputArray[1]
-        self.sci_framenum = inputArray[2]
-        self.n_PCA = inputArray[3]
-        self.quad_choice = inputArray[4]
+        self.n_PCA = inputArray[2]
+        self.quad_choice = inputArray[3]
 
         # read in PCA cube
         cube_string = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
@@ -401,7 +397,8 @@ class PCABackgroundSubtSingle:
 
         # apply mask over weird detector regions to science image
         sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
-
+        
+        
         ## mask the PSF
         
         # define region
@@ -418,7 +415,12 @@ class PCABackgroundSubtSingle:
         mask_psf_region.data[mask_psf_region.data == 0] = 1
         ##mask_psf_region.data[mask_psf_region.data == -99999] = 0 # have to avoid nans in the linear algebra
         psf_mask[mask_psf_region.bbox.slices] = mask_psf_region.data  # place the mask cutout (consisting only of 1s) onto the array of nans
-        sciImg_masked = np.multiply(sciImg,psf_mask) # this is now the masked science frame        
+
+        # I don't know why, but the sciImg nans in weird detector regions become zeros by this point, and I want them to stay nans
+        # so, re-apply the mask over the bad regions of the detector
+        sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
+        
+        sciImg_masked = np.multiply(sciImg,psf_mask) # this is now the masked science frame  
         
         # subtract the median (just a constant) from the remaining science image
         sciImg_psf_masked = np.subtract(sciImg_masked,np.nanmedian(sciImg_masked)) # where PSF is masked
@@ -426,7 +428,7 @@ class PCABackgroundSubtSingle:
         
         # apply the PSF mask to PCA slices, with which we will do the fitting
         pca_cube_masked = np.multiply(self.pca_cube,psf_mask)
-        
+
 
         ## PCA-decompose
         
@@ -454,17 +456,22 @@ class PCABackgroundSubtSingle:
         # note that the PCA components WITHOUT masking of the PSF location is being
         # used to reconstruct the background
         recon_backgrnd_2d = np.dot(self.pca_cube[0:self.n_PCA,:,:].T, soln_vector[0]).T
+        # now do the same, but for the channel bias variation contributions only (assumes 32 elements only)
+        recon_backgrnd_2d_channels_only_no_psf_masking = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # without PSF masking
+        recon_backgrnd_2d_channels_only_psf_masked = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # with PSF masking
         
-        # do the actual subtraction
+        # do the actual subtraction:
+        # all-background subtraction
         sciImg_subtracted = np.subtract(sciImg_psf_not_masked,recon_backgrnd_2d)
+        # background subtraction of channels only:
+        # without PSF masking
+        #sciImg_subtracted_channels_only_no_psf_masking = np.subtract(sciImg_psf_not_masked,recon_backgrnd_2d_channels_only)
+        # with PSF masking
+        sciImg_subtracted_channels_only_psf_masked = np.subtract(sciImg_psf_masked,
+                                                                 np.multiply(recon_backgrnd_2d_channels_only_psf_masked,np.multiply(self.pca_cube,psf_mask))) 
 
         # add reduction step info to header
         header_sci["RED_STEP"] = "pca_background_subtracted"
-
-        ## INCORPORATE MORE FANCY PLOTTING LIKE FROM THE PAST HERE
-        plt.plot(np.array(soln_vector[0]))
-        plt.savefig("junk.pdf")
-        plt.clf()
         
         # save reconstructed background for checking
         abs_recon_bkgd = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
@@ -512,6 +519,14 @@ class PCABackgroundSubtSingle:
         print('Background-subtracted frame '+
               os.path.basename(abs_sci_name)+
               ' written out. PCA = '+str(self.n_PCA))
+
+        ## make FYI plots of the effectiveness of the background subtraction
+        # (N.b. the PSF and weird detector regions are masked here)
+        self.vital_stats(file_base_name = str(os.path.basename(abs_sci_name)),
+                         sci_img_pre = sciImg_masked,
+                         sci_img_post_channel_subt = sciImg_subtracted_channels_only_psf_masked,
+                         sci_img_post_all_subt = background_subtracted_masked,
+                         pca_spec = soln_vector[0])
         
         print('Elapsed time:')
         elapsed_time = time.time() - start_time
@@ -519,7 +534,7 @@ class PCABackgroundSubtSingle:
         print(elapsed_time)
         
 
-    def return_array_one_block(sliceArray):
+    def return_array_one_block(self, sliceArray):
         '''
         This takes a 1D array with background frame range, science frame range, and N_PCA information
         and returns an expanded array where each row corresponds to a single science array
@@ -557,6 +572,79 @@ class PCABackgroundSubtSingle:
 
         return sliceArrayTiled2
 
+
+    def vital_stats(self, file_base_name, sci_img_pre, sci_img_post_channel_subt, sci_img_post_all_subt, pca_spec):
+        '''
+        Make a FYI plot of the PCA spectrum, and the noise levels before and after subtraction
+
+        INPUTS:
+        file_base_name: file base name (in the form of an os.path.basename)
+        sci_img_pre: science array, before background-subtraction
+        sci_img_post_channel_subt: science array, after subtraction of channel variations only
+        sci_img_post_all_subt: science array, after subtraction of the whole reconstructed background
+        pca_spec: the PCA spectrum, including the channel variations
+        -> N.b. for now it is assumed that the first 32 elements are the channel variations
+
+        RETURNS:
+        Saves plot of 5 subplots:
+        0. Histogram of counts before any background-subtraction
+        1. PCA spectrum of the background decomposition (channel bias variations only)
+        2. PCA spectrum of the background decomposition (noise from photons, read, etc.; no channel bias variations)
+        3. Histogram of counts after channel bias subtraction
+        4. Histogram of counts after channel bias and other noise subtraction
+        '''
+    
+        fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15,10))
+        
+        # Histogram of counts before any background-subtraction
+        array_ravelPre = np.ravel(sci_img_pre)
+        iiPre = np.isfinite(array_ravelPre)
+        axes[0,0].set_title('Pre-backgd subtraction\nMedian: '+str(np.nanmedian(sci_img_pre))+'\nStdev: '+str(np.nanstd(sci_img_pre)))
+        axes[0,0].hist(array_ravelPre[iiPre], bins=200)
+        axes[0,0].set_xlim([-1000,1000])
+
+        # PCA spectrum of the background decomposition (channel bias variations only)
+        axes[0,1].set_title('PCA Spec\n(channels)')
+        axes[0,1].plot(pca_spec)
+        axes[0,1].set_xlim([0,32])
+
+        # PCA spectrum of the background decomposition (noise from photons, read, etc.; no channel bias variations)
+        axes[0,2].set_title('PCA Spec\n(not incl. channels)')
+        axes[0,2].plot(pca_spec)
+        axes[0,2].set_xlim([32,len(pca_spec)])
+        axes[0,2].set_ylim([np.min(pca_spec[32:]),np.max(pca_spec[32:])])
+
+        # Histogram of counts after subtraction of background contributed by channel bias variations
+        array_ravelPost_channel_subt = np.ravel(sci_img_post_channel_subt)
+        iiiPost = np.isfinite(array_ravelPost_channel_subt)
+        axes[1,0].set_title('Post-channel background subtraction\nMedian: '+
+                          str(np.nanmedian(array_ravelPost_channel_subt))+
+                          '\nStdev: '+str(np.nanstd(array_ravelPost_channel_subt)))
+        axes[1,0].hist(array_ravelPost_channel_subt[iiiPost], bins=200)
+        axes[1,0].set_xlim([-1000,1000])
+
+        print('----------------------')
+        # some tests of regions where the background is not being oversubtracted due to the PSF
+        print('before any subt, '+file_base_name+': std='+str(np.nanstd(sci_img_pre[:,0:760]))+', med='+str(np.nanmedian(sci_img_pre[:,0:760])))
+        print('after channels only, '+file_base_name+': std='+str(np.nanstd(sci_img_post_channel_subt[:,0:760]))+', med='+str(np.nanmedian(sci_img_post_channel_subt[:,0:760])))
+        print('after all, '+file_base_name+': std='+str(np.nanstd(sci_img_post_all_subt[:,0:760]))+', med='+str(np.nanmedian(sci_img_post_all_subt[:,0:760])))
+
+        # Histogram of counts after BOTH channel bias and other noise subtraction
+        array_ravelPost_all_subt = np.ravel(sci_img_post_all_subt)
+        ivPost = np.isfinite(array_ravelPost_all_subt)
+        axes[1,1].set_title('Post-all background subtraction\nMedian: '+
+                          str(np.nanmedian(array_ravelPost_all_subt))+'\nStdev: '+
+                          str(np.nanstd(array_ravelPost_all_subt)))
+        axes[1,1].hist(array_ravelPost_all_subt[ivPost], bins=200)
+        axes[1,1].set_xlim([-1000,1000])
+
+        plt.suptitle("frame " + file_base_name )
+        plt.tight_layout()
+        abs_vital_stats_png = str(self.config_data["data_dirs"]["DIR_FYI_INFO"] +
+                                '/bkgd_subt_stats_' + file_base_name.split(".")[0] + '.png')
+        plt.savefig(abs_vital_stats_png)
+        plt.clf()
+
     
 class CalcNoise:
     '''
@@ -565,11 +653,60 @@ class CalcNoise:
 
     pass
 
+
 class CookieCutout:
     '''
     Cuts out region around PSF commensurate with the AO control radius
     '''
 
+    def __init__(self, quad_choice, config_data=config):
+
+        self.config_data = config_data
+
+        # determine approximate AO control radius r_c in detector pixels
+        # r_c = lambda/(2*d)
+        d = np.divide(np.float(self.config_data["instrum_params"]["D_1"]),
+                      np.float(self.config_data["instrum_params"]["N_SUBAP_DIAM"])) # intersubaperture spacing (m)
+        r_c = np.divide(np.float(self.config_data["observ_params"]["WAVEL_C_UM"]),2*d)*(10**-6)*asec_per_rad # r_c (m)
+        self.ao_ctrl_pix = np.divide(r_c,np.float(self.config_data["instrum_params"]["LMIR_PS"]))
+        self.buffer_fac = 0.5 # multiple of r_c we want to cut out around the PSF
+        ## ## (SMALL VALUE OF BUFFER IN PLACE FOR NOW, UNTIL I CHANGE THE METHOD OF BACKGROUND SUBTRACTION)
+        self.quad_choice = quad_choice
+
+    def __call__(self, abs_sci_name, quad_choice):
+        '''
+        Cut out the cookie around the PSF
+
+        INPUTS:
+        abs_sci_name: absolute science array filename
+        quad_choice: quadrant in which this PSF sits (2 or 3)
+        '''
+
+        print("AO control radius in pixels: " + str(self.ao_ctrl_pix))
+
+        # read in the science frame from raw data directory
+        sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
+
+        # apply mask over weird detector regions to science image
+        sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
+        
+        # with crude centering, cut out squares around that region
+        # (we'll center more carefully next)
+        psf_loc = find_airy_psf(sciImg)
+
+        cookie_cut_out = sciImg[psf_loc[0]-self.buffer_fac*self.ao_ctrl_pix:psf_loc[0]+self.buffer_fac*self.ao_ctrl_pix,
+                                psf_loc[1]-self.buffer_fac*self.ao_ctrl_pix:psf_loc[1]+self.buffer_fac*self.ao_ctrl_pix]
+
+        # write out
+        print("Writing out squares of half-width " + str(buffer_fac)+\
+              " of the control radius for " + os.path.basename(abs_sci_name))
+        abs_cookie_subarray = str(self.config_data["data_dirs"]["DIR_CUTOUTS"] + \
+                                  os.path.basename(abs_sci_name))
+        fits.writeto(filename=abs_recon_bkgd,
+                     data=cookie_cut_out,
+                     overwrite=True)
+        
+    
 
 def main():
     '''
@@ -578,7 +715,7 @@ def main():
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/altair_config.ini")
+    config.read("modules/config.ini")
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
@@ -628,10 +765,16 @@ def main():
                    quad_choice = 2,
                    indiv_channel = True)
     '''
-                   
+                      
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
-    param_array = [9000, 9099, 4900, 42, 2]
+    
+    # set up parameters of PCA background-subtraction:
+    # [0]: starting frame number of the PCA component cube
+    # [1]: stopping frame number (inclusive)  "  "
+    # [2]: total number of PCA components to reconstruct the background with
+    # [3]: background quadrant choice (2 or 3)
+    ## WILL NEED MORE PARAMETER ARRAYS FOR VARIOUS FRAME SEQUENCES
+    param_array = [9000, 9099, 42, 2]
     do_pca_back_subt = PCABackgroundSubtSingle(param_array, config)
-    do_pca_back_subt(ramp_subted_03_name_array[0])
-    #pool.map(do_pca_back_subt, ramp_subted_03_name_array[0:5])
+    pool.map(do_pca_back_subt, ramp_subted_03_name_array)

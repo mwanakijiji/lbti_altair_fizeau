@@ -4,13 +4,16 @@
 # In the meantime, FYI plots/tables are written out
 
 from modules import *
+from modules import basic_red, fits_hdr
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
-## ## BASIC REDUCTIONS
-
 ## ## FITS HEADER METADATA EXTRACTION
+fits_meta_data = fits_hdr.main()
+
+## ## BASIC REDUCTIONS
+basic_red.main()
 
 ## ## CENTERING OF PSFS
 

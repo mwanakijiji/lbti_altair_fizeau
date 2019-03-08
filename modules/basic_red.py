@@ -171,17 +171,20 @@ class RemoveStrayRamp:
         print("Writing out ramp-removed-fixed frame " + os.path.basename(abs_image_ramp_subted_name))
 
         
-class PCABackgroundCubeMaker:
+class BackgroundPCACubeMaker:
     '''
     Generates a PCA cube based on the backgrounds in the science frames.
     N.b. The user has to input a beginning and ending frame number for
     calculating a PCA basis (need to have common filter, integ time, etc.)
     '''
     
-    def __init__(self, file_list, n_PCA, config_data = config):
+    def __init__(self,
+                 file_list,
+                 n_PCA,
+                 config_data = config):
         '''
         INPUTS:
-        file_list: list of filenames in the directory
+        file_list: list of ALL filenames in the directory
         n_PCA: number of PCA components to save in the cube
         -> (does NOT include possible separate components representing
         -> individual channel variations)
@@ -274,48 +277,9 @@ class PCABackgroundCubeMaker:
                       np.subtract(training_cube_masked_weird[slice_num,:,ch_num*64:(ch_num+1)*64],
                                   np.nanmedian(training_cube_masked_weird[slice_num,:,ch_num*64:(ch_num+1)*64]))
 
-        # flatten each individual frame into a 1D array
-        print("Flattening the training cube...")
-        test_cube_1_1ds = np.reshape(training_cube_masked_weird,
-                                     (np.shape(training_cube_masked_weird)[0],
-                                      np.shape(training_cube_masked_weird)[1]*np.shape(training_cube_masked_weird)[2])
-                                      ) 
-
-        ## carefully remove nans before doing PCA
-
-        # indices of finite elements over a single flattened frame
-        idx = np.isfinite(test_cube_1_1ds[0,:])
-        
-        # reconstitute only the finite elements together in another PCA cube of 1D slices
-        training_set_1ds_noNaN = np.nan*np.ones((len(test_cube_1_1ds[:,0]),np.sum(idx))) # initialize
-        
-        # for each PCA component, populate the arrays without nans with the finite elements
-        for t in range(0,len(test_cube_1_1ds[:,0])): 
-            training_set_1ds_noNaN[t,:] = test_cube_1_1ds[t,idx]
-
-        # do PCA on the flattened `cube' with no NaNs
-        print("Doing PCA to make PCA basis cube...")
-        pca = PCA(n_components=self.n_PCA, svd_solver="randomized") # initialize object
-        #pca = RandomizedPCA(n_PCA) # for Python 2.7 
-        test_pca = pca.fit(training_set_1ds_noNaN) # calculate PCA basis set
-        del training_set_1ds_noNaN # clear memory
-
-        ## reinsert the NaN values into each 1D slice of the PCA basis set
-        
-        print('Putting PCA components into cube...')
-
-        # initialize a cube of 2D slices
-        pca_comp_cube = np.nan*np.ones((self.n_PCA,shape_img[0],shape_img[1]), dtype = np.float32)
-
-        # for each PCA component, populate the arrays without nans with the finite elements
-        for slicenum in range(0,self.n_PCA):
-            # initialize a new 1d frame long enough to contain all pixels
-            pca_masked_1dslice_noNaN = np.nan*np.ones((len(test_cube_1_1ds[0,:])))
-            # put the finite elements into the right positions
-            pca_masked_1dslice_noNaN[idx] = pca.components_[slicenum]
-            # put into the 2D cube
-            pca_comp_cube[slicenum,:,:] = pca_masked_1dslice_noNaN.reshape(shape_img[0],shape_img[1]).astype(np.float32)
-
+        # generate the PCA cube from the empirical background data
+        pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
+            
         # if we also want PCA slices for representing individual channel pedestal variations,
         # append slices representing each channel with ones
         if indiv_channel:
@@ -336,7 +300,7 @@ class PCABackgroundCubeMaker:
         print("Wrote out background PCA cube " + os.path.basename(abs_pca_cube_name))
         
         
-class PCABackgroundSubtSingle:
+class BackgroundPCASubtSingle:
     '''
     Does a PCA decomposition of the background of a given sequence of science frames,
     and subtracts it from each frame (N.b. remaining pedestal should be photons alone)
@@ -758,18 +722,18 @@ def main():
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
 
-    '''
     # generate PCA cubes for backgrounds
-    # (N.b. n_PCA needs to be larger that the number of frames being used, and
+    # (N.b. n_PCA needs to be smaller that the number of frames being used, and
     # this number does NOT include possible elements representing individual
     # channel bias variations)
-    pca_backg_maker = PCABackgroundCubeMaker(file_list = ramp_subted_03_name_array,
+    pca_backg_maker = BackgroundPCACubeMaker(file_list = ramp_subted_03_name_array,
                                             n_PCA = 10) # create instance
     pca_backg_maker(start_frame_num = 9000,
                    stop_frame_num = 9099,
                    quad_choice = 2,
                    indiv_channel = True)
-                      
+
+    '''                  
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
     
@@ -780,7 +744,7 @@ def main():
     # [3]: background quadrant choice (2 or 3)
     ## WILL NEED MORE PARAMETER ARRAYS FOR VARIOUS FRAME SEQUENCES
     param_array = [9000, 9099, 42, 2]
-    do_pca_back_subt = PCABackgroundSubtSingle(param_array, config)
+    do_pca_back_subt = BackgroundPCASubtSingle(param_array, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array)
     '''
     

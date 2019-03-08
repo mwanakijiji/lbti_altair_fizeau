@@ -9,6 +9,7 @@ from scipy import ndimage, sqrt, stats, misc, signal
 import git
 import configparser
 import multiprocessing
+from sklearn.decomposition import PCA
 
 
 ## SOME VARIABLES
@@ -34,6 +35,7 @@ def get_git_hash():
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
 
+    ## ## HAVENT FINISHED THIS YET
     print(sha)
 
     
@@ -53,9 +55,15 @@ def make_dirs():
             print("Made directory " + abs_path_name)
         
 
-# mask for weird regions of the detector where I don't care about the background subtraction
-# (This comes in when generating PCA basis of the background)
 def make_first_pass_mask(quadChoice):
+    '''
+    Make mask for weird regions of the detector where I don't care about the background subtraction
+    (This comes in when generating PCA basis of the background)
+
+    RETURNS:
+    mask_weird: array of nans and 1s for multiplying with the array to be masked
+    '''
+    
     mask_weird = np.ones((512,2048))
     mask_weird[0:10,:] = np.nan # edge
     mask_weird[-9:,:] = np.nan # edge
@@ -73,9 +81,14 @@ def make_first_pass_mask(quadChoice):
     return mask_weird
 
 
-# find star and return coordinates [y,x]
-# (This comes in when generating PCA basis of the background)
 def find_airy_psf(image):
+    '''
+    Find star and return coordinates [y,x]
+    (This comes in when generating PCA basis of the background)
+
+    RETURNS:
+    [cy, cx]: PSF center
+    '''
 
     # replace NaNs with zeros to get the Gaussian filter to work
     nanMask = np.where(np.isnan(image) == True)
@@ -91,9 +104,14 @@ def find_airy_psf(image):
     return [cy, cx]
 
 
-# generate PCA vector elements representing channel bias changes
-# (This comes in when generating PCA basis of the background)
 def channels_PCA_cube():
+    '''
+    Generate PCA vector elements representing channel bias changes
+    (This comes in when generating PCA basis of the background)
+
+    RETURNS:
+    channel_vars_PCA: cube of slices boolean-representing each channel
+    '''
 
     # 32 channels, each 64 pixels wide
     total_channels = 32
@@ -104,3 +122,63 @@ def channels_PCA_cube():
         channel_vars_PCA[chNum,:,chNum*64:(chNum+1)*64] = 1.
         
     return channel_vars_PCA
+
+
+def PCA_basis(training_cube_masked_weird, n_PCA):
+    '''
+    Return a PCA basis from a training cube
+
+    INPUTS:
+    training_cube_masked_weird: 3D cube of training images, with weird regions already masked
+    (N.b. This cube needs to have dimensions [num_images,y_extent,x_extent])
+
+    RETURNS:
+    pca_basis: the PCA basis
+    '''
+
+    # get shape for a single image
+    shape_img = np.shape(training_cube_masked_weird[0,:,:])
+    
+    # flatten each individual frame into a 1D array
+    print("Flattening the training cube...")
+    test_cube_1_1ds = np.reshape(training_cube_masked_weird,
+                                     (np.shape(training_cube_masked_weird)[0],
+                                      np.shape(training_cube_masked_weird)[1]*np.shape(training_cube_masked_weird)[2])
+                                      ) 
+
+    ## carefully remove nans before doing PCA
+
+    # indices of finite elements over a single flattened frame
+    idx = np.isfinite(test_cube_1_1ds[0,:])
+        
+    # reconstitute only the finite elements together in another PCA cube of 1D slices
+    training_set_1ds_noNaN = np.nan*np.ones((len(test_cube_1_1ds[:,0]),np.sum(idx))) # initialize
+        
+    # for each PCA component, populate the arrays without nans with the finite elements
+    for t in range(0,len(test_cube_1_1ds[:,0])): 
+        training_set_1ds_noNaN[t,:] = test_cube_1_1ds[t,idx]
+
+    # do PCA on the flattened `cube' with no NaNs
+    print("Doing PCA to make PCA basis cube...")
+    pca = PCA(n_components = n_PCA, svd_solver = "randomized") # initialize object
+    #pca = RandomizedPCA(n_PCA) # for Python 2.7 
+    test_pca = pca.fit(training_set_1ds_noNaN) # calculate PCA basis set
+    del training_set_1ds_noNaN # clear memory
+
+    ## reinsert the NaN values into each 1D slice of the PCA basis set
+        
+    print('Putting PCA components into cube...')
+
+    # initialize a cube of 2D slices
+    pca_comp_cube = np.nan*np.ones((n_PCA, shape_img[0], shape_img[1]), dtype = np.float32)
+
+    # for each PCA component, populate the arrays without nans with the finite elements
+    for slicenum in range(0,n_PCA):
+        # initialize a new 1d frame long enough to contain all pixels
+        pca_masked_1dslice_noNaN = np.nan*np.ones((len(test_cube_1_1ds[0,:])))
+        # put the finite elements into the right positions
+        pca_masked_1dslice_noNaN[idx] = pca.components_[slicenum]
+        # put into the 2D cube
+        pca_comp_cube[slicenum,:,:] = pca_masked_1dslice_noNaN.reshape(shape_img[0],shape_img[1]).astype(np.float32)
+
+    return pca_comp_cube

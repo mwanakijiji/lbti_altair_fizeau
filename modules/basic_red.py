@@ -673,7 +673,7 @@ class CookieCutout:
         ## ## (SMALL VALUE OF BUFFER IN PLACE FOR NOW, UNTIL I CHANGE THE METHOD OF BACKGROUND SUBTRACTION)
         self.quad_choice = quad_choice
 
-    def __call__(self, abs_sci_name, quad_choice):
+    def __call__(self, abs_sci_name):
         '''
         Cut out the cookie around the PSF
 
@@ -682,7 +682,7 @@ class CookieCutout:
         quad_choice: quadrant in which this PSF sits (2 or 3)
         '''
 
-        print("AO control radius in pixels: " + str(self.ao_ctrl_pix))
+        print("AO control radius in pixels: " + str(int(self.ao_ctrl_pix)))
 
         # read in the science frame from raw data directory
         sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
@@ -694,15 +694,15 @@ class CookieCutout:
         # (we'll center more carefully next)
         psf_loc = find_airy_psf(sciImg)
 
-        cookie_cut_out = sciImg[psf_loc[0]-self.buffer_fac*self.ao_ctrl_pix:psf_loc[0]+self.buffer_fac*self.ao_ctrl_pix,
-                                psf_loc[1]-self.buffer_fac*self.ao_ctrl_pix:psf_loc[1]+self.buffer_fac*self.ao_ctrl_pix]
+        cookie_cut_out = sciImg[psf_loc[0]-int(self.buffer_fac*self.ao_ctrl_pix):psf_loc[0]+int(self.buffer_fac*self.ao_ctrl_pix),
+                                psf_loc[1]-int(self.buffer_fac*self.ao_ctrl_pix):psf_loc[1]+int(self.buffer_fac*self.ao_ctrl_pix)]
 
         # write out
-        print("Writing out squares of half-width " + str(buffer_fac)+\
+        print("Writing out squares of half-width " + str(self.buffer_fac)+\
               " of the control radius for " + os.path.basename(abs_sci_name))
         abs_cookie_subarray = str(self.config_data["data_dirs"]["DIR_CUTOUTS"] + \
                                   os.path.basename(abs_sci_name))
-        fits.writeto(filename=abs_recon_bkgd,
+        fits.writeto(filename=abs_cookie_subarray,
                      data=cookie_cut_out,
                      overwrite=True)
         
@@ -764,7 +764,6 @@ def main():
                    stop_frame_num = 9099,
                    quad_choice = 2,
                    indiv_channel = True)
-    '''
                       
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
@@ -778,3 +777,11 @@ def main():
     param_array = [9000, 9099, 42, 2]
     do_pca_back_subt = PCABackgroundSubtSingle(param_array, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array)
+    '''
+    
+    # make a list of the PCA-background-subtracted files
+    pcab_subted_05_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
+    pcab_subted_05_name_array = list(glob.glob(os.path.join(pcab_subted_05_directory, "*.fits")))
+    
+    make_cookie_cuts = CookieCutout(quad_choice = 2)
+    pool.map(make_cookie_cuts, pcab_subted_05_name_array)    

@@ -4,7 +4,11 @@
 # In the meantime, FYI plots/tables are written out
 
 from modules import *
-from modules import basic_red, fits_hdr, centering, psf_pca_bases
+from modules import basic_red,\
+     fits_hdr, \
+     centering, \
+     psf_pca_bases, \
+     injection
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
@@ -22,6 +26,7 @@ centering.main()
 psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION
+injection.main()
 
 ## ## HOST REMOVAL
 

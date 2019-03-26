@@ -48,7 +48,7 @@ class PSFPCACubeMaker:
                  start_frame_num,
                  stop_frame_num):
         '''
-        Make PCA cube to reconstruct a PSF
+        Make PCA cube (for future step of reconstructing) a PSF
 
         INPUTS:
         start_frame_num: starting frame number to use in PCA basis generation
@@ -66,6 +66,7 @@ class PSFPCACubeMaker:
         #mask_weird = make_first_pass_mask(quad_choice) # make the right mask
         mask_weird = np.ones(shape_img)
 
+        # loop over frames to add them to training cube
         for frame_num in range(start_frame_num, stop_frame_num+1):
 
             # get name of file that this number corresponds to

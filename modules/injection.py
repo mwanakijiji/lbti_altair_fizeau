@@ -50,23 +50,25 @@ class FakePlanetInjector:
         INPUTS:
         '''
 
+        ###########################################
         # PCA-decompose the host star PSF
-        
+        # (be sure to mask the bad regions)
 
 
         
-        #
-
+        ###########################################
         # inject the fake planet
         # (parameters are:
         # [0]: angle east (in deg) from true north (i.e., after image derotation)
         # [1]: radius (in asec)
         # [2]: contrast ratio (A_star/A_planet, where A_star
         #            is from the PCA_reconstructed star, since the
-        #            empirical stellar PSF will be in saturation regime)
+        #            empirical stellar PSF will have saturated/nonlinear regions)
 
-
-
+        # from these parameters, make strings for the filename
+        str_fake_angle_e_of_n = str("{:0>5d}".format(int(100*fake_angle_e_of_n))) # 10.5 [deg] -> "01050" etc.
+        str_fake_radius = str("{:0>5d}".format(int(100*fake_radius))) # 5.05 [asec] -> "00505" etc. 
+        str_fake_contrast = str("{:0>5d}".format(int(100*np.abs(math.log10(fake_contrast))))) # 10^(-4) -> "00400" etc.
 
         # re-rotate image back to original PA
         
@@ -80,14 +82,17 @@ class FakePlanetInjector:
         # fake planet is injected
         #header_sci["FAKE_PLANET_PCA_SPECTRUM"] = 
 
-        # write file out
+        # write file out, with fake planet params in file name
         abs_image_cookie_centered_name = str(self.config_data["data_dirs"]["DIR_CENTERED"] + \
+                                             fake_angle_e_of_n + "_" + \
+                                             fake_radius + "_" + \
+                                             fake_contrast + "_" + \
                                              os.path.basename(abs_sci_name))
         fits.writeto(filename=abs_image_cookie_centered_name,
                      data=sci_shifted,
                      header=header_sci,
                      overwrite=True)
-        print("Writing out centered frame " + os.path.basename(abs_sci_name))
+        print("Writing out fake-planet-injected frame " + os.path.basename(abs_sci_name))
         
         
 

@@ -13,16 +13,21 @@ from modules import basic_red,\
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
+## ## MAKE NEEDED DIRECTORIES
+make_dirs()
+
 ## ## FITS HEADER METADATA EXTRACTION
+'''
 fits_meta_data = fits_hdr.main()
 
 ## ## BASIC REDUCTIONS
 basic_red.main()
+'''
 
 ## ## CENTERING OF PSFS
 centering.main()
 
-## ## PCA_BASIS GENERATION
+## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION

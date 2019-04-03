@@ -222,6 +222,10 @@ class BackgroundPCACubeMaker:
 
         mask_weird = make_first_pass_mask(quad_choice) # make the right mask
 
+        # initialize slice counter for removing unused slices later
+        slice_counter = 0
+
+        # loop over frames and add them to cube
         for frame_num in range(start_frame_num, stop_frame_num+1):
 
             # get name of file that this number corresponds to
@@ -235,7 +239,10 @@ class BackgroundPCACubeMaker:
                 sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
 
                 # add to cube
-                training_cube[frame_num-start_frame_num,:,:] = sci
+                training_cube[slice_counter,:,:] = sci
+
+                # advance counter
+                slice_counter += 1
 
             # if there was no match
             elif (len(abs_matching_file) == 0):
@@ -247,6 +254,9 @@ class BackgroundPCACubeMaker:
 
                 print("Something is amiss with your frame number choice.")
                 break
+
+        # remove the unused slices
+        training_cube = training_cube[0:slice_counter,:,:]
 
         # mask the raw training set
         training_cube_masked_weird = np.multiply(training_cube,mask_weird)
@@ -443,8 +453,8 @@ class BackgroundPCASubtSingle:
                                 'recon_bkgd_quad_'+
                                 str("{:0>2d}".format(self.quad_choice))+
                                 '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
-                                '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+
-                                             os.path.basename(abs_sci_name))
+                                '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+'_'+
+                                os.path.basename(abs_sci_name))
         fits.writeto(filename=abs_recon_bkgd,
                      data=recon_backgrnd_2d,
                      overwrite=True)

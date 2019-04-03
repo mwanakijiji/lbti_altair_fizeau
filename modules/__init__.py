@@ -161,7 +161,10 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     # do PCA on the flattened `cube' with no NaNs
     print("Doing PCA to make PCA basis cube...")
     pca = PCA(n_components = n_PCA, svd_solver = "randomized") # initialize object
-    #pca = RandomizedPCA(n_PCA) # for Python 2.7 
+    #pca = RandomizedPCA(n_PCA) # for Python 2.7
+    print('---a---')
+    print(np.isnan(training_set_1ds_noNaN).any())
+    print(training_set_1ds_noNaN)
     test_pca = pca.fit(training_set_1ds_noNaN) # calculate PCA basis set
     del training_set_1ds_noNaN # clear memory
 

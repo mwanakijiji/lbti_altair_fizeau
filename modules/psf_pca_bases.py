@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 class PSFPCACubeMaker:
     '''
     Make PCA bases of PSFs, in style of background PCA decomposition
-    but with different masks (or no masks), no subtraction of background
-    (i.e., it is assumed to be zero), and there is no consideration of
-    channel variations
+    but with different sizes, masks (or no masks), no subtraction of background
+    (i.e., it is assumed to already be subtracted away), and there is no
+    consideration of channel variations
 
     INHERITANCE:
     BackgroundPCACubeMaker
@@ -66,26 +66,35 @@ class PSFPCACubeMaker:
         #mask_weird = make_first_pass_mask(quad_choice) # make the right mask
         mask_weird = np.ones(shape_img)
 
+        # initialize slice counter for removing unused slices later
+        slice_counter = 0
+
         # loop over frames to add them to training cube
         for frame_num in range(start_frame_num, stop_frame_num+1):
 
+            print(frame_num)
             # get name of file that this number corresponds to
             abs_matching_file_array = [s for s in self.file_list if str("{:0>6d}".format(frame_num)) in s]
-            abs_matching_file = abs_matching_file_array[0] # get the name
             
             # if there was a match
-            if (len(abs_matching_file) != 0):
+            if (len(abs_matching_file_array) != 0):
 
                 # read in the science frame from raw data directory
+                abs_matching_file = abs_matching_file_array[0] # get the name
                 sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
 
                 # add to cube
-                training_cube[frame_num-start_frame_num,:,:] = sci
+                training_cube[slice_counter,:,:] = sci
+
+                # advance counter
+                slice_counter += 1
+
+                print(slice_counter)
 
             # if there was no match
-            elif (len(abs_matching_file) == 0):
+            elif (len(abs_matching_file_array) == 0):
 
-                print("Frame " + os.path.basename(abs_matching_file) + " not found.")
+                print("Frame " + str(frame_num) + " not found.")
 
             # if there were multiple matches
             else:
@@ -93,16 +102,25 @@ class PSFPCACubeMaker:
                 print("Something is amiss with your frame number choice.")
                 break
 
+        # remove the unused slices
+        training_cube = training_cube[0:slice_counter,:,:]
+
+        ## TEST: WRITE OUT
+        hdu = fits.PrimaryHDU(training_cube)
+        hdulist = fits.HDUList([hdu])
+        hdu.writeto("junk.fits", clobber=True)
+        ## END TEST
+            
         # mask the raw training set
-        training_cube_masked_weird = np.multiply(training_cube,mask_weird)
+        training_cube_masked_weird = np.multiply(training_cube, mask_weird)
         del training_cube
 
         # generate the PCA cube from the PSF data
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
         
         # write out the PCA vector cube
-        abs_pca_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
-                                'psf_PCA_vector_cookie_' +
+        abs_pca_cube_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                'psf_PCA_vector_cookie' +
                                 '_seqStart_'+str("{:0>6d}".format(start_frame_num))+
                                 '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'.fits')
         fits.writeto(filename=abs_pca_cube_name,
@@ -133,5 +151,5 @@ def main():
     ## WILL NEED MORE PARAMETER ARRAYS FOR VARIOUS FRAME SEQUENCES
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 10) # create instance
-    pca_psf_maker(start_frame_num = 9000,
-                   stop_frame_num = 9099)
+    pca_psf_maker(start_frame_num = 4900,
+                   stop_frame_num = 4919)

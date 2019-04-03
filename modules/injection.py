@@ -3,6 +3,9 @@ import configparser
 import glob
 import time
 import itertools
+import pandas as pd
+import pickle
+import math
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
@@ -30,6 +33,8 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     '''
     
     # apply mask over weird regions to PCA cube
+    print(type(pca_cube))
+    #print(type(mask_weird[0]))
     pca_cube_masked = np.multiply(pca_cube,mask_weird)
 
     # apply mask over weird detector regions to science image
@@ -85,14 +90,12 @@ class FakePlanetInjector:
     '''
 
     def __init__(self,
-                 file_list,
+                 fake_params_pre_permute,
                  n_PCA,
                  abs_PCA_name,
-                 fake_params_pre_permute,
                  config_data = config):
         '''
         INPUTS:
-        file_list: list of ALL filenames in the directory
         n_PCA: number of principal components to use
         abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
@@ -102,15 +105,14 @@ class FakePlanetInjector:
         config_data: configuration data, as usual
         '''
 
-        self.file_list = file_list
         self.n_PCA = n_PCA
         self.abs_PCA_name = abs_PCA_name
         self.config_data = config_data
 
         # read in the PCA vector cube for this series of frames
-        self.pca_cube_nosat, self.header_pca_cube_nosat = fits.getdata(self.abs_PCA_name, 0, header=True)
+        self.pca_basis_cube_unsat, self.header_pca_basis_cube_unsat = fits.getdata(self.abs_PCA_name, 0, header=True)
 
-        # permutate values to get all possible parameter combinations
+        # permutate values of fake planet parameters to get all possible combinations
         keys, values = zip(*fake_params_pre_permute.items())
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
@@ -118,13 +120,9 @@ class FakePlanetInjector:
         self.experiment_vector = pd.DataFrame(experiments)
         
         # convert radii in asec to pixels
-        self.experiment_vector["rad_pix"] = np.divide(self.experiment_vector["rad_asec"],lmir_ps)
-        self.experiment_vector["ampl_linear_abs"] = np.multiply(self.experiment_vector["ampl_linear_norm"],
-                                                   np.max(fit_sat["recon_2d"])) # maybe should do this after smoothing?
-
+        self.experiment_vector["rad_pix"] = np.divide(self.experiment_vector["rad_asec"],
+                                                      np.float(self.config_data["instrum_params"]["LMIR_PS"]))
         self.pos_info = polar_to_xy(self.experiment_vector)
-                                                   
-        self.ampl_host_star = np.max(fit_sat["recon_2d"]) # FYI for now
 
         
         ##########
@@ -140,6 +138,7 @@ class FakePlanetInjector:
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
         '''
 
+        print(abs_sci_name)
         # read in the cutout science frame
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
@@ -157,9 +156,28 @@ class FakePlanetInjector:
         # given this sci frame, retrieve the appropriate PCA frame
 
         # do the PCA fit of masked host star
-        # returns: the PCA best-fit vector, and the 2D reconstructed PSF
+        # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
         # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
         fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=100)
+
+        # get absolute amplitude of the host star
+        ampl_host_star = np.max(fit_unsat["recon_2d"])
+
+        ## ## is this line necessary?
+        #experiment_vector["ampl_linear_abs"] = np.multiply(self.experiment_vector["ampl_linear_norm"],
+        #                                                        np.max(fit_unsat["recon_2d"])) # maybe should do this after smoothing?
+
+        # pickle the PCA vector
+        pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,
+                        "pca_vector": fit_unsat["pca_vector"],
+                        "recons_2d_psf_unsat": fit_unsat["recon_2d"],
+                        "sci_image_name": abs_sci_name}
+        print(pickle_stuff)
+        pca_fit_pickle_write_name = str(self.config_data["data_dirs"]["DIR_PICKLE"]) \
+          + "pickle_pca_psf_info_" + str(os.path.basename(abs_sci_name).split(".")[0]) + ".pkl"
+        print(pca_fit_pickle_write_name)
+        with open(pca_fit_pickle_write_name, "wb") as f:
+            pickle.dump(pickle_stuff, f)
         
         ###########################################
         # inject the fake planet
@@ -170,58 +188,62 @@ class FakePlanetInjector:
         #            is from the PCA_reconstructed star, since the
         #            empirical stellar PSF will have saturated/nonlinear regions)
 
-        # from these parameters, make strings for the filename
-        str_fake_angle_e_of_n = str("{:0>5d}".format(int(100*fake_angle_e_of_n))) # 10.5 [deg] -> "01050" etc.
-        str_fake_radius = str("{:0>5d}".format(int(100*fake_radius))) # 5.05 [asec] -> "00505" etc. 
-        str_fake_contrast = str("{:0>5d}".format(int(100*np.a7UAZ bs(math.log10(fake_contrast))))) # 10^(-4) -> "00400" etc.
-
-        # find the injection angle, given the PA of the image
-        # (i.e., add angle east of true North, and parallactic angle; don't de-rotate the image)
-        angle_static_frame_injection = np.add(fake_angle_e_of_n,header_sci["LBT_PARA"])
-
-        ## inject the planet at the right position, amplitude (SEE inject_fake_planets_test1.ipynb)
-
+        ## ## (see inject_fake_planets_test1.ipynb)
         # loop over all elements in the parameter vector
         # (N.b. each element represents one fake planet)
         for elem_num in range(0,len(self.experiment_vector)):
+
+            print(self.experiment_vector)
+            
+            fake_angle_e_of_n_deg = self.experiment_vector["angle_deg"][elem_num]
+            fake_radius_asec = self.experiment_vector["rad_asec"][elem_num]
+            fake_contrast_rel = self.experiment_vector["ampl_linear_norm"][elem_num]
+
+            # from these parameters, make strings for the filename
+            str_fake_angle_e_of_n_deg = str("{:0>5d}".format(int(100*fake_angle_e_of_n_deg))) # 10.5 [deg] -> "01050" etc.
+            str_fake_radius_asec = str("{:0>5d}".format(int(100*fake_radius_asec))) # 5.05 [asec] -> "00505" etc. 
+            str_fake_contrast_rel = str("{:0>5d}".format(int(100*np.abs(math.log10(fake_contrast_rel))))) # 10^(-4) -> "00400" etc.
+
+            # find the injection angle, given the PA of the image
+            # (i.e., add angle east of true North, and parallactic angle; don't de-rotate the image)
+            angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,header_sci["LBT_PARA"])
+                
             # shift the image to the right location
             reconImg_shifted = scipy.ndimage.interpolation.shift(
                 fit_unsat["recon_2d"],
                 shift = [self.experiment_vector["y_pix_coord"][elem_num],
                          self.experiment_vector["x_pix_coord"][elem_num]]) # shift in +y,+x convention
+                         
             # multiply it to get the right amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.experiment_vector["ampl_linear_norm"][elem_num])
 
             # actually inject it
-            image_w_fake_planet = np.add(reconImg_shifted, ampl_norm*reconImg_shifted)
-
-            # write it out
-            ## ## do I actually want to write out a separate FITS file for each fake planet?
-
-            ## ## CURRENT LOCATION
-        
+            image_w_fake_planet = np.add(reconImg_shifted, reconImg_shifted_ampl)
+                    
             # add info to the header indicating last reduction step, and PCA info
             header_sci["RED_STEP"] = "fake_planet_injection"
 
             # PCA vector file with which the host star was decomposed
-            #header_sci["FAKE_PLANET_PCA_CUBE_FILE"] =
+            #header_sci["FAKE_PLANET_PCA_CUBE_FILE"] = os.path.basename(self.abs_PCA_name)
 
             # PCA spectrum of the host star using the above PCA vector, with which the
             # fake planet is injected
-            #header_sci["FAKE_PLANET_PCA_SPECTRUM"] =
+            #header_sci["FAKE_PLANET_PCA_SPECTRUM"] = 
 
             # write FITS file out, with fake planet params in file name
-            abs_image_cookie_centered_name = str(self.config_data["data_dirs"]["DIR_CENTERED"] + \
-                                             str_fake_angle_e_of_n + "_" + \
-                                             str_fake_radius + "_" + \
-                                             str_fake_contrast + "_" + \
-                                             os.path.basename(abs_sci_name))
-            fits.writeto(filename=abs_image_cookie_centered_name,
-                     data=sci_shifted,
-                     header=header_sci,
-                     overwrite=True)
-            print("Writing out fake-planet-injected frame " + os.path.basename(abs_sci_name))
+            ## ## do I actually want to write out a separate FITS file for each fake planet?
+            abs_image_w_fake_planet_name = str(self.config_data["data_dirs"]["DIR_FAKE_PSFS"] + \
+                                                 "fake_planet_" + \
+                                                 str_fake_angle_e_of_n_deg + "_" + \
+                                                 str_fake_radius_asec + "_" + \
+                                                 str_fake_contrast_rel + "_" + \
+                                                 os.path.basename(abs_sci_name))
+            fits.writeto(filename = abs_image_w_fake_planet_name,
+                     data = image_w_fake_planet,
+                     header = header_sci,
+                     overwrite = True)
+            print("Writing out fake-planet-injected frame " + os.path.basename(abs_image_w_fake_planet_name))
         
         
 
@@ -242,6 +264,18 @@ def main():
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
-    # 
-    inject_fake_psfs = FakePlanetInjector()
-    pool.map(inject_fake_psfs, cookies_06_name_array) 
+    # fake planet injection parameters
+    fake_params_pre_permute = {"angle_deg": [0., 60., 120.],\
+                               "rad_asec": [0.3, 0.4],\
+                               "ampl_linear_norm": [1., 0.9]}
+
+    # initialize and parallelize
+    ## ## generalize the retrieved PCA vector cube as function of science frame range later!
+    inject_fake_psfs = FakePlanetInjector(fake_params_pre_permute,
+                                          n_PCA = 100,
+                                          abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                          + "pca_cubes_psfs/" \
+                                          + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
+
+    inject_fake_psfs(cookies_centered_06_name_array[0])
+    #pool.map(inject_fake_psfs, cookies_centered_06_name_array[0:6])

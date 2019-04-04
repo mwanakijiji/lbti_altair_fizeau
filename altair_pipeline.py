@@ -22,7 +22,6 @@ fits_meta_data = fits_hdr.main()
 
 ## ## BASIC REDUCTIONS
 basic_red.main()
-'''
 
 ## ## CENTERING OF PSFS
 centering.main()
@@ -32,8 +31,10 @@ psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION
 injection.main()
+'''
 
 ## ## HOST REMOVAL
+host_removal.main()
 
 ## ## ADI: large radii, small radii
 

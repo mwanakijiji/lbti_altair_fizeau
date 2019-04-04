@@ -2,13 +2,9 @@ import multiprocessing
 import configparser
 import glob
 import time
-import itertools
-import pandas as pd
 import pickle
 import math
 from astropy.io import fits
-from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
-from astropy.modeling import models, fitting
 from modules import *
 
 # import the PCA machinery for making backgrounds
@@ -19,70 +15,7 @@ matplotlib.use('agg') # avoids some crashes when multiprocessing
 import matplotlib.pyplot as plt
 
 
-def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
-    '''
-    INPUTS:
-    pca_cube: cube of PCA components
-    img_string: full path name of the science image
-    sciImg: the science image
-    n_PCA: number of PCA components
-    
-    RETURNS:
-    pca spectrum: spectrum of PCA vector amplitudes
-    reconstructed PSF: host star PSF as reconstructed with N PCA vector components
-    '''
-    
-    # apply mask over weird regions to PCA cube
-    print(type(pca_cube))
-    #print(type(mask_weird[0]))
-    pca_cube_masked = np.multiply(pca_cube,mask_weird)
-
-    # apply mask over weird detector regions to science image
-    sciImg_psf_masked = np.multiply(sciImg,mask_weird)
-            
-    ## PCA-decompose
-        
-    # flatten the science array and PCA cube 
-    pca_not_masked_1ds = np.reshape(pca_cube,(np.shape(pca_cube)[0],np.shape(pca_cube)[1]*np.shape(pca_cube)[2]))
-    sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_psf_masked)[0]*np.shape(sciImg_psf_masked)[1]))
-    pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
-    
-    ## remove nans from the linear algebra
-        
-    # indices of finite elements over a single flattened frame
-    idx = np.logical_and(np.isfinite(pca_masked_1ds[0,:]), np.isfinite(sci_masked_1d)) 
-        
-    # reconstitute only the finite elements together in another PCA cube and a science image
-    pca_masked_1ds_noNaN = np.nan*np.ones((len(pca_masked_1ds[:,0]),np.sum(idx))) # initialize array with slices the length of number of finite elements
-    for t in range(0,len(pca_masked_1ds[:,0])): # for each PCA component, populate the arrays without nans with the finite elements
-        pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
-    sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
-    sci_masked_1d_noNaN = sci_masked_1d[idx] 
-        
-    # the vector of component amplitudes
-    soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:n_PCA,:].T, sci_masked_1d_noNaN)
-        
-    # reconstruct the background based on that vector
-    # note that the PCA components WITHOUT masking of the PSF location is being
-    # used to reconstruct the background
-    recon_2d = np.dot(pca_cube[0:n_PCA,:,:].T, soln_vector[0]).T
-    
-    d = {'pca_vector': soln_vector[0], 'recon_2d': recon_2d}
-    
-    return d
-
-
-def polar_to_xy(pos_info):
-    '''
-    Converts polar vectors (radians, pix) to xy vectors (pix, pix)
-    '''
-    pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],np.cos(np.multiply(pos_info["angle_deg"],np.pi/180.)))
-    pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],np.sin(np.multiply(pos_info["angle_deg"],np.pi/180.)))
-    
-    return pos_info
-
-
-class FakePlanetInjector:
+class HostRemoval:
     '''
     PCA-decompose host star PSF and inject fake planet PSFs,
     based on a grid of fake planet parameters
@@ -272,21 +205,26 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
     
-    # make a list of the centered cookie cutout files
-    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
+    # make a list of the images WITH fake planets
+    fake_planet_frames_07_directory = str(config["data_dirs"]["DIR_FAKE_PSFS"])
+    fake_planet_frames_07_name_array = list(glob.glob(os.path.join(fake_planet_frames_07_directory, "*.fits")))
 
-    # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg": [0., 60., 120.],\
-                               "rad_asec": [0.3, 0.4],\
-                               "ampl_linear_norm": [1., 0.9]}
+    # make a list of the images WITHOUT fake planets
+    # (these are just the centered frames)
+    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits"))) 
 
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
-    inject_fake_psfs = FakePlanetInjector(fake_params_pre_permute,
-                                          n_PCA = 100,
-                                          abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                          + "pca_cubes_psfs/" \
-                                          + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
+    host_removal = HostRemoval(n_PCA = 100,
+                               abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                               + "pca_cubes_psfs/" \
+                               + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
+                               
+    # remove the host from the frames WITH fake planets
+    host_removal(fake_planet_frames_07_name_array[0])
+    #pool.map(host_removal, fake_planet_frames_07_name_array[0:6])
 
-    pool.map(inject_fake_psfs, cookies_centered_06_name_array)
+    # remove the host from the frames WITHOUT fake planets
+    host_removal(cookies_centered_06_name_array[0])
+    #pool.map(host_removal, cookies_centered_06_name_array[0:6])

@@ -85,10 +85,10 @@ class HostRemoval:
         # do the PCA fit of masked host star
         # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
         # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
-        fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, no_mask, n_PCA=100)
+        fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
 
         # subtract the PCA-reconstructed host star
-        image_host_removed = np.subtract(sci,fit_unsat)
+        image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
 
         # pickle the PCA vector
         pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,
@@ -152,9 +152,9 @@ def main():
                                             + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
                                
     # remove the host from the frames WITH fake planets
-    host_removal_fake_planets(fake_planet_frames_07_name_array[0])
-    #pool.map(host_removal, fake_planet_frames_07_name_array[0:6])
+    ## ## host_removal_fake_planets(fake_planet_frames_07_name_array[0])
+    pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
 
     # remove the host from the frames WITHOUT fake planets
-    host_removal_no_fake_planets(cookies_centered_06_name_array[0])
-    #pool.map(host_removal, cookies_centered_06_name_array[0:6])
+    ## ## host_removal_no_fake_planets(cookies_centered_06_name_array[0])
+    pool.map(host_removal_no_fake_planets, cookies_centered_06_name_array)

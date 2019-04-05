@@ -8,7 +8,8 @@ from modules import basic_red,\
      fits_hdr, \
      centering, \
      psf_pca_bases, \
-     injection
+     injection, \
+     host_removal
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.

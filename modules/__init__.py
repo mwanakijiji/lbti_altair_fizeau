@@ -185,3 +185,56 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
         pca_comp_cube[slicenum,:,:] = pca_masked_1dslice_noNaN.reshape(shape_img[0],shape_img[1]).astype(np.float32)
 
     return pca_comp_cube
+
+
+def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
+    '''
+    INPUTS:
+    pca_cube: cube of PCA components
+    img_string: full path name of the science image
+    sciImg: the science image
+    n_PCA: number of PCA components
+    
+    RETURNS:
+    pca spectrum: spectrum of PCA vector amplitudes
+    reconstructed PSF: host star PSF as reconstructed with N PCA vector components
+    '''
+    
+    # apply mask over weird regions to PCA cube
+    print(type(pca_cube))
+    #print(type(mask_weird[0]))
+    pca_cube_masked = np.multiply(pca_cube,mask_weird)
+
+    # apply mask over weird detector regions to science image
+    sciImg_psf_masked = np.multiply(sciImg,mask_weird)
+            
+    ## PCA-decompose
+        
+    # flatten the science array and PCA cube 
+    pca_not_masked_1ds = np.reshape(pca_cube,(np.shape(pca_cube)[0],np.shape(pca_cube)[1]*np.shape(pca_cube)[2]))
+    sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_psf_masked)[0]*np.shape(sciImg_psf_masked)[1]))
+    pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
+    
+    ## remove nans from the linear algebra
+        
+    # indices of finite elements over a single flattened frame
+    idx = np.logical_and(np.isfinite(pca_masked_1ds[0,:]), np.isfinite(sci_masked_1d)) 
+        
+    # reconstitute only the finite elements together in another PCA cube and a science image
+    pca_masked_1ds_noNaN = np.nan*np.ones((len(pca_masked_1ds[:,0]),np.sum(idx))) # initialize array with slices the length of number of finite elements
+    for t in range(0,len(pca_masked_1ds[:,0])): # for each PCA component, populate the arrays without nans with the finite elements
+        pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
+    sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
+    sci_masked_1d_noNaN = sci_masked_1d[idx] 
+        
+    # the vector of component amplitudes
+    soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:n_PCA,:].T, sci_masked_1d_noNaN)
+        
+    # reconstruct the background based on that vector
+    # note that the PCA components WITHOUT masking of the PSF location is being
+    # used to reconstruct the background
+    recon_2d = np.dot(pca_cube[0:n_PCA,:,:].T, soln_vector[0]).T
+    
+    d = {'pca_vector': soln_vector[0], 'recon_2d': recon_2d}
+    
+    return d

@@ -26,13 +26,13 @@ basic_red.main()
 
 ## ## CENTERING OF PSFS
 centering.main()
+'''
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION
 injection.main()
-'''
 
 ## ## HOST REMOVAL
 host_removal.main()

@@ -209,7 +209,7 @@ class BackgroundPCACubeMaker:
         quad_choice: quadrant (1 to 4) of the array we are interested in making a background for
         -> N.b. the quadrant we're making the background with should NOT contain a PSF; when
         -> the background is reconstructed for a science frame, the background WITHOUT a psf
-        -> will be generated for a science fram quadrant that DOES contain a psf
+        -> will be generated for a science frame quadrant that DOES contain a psf
         indivChannel: do you want to append PCA components that involve individual channel pedestals?
         '''
 
@@ -307,6 +307,7 @@ class BackgroundPCACubeMaker:
                      data=pca_comp_cube,
                      header=None,
                      overwrite=True)
+        print("Wrote out background PCA cube " + str(abs_pca_cube_name))
         print("Wrote out background PCA cube " + os.path.basename(abs_pca_cube_name))
         
         
@@ -699,6 +700,8 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
+    import ipdb; ipdb.set_trace()
+
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -736,9 +739,17 @@ def main():
     # channel bias variations)
     pca_backg_maker = BackgroundPCACubeMaker(file_list = ramp_subted_03_name_array,
                                             n_PCA = 10) # create instance
+    
+    # make background PCA cube for PSFs in quadrant 1
     pca_backg_maker(start_frame_num = 9000,
                    stop_frame_num = 9099,
                    quad_choice = 2,
+                   indiv_channel = True)
+
+    # make background PCA cube for PSFs in quadrant 2
+    pca_backg_maker(start_frame_num = 6200,
+                   stop_frame_num = 6299,
+                   quad_choice = 3,
                    indiv_channel = True)
 
     '''                  

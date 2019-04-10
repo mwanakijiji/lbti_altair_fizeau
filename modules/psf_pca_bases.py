@@ -56,6 +56,7 @@ class PSFPCACubeMaker:
         '''
         
         # read in a first file to get the shape
+        print(self.file_list)
         test_img, header = fits.getdata(self.file_list[0], 0, header=True)
         shape_img = np.shape(test_img)
         

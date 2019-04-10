@@ -699,7 +699,6 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
-    '''
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -726,7 +725,6 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
-    '''
     
     # make a list of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])

@@ -253,7 +253,7 @@ class BackgroundPCACubeMaker:
             else:
 
                 print("Something is amiss with your frame number choice.")
-                break
+                return
 
         # remove the unused slices
         training_cube = training_cube[0:slice_counter,:,:]
@@ -390,7 +390,12 @@ class BackgroundPCASubtSingle:
         mask_psf_region.data[mask_psf_region.data == 1] = np.nan  # make zeros within mask cutout (but not in the mask itself) nans
         mask_psf_region.data[mask_psf_region.data == 0] = 1
         ##mask_psf_region.data[mask_psf_region.data == -99999] = 0 # have to avoid nans in the linear algebra
-        psf_mask[mask_psf_region.bbox.slices] = mask_psf_region.data  # place the mask cutout (consisting only of 1s) onto the array of nans
+        
+        try:
+            psf_mask[mask_psf_region.bbox.slices] = mask_psf_region.data  # place the mask cutout (consisting only of 1s) onto the array of nans
+        except:
+            print("Mask and cookie not same shape; skipping frame " + str(os.path.basename(abs_sci_name)))
+            return
 
         # I don't know why, but the sciImg nans in weird detector regions become zeros by this point, and I want them to stay nans
         # so, re-apply the mask over the bad regions of the detector
@@ -508,7 +513,7 @@ class BackgroundPCASubtSingle:
         elapsed_time = time.time() - start_time
         print('--------------------------------------------------------------')
         print(elapsed_time)
-        
+
 
     def return_array_one_block(self, sliceArray):
         '''
@@ -700,9 +705,8 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
-    import ipdb; ipdb.set_trace()
-
     # make a list of the raw files
+    '''
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
 
@@ -728,45 +732,71 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
-    
-    # make a list of the ramp-removed files
-    ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
-    ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
+    '''
 
+    # make lists of the ramp-removed files
+    ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
+    # all files in directory
+    ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
+    # assemble two lists of file names: 
+    # in the up nod (quadrant 2): 4259 - 7734
+    # in the down nod (quadrant 3): 7927 - 11408
+    # the below are for the up nod---
+    ramp_subted_03_name_array_000000_006999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[0-6]*.fits")))
+    ramp_subted_03_name_array_007000_007699 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_007[0-6]*.fits")))
+    ramp_subted_03_name_array_007700_007729 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_0077[0-2]*.fits")))
+    ramp_subted_03_name_array_007730_007734 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00773[0-4].fits")))
+    ramp_subted_03_name_array_nod_up = np.concatenate((ramp_subted_03_name_array_000000_006999,ramp_subted_03_name_array_007000_007699,ramp_subted_03_name_array_007700_007729,ramp_subted_03_name_array_007730_007734))
+    # the below are for the down nod---
+    ramp_subted_03_name_array_007927_007929 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00792[7-9].fits")))
+    ramp_subted_03_name_array_007930_007999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_0079[3-9]*.fits")))
+    ramp_subted_03_name_array_008000_009999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[8-9]*.fits")))
+    ramp_subted_03_name_array_010000_011408 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_01*.fits")))
+    ramp_subted_03_name_array_nod_down = np.concatenate((ramp_subted_03_name_array_007927_007929,ramp_subted_03_name_array_007930_007999,ramp_subted_03_name_array_008000_009999,ramp_subted_03_name_array_010000_011408))
+
+    '''
     # generate PCA cubes for backgrounds
     # (N.b. n_PCA needs to be smaller that the number of frames being used, and
     # this number does NOT include possible elements representing individual
     # channel bias variations)
     pca_backg_maker = BackgroundPCACubeMaker(file_list = ramp_subted_03_name_array,
                                             n_PCA = 10) # create instance
-    
-    # make background PCA cube for PSFs in quadrant 1
+
+    ## ## This is commented out for the time being to save time
+    # make background PCA cube for PSFs in quadrant 2
     pca_backg_maker(start_frame_num = 9000,
                    stop_frame_num = 9099,
                    quad_choice = 2,
                    indiv_channel = True)
 
-    # make background PCA cube for PSFs in quadrant 2
+    # make background PCA cube for PSFs in quadrant 3
     pca_backg_maker(start_frame_num = 6200,
                    stop_frame_num = 6299,
                    quad_choice = 3,
                    indiv_channel = True)
+    '''
 
-    '''                  
+
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
-    
+
     # set up parameters of PCA background-subtraction:
     # [0]: starting frame number of the PCA component cube
     # [1]: stopping frame number (inclusive)  "  "
-    # [2]: total number of PCA components to reconstruct the background with
+    # [2]: total number of PCA components to reconstruct the background with 
+    #      (usually 32 channel elements + 10 noise PCA elements)
     # [3]: background quadrant choice (2 or 3)
-    ## WILL NEED MORE PARAMETER ARRAYS FOR VARIOUS FRAME SEQUENCES
+
+    # science frames in the up nod (quadrant 2): 4259 - 7734
     param_array = [9000, 9099, 42, 2]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array, config)
-    pool.map(do_pca_back_subt, ramp_subted_03_name_array)
-    '''
-    
+    pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_up)
+
+    # science frames in the down nod (quadrant 3): 7927 - 11408
+    param_array = [6200, 6299, 42, 3]
+    do_pca_back_subt = BackgroundPCASubtSingle(param_array, config)
+    pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_down)
+
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
     pcab_subted_04_name_array = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))

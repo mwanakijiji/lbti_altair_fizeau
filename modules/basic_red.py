@@ -454,6 +454,8 @@ class BackgroundPCASubtSingle:
         # add last reduction step to header
         header_sci["RED_STEP"] = "pca_background_subtracted"
         
+        # write out frames (note that these are cast to 32-bit floats)
+
         # save reconstructed background for checking
         abs_recon_bkgd = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'recon_bkgd_quad_'+
@@ -461,8 +463,9 @@ class BackgroundPCASubtSingle:
                                 '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
                                 '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+'_'+
                                 os.path.basename(abs_sci_name))
+        print("Wrote reconstructed background for " + str(os.path.basename(abs_sci_name)))
         fits.writeto(filename=abs_recon_bkgd,
-                     data=recon_backgrnd_2d,
+                     data=recon_backgrnd_2d.astype(np.float32),
                      overwrite=True)
         
         # save masked science frame BEFORE background-subtraction
@@ -472,8 +475,9 @@ class BackgroundPCASubtSingle:
                                 '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
                                 '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+
                                              os.path.basename(abs_sci_name))
+        print("Wrote masked science frame pre-background subtraction for " + str(os.path.basename(abs_sci_name)))
         fits.writeto(filename=abs_masked_sci_before_bkd_subt,
-                     data=sciImg_psf_masked,
+                     data=sciImg_psf_masked.astype(np.float32),
                      overwrite=True)
 
         # save masked, background-subtracted science frame
@@ -485,8 +489,9 @@ class BackgroundPCASubtSingle:
                                 '_PCAseqStart_'+str("{:0>6d}".format(self.cube_start_framenum))+
                                 '_PCAseqStop_'+str("{:0>6d}".format(self.cube_stop_framenum))+
                                              os.path.basename(abs_sci_name))
+        print("Wrote masked, background-subtracted science frame " + str(os.path.basename(abs_sci_name)))
         fits.writeto(filename=abs_masked_sci_after_bkd_subt,
-                     data=background_subtracted_masked,
+                     data=background_subtracted_masked.astype(np.float32),
                      overwrite=True)
             
         
@@ -494,7 +499,7 @@ class BackgroundPCASubtSingle:
         sciImg_subtracted_name = str(self.config_data["data_dirs"]["DIR_PCAB_SUBTED"] +
                                 os.path.basename(abs_sci_name))
         fits.writeto(filename=sciImg_subtracted_name,
-                     data=sciImg_subtracted,
+                     data=sciImg_subtracted.astype(np.float32),
                      header=header_sci,
                      overwrite=True)
         print('Background-subtracted frame '+
@@ -738,15 +743,20 @@ def main():
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
     # all files in directory
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
+
     # assemble two lists of file names: 
     # in the up nod (quadrant 2): 4259 - 7734
     # in the down nod (quadrant 3): 7927 - 11408
+
     # the below are for the up nod---
     ramp_subted_03_name_array_000000_006999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[0-6]*.fits")))
     ramp_subted_03_name_array_007000_007699 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_007[0-6]*.fits")))
     ramp_subted_03_name_array_007700_007729 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_0077[0-2]*.fits")))
     ramp_subted_03_name_array_007730_007734 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00773[0-4].fits")))
     ramp_subted_03_name_array_nod_up = np.concatenate((ramp_subted_03_name_array_000000_006999,ramp_subted_03_name_array_007000_007699,ramp_subted_03_name_array_007700_007729,ramp_subted_03_name_array_007730_007734))
+    ## ## the below list made to process only files with numbers >6999 (the original is above)
+    #ramp_subted_03_name_array_nod_up = np.concatenate((ramp_subted_03_name_array_007000_007699,ramp_subted_03_name_array_007700_007729,ramp_subted_03_name_array_007730_007734))
+
     # the below are for the down nod---
     ramp_subted_03_name_array_007927_007929 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00792[7-9].fits")))
     ramp_subted_03_name_array_007930_007999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_0079[3-9]*.fits")))
@@ -797,6 +807,8 @@ def main():
     do_pca_back_subt = BackgroundPCASubtSingle(param_array, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_down)
 
+    ''' 
+    ## ## DO THIS STEP NEXT
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
     pcab_subted_04_name_array = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))
@@ -805,3 +817,4 @@ def main():
     ## ## might add functionality to override the found 'center' of the PSF
     make_cookie_cuts = CookieCutout(quad_choice = 2)
     pool.map(make_cookie_cuts, pcab_subted_04_name_array)    
+    '''

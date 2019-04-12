@@ -366,13 +366,18 @@ class BackgroundPCASubtSingle:
 
         # start the timer
         start_time = time.time()
+        import ipdb; ipdb.set_trace()
 
         # read in the science frame from raw data directory
         sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
+        print("std right after read-in: "+str(np.nanstd(sciImg)))
+        print(type(sciImg[0,0]))
+
         # apply mask over weird detector regions to science image
         sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
-
+        print("std after 1st mask: "+str(np.nanstd(sciImg)))
+        print(type(sciImg[0,0]))
 
         ## mask the PSF
 
@@ -396,24 +401,24 @@ class BackgroundPCASubtSingle:
             print("Mask and cookie not same shape; skipping frame " + str(os.path.basename(abs_sci_name)))
             return
 
+        print("std of sciImg before re-mult: "+str(np.nanstd(sciImg)))
+
         # I don't know why, but the sciImg nans in weird detector regions become zeros by this point, and I want them to stay nans
         # so, re-apply the mask over the bad regions of the detector
         sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
 
-        import ipdb; ipdb.set_trace()
         ##################
         # BEGIN BUG REGION
+        print("std of sciImg after re-mult: "+str(np.nanstd(sciImg)))
         sciImg_masked = np.multiply(sciImg,psf_mask) # this is now the masked science frame
-        import ipdb; ipdb.set_trace()
+        print("std of sciImg_masked: "+str(np.nanstd(sciImg_masked)))
 
         # subtract the median (just a constant) from the remaining science image
         sciImg_psf_masked = np.subtract(sciImg_masked,np.nanmedian(sciImg_masked)) # where PSF is masked
         sciImg_psf_not_masked = np.subtract(sciImg,np.nanmedian(sciImg_masked)) # where PSF is not masked
-        import ipdb; ipdb.set_trace()
 
         # apply the PSF mask to PCA slices, with which we will do the fitting
         pca_cube_masked = np.multiply(self.pca_cube,psf_mask)
-        import ipdb; ipdb.set_trace()
 
         ## PCA-decompose
 
@@ -421,7 +426,6 @@ class BackgroundPCASubtSingle:
         pca_not_masked_1ds = np.reshape(self.pca_cube,(np.shape(self.pca_cube)[0],np.shape(self.pca_cube)[1]*np.shape(self.pca_cube)[2]))
         sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_masked)[0]*np.shape(sciImg_masked)[1]))
         pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
-        import ipdb; ipdb.set_trace()
 
         ## remove nans from the linear algebra
 
@@ -434,11 +438,9 @@ class BackgroundPCASubtSingle:
             pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
         sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
         sci_masked_1d_noNaN = sci_masked_1d[idx]
-        import ipdb; ipdb.set_trace()
 
         # the vector of component amplitudes
         soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:self.n_PCA,:].T, sci_masked_1d_noNaN)
-        import ipdb; ipdb.set_trace()
         # END BUG REGION
         ###############
 
@@ -446,6 +448,7 @@ class BackgroundPCASubtSingle:
         # note that the PCA components WITHOUT masking of the PSF location is being
         # used to reconstruct the background
         recon_backgrnd_2d = np.dot(self.pca_cube[0:self.n_PCA,:,:].T, soln_vector[0]).T
+        import ipdb; ipdb.set_trace()
         # now do the same, but for the channel bias variation contributions only (assumes 32 elements only)
         recon_backgrnd_2d_channels_only_no_psf_masking = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # without PSF masking
         recon_backgrnd_2d_channels_only_psf_masked = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # with PSF masking
@@ -628,7 +631,6 @@ class BackgroundPCASubtSingle:
         print('after channels only, '+file_base_name+': std='+str(np.nanstd(sci_img_post_channel_subt[:,0:760]))+', med='+str(np.nanmedian(sci_img_post_channel_subt[:,0:760])))
         print('after all, '+file_base_name+': std='+str(np.nanstd(sci_img_post_all_subt[:,0:760]))+', med='+str(np.nanmedian(sci_img_post_all_subt[:,0:760])))
 
-        import ipdb; ipdb.set_trace()
         # Histogram of counts after BOTH channel bias and other noise subtraction
         array_ravelPost_all_subt = np.ravel(sci_img_post_all_subt)
         ivPost = np.isfinite(array_ravelPost_all_subt)
@@ -816,23 +818,24 @@ def main():
     param_array_up = [9000, 9099, 132, 2]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_up, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_up)
-
+    
     # science frames in the down nod (quadrant 3): 7927 - 11408
     param_array_down = [6200, 6299, 132, 3]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_down)
-
     '''
 
     ## ## TEST HERE
-    import ipdb; ipdb.set_trace()
-    param_array_up = [9000, 9099, 132, 2]
-    do_pca_back_subt = BackgroundPCASubtSingle(param_array_up, config)
-    do_pca_back_subt(ramp_subted_03_name_array_nod_up[0])
+    #import ipdb; ipdb.set_trace()
+    # PSF IN UP NOD HERE
+    #param_array_up = [9000, 9099, 132, 2]
+    #do_pca_back_subt = BackgroundPCASubtSingle(param_array_up, config)
+    #do_pca_back_subt(ramp_subted_03_name_array_nod_up[0])
 
+    # PSF IN DOWN NOD HERE
     param_array_down = [6200, 6299, 132, 3]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
-    do_pca_back_subt(ramp_subted_03_name_array_nod_down[0])
+    do_pca_back_subt(ramp_subted_03_name_array_nod_down[10])
     ## ## END TEST
 
 

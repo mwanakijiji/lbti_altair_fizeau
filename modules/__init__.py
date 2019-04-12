@@ -38,7 +38,7 @@ def get_git_hash():
     ## ## HAVENT FINISHED THIS YET
     print(sha)
 
-    
+
 def make_dirs():
     '''
     Make directories for housing files/info if they don't already exist
@@ -48,12 +48,12 @@ def make_dirs():
     for vals in config["data_dirs"]:
         abs_path_name = str(config["data_dirs"][vals])
         print("Directory exists: " + abs_path_name)
-        
+
         # if directory does not exist, create it
         if not os.path.exists(abs_path_name):
             os.makedirs(abs_path_name)
             print("Made directory " + abs_path_name)
-        
+
 
 def make_first_pass_mask(quadChoice):
     '''
@@ -63,8 +63,8 @@ def make_first_pass_mask(quadChoice):
     RETURNS:
     mask_weird: array of nans and 1s for multiplying with the array to be masked
     '''
-    
-    mask_weird = np.ones((512,2048))
+
+    mask_weird = np.ones((512,2048)).astype(np.float16)
     mask_weird[0:10,:] = np.nan # edge
     mask_weird[-9:,:] = np.nan # edge
     mask_weird[:,0:10] = np.nan # edge
@@ -77,7 +77,7 @@ def make_first_pass_mask(quadChoice):
         mask_weird[:260,:] = np.nan # get rid of whole bottom half
     if np.logical_and(quadChoice!=2,quadChoice!=3):
         print('No detector science quadrant chosen!')
-    
+
     return mask_weird
 
 
@@ -93,10 +93,10 @@ def find_airy_psf(image):
     # replace NaNs with zeros to get the Gaussian filter to work
     nanMask = np.where(np.isnan(image) == True)
     image[nanMask] = 0
-    
+
     # Gaussian filter for further removing effect
     # of bad pixels (somewhat redundant?)
-    imageG = ndimage.filters.gaussian_filter(image, 6) 
+    imageG = ndimage.filters.gaussian_filter(image, 6)
     loc = np.argwhere(imageG==np.max(imageG))
     cx = loc[0,1]
     cy = loc[0,0]
@@ -116,11 +116,11 @@ def channels_PCA_cube():
     # 32 channels, each 64 pixels wide
     total_channels = 32
     channel_vars_PCA = np.zeros((total_channels,512,2048))
-    
+
     # in each slice, make one channel ones and leave the other pixels zero
     for chNum in range(0,total_channels):
         channel_vars_PCA[chNum,:,chNum*64:(chNum+1)*64] = 1.
-        
+
     return channel_vars_PCA
 
 
@@ -138,24 +138,24 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
 
     # get shape for a single image
     shape_img = np.shape(training_cube_masked_weird[0,:,:])
-    
+
     # flatten each individual frame into a 1D array
     print("Flattening the training cube...")
     test_cube_1_1ds = np.reshape(training_cube_masked_weird,
                                      (np.shape(training_cube_masked_weird)[0],
                                       np.shape(training_cube_masked_weird)[1]*np.shape(training_cube_masked_weird)[2])
-                                      ) 
+                                      )
 
     ## carefully remove nans before doing PCA
 
     # indices of finite elements over a single flattened frame
     idx = np.isfinite(test_cube_1_1ds[0,:])
-        
+
     # reconstitute only the finite elements together in another PCA cube of 1D slices
     training_set_1ds_noNaN = np.nan*np.ones((len(test_cube_1_1ds[:,0]),np.sum(idx))) # initialize
-        
+
     # for each PCA component, populate the arrays without nans with the finite elements
-    for t in range(0,len(test_cube_1_1ds[:,0])): 
+    for t in range(0,len(test_cube_1_1ds[:,0])):
         training_set_1ds_noNaN[t,:] = test_cube_1_1ds[t,idx]
 
     # do PCA on the flattened `cube' with no NaNs

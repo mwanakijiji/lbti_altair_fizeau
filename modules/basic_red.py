@@ -220,7 +220,8 @@ class BackgroundPCACubeMaker:
         print("Initializing a PCA cube...")
         training_cube = np.nan*np.ones((stop_frame_num-start_frame_num+1,shape_img[0],shape_img[1]), dtype = np.int64)
 
-        mask_weird = make_first_pass_mask(quad_choice) # make the right mask
+        # commented out after changing the fcn machinery
+        #mask_weird = make_first_pass_mask(quad_choice) # make the right mask
 
         # initialize slice counter for removing unused slices later
         slice_counter = 0
@@ -259,14 +260,14 @@ class BackgroundPCACubeMaker:
         training_cube = training_cube[0:slice_counter,:,:]
 
         # mask the raw training set
-        training_cube_masked_weird = np.multiply(training_cube,mask_weird)
+        training_cube_masked_weird = mask_weird(training_cube,quad_choice)
         del training_cube
 
         ## at this point, test_cube holds the (masked) background frames to be used as a training set
 
         # find the 2D median across all background arrays, and subtract it from each individual background array
         # (N.b. the region of the PSF itself will look funny, but we'll mask this in due course)
-        median_2d_bckgrd = np.nanmedian(training_cube_masked_weird, axis=0)    
+        median_2d_bckgrd = np.nanmedian(training_cube_masked_weird, axis=0)
         for t in range(0,stop_frame_num-start_frame_num+1):
             training_cube_masked_weird[t,:,:] = np.subtract(training_cube_masked_weird[t,:,:],median_2d_bckgrd)
 
@@ -354,7 +355,7 @@ class BackgroundPCASubtSingle:
 
         # apply mask over weird detector regions to PCA cube
         # (N.b. otherwise the PCA wont converge!)
-        self.pca_cube = np.multiply(self.pca_cube,make_first_pass_mask(self.quad_choice))
+        self.pca_cube = make_first_pass_mask(self.pca_cube,self.quad_choice)
 
     def __call__(self, abs_sci_name):
         '''
@@ -366,7 +367,6 @@ class BackgroundPCASubtSingle:
 
         # start the timer
         start_time = time.time()
-        import ipdb; ipdb.set_trace()
 
         # read in the science frame from raw data directory
         sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
@@ -375,7 +375,7 @@ class BackgroundPCASubtSingle:
         print(type(sciImg[0,0]))
 
         # apply mask over weird detector regions to science image
-        sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
+        sciImg = make_first_pass_mask(sciImg,self.quad_choice)
         print("std after 1st mask: "+str(np.nanstd(sciImg)))
         print(type(sciImg[0,0]))
 
@@ -405,7 +405,7 @@ class BackgroundPCASubtSingle:
 
         # I don't know why, but the sciImg nans in weird detector regions become zeros by this point, and I want them to stay nans
         # so, re-apply the mask over the bad regions of the detector
-        sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
+        sciImg = make_first_pass_mask(sciImg,self.quad_choice)
 
         ##################
         # BEGIN BUG REGION
@@ -448,7 +448,7 @@ class BackgroundPCASubtSingle:
         # note that the PCA components WITHOUT masking of the PSF location is being
         # used to reconstruct the background
         recon_backgrnd_2d = np.dot(self.pca_cube[0:self.n_PCA,:,:].T, soln_vector[0]).T
-        import ipdb; ipdb.set_trace()
+
         # now do the same, but for the channel bias variation contributions only (assumes 32 elements only)
         recon_backgrnd_2d_channels_only_no_psf_masking = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # without PSF masking
         recon_backgrnd_2d_channels_only_psf_masked = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # with PSF masking
@@ -494,7 +494,7 @@ class BackgroundPCASubtSingle:
                      overwrite=True)
 
         # save masked, background-subtracted science frame
-        background_subtracted_masked = np.multiply(sciImg_subtracted,make_first_pass_mask(self.quad_choice))
+        background_subtracted_masked = make_first_pass_mask(sciImg_subtracted,self.quad_choice)
         background_subtracted_masked = np.multiply(background_subtracted_masked,psf_mask)
         abs_masked_sci_after_bkd_subt = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'masked_sci_after_bkd_subt_quad_'+
@@ -691,7 +691,7 @@ class CookieCutout:
         sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
         # apply mask over weird detector regions to science image
-        sciImg = np.multiply(sciImg, make_first_pass_mask(self.quad_choice))
+        sciImg = make_first_pass_mask(sciImg,self.quad_choice)
 
         # with crude centering, cut out squares around that region
         # (we'll center more carefully next)
@@ -818,12 +818,11 @@ def main():
     param_array_up = [9000, 9099, 132, 2]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_up, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_up)
-    
+    '''
     # science frames in the down nod (quadrant 3): 7927 - 11408
     param_array_down = [6200, 6299, 132, 3]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_down)
-    '''
 
     ## ## TEST HERE
     #import ipdb; ipdb.set_trace()
@@ -833,11 +832,10 @@ def main():
     #do_pca_back_subt(ramp_subted_03_name_array_nod_up[0])
 
     # PSF IN DOWN NOD HERE
-    param_array_down = [6200, 6299, 132, 3]
-    do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
-    do_pca_back_subt(ramp_subted_03_name_array_nod_down[10])
+    #param_array_down = [6200, 6299, 132, 3]
+    #do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
+    #do_pca_back_subt(ramp_subted_03_name_array_nod_down[10])
     ## ## END TEST
-
 
     '''
     ## ## DO THIS STEP NEXT

@@ -55,30 +55,53 @@ def make_dirs():
             print("Made directory " + abs_path_name)
 
 
-def make_first_pass_mask(quadChoice):
+def make_first_pass_mask(image, quadChoice):
     '''
     Make mask for weird regions of the detector where I don't care about the background subtraction
     (This comes in when generating PCA basis of the background)
+
+    INPUTS:
+    image: the 2D image to be masked
+    quadChoice: the quadrant the PSF is in (2 or 3, for Altair dataset)
 
     RETURNS:
     mask_weird: array of nans and 1s for multiplying with the array to be masked
     '''
 
-    mask_weird = np.ones((512,2048)).astype(np.float16)
-    mask_weird[0:10,:] = np.nan # edge
-    mask_weird[-9:,:] = np.nan # edge
-    mask_weird[:,0:10] = np.nan # edge
-    mask_weird[260:,1046:1258] = np.nan # bullet hole
-    mask_weird[:,1500:] = np.nan # unreliable bad pixel mask
-    mask_weird[:,:440] = np.nan # unreliable bad pixel mask
-    if quadChoice == 3: # if we want science on the third quadrant
-        mask_weird[260:,:] = np.nan # get rid of whole top half
-    if quadChoice == 2: # if we want science on the third quadrant
-        mask_weird[:260,:] = np.nan # get rid of whole bottom half
+    # if image is 2D
+    if (len(np.shape(image)) == 2):
+        image[0:10,:] = np.nan
+        image[-9:,:] = np.nan # edge
+        image[:,0:10] = np.nan # edge
+        image[260:,1046:1258] = np.nan # bullet hole
+        image[:,1500:] = np.nan # unreliable bad pixel mask
+        image[:,:440] = np.nan # unreliable bad pixel mask
+        if quadChoice == 3: # if we want science on the third quadrant
+            image[260:,:] = np.nan # get rid of whole top half
+        if quadChoice == 2: # if we want science on the third quadrant
+            image[:260,:] = np.nan # get rid of whole bottom half
+
+    elif (len(np.shape(image)) == 3):
+        image[:,0:10,:] = np.nan
+        image[:,-9:,:] = np.nan # edge
+        image[:,:,0:10] = np.nan # edge
+        image[:,260:,1046:1258] = np.nan # bullet hole
+        image[:,:,1500:] = np.nan # unreliable bad pixel mask
+        image[:,:,:440] = np.nan # unreliable bad pixel mask
+        if quadChoice == 3: # if we want science on the third quadrant
+            image[:,260:,:] = np.nan # get rid of whole top half
+        if quadChoice == 2: # if we want science on the third quadrant
+            image[:,:260,:] = np.nan # get rid of whole bottom half
+
+    # deal with a bug associated with 32-bit floats,
+    # where stray pixels (in my experience, just one) can be assigned value +-2.1474842e+09
+    # (left un-fixed, it screws up the whole PCA decomposition)
+    image[np.abs(image) > 1e+05] = 0
+
     if np.logical_and(quadChoice!=2,quadChoice!=3):
         print('No detector science quadrant chosen!')
 
-    return mask_weird
+    return image
 
 
 def find_airy_psf(image):
@@ -169,7 +192,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     del training_set_1ds_noNaN # clear memory
 
     ## reinsert the NaN values into each 1D slice of the PCA basis set
-        
+
     print('Putting PCA components into cube...')
 
     # initialize a cube of 2D slices
@@ -194,12 +217,12 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     img_string: full path name of the science image
     sciImg: the science image
     n_PCA: number of PCA components
-    
+
     RETURNS:
     pca spectrum: spectrum of PCA vector amplitudes
     reconstructed PSF: host star PSF as reconstructed with N PCA vector components
     '''
-    
+
     # apply mask over weird regions to PCA cube
     print(type(pca_cube))
     #print(type(mask_weird[0]))
@@ -207,34 +230,33 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
 
     # apply mask over weird detector regions to science image
     sciImg_psf_masked = np.multiply(sciImg,mask_weird)
-            
+
     ## PCA-decompose
-        
-    # flatten the science array and PCA cube 
+
+    # flatten the science array and PCA cube
     pca_not_masked_1ds = np.reshape(pca_cube,(np.shape(pca_cube)[0],np.shape(pca_cube)[1]*np.shape(pca_cube)[2]))
     sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_psf_masked)[0]*np.shape(sciImg_psf_masked)[1]))
     pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
-    
+
     ## remove nans from the linear algebra
-        
+
     # indices of finite elements over a single flattened frame
-    idx = np.logical_and(np.isfinite(pca_masked_1ds[0,:]), np.isfinite(sci_masked_1d)) 
-        
+    idx = np.logical_and(np.isfinite(pca_masked_1ds[0,:]), np.isfinite(sci_masked_1d))
+
     # reconstitute only the finite elements together in another PCA cube and a science image
     pca_masked_1ds_noNaN = np.nan*np.ones((len(pca_masked_1ds[:,0]),np.sum(idx))) # initialize array with slices the length of number of finite elements
     for t in range(0,len(pca_masked_1ds[:,0])): # for each PCA component, populate the arrays without nans with the finite elements
         pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
     sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
-    sci_masked_1d_noNaN = sci_masked_1d[idx] 
-        
+    sci_masked_1d_noNaN = sci_masked_1d[idx]
+
     # the vector of component amplitudes
     soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:n_PCA,:].T, sci_masked_1d_noNaN)
-        
     # reconstruct the background based on that vector
     # note that the PCA components WITHOUT masking of the PSF location is being
     # used to reconstruct the background
     recon_2d = np.dot(pca_cube[0:n_PCA,:,:].T, soln_vector[0]).T
-    
+
     d = {'pca_vector': soln_vector[0], 'recon_2d': recon_2d}
-    
+
     return d

@@ -368,6 +368,14 @@ class BackgroundPCASubtSingle:
         # start the timer
         start_time = time.time()
 
+        # destination file name of the background-subtracted array
+        sciImg_subtracted_name = str(self.config_data["data_dirs"]["DIR_PCAB_SUBTED"] + os.path.basename(abs_sci_name))
+
+        # this can be handy for not re-processing images already written out
+        #exists = os.path.isfile(sciImg_subtracted_name)
+        #if exists:
+        #    return
+
         # read in the science frame from raw data directory
         sciImg, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
@@ -407,8 +415,6 @@ class BackgroundPCASubtSingle:
         # so, re-apply the mask over the bad regions of the detector
         sciImg = make_first_pass_mask(sciImg,self.quad_choice)
 
-        ##################
-        # BEGIN BUG REGION
         print("std of sciImg after re-mult: "+str(np.nanstd(sciImg)))
         sciImg_masked = np.multiply(sciImg,psf_mask) # this is now the masked science frame
         print("std of sciImg_masked: "+str(np.nanstd(sciImg_masked)))
@@ -441,8 +447,6 @@ class BackgroundPCASubtSingle:
 
         # the vector of component amplitudes
         soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:self.n_PCA,:].T, sci_masked_1d_noNaN)
-        # END BUG REGION
-        ###############
 
         # reconstruct the background based on that vector
         # note that the PCA components WITHOUT masking of the PSF location is being
@@ -508,8 +512,6 @@ class BackgroundPCASubtSingle:
                      overwrite=True)
 
         # save background-subtracted science frame
-        sciImg_subtracted_name = str(self.config_data["data_dirs"]["DIR_PCAB_SUBTED"] +
-                                os.path.basename(abs_sci_name))
         fits.writeto(filename=sciImg_subtracted_name,
                      data=sciImg_subtracted.astype(np.float32),
                      header=header_sci,
@@ -814,11 +816,10 @@ def main():
     # [3]: background quadrant choice (2 or 3)
 
     # science frames in the up nod (quadrant 2): 4259 - 7734
-    '''
     param_array_up = [9000, 9099, 132, 2]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_up, config)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array_nod_up)
-    '''
+
     # science frames in the down nod (quadrant 3): 7927 - 11408
     param_array_down = [6200, 6299, 132, 3]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)

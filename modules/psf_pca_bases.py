@@ -142,7 +142,7 @@ def main():
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
-    
+
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))

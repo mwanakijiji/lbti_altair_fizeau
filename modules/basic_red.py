@@ -755,7 +755,6 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
-    '''
 
     # make lists of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
@@ -767,22 +766,17 @@ def main():
     # in the down nod (quadrant 3): 7927 - 11408
 
     # the below are for the up nod---
-    ramp_subted_03_name_array_000000_006999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[0-6]*.fits")))
-    ramp_subted_03_name_array_007000_007699 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_007[0-6]*.fits")))
-    ramp_subted_03_name_array_007700_007729 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_0077[0-2]*.fits")))
-    ramp_subted_03_name_array_007730_007734 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00773[0-4].fits")))
-    ramp_subted_03_name_array_nod_up = np.concatenate((ramp_subted_03_name_array_000000_006999,ramp_subted_03_name_array_007000_007699,ramp_subted_03_name_array_007700_007729,ramp_subted_03_name_array_007730_007734))
-    ## ## the below list made to process only files with numbers >6999 (the original is above)
-    #ramp_subted_03_name_array_nod_up = np.concatenate((ramp_subted_03_name_array_007000_007699,ramp_subted_03_name_array_007700_007729,ramp_subted_03_name_array_007730_007734))
+    ramp_subted_04_name_array_up = list(glob.glob(os.path.join(ramp_subted_04_directory, "*_00[0123456]*.fits")))
+    ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_007[0123456]*.fits")))
+    ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_0077[012]*.fits")))
+    ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_00773[01234]*.fits")))
 
-    # the below are for the down nod---
-    ramp_subted_03_name_array_007927_007929 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00792[7-9].fits")))
-    ramp_subted_03_name_array_007930_007999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_0079[3-9]*.fits")))
-    ramp_subted_03_name_array_008000_009999 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[8-9]*.fits")))
-    ramp_subted_03_name_array_010000_011408 = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_01*.fits")))
-    ramp_subted_03_name_array_nod_down = np.concatenate((ramp_subted_03_name_array_007927_007929,ramp_subted_03_name_array_007930_007999,ramp_subted_03_name_array_008000_009999,ramp_subted_03_name_array_010000_011408))
+    # the below are for the down nod--
+    ramp_subted_04_name_array_down = list(glob.glob(os.path.join(ramp_subted_04_directory, "*_00792[789]*.fits")))
+    ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_0079[3456789]*.fits")))
+    ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_00[89]*.fits")))
+    ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_01*.fits")))
 
-    '''
     ## ## COMMENTED OUT TO SAVE TIME
     # generate PCA cubes for backgrounds
     # (N.b. n_PCA needs to be smaller that the number of frames being used, and
@@ -803,7 +797,6 @@ def main():
                    stop_frame_num = 6299,
                    quad_choice = 3,
                    indiv_channel = True)
-    '''
 
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
@@ -837,15 +830,26 @@ def main():
     #do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
     #do_pca_back_subt(ramp_subted_03_name_array_nod_down[10])
     ## ## END TEST
-
     '''
+
     ## ## DO THIS STEP NEXT
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
-    pcab_subted_04_name_array = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))
+    pcab_subted_04_name_array_up = list(glob.glob(os.path.join(pcab_subted_04_directory, "*_00[0123456]*.fits")))
+    pcab_subted_04_name_array_up.extend(glob.glob(os.path.join(pcab_subted_04_directory, "*_007[0123456]*.fits")))
+    pcab_subted_04_name_array_up.extend(glob.glob(os.path.join(pcab_subted_04_directory, "*_0077[012]*.fits")))
+    pcab_subted_04_name_array_up.extend(glob.glob(os.path.join(pcab_subted_04_directory, "*_00773[01234]*.fits")))
+
+    pcab_subted_04_name_array_down = list(glob.glob(os.path.join(pcab_subted_04_directory, "*_00792[789]*.fits")))
+    pcab_subted_04_name_array_down.extend(glob.glob(os.path.join(pcab_subted_04_directory, "*_0079[3456789]*.fits")))
+    pcab_subted_04_name_array_down.extend(glob.glob(os.path.join(pcab_subted_04_directory, "*_00[89]*.fits")))
+    pcab_subted_04_name_array_down.extend(glob.glob(os.path.join(pcab_subted_04_directory, "*_01*.fits")))
 
     # make cookie cutouts of the PSFs
     ## ## might add functionality to override the found 'center' of the PSF
+    # up nod images
     make_cookie_cuts = CookieCutout(quad_choice = 2)
-    pool.map(make_cookie_cuts, pcab_subted_04_name_array)
-    '''
+    pool.map(make_cookie_cuts, pcab_subted_04_name_array_up)
+    # down nod images
+    make_cookie_cuts = CookieCutout(quad_choice = 3)
+    pool.map(make_cookie_cuts, pcab_subted_04_name_array_down)

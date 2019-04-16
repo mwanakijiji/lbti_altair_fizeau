@@ -673,7 +673,7 @@ class CookieCutout:
         d = np.divide(np.float(self.config_data["instrum_params"]["D_1"]),
                       np.float(self.config_data["instrum_params"]["N_SUBAP_DIAM"])) # intersubaperture spacing (m)
         r_c = np.divide(np.float(self.config_data["observ_params"]["WAVEL_C_UM"]),2*d)*(10**-6)*asec_per_rad # r_c (m)
-        self.ao_ctrl_pix = np.divide(r_c,np.float(self.config_data["instrum_params"]["LMIR_PS"]))
+        self.ao_ctrl_pix = np.divide(r_c,np.float(self.config_data["instrum_params"]["LMIR_PS"])) # r_c (pix)
         self.buffer_fac = 0.5 # multiple of r_c we want to cut out around the PSF
         ## ## (SMALL VALUE OF BUFFER IN PLACE FOR NOW, UNTIL I CHANGE THE METHOD OF BACKGROUND SUBTRACTION)
         self.quad_choice = quad_choice
@@ -729,7 +729,6 @@ def main():
     pool = multiprocessing.Pool(ncpu)
 
     # make a list of the raw files
-    '''
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
 
@@ -766,6 +765,7 @@ def main():
     # in the down nod (quadrant 3): 7927 - 11408
 
     # the below are for the up nod---
+    # (assembling this list is kind of awkward)
     ramp_subted_04_name_array_up = list(glob.glob(os.path.join(ramp_subted_04_directory, "*_00[0123456]*.fits")))
     ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_007[0123456]*.fits")))
     ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_0077[012]*.fits")))
@@ -777,7 +777,7 @@ def main():
     ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_00[89]*.fits")))
     ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_01*.fits")))
 
-    ## ## COMMENTED OUT TO SAVE TIME
+    ## ## CAN COMMENT THIS OUT TO SAVE TIME
     # generate PCA cubes for backgrounds
     # (N.b. n_PCA needs to be smaller that the number of frames being used, and
     # this number does NOT include possible elements representing individual
@@ -830,9 +830,7 @@ def main():
     #do_pca_back_subt = BackgroundPCASubtSingle(param_array_down, config)
     #do_pca_back_subt(ramp_subted_03_name_array_nod_down[10])
     ## ## END TEST
-    '''
 
-    ## ## DO THIS STEP NEXT
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
     pcab_subted_04_name_array_up = list(glob.glob(os.path.join(pcab_subted_04_directory, "*_00[0123456]*.fits")))

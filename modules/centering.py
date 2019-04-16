@@ -20,7 +20,7 @@ class Centering:
     def __init__(self, config_data=config):
 
         self.config_data = config_data
-        
+
 
     def __call__(self, abs_sci_name):
         '''
@@ -37,7 +37,7 @@ class Centering:
         # get coordinate grid info
         y, x = np.mgrid[0:np.shape(sci)[0],0:np.shape(sci)[1]]
         z = np.copy(sci)
-        
+
         # make an initial Gaussian guess
         p_init = models.Gaussian2D(amplitude=60000.,
                                    x_mean=np.float(0.5*np.shape(sci)[1]),
@@ -47,9 +47,13 @@ class Centering:
         fit_p = fitting.LevMarLSQFitter()
 
         # fit the data
-        p = fit_p(p_init, x, y, z)
-        ampl, x_mean, y_mean, x_stdev, y_stdev, theat = p._parameters
-        
+        try:
+            p = fit_p(p_init, x, y, z)
+            ampl, x_mean, y_mean, x_stdev, y_stdev, theat = p._parameters
+
+        except:
+            return
+
         # make FYI plots of the data with the best-fit model
         plt.clf()
         plt.figure(figsize=(8, 2.5))
@@ -69,7 +73,7 @@ class Centering:
         plt.savefig(abs_best_fit_gauss_png)
         plt.close()
         plt.clf()
-                
+
         # center the frame
         # N.b. for a 100x100 image, the physical center is at Python coordinate (49.5,49.5)
         # i.e., in between pixels 49 and 50 in both dimensions (Python convention),
@@ -79,7 +83,7 @@ class Centering:
 
         # shift in [+y,+x] convention
         sci_shifted = scipy.ndimage.interpolation.shift(sci, shift = [y_true_center-y_mean, x_true_center-x_mean])
-        
+
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_centered"
 

@@ -8,7 +8,7 @@ from astropy.io import fits
 from modules import *
 
 # import the PCA machinery for making backgrounds
-from .basic_red import BackgroundPCACubeMaker 
+from .basic_red import BackgroundPCACubeMaker
 
 import matplotlib
 matplotlib.use('agg') # avoids some crashes when multiprocessing
@@ -46,9 +46,9 @@ class HostRemoval:
         # saturated PSFs away)
         self.pca_basis_cube_sat, self.header_pca_basis_cube_sat = fits.getdata(self.abs_PCA_name, 0, header=True)
 
-        
+
         ##########
-        
+
 
     def __call__(self,
                  abs_sci_name):
@@ -61,7 +61,7 @@ class HostRemoval:
         '''
 
         print(abs_sci_name)
-        
+
         # read in the cutout science frame
         # (there should be no masking of this frame downstream)
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
@@ -77,15 +77,18 @@ class HostRemoval:
         #hdulist = fits.HDUList([hdu])
         #hdu.writeto("junk_mask.fits", clobber=True)
         ## END TEST
-        
+
         ###########################################
         # PCA-decompose the host star PSF
         # (note no de-rotation of the image here)
-        
+
         # do the PCA fit of masked host star
         # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
         # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
-        fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
+        try:
+            fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
+        except:
+            return
 
         # subtract the PCA-reconstructed host star
         image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
@@ -101,7 +104,7 @@ class HostRemoval:
         print(pca_fit_pickle_write_name)
         with open(pca_fit_pickle_write_name, "wb") as f:
             pickle.dump(pickle_stuff, f)
-                    
+
         # add info to the header indicating last reduction step, and PCA info
         header_sci["RED_STEP"] = "host_removed"
 
@@ -113,8 +116,8 @@ class HostRemoval:
                      header = header_sci,
                      overwrite = True)
         print("Writing out host_removed frame " + os.path.basename(abs_sci_name))
-        
-        
+
+
 
 
 def main():
@@ -128,33 +131,82 @@ def main():
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
-    
+
     # make a list of the images WITH fake planets
+    '''
     fake_planet_frames_07_directory = str(config["data_dirs"]["DIR_FAKE_PSFS"])
     fake_planet_frames_07_name_array = list(glob.glob(os.path.join(fake_planet_frames_07_directory, "*.fits")))
+    '''
 
     # make a list of the images WITHOUT fake planets
     # (these are just the centered frames)
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits"))) 
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
+    # separate by cube: A, B, C, or D
+    sci_frames_for_cube_A = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00560[012345678]*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00582[6789]*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[012]*.fits")))
+    sci_frames_for_cube_A.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00630[01]*.fits")))
+
+    sci_frames_for_cube_B = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_00630[3456789]*.fits")))
+    sci_frames_for_cube_B.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[45678]*.fits")))
+    sci_frames_for_cube_B.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0069[01]*.fits")))
+    sci_frames_for_cube_B.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00692[01]*.fits")))
+
+    sci_frames_for_cube_C = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0071[23456789]*.fits")))
+    sci_frames_for_cube_C.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_007[23456]*.fits")))
+    sci_frames_for_cube_C.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0077[012]*.fits")))
+    sci_frames_for_cube_C.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00773[01234]*.fits")))
+
+    sci_frames_for_cube_D = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_00792[789]*.fits")))
+    sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0079[3456789]*.fits")))
+    sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
+    sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_01*.fits")))
 
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
+    '''
     host_removal_fake_planets = HostRemoval(n_PCA = 100,
                                             outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
                                             abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                             + "pca_cubes_psfs/" \
                                             + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
-    host_removal_no_fake_planets = HostRemoval(n_PCA = 100,
+    '''
+    host_removal_no_fake_planets_A = HostRemoval(n_PCA = 100,
                                             outdir = config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"], \
                                             abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                             + "pca_cubes_psfs/" \
-                                            + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
-                               
+                                            + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits")
+
+    host_removal_no_fake_planets_B = HostRemoval(n_PCA = 100,
+                                            outdir = config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"], \
+                                            abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                            + "pca_cubes_psfs/" \
+                                            + "psf_PCA_vector_cookie_seqStart_006335_seqStop_006921.fits")
+
+    host_removal_no_fake_planets_C = HostRemoval(n_PCA = 100,
+                                            outdir = config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"], \
+                                            abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                            + "pca_cubes_psfs/" \
+                                            + "psf_PCA_vector_cookie_seqStart_007389_seqStop_007734.fits")
+
+    host_removal_no_fake_planets_D = HostRemoval(n_PCA = 100,
+                                            outdir = config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"], \
+                                            abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                            + "pca_cubes_psfs/" \
+                                            + "psf_PCA_vector_cookie_seqStart_008849_seqStop_009175.fits")
+
     # remove the host from the frames WITH fake planets
     ## ## host_removal_fake_planets(fake_planet_frames_07_name_array[0])
-    pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
+    #pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
 
     # remove the host from the frames WITHOUT fake planets
-    ## ## host_removal_no_fake_planets(cookies_centered_06_name_array[0])
-    pool.map(host_removal_no_fake_planets, cookies_centered_06_name_array)
+    ## ## host_removal_no_fake_planets(cookies_centered_06_directory[0])
+    pool.map(host_removal_no_fake_planets_A, sci_frames_for_cube_A)
+    pool.map(host_removal_no_fake_planets_B, sci_frames_for_cube_B)
+    pool.map(host_removal_no_fake_planets_C, sci_frames_for_cube_C)
+    pool.map(host_removal_no_fake_planets_D, sci_frames_for_cube_D)

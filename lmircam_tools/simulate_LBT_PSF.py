@@ -28,7 +28,7 @@ def lbt_aperture2(deltaspacing,N_pix,D):
     #N_pix = 2048 # samples across the aperture image
     #D = 8.25 # M1 diameter, in m
     padfactor = N_pix*deltaspacing/D
-    
+
     centerx=(D*padfactor/deltaspacing)/2.0 #pixels
     centery=(D*padfactor/deltaspacing)/2.0 #pixels
     lenx = D*padfactor/deltaspacing #pixels
@@ -49,9 +49,9 @@ def lbt_aperture2(deltaspacing,N_pix,D):
     rrdx= np.sqrt(xdx**2+yy**2)
     sxAperture=rrsx<D/2.0
     dxAperture=rrdx<D/2.0
-   
+
     LBTAperture = sxAperture + dxAperture
-    
+
     return centerx, centery, sxAperture, dxAperture, LBTAperture, deltaspacing
 
 ###################################
@@ -62,26 +62,26 @@ def make_psf(sxAperture, dxAperture, phase, wavel, centerx, centery, tip_asec, t
 
     # aperture plate scale has to be re-computed for every wavelength
     aperturePlateScale = 9416.20*wavel
-    
+
     # make phase screen for injecting relative tip-tilt
     phaseScreenIndicesUnnormzed = np.indices(np.shape(sxAperture)) # use indices to make screen
     # if the tip (or tilt) value in the aperture center is zero, what value
     tip_unnormzed = aperturePlateScale*phaseScreenIndicesUnnormzed[0]*tip_asec/206264.806 # small angle approx for np.tan(tip_asec/206264.806)
     tilt_unnormzed = aperturePlateScale*phaseScreenIndicesUnnormzed[1]*tilt_asec/206264.806 
-    
+
     tipDXavg = np.mean(tip_unnormzed[np.where(dxAperture)]) #  mean value of the tip/tilt in the DX aperture
     tiltDXavg = np.mean(tilt_unnormzed[np.where(dxAperture)])
-    
+
     tip = np.divide(np.subtract(tip_unnormzed,tipDXavg),wavel) # make the OPD from tip equal zero at the center in the DX aperture, and don't forget to divide by lambda
     tilt = np.divide(np.subtract(tilt_unnormzed,tiltDXavg),wavel) # make piston-neutral and div by lambda
 
     phaseScreen = np.add(tip,tilt) # adds x- and y- components of screen, i.e., tip and tilt
-    
+
     sxAperturephase = np.multiply(1.0, sxAperture)
     dxAperturephase = np.multiply(dxAperture, np.exp(1.j * 2 * np.pi * np.add(phase,phaseScreen))) # phase: for OPD; phaseScreen: for tip-tilt
-    
+
     LBTAperturephase = sxAperturephase + dxAperturephase
-    
+
     FTAp = np.fft.fft2(LBTAperturephase)
     FTAp = np.fft.fftshift(FTAp)
 
@@ -96,7 +96,7 @@ def psf_sim(parameters):
     # diff_tip and diff_tilt in asec
     # transl in pixels
 
-    
+
     start_time = time.time()
 
     monochromatic = False
@@ -104,7 +104,7 @@ def psf_sim(parameters):
         wavel = 3.87e-6 # m (monochromatic)
     else:
         wavel = np.linspace(3.4,4.0,num=10)*1e-6 # (polychromatic)
-    
+
     plateScale_LMIR = 0.0107 # in asec/pix
     N_pix = 2048 # number of pixels across the input and output arrays
     D = 8.25 # effective M1 diameter, in m
@@ -115,20 +115,20 @@ def psf_sim(parameters):
     diff_tip = parameters[1]
     diff_tilt = parameters[2]
     transl = parameters[3]
-    
+
     # dictionary of psf stats
     psf_stats = {'OPD': [], 'tip': [], 'tilt': [], 'translation': [],
              'centerlobe_ampl': [], 'sidelobe_ampl': [],
              'centerlobe_phase_deg': [], 'sidelobe_phase_deg': [],
              'PSF_image': [], 'FTamp_image': [], 'FTphase_image': [],
              'freq_x_axis_shifted': [], 'freq_y_axis_shifted': []} 
-    
+
     phase = opd/wavel # this is a float (monochrom) or array (polychrom)
-    
+
     # INJECT RELATIVE TIP-TILT
     tip_asec = diff_tip
     tilt_asec = diff_tilt
-        
+
     # create mono- or polychromatic PSF
     if monochromatic: # wavel just has 1 value
         deltaSpacing = 9412.639*wavel # sampling rate in pupil plane (m/pix)
@@ -153,7 +153,7 @@ def psf_sim(parameters):
     padI_no_fft_shift_0 = padI # needed for plotting later
     padI = np.fft.fftshift(padI)
 
-    
+
     # INJECT PSF TRANSLATION
     #if any_y_translation: # fixed y-translation
     #    transl_y = 1.0
@@ -172,12 +172,12 @@ def psf_sim(parameters):
     print('Tilt: '+str(tilt_asec)+' asec')
     print('Translation in x: '+str(transl)+' pix')
     print('Translation in y: '+str(transl_y)+' pix')
-                
+
     # now extract results from the PSF...
-                
+
     PhaseExtract = np.fft.fft2(padI)
     PhaseExtract = np.fft.fftshift(PhaseExtract)
-    
+
     AmpPE = np.absolute(PhaseExtract)
     ArgPE = np.angle(PhaseExtract)
     ArgPE_deg = ArgPE*180./np.pi
@@ -189,19 +189,19 @@ def psf_sim(parameters):
     center_ampl = np.max(ma.masked_array(AmpPE, mask=mask_center))
     # side lobe of FT amplitude
     side_ampl = np.max(ma.masked_array(AmpPE, mask=mask_right))
-    
+
     # find phase value at center and side lobe
-    
+
     # ... central lobe of FT amplitude
     CenterPhase_deg = np.ma.median(ma.masked_array(ArgPE_deg, mask=mask_center))
     sidelobe_phase_deg = np.ma.median(ma.masked_array(ArgPE_deg, mask=mask_right))
-    
+
     # get the axes right
     freq_x_axis = np.fft.fftfreq(np.shape(I)[1]) # frequency axes (in pix^-1)
     freq_y_axis = np.fft.fftfreq(np.shape(I)[0])
     freq_x_axis_shifted = np.fft.fftshift(freq_x_axis) 
     freq_y_axis_shifted = np.fft.fftshift(freq_y_axis)
-    
+
     # store stats and images
     psf_stats['OPD'] = opd
     psf_stats['translation'] = transl
@@ -253,12 +253,12 @@ def main():
     ## USER INPUTS
 
     opd_start = 0.0e-6
-    #opd_stop = 0.0e-6
-    opd_stop = 50.0e-6 # inclusive
+    opd_stop = 0.0e-6
+    #opd_stop = 50.0e-6 # inclusive
     opd_increment = 0.5e-6 # change in OPD at each step; in m
 
     tilt_start = 0.0
-    tilt_stop = 0.0 # asec 
+    tilt_stop = 0.1 # asec 
     tilt_increment = 0.01
 
     tip_start = 0.

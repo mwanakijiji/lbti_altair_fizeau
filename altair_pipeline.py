@@ -35,14 +35,14 @@ psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION
 injection.main()
-'''
 
 ## ## HOST REMOVAL
 host_removal.main()
-
+'''
 ## ## ADI: large radii, small radii
 
 ## ## DETECTION
+detection.main()
 
 ## ## ORBITAL PARAMETER FORWARD MODELING
 

@@ -10,7 +10,8 @@ from modules import \
      centering, \
      psf_pca_bases, \
      injection, \
-     host_removal
+     host_removal, \
+     detection
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.

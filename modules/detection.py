@@ -4,6 +4,7 @@ import glob
 import time
 import pickle
 import math
+import pandas as pd
 from astropy.io import fits
 from modules import *
 
@@ -74,7 +75,7 @@ def circ_mask(input_array, mask_center, mask_radius, invert=False):
 
 class Median:
     '''
-    Derotate frames, take median
+    Derotate frames in series, take median
     '''
 
     def __init__(self,
@@ -90,10 +91,9 @@ class Median:
         ##########
 
 
-    def __call__(self,
-                 abs_sci_name_array):
+    def __call__(self,abs_sci_name_array):
         '''
-        Detect companions, for a single frame so as to parallelize the job
+        Make the stack and take median
 
         INPUTS:
 
@@ -151,18 +151,16 @@ class Detection:
 
         # read in the single frame produced by previous module
         ## ## REPLACE FILENAME HERE WITH CONFIG PARAM
-        self.master_frame, self.header = fits.getdata("junk_median.fits")
+        self.master_frame = fits.getdata("junk_median.fits")
 
         # radius of aperture around planet candidate (pix)
         comp_rad = 10
 
-        ##########
-
 
     def __call__(self):
 
-        # read in a centered PSF model
-        centered_psf, header = fits.getdata("lm_180507_009030.fits")
+        # read in a centered PSF model to use for companion search
+        centered_psf = fits.getdata("lm_180507_009030.fits")
 
         # find where a companion might be by correlating with centered PSF
         ## ## CHANGE THIS! COMPANION PSF AT LARGE RADII WILL HAVE FRINGES WASHED OUT
@@ -215,7 +213,7 @@ class Detection:
                       mask_radius = comp_rad,
                       invert=False)
 
-        # mask involving the noise ring and without the companion
+        # mask involving the noise ring without the companion
         net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),comp_mask)
 
         # find S/N
@@ -248,10 +246,13 @@ def main():
     hosts_removed_no_fake_psf_08b_name_array = list(glob.glob(os.path.join(hosts_removed_no_fake_psf_08b_directory, "*.fits")))
 
     # make a median of all frames
-    make_median = Median()
+    '''
+    median_instance = Median()
+    make_median = median_instance(hosts_removed_no_fake_psf_08b_name_array)
+    '''
 
     # initialize and parallelize
     detection_blind_search = Detection() #fake=False)
 
-    detection_blind_search(hosts_removed_no_fake_psf_08b_name_array)
+    detection_blind_search()
     #pool.map(detection_blind_search, hosts_removed_no_fake_psf_08b_name_array)

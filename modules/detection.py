@@ -167,6 +167,14 @@ class Detection:
         ## ## CORRELATE WITH MAYBE THE MEDIAN OF ALL HOST STARS?
         fake_corr = scipy.signal.correlate2d(self.master_frame, centered_psf, mode="same")
 
+        ## ## BEGIN STAND-IN WITH FAKE PLANET
+        fake_planet_standin = np.roll(centered_psf, 30, axis=0)
+        fake_planet_standin = np.roll(fake_planet_standin, 25, axis=1)
+        fake_planet_frame = np.add(self.master_frame,np.multiply(0.2,fake_planet_standin))
+        self.master_frame = fake_planet_frame
+        fake_corr = scipy.signal.correlate2d(fake_planet_frame, centered_psf, mode="same")
+        ## ## END STAND-IN
+
         # where is the location of the companion/maximum?
         loc_vec = np.where(fake_corr == np.max(fake_corr))
 
@@ -180,6 +188,13 @@ class Detection:
         ## ## check this by displacing, flipping, and subtracting to detect asymmetry
         x_cen = 0.5*np.shape(self.master_frame)[0]-0.5
         y_cen = 0.5*np.shape(self.master_frame)[1]-0.5
+
+        ## ## BEGIN STAND-IN
+        pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
+        comp_rad = 20
+        print(loc_vec)
+        smoothed_w_fake_planet = ndimage.filters.gaussian_filter(self.master_frame, sigma = [5,5], order = 0, output = None, mode = "reflect", cval = 0.0, truncate = 4.0)
+        ## ## END STAND-IN
 
         # calculate outer noise annulus radius
         fake_psf_outer_edge_rad = np.add(np.sqrt(np.power(apparent_comp_vec["x_pix_coord"][pos_num]-x_cen,2) + 
@@ -224,6 +239,13 @@ class Detection:
         print(np.nanmax(comp_ampl))
         print("Noise:")
         print(np.nanstd(noise_smoothed))
+
+        ## BEGIN WRITE OUT AS A CHECK
+        fits.writeto(filename="junk_smoothed.fits", data=smoothed_w_fake_planet, overwrite=True)
+        fits.writeto(filename="junk_noise_smoothed.fits", data=noise_smoothed, overwrite=True)
+        fits.writeto(filename="junk_comp_mask.fits", data=comp_ampl, overwrite=True)
+        fits.writeto(filename="junk_host_subt.fits", data=self.master_frame, overwrite=True)
+        ## END WRITE OUT AS A CHECK
 
 
 

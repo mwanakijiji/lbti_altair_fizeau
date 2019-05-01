@@ -39,6 +39,35 @@ def get_git_hash():
     print(sha)
 
 
+def polar_to_xy(pos_info, asec = False):
+    '''
+    Converts polar vectors (deg, pix) to xy vectors (pix, pix)
+    (Note degrees are CCW from +x axis)
+
+    INPUTS:
+    pos_info: dictionary with keys
+        "rad_pix": radius in pixels (if asec = False)
+        "rad_asec": radius in arcsec (if asec = True)
+        "angle_deg": angle in degrees E of true N
+
+    OUTPUTS:
+    dictionary with the addition of keys
+        "x_pix_coord": position in x in pixels
+        "y_pix_coord": position in y in pixels
+    '''
+
+    # if radius is in asec
+    if asec:
+        pos_info["rad_pix"] = np.divide(pos_info["rad_asec"],
+                                        np.float(self.config_data["instrum_params"]["LMIR_PS"]))
+
+    # convert to x,y
+    pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],np.sin(np.multiply(pos_info["angle_deg"],np.pi/180.)))
+    pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],np.cos(np.multiply(pos_info["angle_deg"],np.pi/180.)))
+
+    return pos_info
+
+
 def make_dirs():
     '''
     Make directories for housing files/info if they don't already exist

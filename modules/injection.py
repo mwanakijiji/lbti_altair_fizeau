@@ -19,16 +19,6 @@ matplotlib.use('agg') # avoids some crashes when multiprocessing
 import matplotlib.pyplot as plt
 
 
-def polar_to_xy(pos_info):
-    '''
-    Converts polar vectors (radians, pix) to xy vectors (pix, pix)
-    '''
-    pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],np.cos(np.multiply(pos_info["angle_deg"],np.pi/180.)))
-    pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],np.sin(np.multiply(pos_info["angle_deg"],np.pi/180.)))
-
-    return pos_info
-
-
 class FakePlanetInjector:
     '''
     PCA-decompose host star PSF and inject fake planet PSFs,
@@ -67,6 +57,8 @@ class FakePlanetInjector:
         self.experiment_vector = pd.DataFrame(experiments)
         
         # convert radii in asec to pixels
+        ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
+        ## ## file to be deg E of N, and in asec
         self.experiment_vector["rad_pix"] = np.divide(self.experiment_vector["rad_asec"],
                                                       np.float(self.config_data["instrum_params"]["LMIR_PS"]))
         self.pos_info = polar_to_xy(self.experiment_vector)
@@ -180,8 +172,12 @@ class FakePlanetInjector:
             #hdu.writeto("junk.fits", clobber=True)
             ## END TEST
                     
-            # add info to the header indicating last reduction step, and PCA info
+            # add info to the header indicating last reduction step, and fake PSF parameters and PCA info
             header_sci["RED_STEP"] = "fake_planet_injection"
+            header_sci["FAKEAEON"] = fake_angle_e_of_n_deg
+            header_sci["FAKERADA"] = fake_radius_asec
+            header_sci["FAKECREL"] = fake_contrast_rel
+            header_sci["FAKECL10"] = math.log10(fake_contrast_rel)
 
             # PCA vector file with which the host star was decomposed
             #header_sci["FAKE_PLANET_PCA_CUBE_FILE"] = os.path.basename(self.abs_PCA_name)
@@ -190,7 +186,7 @@ class FakePlanetInjector:
             # fake planet is injected
             #header_sci["FAKE_PLANET_PCA_SPECTRUM"] = 
 
-            # write FITS file out, with fake planet params in file name
+            # write FITS file out, with fake planet params in file name and header
             ## ## do I actually want to write out a separate FITS file for each fake planet?
             abs_image_w_fake_planet_name = str(self.config_data["data_dirs"]["DIR_FAKE_PSFS"] + \
                                                  "fake_planet_" + \

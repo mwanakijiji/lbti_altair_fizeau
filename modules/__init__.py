@@ -59,7 +59,7 @@ def polar_to_xy(pos_info, asec = False):
     # if radius is in asec
     if asec:
         pos_info["rad_pix"] = np.divide(pos_info["rad_asec"],
-                                        np.float(self.config_data["instrum_params"]["LMIR_PS"]))
+                                        np.float(config["instrum_params"]["LMIR_PS"]))
 
     # convert to x,y
     pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],np.sin(np.multiply(pos_info["angle_deg"],np.pi/180.)))

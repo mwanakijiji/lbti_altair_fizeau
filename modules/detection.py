@@ -129,13 +129,21 @@ class Median:
             # put into cube
             cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)
 
+        # generate the header
+        #hdu = fits.PrimaryHDU(cube_derotated_frames)
+        #hdul = fits.HDUList([hdu])
+        hdr_write = fits.Header()
+        hdr_write["FAKEAEON"] = header_sci["FAKEAEON"]
+        hdr_write["FAKERADA"] = header_sci["FAKERADA"]
+        hdr_write["FAKECREL"] = header_sci["FAKECREL"]
+
         # write cube
-        fits.writeto(filename = "junk_stack.fits", data = cube_derotated_frames, overwrite = True)
+        fits.writeto(filename = "junk_stack.fits", data = cube_derotated_frames, header = hdr_write, overwrite = True)
         print("Wrote cube of derotated frames.")
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        fits.writeto(filename = "junk_median.fits", data = median_stack, overwrite = True)
+        fits.writeto(filename = "junk_median.fits", data = median_stack, header = hdr_write, overwrite = True)
         print("Wrote median of stack.")
 
 
@@ -175,6 +183,7 @@ class Detection:
         ## ## WILL NEED TO CHANGE THIS!
         centered_psf = fits.getdata("lm_180507_009030.fits")
 
+        print(self.header)
         # case 1: we don't know where a possible companion is, and we're searching blindly for it
         if blind_search:
             
@@ -192,10 +201,11 @@ class Detection:
 
             # fake planet injection parameters in ADI frame are from the header
             # (note units are asec, and deg E of N)
-            injection_loc_dict = {"angle_deg": self.header_sci["FAKEAEON"],
-                                  "rad_asec": self.header_sci["FAKERADA"],
-                                  "ampl_linear_norm": self.header_sci["FAKECREL"]}
+            injection_loc_dict = {"angle_deg": [self.header["FAKEAEON"]],
+                                  "rad_asec": [self.header["FAKERADA"]],
+                                  "ampl_linear_norm": [self.header["FAKECREL"]]}
 
+            print(injection_loc_dict)
             injection_loc = pd.DataFrame(injection_loc_dict)
             loc_vec = polar_to_xy(pos_info = injection_loc, asec = True)
             
@@ -217,7 +227,6 @@ class Detection:
 
         ## ## BEGIN STAND-IN
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
-        print(loc_vec)
         kernel_scale = 5
         smoothed_w_fake_planet = ndimage.filters.gaussian_filter(self.master_frame,
                                                                  sigma = np.multiply(kernel_scale,[1,1]),
@@ -310,7 +319,6 @@ def main():
 
     # make a median of all frames
     write_adi_name_fake_psfs = "junk_median.fits"
-    '''
     median_instance = Median()
     print('yyy')
     print(hosts_removed_fake_psf_08a_name_array)
@@ -318,6 +326,7 @@ def main():
                                   write_adi_name = write_adi_name_fake_psfs)
     
 
+    '''
     # make a list of the images WITHOUT fake planets
     hosts_removed_no_fake_psf_08b_directory = str(config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"])
     hosts_removed_no_fake_psf_08b_name_array = list(glob.glob(os.path.join(hosts_removed_no_fake_psf_08b_directory, "*.fits")))
@@ -330,6 +339,6 @@ def main():
     # initialize and parallelize
     detection_blind_search = Detection(adi_frame_name = write_adi_name_fake_psfs)
 
-    detection_blind_search(blind_search = True)
-    #detection_blind_search(fake_companion = True)
+    #detection_blind_search(blind_search = True)
+    detection_blind_search(fake_planet = True)
     #pool.map(detection_blind_search, hosts_removed_no_fake_psf_08b_name_array)

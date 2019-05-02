@@ -230,6 +230,6 @@ def main():
                                           n_PCA = 100,
                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
-                                          + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
+                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits")
 
     pool.map(inject_fake_psfs, cookies_centered_06_name_array)

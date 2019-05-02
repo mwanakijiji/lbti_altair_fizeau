@@ -133,11 +133,10 @@ def main():
     pool = multiprocessing.Pool(ncpu)
 
     # make a list of the images WITH fake planets
-    '''
     fake_planet_frames_07_directory = str(config["data_dirs"]["DIR_FAKE_PSFS"])
     fake_planet_frames_07_name_array = list(glob.glob(os.path.join(fake_planet_frames_07_directory, "*.fits")))
-    '''
 
+    '''
     # make a list of the images WITHOUT fake planets
     # (these are just the centered frames)
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
@@ -166,15 +165,15 @@ def main():
     sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0079[3456789]*.fits")))
     sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
     sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_01*.fits")))
-
+    '''
+    
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
-    '''
     host_removal_fake_planets = HostRemoval(n_PCA = 100,
                                             outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
                                             abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                             + "pca_cubes_psfs/" \
-                                            + "psf_PCA_vector_cookie_seqStart_004900_seqStop_004919.fits")
+                                            + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits")
     '''
     host_removal_no_fake_planets_A = HostRemoval(n_PCA = 100,
                                             outdir = config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"], \
@@ -201,8 +200,8 @@ def main():
                                             + "psf_PCA_vector_cookie_seqStart_008849_seqStop_009175.fits")
 
     # remove the host from the frames WITH fake planets
-    ## ## host_removal_fake_planets(fake_planet_frames_07_name_array[0])
-    #pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
+    host_removal_fake_planets(fake_planet_frames_07_name_array[0])
+    pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
 
     # remove the host from the frames WITHOUT fake planets
     ## ## host_removal_no_fake_planets(cookies_centered_06_directory[0])
@@ -210,3 +209,4 @@ def main():
     pool.map(host_removal_no_fake_planets_B, sci_frames_for_cube_B)
     pool.map(host_removal_no_fake_planets_C, sci_frames_for_cube_C)
     pool.map(host_removal_no_fake_planets_D, sci_frames_for_cube_D)
+    '''

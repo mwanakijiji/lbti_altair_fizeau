@@ -91,7 +91,9 @@ class Median:
         ##########
 
 
-    def __call__(self,abs_sci_name_array):
+    def __call__(self,
+                 abs_sci_name_array,
+                 write_adi_name):
         '''
         Make the stack and take median
 
@@ -142,6 +144,7 @@ class Detection:
     '''
 
     def __init__(self,
+                 adi_frame_name,
                  config_data = config):
         '''
         INPUTS:
@@ -152,19 +155,25 @@ class Detection:
 
         # read in the single frame produced by previous module
         ## ## REPLACE FILENAME HERE WITH CONFIG PARAM
-        self.master_frame, self.header = fits.getdata("junk_median.fits")
+        self.master_frame, self.header = fits.getdata(adi_frame_name)
 
         # radius of aperture around planet candidate (pix)
         self.comp_rad = 10
 
 
-    def __call__(self):
+    def __call__(self,
+                 blind_search = False,
+                 fake_planet = False):
+        '''
+        INPUTS:
+        blind_search/fake_planet flags: these are either/or modes, but both defaults set to false
+        '''
 
         # read in a centered PSF model to use for companion search
         ## ## WILL NEED TO CHANGE THIS!
         centered_psf = fits.getdata("lm_180507_009030.fits")
 
-        # if we don't know where a possible companion is, and we're searching blindly for it
+        # case 1: we don't know where a possible companion is, and we're searching blindly for it
         if blind_search:
             
             # find where a companion might be by correlating with centered PSF
@@ -183,32 +192,25 @@ class Detection:
             # location of the companion/maximum
             loc_vec = np.where(fake_corr == np.max(fake_corr))
 
-        # if this is a frame involving an injected fake companion, we already know
+        # case 2: this is an ADI frame involving an injected fake companion, and we already know
         # where it is and just want to determine its amplitude relative to the noise
         elif fake_planet:
 
-            # fake planet parameters are in the header
-            fake_angle_e_of_n_deg = self.header_sci["FAKEAEON"]
-            fake_radius_asec = self.header_sci["FAKERADA"]
-            fake_contrast_rel = self.header_sci["FAKECREL"]
+            # fake planet injection parameters in ADI frame are from the header
+            # (note units are asec, and deg E of N)
+            injection_loc_dict = {"angle_deg": self.header_sci["FAKEAEON"],
+                                  "rad_asec": self.header_sci["FAKERADA"],
+                                  "ampl_linear_norm": self.header_sci["FAKECREL"]}
 
-            # fake planet injection parameters
-            fake_params_pre_permute = {"angle_deg": [0., 60., 120.],\
-                               "rad_asec": [0.3, 0.4],\
-                               "ampl_linear_norm": [1., 0.9]}
-
-            # location of the fake planet
-            injection_loc_dict = {"rad_asec": fake_radius_asec, "angle_deg": fake_angle_e_of_n_deg} # asec, deg E of N
             injection_loc = pd.DataFrame(injection_loc_dict)
             loc_vec = polar_to_xy(pos_info = injection_loc, asec = True)
-
-            ## ## ## THIS IS WHERE I STOPPED; NEED TO INCORPORATE KNOWN AMPLITUDE SOMEHOW? OR STORE IT FOR LATER?
             
         # data type N/A
         else:
             print("Pipeline doesn't know if this data is real or has fake planets!")
             
         # convert to DataFrame
+        ## ## note that this is at pixel-level accuracy; refine this later to allow sub-pixel precision
         companion_loc_vec = pd.DataFrame({"y_pix_coord": loc_vec[0], "x_pix_coord": loc_vec[1]})
 
         # find center of frame for placing of masks
@@ -275,6 +277,8 @@ class Detection:
         print(np.nanmax(comp_ampl))
         print("Noise:")
         print(np.nanstd(noise_smoothed))
+        print("S/N:")
+        print(np.divide(np.nanmax(comp_ampl),np.nanstd(noise_smoothed)))
 
         ## BEGIN WRITE OUT AS A CHECK
         fits.writeto(filename="junk_smoothed.fits", data=smoothed_w_fake_planet, overwrite=True)
@@ -299,18 +303,30 @@ def main():
     # multiprocessing instance
     #pool = multiprocessing.Pool(ncpu)
 
+    # make a list of the images WITH fake planets
+    hosts_removed_fake_psf_08a_directory = str(config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"])
+    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*.fits")))
+
+    # make a median of all frames
+    write_adi_name_fake_psfs = "junk_median.fits"
+    median_instance = Median()
+    make_median = median_instance(hosts_removed_fake_psf_08a_name_array,
+                                  write_adi_name = write_adi_name_fake_psfs)
+    
+
     # make a list of the images WITHOUT fake planets
+    '''
     hosts_removed_no_fake_psf_08b_directory = str(config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"])
     hosts_removed_no_fake_psf_08b_name_array = list(glob.glob(os.path.join(hosts_removed_no_fake_psf_08b_directory, "*.fits")))
 
     # make a median of all frames
-    '''
     median_instance = Median()
     make_median = median_instance(hosts_removed_no_fake_psf_08b_name_array)
     '''
 
     # initialize and parallelize
-    detection_blind_search = Detection() #fake=False)
+    detection_blind_search = Detection(adi_frame_name = write_adi_name_fake_psfs)
 
-    detection_blind_search()
+    detection_blind_search(blind_search = True)
+    #detection_blind_search(fake_companion = True)
     #pool.map(detection_blind_search, hosts_removed_no_fake_psf_08b_name_array)

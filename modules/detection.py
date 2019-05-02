@@ -102,6 +102,7 @@ class Median:
         abs_sci_name: the array of absolute paths of the science frames we want to combine
         '''
 
+        print('yyy2')
         print(abs_sci_name_array)
 
         # read in a first array to get the shape
@@ -152,10 +153,11 @@ class Detection:
         '''
 
         self.config_data = config_data
+        self.adi_frame_name = adi_frame_name
 
         # read in the single frame produced by previous module
         ## ## REPLACE FILENAME HERE WITH CONFIG PARAM
-        self.master_frame, self.header = fits.getdata(adi_frame_name)
+        self.master_frame, self.header = fits.getdata(self.adi_frame_name, 0, header=True)
 
         # radius of aperture around planet candidate (pix)
         self.comp_rad = 10
@@ -180,14 +182,6 @@ class Detection:
             ## ## CHANGE THIS! COMPANION PSF AT LARGE RADII WILL HAVE FRINGES WASHED OUT
             ## ## CORRELATE WITH MAYBE THE MEDIAN OF ALL HOST STARS?
             fake_corr = scipy.signal.correlate2d(self.master_frame, centered_psf, mode="same")
-
-            ## ## BEGIN STAND-IN WITH FAKE PLANET
-            fake_planet_standin = np.roll(centered_psf, 30, axis=0)
-            fake_planet_standin = np.roll(fake_planet_standin, 25, axis=1)
-            fake_planet_frame = np.add(self.master_frame,np.multiply(0.2,fake_planet_standin))
-            self.master_frame = fake_planet_frame
-            fake_corr = scipy.signal.correlate2d(fake_planet_frame, centered_psf, mode="same")
-            ## ## END STAND-IN
 
             # location of the companion/maximum
             loc_vec = np.where(fake_corr == np.max(fake_corr))
@@ -305,17 +299,26 @@ def main():
 
     # make a list of the images WITH fake planets
     hosts_removed_fake_psf_08a_directory = str(config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"])
-    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*.fits")))
+
+    # specify parameters of fake companion
+    fake_params = {"angle_deg": 0, "rad_asec": 0.3, "ampl_linear_norm": 1.} ## ## automate/serialize this line
+    str_fake_angle_e_of_n_deg = str("{:0>5d}".format(int(100*fake_params["angle_deg"])))
+    str_fake_radius_asec = str("{:0>5d}".format(int(100*fake_params["rad_asec"])))
+    str_fake_contrast_rel = str("{:0>5d}".format(int(100*np.abs(math.log10(fake_params["ampl_linear_norm"])))))
+    fake_params_string = str_fake_angle_e_of_n_deg + "_" + str_fake_radius_asec + "_" + str_fake_contrast_rel
+    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*"+fake_params_string+"*.fits")))
 
     # make a median of all frames
     write_adi_name_fake_psfs = "junk_median.fits"
+    '''
     median_instance = Median()
-    make_median = median_instance(hosts_removed_fake_psf_08a_name_array,
+    print('yyy')
+    print(hosts_removed_fake_psf_08a_name_array)
+    make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array,
                                   write_adi_name = write_adi_name_fake_psfs)
     
 
     # make a list of the images WITHOUT fake planets
-    '''
     hosts_removed_no_fake_psf_08b_directory = str(config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"])
     hosts_removed_no_fake_psf_08b_name_array = list(glob.glob(os.path.join(hosts_removed_no_fake_psf_08b_directory, "*.fits")))
 

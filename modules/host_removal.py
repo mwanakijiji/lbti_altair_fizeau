@@ -135,6 +135,8 @@ def main():
     # make a list of the images WITH fake planets
     fake_planet_frames_07_directory = str(config["data_dirs"]["DIR_FAKE_PSFS"])
     fake_planet_frames_07_name_array = list(glob.glob(os.path.join(fake_planet_frames_07_directory, "*.fits")))
+    print('ppp')
+    print(fake_planet_frames_07_name_array)
 
     '''
     # make a list of the images WITHOUT fake planets
@@ -198,11 +200,13 @@ def main():
                                             abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                             + "pca_cubes_psfs/" \
                                             + "psf_PCA_vector_cookie_seqStart_008849_seqStop_009175.fits")
-
+    '''
+    
     # remove the host from the frames WITH fake planets
     host_removal_fake_planets(fake_planet_frames_07_name_array[0])
     pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
 
+    '''
     # remove the host from the frames WITHOUT fake planets
     ## ## host_removal_no_fake_planets(cookies_centered_06_directory[0])
     pool.map(host_removal_no_fake_planets_A, sci_frames_for_cube_A)

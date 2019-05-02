@@ -174,10 +174,15 @@ class FakePlanetInjector:
                     
             # add info to the header indicating last reduction step, and fake PSF parameters and PCA info
             header_sci["RED_STEP"] = "fake_planet_injection"
+            header_sci.comments["RED_STEP"] = "Last reduction step performed"
             header_sci["FAKEAEON"] = fake_angle_e_of_n_deg
+            header_sci.comments["FAKEAEON"] = "Fake companion angle after de-rotation (deg E of N)"
             header_sci["FAKERADA"] = fake_radius_asec
+            header_sci.comments["FAKERADA"] = "Fake companion radius from star (asec)"
             header_sci["FAKECREL"] = fake_contrast_rel
+            header_sci.comments["FAKECREL"] = "Fake companion contrast (relative, and normalized to 1)"
             header_sci["FAKECL10"] = math.log10(fake_contrast_rel)
+            header_sci.comments["FAKECL10"] = "Fake companion log10 contrast (relative)"
 
             # PCA vector file with which the host star was decomposed
             #header_sci["FAKE_PLANET_PCA_CUBE_FILE"] = os.path.basename(self.abs_PCA_name)
@@ -220,8 +225,8 @@ def main():
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
     # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg": [0., 60., 120.],\
-                               "rad_asec": [0.3, 0.4],\
+    fake_params_pre_permute = {"angle_deg": [0., 60., 120.],
+                               "rad_asec": [0.3, 0.4],
                                "ampl_linear_norm": [1., 0.9]}
 
     # initialize and parallelize

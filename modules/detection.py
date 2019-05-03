@@ -309,20 +309,36 @@ def main():
     # make a list of the images WITH fake planets
     hosts_removed_fake_psf_08a_directory = str(config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"])
 
-    # specify parameters of fake companion
-    fake_params = {"angle_deg": 0, "rad_asec": 0.3, "ampl_linear_norm": 1.} ## ## automate/serialize this line
-    str_fake_angle_e_of_n_deg = str("{:0>5d}".format(int(100*fake_params["angle_deg"])))
-    str_fake_radius_asec = str("{:0>5d}".format(int(100*fake_params["rad_asec"])))
-    str_fake_contrast_rel = str("{:0>5d}".format(int(100*np.abs(math.log10(fake_params["ampl_linear_norm"])))))
-    fake_params_string = str_fake_angle_e_of_n_deg + "_" + str_fake_radius_asec + "_" + str_fake_contrast_rel
-    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*"+fake_params_string+"*.fits")))
+    # find all combinations of fake planet parameters
+    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory))) # all files
+    # list fake planet parameter patterns from fake_planet_xxxxx_xxxxx_xxxxx_lm_YYMMDD_NNNNNN.fits
+    degen_param_list = [i.split("fake_planet_")[1].split("_lm_")[0] for i in str_file] # list may have repeats
+    param_list = list(frozenset(degen_param_list)) # remove repeats
 
-    # make a median of all frames
-    write_adi_name_fake_psfs = "junk_median.fits"
-    median_instance = Median()
-    print('yyy')
-    print(hosts_removed_fake_psf_08a_name_array)
-    make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array,
+    # loop over all fake planet parameter combinations
+    for t in range(0,len(param_list)):
+
+        # extract fake planet parameter raw values as ints
+        raw_angle = int(param_list[t].split("_")[0])
+        raw_radius = int(param_list[t].split("_")[1])
+        raw_contrast = int(param_list[t].split("_")[2])
+
+        # get real values
+        fake_angle_e_of_n_deg = np.divide(raw_angle,100.)
+        fake_radius_asec = np.divide(raw_radius,100.)
+        fake_contrast_rel = np.power(10.,-np.divide(raw_contrast,100.)) # scale is relative and linear
+    
+        # specify parameters of fake companion
+        fake_params_string = param_list[t]
+        hosts_removed_fake_psf_08a_name_array_one_combo = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*"+fake_params_string+"*.fits")))
+
+        # make a median of all frames
+        ## ## ## THIS IS WHERE I STOPPED; MAKE WRITTEN ADI FRAME A CONFIG PARAMETER; INSERT HEADER KEYS TO RECORD NUMBER OF FRAMES MEDIANED, ETC.
+        write_adi_name_fake_psfs = "junk_median.fits"
+        median_instance = Median()
+        print('yyy')
+        print(hosts_removed_fake_psf_08a_name_array)
+        make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array,
                                   write_adi_name = write_adi_name_fake_psfs)
     
 

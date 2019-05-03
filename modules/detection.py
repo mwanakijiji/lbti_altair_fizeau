@@ -106,9 +106,6 @@ class Median:
         fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
         '''
 
-        print('yyy2')
-        print(abs_sci_name_array)
-
         # read in a first array to get the shape
         shape_test, header = fits.getdata(abs_sci_name_array[0], 0, header=True)
 
@@ -121,8 +118,6 @@ class Median:
 
         # loop over individual frames to derotate them and put them in to a cube
         for t in range(0,len(sorted_abs_sci_name_array)):
-
-            print(t)
 
             # read in the pre-derotated frames, derotate them, and put them into a cube
             sci, header_sci = fits.getdata(sorted_abs_sci_name_array[t], 0, header=True)
@@ -143,12 +138,12 @@ class Median:
 
         # write cube
         fits.writeto(filename = write_cube_name, data = cube_derotated_frames, header = hdr_write, overwrite = True)
-        print("Wrote cube of derotated frames.")
+        print("Wrote cube of derotated frames, " + os.path.basename(write_cube_name))
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
         fits.writeto(filename = write_adi_name, data = median_stack, header = hdr_write, overwrite = True)
-        print("Wrote median of stack.")
+        print("Wrote median of stack, " + os.path.basename(write_adi_name))
 
 
 class Detection:
@@ -187,7 +182,6 @@ class Detection:
         ## ## WILL NEED TO CHANGE THIS!
         centered_psf = fits.getdata("lm_180507_009030.fits")
 
-        print(self.header)
         # case 1: we don't know where a possible companion is, and we're searching blindly for it
         if blind_search:
             
@@ -212,6 +206,7 @@ class Detection:
             print(injection_loc_dict)
             injection_loc = pd.DataFrame(injection_loc_dict)
             loc_vec = polar_to_xy(pos_info = injection_loc, asec = True)
+            print(loc_vec)
             
         # data type N/A
         else:
@@ -219,7 +214,7 @@ class Detection:
             
         # convert to DataFrame
         ## ## note that this is at pixel-level accuracy; refine this later to allow sub-pixel precision
-        companion_loc_vec = pd.DataFrame({"y_pix_coord": loc_vec[0], "x_pix_coord": loc_vec[1]})
+        companion_loc_vec = pd.DataFrame({"y_pix_coord": loc_vec["y_pix_coord"], "x_pix_coord": loc_vec["x_pix_coord"]})
 
         # find center of frame for placing of masks
         # N.b. for a 100x100 image, the physical center is at Python coordinate (49.5,49.5)
@@ -279,13 +274,19 @@ class Detection:
         # find S/N
         noise_smoothed = np.multiply(smoothed_adi_frame,net_noise_mask)
         comp_ampl = np.multiply(smoothed_adi_frame,comp_mask_inv)
-
+        signal = np.nanmax(comp_ampl)
+        noise = np.nanstd(noise_smoothed)
+        s2n = np.divide(signal,noise)
+        
         print("Signal:")
-        print(np.nanmax(comp_ampl))
+        print(signal)
         print("Noise:")
-        print(np.nanstd(noise_smoothed))
+        print(noise)
         print("S/N:")
-        print(np.divide(np.nanmax(comp_ampl),np.nanstd(noise_smoothed)))
+        print(s2n)
+
+        # write to csv
+        ## ## TBD
 
         # write out as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
@@ -293,9 +294,10 @@ class Detection:
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
         sn_check_cube[2,:,:] = noise_smoothed # the noise ring
         sn_check_cube[3,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
-        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(adi_frame_name),
+        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_name),
                      data = sn_check_cube,
                      overwrite = True)
+        print("Wrote out S/N cube for " + os.path.basename(self.adi_frame_name))
 
 
 def main():
@@ -308,19 +310,21 @@ def main():
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/config.ini")
 
-    # multiprocessing instance
-    #pool = multiprocessing.Pool(ncpu)
-
+    ###########################################################
+    ## ## IMAGES WITH FAKE PLANETS, TO DETERMINE SENSITIVITY
+    
     # make a list of the images WITH fake planets
     hosts_removed_fake_psf_08a_directory = str(config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"])
 
-    # find all combinations of fake planet parameters
-    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory))) # all files
+    # find all combinations of available fake planet parameters
+    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory,"*.fits"))) # list of all files
     # list fake planet parameter patterns from fake_planet_xxxxx_xxxxx_xxxxx_lm_YYMMDD_NNNNNN.fits
-    degen_param_list = [i.split("fake_planet_")[1].split("_lm_")[0] for i in str_file] # list may have repeats
+    print(hosts_removed_fake_psf_08a_name_array[0].split("fake_planet_"))
+    degen_param_list = [i.split("fake_planet_")[1].split("_lm_")[0] for i in hosts_removed_fake_psf_08a_name_array] # list which may have repeats
     param_list = list(frozenset(degen_param_list)) # remove repeats
 
-    # loop over all fake planet parameter combinations
+    # loop over all fake planet parameter combinations and make ADI frames
+    '''
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints
@@ -328,26 +332,49 @@ def main():
         raw_radius = int(param_list[t].split("_")[1])
         raw_contrast = int(param_list[t].split("_")[2])
 
-        # get real values
+        # get physical values
         fake_angle_e_of_n_deg = np.divide(raw_angle,100.)
         fake_radius_asec = np.divide(raw_radius,100.)
         fake_contrast_rel = np.power(10.,-np.divide(raw_contrast,100.)) # scale is relative and linear
     
         # specify parameters of fake companion
         fake_params_string = param_list[t]
+
+        # list of files corresponding to that combination of fake planet parameters
         hosts_removed_fake_psf_08a_name_array_one_combo = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*"+fake_params_string+"*.fits")))
 
         # make a median of all frames
-        ## ## ## THIS IS WHERE I STOPPED; MAKE WRITTEN ADI FRAME A CONFIG PARAMETER; INSERT HEADER KEYS TO RECORD NUMBER OF FRAMES MEDIANED, ETC.
         median_instance = Median()
-        print('yyy')
-        print(hosts_removed_fake_psf_08a_name_array)
-        make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array,
+        make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array_one_combo,
                                       write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
                                       write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
                                       fake_planet = True)
-    
+    '''
 
+    # loop again over all fake planet parameter combinations to retrieve ADI frames and look for signal
+    for t in range(0,len(param_list)):
+
+        # extract fake planet parameter raw values as ints
+        raw_angle = int(param_list[t].split("_")[0])
+        raw_radius = int(param_list[t].split("_")[1])
+        raw_contrast = int(param_list[t].split("_")[2])
+
+        # get physical values
+        fake_angle_e_of_n_deg = np.divide(raw_angle,100.)
+        fake_radius_asec = np.divide(raw_radius,100.)
+        fake_contrast_rel = np.power(10.,-np.divide(raw_contrast,100.)) # scale is relative and linear
+    
+        # specify parameters of fake companion
+        fake_params_string = param_list[t]
+
+        # initialize and detect
+        detection_blind_search = Detection(adi_frame_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits")
+        detection_blind_search(fake_planet = True)
+        #detection_blind_search(blind_search = True)
+    
+    ###########################################################
+    ## ## IMAGES WITHOUT FAKE PLANETS; I.E., ACTUAL SCIENCE
+        
     '''
     # make a list of the images WITHOUT fake planets
     hosts_removed_no_fake_psf_08b_directory = str(config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"])
@@ -358,9 +385,6 @@ def main():
     make_median = median_instance(hosts_removed_no_fake_psf_08b_name_array)
     '''
 
-    # initialize and parallelize
-    detection_blind_search = Detection(adi_frame_name = write_adi_name_fake_psfs)
-
-    #detection_blind_search(blind_search = True)
-    detection_blind_search(fake_planet = True)
+    # multiprocessing instance
+    #pool = multiprocessing.Pool(ncpu)
     #pool.map(detection_blind_search, hosts_removed_no_fake_psf_08b_name_array)

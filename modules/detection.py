@@ -93,13 +93,17 @@ class Median:
 
     def __call__(self,
                  abs_sci_name_array,
-                 write_adi_name):
+                 write_cube_name,
+                 write_adi_name,
+                 fake_planet = False):
         '''
         Make the stack and take median
 
         INPUTS:
 
         abs_sci_name: the array of absolute paths of the science frames we want to combine
+        write_adi_name: absolute path filename for writing out the ADI frame
+        fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
         '''
 
         print('yyy2')
@@ -130,20 +134,20 @@ class Median:
             cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)
 
         # generate the header
-        #hdu = fits.PrimaryHDU(cube_derotated_frames)
-        #hdul = fits.HDUList([hdu])
         hdr_write = fits.Header()
-        hdr_write["FAKEAEON"] = header_sci["FAKEAEON"]
-        hdr_write["FAKERADA"] = header_sci["FAKERADA"]
-        hdr_write["FAKECREL"] = header_sci["FAKECREL"]
+        hdr_write["NUMFRAME"] = np.shape(cube_derotated_frames)[0] # number of frames we're taking median of
+        if fake_planet:
+            hdr_write["FAKEAEON"] = header_sci["FAKEAEON"] # angle of fake companion, E of N
+            hdr_write["FAKERADA"] = header_sci["FAKERADA"] # radial distance of fake companion, asec
+            hdr_write["FAKECREL"] = header_sci["FAKECREL"] # contrast ratio of fake companion
 
         # write cube
-        fits.writeto(filename = "junk_stack.fits", data = cube_derotated_frames, header = hdr_write, overwrite = True)
+        fits.writeto(filename = write_cube_name, data = cube_derotated_frames, header = hdr_write, overwrite = True)
         print("Wrote cube of derotated frames.")
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        fits.writeto(filename = "junk_median.fits", data = median_stack, header = hdr_write, overwrite = True)
+        fits.writeto(filename = write_adi_name, data = median_stack, header = hdr_write, overwrite = True)
         print("Wrote median of stack.")
 
 
@@ -334,12 +338,13 @@ def main():
 
         # make a median of all frames
         ## ## ## THIS IS WHERE I STOPPED; MAKE WRITTEN ADI FRAME A CONFIG PARAMETER; INSERT HEADER KEYS TO RECORD NUMBER OF FRAMES MEDIANED, ETC.
-        write_adi_name_fake_psfs = "junk_median.fits"
         median_instance = Median()
         print('yyy')
         print(hosts_removed_fake_psf_08a_name_array)
         make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array,
-                                  write_adi_name = write_adi_name_fake_psfs)
+                                      write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
+                                      write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
+                                      fake_planet = True)
     
 
     '''

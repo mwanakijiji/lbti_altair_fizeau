@@ -232,7 +232,7 @@ class Detection:
         ## ## BEGIN STAND-IN
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel_scale = 5
-        smoothed_w_fake_planet = ndimage.filters.gaussian_filter(self.master_frame,
+        smoothed_adi_frame = ndimage.filters.gaussian_filter(self.master_frame,
                                                                  sigma = np.multiply(kernel_scale,[1,1]),
                                                                  order = 0,
                                                                  output = None,
@@ -252,22 +252,22 @@ class Detection:
                                   self.comp_rad)
 
         # invert-mask the companion
-        comp_mask_inv = circ_mask(input_array = smoothed_w_fake_planet,
+        comp_mask_inv = circ_mask(input_array = smoothed_adi_frame,
                       mask_center = [companion_loc_vec["y_pix_coord"][pos_num],
                                      companion_loc_vec["x_pix_coord"][pos_num]],
                       mask_radius = self.comp_rad,
                       invert=True)
 
         # invert-mask the noise ring
-        noise_mask_outer_inv = circ_mask(input_array = smoothed_w_fake_planet,
+        noise_mask_outer_inv = circ_mask(input_array = smoothed_adi_frame,
                              mask_center = [y_cen,x_cen],
                              mask_radius = fake_psf_outer_edge_rad,
                              invert=True)
-        noise_mask_inner = circ_mask(input_array = smoothed_w_fake_planet,
+        noise_mask_inner = circ_mask(input_array = smoothed_adi_frame,
                              mask_center = [y_cen,x_cen],
                              mask_radius = fake_psf_inner_edge_rad,
                              invert=False)
-        comp_mask = circ_mask(input_array = smoothed_w_fake_planet,
+        comp_mask = circ_mask(input_array = smoothed_adi_frame,
                       mask_center = [companion_loc_vec["y_pix_coord"][pos_num],
                                      companion_loc_vec["x_pix_coord"][pos_num]],
                       mask_radius = self.comp_rad,
@@ -277,8 +277,8 @@ class Detection:
         net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),comp_mask)
 
         # find S/N
-        noise_smoothed = np.multiply(smoothed_w_fake_planet,net_noise_mask)
-        comp_ampl = np.multiply(smoothed_w_fake_planet,comp_mask_inv)
+        noise_smoothed = np.multiply(smoothed_adi_frame,net_noise_mask)
+        comp_ampl = np.multiply(smoothed_adi_frame,comp_mask_inv)
 
         print("Signal:")
         print(np.nanmax(comp_ampl))
@@ -287,14 +287,15 @@ class Detection:
         print("S/N:")
         print(np.divide(np.nanmax(comp_ampl),np.nanstd(noise_smoothed)))
 
-        ## BEGIN WRITE OUT AS A CHECK
-        fits.writeto(filename="junk_smoothed.fits", data=smoothed_w_fake_planet, overwrite=True)
-        fits.writeto(filename="junk_noise_smoothed.fits", data=noise_smoothed, overwrite=True)
-        fits.writeto(filename="junk_comp_mask.fits", data=comp_ampl, overwrite=True)
-        fits.writeto(filename="junk_host_subt.fits", data=self.master_frame, overwrite=True)
-        ## END WRITE OUT AS A CHECK
-
-
+        # write out as a check
+        sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
+        sn_check_cube[0,:,:] = self.master_frame # the original ADI frame
+        sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
+        sn_check_cube[2,:,:] = noise_smoothed # the noise ring
+        sn_check_cube[3,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
+        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(adi_frame_name),
+                     data = sn_check_cube,
+                     overwrite = True)
 
 
 def main():

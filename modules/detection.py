@@ -55,7 +55,8 @@ def circ_mask(input_array, mask_center, mask_radius, invert=False):
     OUTPUTS:
     mask_array: boolean array (1 and nan) of the same size as the input image
     '''
-
+    print('mask center')
+    print(mask_center)
     mask_array = np.ones(np.shape(input_array))
     y_len = np.arange(np.shape(input_array)[0])
     x_len = np.arange(np.shape(input_array)[1])
@@ -237,19 +238,35 @@ class Detection:
         ## ## END STAND-IN
 
         # calculate outer noise annulus radius
-        fake_psf_outer_edge_rad = np.add(np.sqrt(np.power(companion_loc_vec["x_pix_coord"][pos_num]-x_cen,2) + 
-                                  np.power(companion_loc_vec["y_pix_coord"][pos_num]-y_cen,2)), 
-                                  self.comp_rad)
+        print("comp loc vec")
+        print(companion_loc_vec["x_pix_coord"][pos_num])
+        print(companion_loc_vec["y_pix_coord"][pos_num])
+        print(self.comp_rad)
+        #print(np.power(companion_loc_vec["x_pix_coord"][pos_num]-xn,1))
+        #print(np.power(companion_loc_vec["y_pix_coord"][pos_num]-y_cen,1))
+        fake_psf_outer_edge_rad = np.add(\
+                                         np.sqrt(\
+                                                 np.power(companion_loc_vec["x_pix_coord"][pos_num],2) + \
+                                                 np.power(companion_loc_vec["y_pix_coord"][pos_num],2)\
+                                                 ),\
+                                                 self.comp_rad)
+        print("fake_psf_outer_edge_rad")
+        print(fake_psf_outer_edge_rad)
 
         # calculate inner noise annulus radius
-        fake_psf_inner_edge_rad = np.subtract(np.sqrt(np.power(companion_loc_vec["x_pix_coord"][pos_num]-x_cen,2) + 
-                                  np.power(companion_loc_vec["y_pix_coord"][pos_num]-y_cen,2)), 
-                                  self.comp_rad)
+        fake_psf_inner_edge_rad = np.subtract(\
+                                         np.sqrt(\
+                                                 np.power(companion_loc_vec["x_pix_coord"][pos_num],2) + \
+                                                 np.power(companion_loc_vec["y_pix_coord"][pos_num],2)\
+                                                 ),\
+                                                 self.comp_rad)
+        print("fake_psf_inner_edge_rad")
+        print(fake_psf_inner_edge_rad)
 
         # invert-mask the companion
         comp_mask_inv = circ_mask(input_array = smoothed_adi_frame,
-                      mask_center = [companion_loc_vec["y_pix_coord"][pos_num],
-                                     companion_loc_vec["x_pix_coord"][pos_num]],
+                      mask_center = [np.add(y_cen,companion_loc_vec["y_pix_coord"][pos_num]),
+                                     np.add(x_cen,companion_loc_vec["x_pix_coord"][pos_num])],
                       mask_radius = self.comp_rad,
                       invert=True)
 
@@ -263,13 +280,14 @@ class Detection:
                              mask_radius = fake_psf_inner_edge_rad,
                              invert=False)
         comp_mask = circ_mask(input_array = smoothed_adi_frame,
-                      mask_center = [companion_loc_vec["y_pix_coord"][pos_num],
-                                     companion_loc_vec["x_pix_coord"][pos_num]],
+                      mask_center = [np.add(y_cen,companion_loc_vec["y_pix_coord"][pos_num]),
+                                     np.add(x_cen,companion_loc_vec["x_pix_coord"][pos_num])],
                       mask_radius = self.comp_rad,
                       invert=False)
 
         # mask involving the noise ring without the companion
-        net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),comp_mask)
+        net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),
+                                comp_mask)
 
         # find S/N
         noise_smoothed = np.multiply(smoothed_adi_frame,net_noise_mask)

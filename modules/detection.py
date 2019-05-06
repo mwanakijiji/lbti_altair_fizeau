@@ -138,25 +138,34 @@ class Median:
             hdr_write["FAKECREL"] = header_sci["FAKECREL"] # contrast ratio of fake companion
 
         # write cube
-        fits.writeto(filename = write_cube_name, data = cube_derotated_frames, header = hdr_write, overwrite = True)
+        fits.writeto(filename = write_cube_name,
+                     data = cube_derotated_frames,
+                     header = hdr_write,
+                     overwrite = True)
         print("Wrote cube of derotated frames, " + os.path.basename(write_cube_name))
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        fits.writeto(filename = write_adi_name, data = median_stack, header = hdr_write, overwrite = True)
+        fits.writeto(filename = write_adi_name,
+                     data = median_stack,
+                     header = hdr_write,
+                     overwrite = True)
         print("Wrote median of stack, " + os.path.basename(write_adi_name))
 
 
 class Detection:
     '''
-    Do analysis on the median frame
+    Do analysis on ONE median frame
     '''
 
     def __init__(self,
                  adi_frame_name,
+                 csv_record,
                  config_data = config):
         '''
         INPUTS:
+        adi_frame_name: absolute name of the ADI frame to be analyzed
+        csv_record: absolute name of the csv file in which S/N data is recorded
         config_data: configuration data, as usual
         '''
 
@@ -169,6 +178,9 @@ class Detection:
 
         # radius of aperture around planet candidate (pix)
         self.comp_rad = 10
+
+        # csv file to save S/N data
+        self.csv_record = csv_record
 
 
     def __call__(self,
@@ -295,6 +307,11 @@ class Detection:
         signal = np.nanmax(comp_ampl)
         noise = np.nanstd(noise_smoothed)
         s2n = np.divide(signal,noise)
+
+        # append S/N info
+        injection_loc_dict["signal"] = signal
+        injection_loc_dict["noise"] = noise
+        injection_loc_dict["s2n"] = s2n
         
         print("Signal:")
         print(signal)
@@ -303,8 +320,12 @@ class Detection:
         print("S/N:")
         print(s2n)
 
-        # write to csv
-        ## ## TBD
+        # append to csv
+        injection_loc_df = pd.DataFrame(injection_loc_dict)
+        # check if csv file exists; if it does, don't repeat the header
+        exists = os.path.isfile(self.csv_record)
+        injection_loc_df.to_csv(self.csv_record, sep = ",", mode = "a", header = (not exists))
+        print("Appended data to csv")
 
         # write out as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
@@ -369,6 +390,15 @@ def main():
                                       fake_planet = True)
     '''
 
+    # file which will record all S/N calculations, for each fake planet parameter
+    csv_file = config["data_dirs"]["DIR_S2N"] + "test_csv_file.csv"
+
+    # check if csv file exists; I want to start with a new one
+    exists = os.path.isfile(csv_file)
+    if exists:
+        input("A CSV file already exists! Hit [Enter] to delete it and continue.")
+        os.remove(csv_file)
+        
     # loop again over all fake planet parameter combinations to retrieve ADI frames and look for signal
     for t in range(0,len(param_list)):
 
@@ -386,7 +416,8 @@ def main():
         fake_params_string = param_list[t]
 
         # initialize and detect
-        detection_blind_search = Detection(adi_frame_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits")
+        detection_blind_search = Detection(adi_frame_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
+                                           csv_record = csv_file)
         detection_blind_search(fake_planet = True)
         #detection_blind_search(blind_search = True)
     

@@ -391,7 +391,7 @@ def main():
     '''
 
     # file which will record all S/N calculations, for each fake planet parameter
-    csv_file = config["data_dirs"]["DIR_S2N"] + "test_csv_file.csv"
+    csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
 
     # check if csv file exists; I want to start with a new one
     exists = os.path.isfile(csv_file)

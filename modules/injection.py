@@ -63,9 +63,7 @@ class FakePlanetInjector:
                                                       np.float(self.config_data["instrum_params"]["LMIR_PS"]))
         self.pos_info = polar_to_xy(self.experiment_vector)
 
-        
-        ##########
-        
+
 
     def __call__(self,
                  abs_sci_name):

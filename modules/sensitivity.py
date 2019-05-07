@@ -4,6 +4,7 @@ import glob
 import time
 import pickle
 import math
+import numpy as np
 import pandas as pd
 from astropy.io import fits
 from modules import *
@@ -26,7 +27,7 @@ def blahblah():
     mask_array: boolean array (1 and nan) of the same size as the input image
     '''
 
-    return 
+    return
 
 
 class OneDimContrastCurve:
@@ -48,18 +49,13 @@ class OneDimContrastCurve:
 
 
     def __call__(self,
-                 abs_sci_name_array,
-                 write_cube_name,
-                 write_adi_name,
-                 fake_planet = False):
+                 csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]):
         '''
-        Make the stack and take median
+        Read in the csv with detection information
 
         INPUTS:
 
-        abs_sci_name: the array of absolute paths of the science frames we want to combine
-        write_adi_name: absolute path filename for writing out the ADI frame
-        fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
+        csv_file: absolute name of the file which contains the detection information
         '''
 
         
@@ -80,4 +76,67 @@ def main():
     config.read("modules/config.ini")
 
     # read in csv of detection info
-    csv_detection = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
+    ## ## STAND-IN
+    file_name = "test_csv_file.csv"
+    info_file = pd.read_csv(file_name)
+
+    # For groups of rows defined by 
+    #      A.) a common value of rad_asec
+    #      B.) a common value of ampl_linear_norm
+    # 1. find median value of S/N for each group
+    # 2. select lowest value of ampl_linear_norm which provides a minimum X S/N
+
+    # group by radius and ampl_linear_norm
+    info_file_grouped_rad_ampl = info_file.groupby(["rad_asec", "ampl_linear_norm"], 
+                                            axis=0, 
+                                            as_index=False).median()
+
+    # for each radius, find ampl_linear_norm with S/N > threshold_s2n
+    ## ## STAND-IN
+    threshold_s2n = 2
+
+    # unique radius values
+    unique_rad_vals = info_file_grouped_rad_ampl["rad_asec"].unique()
+
+    # initialize array for contrast curve
+    contrast_curve = {"rad_asec": np.nan*np.ones(len(unique_rad_vals)),
+                  "ampl_linear_norm": np.nan*np.ones(len(unique_rad_vals))}
+    contrast_curve_pd = pd.DataFrame(contrast_curve)
+
+    # loop over unique radius values
+    for t in range(0,len(unique_rad_vals)):
+    
+        # subset of data with the right radius from the host star
+        data_right_rad = info_file_grouped_rad_ampl.where(\
+                                                          info_file_grouped_rad_ampl["rad_asec"] == unique_rad_vals[t]\
+                                                          )
+        # sub-subset of data with at least the minimum S/N
+        data_right_s2n_presort = data_right_rad.where(\
+                                                      data_right_rad["s2n"] >= threshold_s2n\
+                                                      ).dropna()
+    
+        # the row of data with the minimum S/N above the minimum threshold    
+        data_right_s2n_postsort = data_right_s2n_presort.where(\
+                                                               data_right_s2n_presort["s2n"] == data_right_s2n_presort["s2n"].min()\
+                                                               ).dropna()
+        '''
+        print(data_right_s2n_postsort)
+        print(data_right_s2n_postsort["rad_asec"].values[0])
+        print(data_right_s2n_postsort["ampl_linear_norm"].values[0])
+        '''
+    
+        # append companion radius and amplitude values
+        contrast_curve_pd.at[t,"rad_asec"] = data_right_s2n_postsort["rad_asec"].values[0]
+        contrast_curve_pd.at[t,"ampl_linear_norm"] = data_right_s2n_postsort["ampl_linear_norm"].values[0]
+    
+        '''
+        print("------------")
+        print(data_right_rad)
+        print("-")
+        print(data_right_s2n_presort)
+        print("-")
+        print(data_right_s2n_postsort)
+        '''
+
+    # write out to csv
+    contrast_curve_pd.to_csv("contrast_test.csv", sep = ",", columns = ["rad_asec","ampl_linear_norm"])

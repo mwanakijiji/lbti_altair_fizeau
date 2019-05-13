@@ -5,10 +5,6 @@ python:
 
 install:
   - pip install -r requirements.txt
-#  - pip install -e .
-
-#script:
-#  - pytest -vs tests/
 
 env:
   - TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR

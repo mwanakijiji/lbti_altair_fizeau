@@ -11,7 +11,8 @@ from modules import \
      psf_pca_bases, \
      injection, \
      host_removal, \
-     detection
+     detection, \
+     sensitivity
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
@@ -33,7 +34,6 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-'''
 
 ## ## FAKE PLANET INJECTION
 injection.main()
@@ -41,13 +41,14 @@ injection.main()
 ## ## HOST REMOVAL
 host_removal.main()
 
-
 ## ## ADI: large radii, small radii
 
 ## ## DETECTION
 detection.main()
+'''
 
 
 ## ## ORBITAL PARAMETER FORWARD MODELING
 
 ## ## SENSITIVITY
+sensitivity.main()

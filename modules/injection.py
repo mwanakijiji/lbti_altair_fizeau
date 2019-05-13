@@ -224,8 +224,8 @@ def main():
 
     # fake planet injection parameters
     fake_params_pre_permute = {"angle_deg": [0., 60., 120.],
-                               "rad_asec": [0.3, 0.4],
-                               "ampl_linear_norm": [1., 0.9]}
+                               "rad_asec": [0.3, 0.4, 0.5, 0.6],
+                               "ampl_linear_norm": [1., 0.8, 0.6, 0.4, 0.3, 0.2, 0.1]}
 
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!

@@ -6,6 +6,7 @@ import pickle
 import math
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from astropy.io import fits
 from modules import *
 
@@ -97,6 +98,7 @@ def main():
 
     # unique radius values
     unique_rad_vals = info_file_grouped_rad_ampl["rad_asec"].unique()
+    print(unique_rad_vals)
 
     # initialize array for contrast curve
     contrast_curve = {"rad_asec": np.nan*np.ones(len(unique_rad_vals)),
@@ -139,4 +141,15 @@ def main():
         '''
 
     # write out to csv
-    contrast_curve_pd.to_csv("contrast_test.csv", sep = ",", columns = ["rad_asec","ampl_linear_norm"])
+    file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CSV"]
+    contrast_curve_pd.to_csv(file_name_cc, sep = ",", columns = ["rad_asec","ampl_linear_norm"])
+    print("Wrote out contrast curve CSV to " + file_name_cc)
+
+    # make plot
+    file_name_cc_plot = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["CONTCURV_PLOT"]
+    plt.plot(contrast_curve_pd["rad_asec"],contrast_curve_pd["ampl_linear_norm"])
+    plt.xlabel("Radius from host star (asec)")
+    plt.ylabel("Min. companion amplitude with S/N > 2")
+    plt.savefig(file_name_cc_plot)
+    plt.clf()
+    print("Wrote out contast curve plot to " + file_name_cc_plot)

@@ -363,7 +363,6 @@ def main():
     param_list = list(frozenset(degen_param_list)) # remove repeats
 
     # loop over all fake planet parameter combinations and make ADI frames
-    '''
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints
@@ -388,7 +387,6 @@ def main():
                                       write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
                                       write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
                                       fake_planet = True)
-    '''
 
     # file which will record all S/N calculations, for each fake planet parameter
     csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]

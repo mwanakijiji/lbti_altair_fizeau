@@ -203,7 +203,7 @@ def main():
     '''
     
     # remove the host from the frames WITH fake planets
-    host_removal_fake_planets(fake_planet_frames_07_name_array[0])
+    #host_removal_fake_planets(fake_planet_frames_07_name_array[0])
     pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
 
     '''

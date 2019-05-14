@@ -17,10 +17,10 @@ from modules import \
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
-
+'''
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
-'''
+
 ## ## FITS HEADER METADATA EXTRACTION
 fits_meta_data = fits_hdr.main()
 
@@ -34,7 +34,7 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-
+'''
 ## ## FAKE PLANET INJECTION
 injection.main()
 
@@ -45,10 +45,7 @@ host_removal.main()
 
 ## ## DETECTION
 detection.main()
-'''
-
 
 ## ## ORBITAL PARAMETER FORWARD MODELING
-
 ## ## SENSITIVITY
 sensitivity.main()

@@ -255,7 +255,11 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     # apply mask over weird regions to PCA cube
     print(type(pca_cube))
     #print(type(mask_weird[0]))
-    pca_cube_masked = np.multiply(pca_cube,mask_weird)
+    try:
+        pca_cube_masked = np.multiply(pca_cube,mask_weird)
+    except:
+        print("Mask and input image have incompatible dimensions!")
+        return
 
     # apply mask over weird detector regions to science image
     sciImg_psf_masked = np.multiply(sciImg,mask_weird)

@@ -325,7 +325,9 @@ class Detection:
         # check if csv file exists; if it does, don't repeat the header
         exists = os.path.isfile(self.csv_record)
         injection_loc_df.to_csv(self.csv_record, sep = ",", mode = "a", header = (not exists))
-        print("Appended data to csv")
+        print("---------------------")
+        print("Appended data to csv ")
+        print(str(self.csv_record))
 
         # write out as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))

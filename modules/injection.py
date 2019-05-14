@@ -55,7 +55,7 @@ class FakePlanetInjector:
 
         # convert to dataframe
         self.experiment_vector = pd.DataFrame(experiments)
-        
+
         # convert radii in asec to pixels
         ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
         ## ## file to be deg E of N, and in asec
@@ -90,7 +90,7 @@ class FakePlanetInjector:
         hdulist = fits.HDUList([hdu])
         hdu.writeto("junk_mask.fits", clobber=True)
         ## END TEST
-        
+
         ###########################################
         # PCA-decompose the host star PSF
         # (be sure to mask the bad regions)
@@ -102,6 +102,8 @@ class FakePlanetInjector:
         # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
         # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
         fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=100)
+        if not fit_unsat: # if the dimensions were incompatible, skip this science frame
+            return
 
         # get absolute amplitude of the host star
         ampl_host_star = np.max(fit_unsat["recon_2d"])
@@ -121,7 +123,7 @@ class FakePlanetInjector:
         print(pca_fit_pickle_write_name)
         with open(pca_fit_pickle_write_name, "wb") as f:
             pickle.dump(pickle_stuff, f)
-        
+
         ###########################################
         # inject the fake planet
         # (parameters are:
@@ -137,7 +139,7 @@ class FakePlanetInjector:
         for elem_num in range(0,len(self.experiment_vector)):
 
             print(self.experiment_vector)
-            
+
             fake_angle_e_of_n_deg = self.experiment_vector["angle_deg"][elem_num]
             fake_radius_asec = self.experiment_vector["rad_asec"][elem_num]
             fake_contrast_rel = self.experiment_vector["ampl_linear_norm"][elem_num]
@@ -150,13 +152,13 @@ class FakePlanetInjector:
             # find the injection angle, given the PA of the image
             # (i.e., add angle east of true North, and parallactic angle; don't de-rotate the image)
             angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,header_sci["LBT_PARA"])
-                
+
             # shift the image to the right location
             reconImg_shifted = scipy.ndimage.interpolation.shift(
                 fit_unsat["recon_2d"],
                 shift = [self.experiment_vector["y_pix_coord"][elem_num],
                          self.experiment_vector["x_pix_coord"][elem_num]]) # shift in +y,+x convention
-                         
+
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.experiment_vector["ampl_linear_norm"][elem_num])
@@ -169,7 +171,7 @@ class FakePlanetInjector:
             #hdulist = fits.HDUList([hdu])
             #hdu.writeto("junk.fits", clobber=True)
             ## END TEST
-                    
+
             # add info to the header indicating last reduction step, and fake PSF parameters and PCA info
             header_sci["RED_STEP"] = "fake_planet_injection"
             header_sci.comments["RED_STEP"] = "Last reduction step performed"
@@ -202,8 +204,7 @@ class FakePlanetInjector:
                      header = header_sci,
                      overwrite = True)
             print("Writing out fake-planet-injected frame " + os.path.basename(abs_image_w_fake_planet_name))
-        
-        
+
 
 
 def main():
@@ -217,15 +218,15 @@ def main():
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
-    
+
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
     # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg": [0., 60., 120.],
-                               "rad_asec": [0.3, 0.4, 0.5, 0.6],
-                               "ampl_linear_norm": [1., 0.8, 0.6, 0.4, 0.3, 0.2, 0.1]}
+    fake_params_pre_permute = {"angle_deg": [0., 60., 120., 180., 240., 300.],
+                               "rad_asec": [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6],
+                               "ampl_linear_norm": [1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]}
 
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!

@@ -88,7 +88,6 @@ class OneDimContrastCurve:
 
         # loop over unique radius values
         for t in range(0,len(unique_rad_vals)):
-
             # subset of data with the right radius from the host star
             data_right_rad = info_file_grouped_rad_ampl.where(\
                                                           info_file_grouped_rad_ampl["rad_asec"] == unique_rad_vals[t]\
@@ -130,18 +129,13 @@ class OneDimContrastCurve:
         file_name_cc_plot = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["CONTCURV_PLOT"]
         plt.plot(contrast_curve_pd["rad_asec"],contrast_curve_pd["ampl_linear_norm"])
         plt.xlabel("Radius from host star (asec)")
-        plt.ylabel("Min. companion amplitude with S/N > 2")
+        plt.ylabel("Min. companion amplitude with S/N > threshhold")
         plt.savefig(file_name_cc_plot)
         plt.clf()
         print("Wrote out contast curve plot to " + file_name_cc_plot)
 
-        
-#class TwoDimSensitivityMap:
-#    '''
-#    Produces a 2D sensitivity map
-#    '''
-    
-    
+
+
 def main():
     '''
     Detect companions (either fake or in a blind search within science data)

@@ -86,9 +86,9 @@ class FakePlanetInjector:
         mask_weird[sci > 55000] = np.nan # mask saturating region
 
         ## TEST: WRITE OUT
-        hdu = fits.PrimaryHDU(mask_weird)
-        hdulist = fits.HDUList([hdu])
-        hdu.writeto("junk_mask.fits", clobber=True)
+        #hdu = fits.PrimaryHDU(mask_weird)
+        #hdulist = fits.HDUList([hdu])
+        #hdu.writeto("junk_mask.fits", clobber=True)
         ## END TEST
 
         ###########################################

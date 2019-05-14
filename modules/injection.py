@@ -149,6 +149,21 @@ class FakePlanetInjector:
             str_fake_radius_asec = str("{:0>5d}".format(int(100*fake_radius_asec))) # 5.05 [asec] -> "00505" etc. 
             str_fake_contrast_rel = str("{:0>5d}".format(int(100*np.abs(math.log10(fake_contrast_rel))))) # 10^(-4) -> "00400" etc.
 
+            # set the name of the image that will be written out
+            abs_image_w_fake_planet_name = str(self.config_data["data_dirs"]["DIR_FAKE_PSFS"] + \
+                                                 "fake_planet_" + \
+                                                 str_fake_angle_e_of_n_deg + "_" + \
+                                                 str_fake_radius_asec + "_" + \
+                                                 str_fake_contrast_rel + "_" + \
+                                                 os.path.basename(abs_sci_name))
+
+            # check if this image already exists, and skip if it already does
+            ## ## might remove this option later; I'm just trying to avoid re-doing some work that has already been done
+            exists = os.path.isfile(abs_image_w_fake_planet_name)
+            if exists:
+                return
+            
+
             # find the injection angle, given the PA of the image
             # (i.e., add angle east of true North, and parallactic angle; don't de-rotate the image)
             angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,header_sci["LBT_PARA"])
@@ -193,12 +208,6 @@ class FakePlanetInjector:
 
             # write FITS file out, with fake planet params in file name and header
             ## ## do I actually want to write out a separate FITS file for each fake planet?
-            abs_image_w_fake_planet_name = str(self.config_data["data_dirs"]["DIR_FAKE_PSFS"] + \
-                                                 "fake_planet_" + \
-                                                 str_fake_angle_e_of_n_deg + "_" + \
-                                                 str_fake_radius_asec + "_" + \
-                                                 str_fake_contrast_rel + "_" + \
-                                                 os.path.basename(abs_sci_name))
             fits.writeto(filename = abs_image_w_fake_planet_name,
                      data = image_w_fake_planet,
                      header = header_sci,

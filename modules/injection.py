@@ -159,9 +159,10 @@ class FakePlanetInjector:
 
             # check if this image already exists, and skip if it already does
             ## ## might remove this option later; I'm just trying to avoid re-doing some work that has already been done
-            exists = os.path.isfile(abs_image_w_fake_planet_name)
-            if exists:
-                return
+            #exists = os.path.isfile(abs_image_w_fake_planet_name)
+            #if exists:
+            #    print(abs_image_w_fake_planet_name + " already exists; skipping...")
+            #    return
             
 
             # find the injection angle, given the PA of the image

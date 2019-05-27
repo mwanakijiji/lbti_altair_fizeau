@@ -35,13 +35,8 @@ centering.main()
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 
-## ## FAKE PLANET INJECTION
-injection.main()
-
-## ## HOST REMOVAL
-host_removal.main()
-
-## ## ADI: large radii, small radii
+## ## FAKE PLANET INJECTION, ADI, DETECTION
+injection_sensitivity.main()
 
 ## ## DETECTION
 detection.main()

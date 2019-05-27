@@ -10,6 +10,7 @@ from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
 from modules import *
+from modules import host_removal
 
 # import the PCA machinery for making backgrounds
 from .basic_red import BackgroundPCACubeMaker 
@@ -429,16 +430,15 @@ def main():
                                      
         # remove host from each frame in the cube
         # instantiate
-        remove_hosts = host_removal.HostRemovalCube(cube = injected_fake_psfs_cube,
-                                                    pas = pas_array,
-                                                          n_PCA = 100,
+        remove_hosts = host_removal.HostRemovalCube(cube_frames = injected_fake_psfs_cube,
+                                                    n_PCA = 100,
                                                           outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
                                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits")
 
         removed_hosts_cube = remove_hosts()
-
+        '''
         # derotate, ADI, determine sensitivity
         median_instance = Median()
         make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array_one_combo,

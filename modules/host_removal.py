@@ -121,6 +121,7 @@ class HostRemoval:
 class HostRemovalCube:
     '''
     PCA-decompose a saturated host star PSF and remove it, using a cube of frames in memory
+    N.b. This does no de-rotation; is blind to parallactic angle
     '''
 
     def __init__(self,
@@ -141,6 +142,7 @@ class HostRemovalCube:
         config_data: configuration data, as usual
         '''
 
+        self.cube_frames = cube_frames
         self.n_PCA = n_PCA
         self.outdir = outdir
         self.abs_PCA_name = abs_PCA_name
@@ -155,72 +157,87 @@ class HostRemovalCube:
         ##########
 
 
-    def __call__(self,
-                 abs_sci_name):
+    def __call__(self):
         '''
-        Reconstruct and inject, for a single frame so as to parallelize the job
+        Reconstruct and subtract the host star from each slice
 
         INPUTS:
 
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
         '''
 
-        print(abs_sci_name)
+        # make a cube that is the same shape as the input
+        host_subt_cube = np.nan*np.ones(np.shape(self.cube_frames))
 
-        # read in the cutout science frame
-        # (there should be no masking of this frame downstream)
-        sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
+        for slice_num in range(0,len(self.cube_frames)):
 
-        # define the mask of this science frame
-        ## ## fine-tune this step later!
-        mask_weird = np.ones(np.shape(sci))
-        no_mask = np.copy(mask_weird) # a non-mask for reconstructing saturated PSFs
-        #mask_weird[sci > 1e8] = np.nan # mask saturating region
+            # select the slice from the cube
+            # (there should be no masking of this frame downstream)
+            sci = self.cube_frames[slice_num,:,:]
 
-        ## TEST: WRITE OUT
-        #hdu = fits.PrimaryHDU(mask_weird)
-        #hdulist = fits.HDUList([hdu])
-        #hdu.writeto("junk_mask.fits", clobber=True)
-        ## END TEST
+            # define the mask of this science frame
+            ## ## fine-tune this step later!
+            mask_weird = np.ones(np.shape(sci))
+            no_mask = np.copy(mask_weird) # a non-mask for reconstructing saturated PSFs
+            #mask_weird[sci > 1e8] = np.nan # mask saturating region
 
-        ###########################################
-        # PCA-decompose the host star PSF
-        # (note no de-rotation of the image here)
+            ## TEST: WRITE OUT
+            #hdu = fits.PrimaryHDU(mask_weird)
+            #hdulist = fits.HDUList([hdu])
+            #hdu.writeto("junk_mask.fits", clobber=True)
+            ## END TEST
 
-        # do the PCA fit of masked host star
-        # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
-        # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
-        try:
-            fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
-        except:
-            return
+            ###########################################
+            # PCA-decompose the host star PSF
+            # (note no de-rotation of the image here)
 
-        # subtract the PCA-reconstructed host star
-        image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
+            # do the PCA fit of masked host star
+            # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
+            # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
+            try:
+                fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
+            except:
+                return
 
-        # pickle the PCA vector
-        pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,
+            # subtract the PCA-reconstructed host star
+            image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
+
+            # pickle the PCA vector
+            '''
+            pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,
                         "pca_vector": fit_unsat["pca_vector"],
                         "recons_2d_psf_unsat": fit_unsat["recon_2d"],
                         "sci_image_name": abs_sci_name}
-        print(pickle_stuff)
-        pca_fit_pickle_write_name = str(self.config_data["data_dirs"]["DIR_PICKLE"]) \
-          + "pickle_pca_sat_psf_info_" + str(os.path.basename(abs_sci_name).split(".")[0]) + ".pkl"
-        print(pca_fit_pickle_write_name)
-        with open(pca_fit_pickle_write_name, "wb") as f:
-            pickle.dump(pickle_stuff, f)
+            print(pickle_stuff)
+            pca_fit_pickle_write_name = str(self.config_data["data_dirs"]["DIR_PICKLE"]) \
+              + "pickle_pca_sat_psf_info_" + str(os.path.basename(abs_sci_name).split(".")[0]) + ".pkl"
+            print(pca_fit_pickle_write_name)
+            with open(pca_fit_pickle_write_name, "wb") as f:
+                pickle.dump(pickle_stuff, f)
 
-        # add info to the header indicating last reduction step, and PCA info
-        header_sci["RED_STEP"] = "host_removed"
+            # add info to the header indicating last reduction step, and PCA info
+            header_sci["RED_STEP"] = "host_removed"
 
-        # write FITS file out, with fake planet params in file name
-        ## ## do I actually want to write out a separate FITS file for each fake planet?
-        abs_image_host_removed_name = str(self.outdir + os.path.basename(abs_sci_name))
-        fits.writeto(filename = abs_image_host_removed_name,
+            # write FITS file out, with fake planet params in file name
+            ## ## do I actually want to write out a separate FITS file for each fake planet?
+            abs_image_host_removed_name = str(self.outdir + os.path.basename(abs_sci_name))
+            '''
+
+            host_subt_cube[slice_num,:,:] = image_host_removed
+
+            '''
+            fits.writeto(filename = abs_image_host_removed_name,
                      data = image_host_removed,
                      header = header_sci,
                      overwrite = True)
-        print("Writing out host_removed frame " + os.path.basename(abs_sci_name))
+            print("Writing out host_removed frame " + os.path.basename(abs_sci_name))
+            '''
+
+        # for memory's sake
+        del self.cube_frames
+
+        # return cube of non-derotated, host-star-subtracted frames
+        return host_subt_cube
 
 
 def main():

@@ -9,18 +9,17 @@ from modules import \
      fits_hdr, \
      centering, \
      psf_pca_bases, \
-     injection, \
-     host_removal, \
+     injection_sensitivity, \
      detection, \
      sensitivity
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
-'''
+
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
-
+'''
 ## ## FITS HEADER METADATA EXTRACTION
 fits_meta_data = fits_hdr.main()
 
@@ -34,13 +33,15 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-
+'''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_sensitivity.main()
 
+'''
 ## ## DETECTION
 detection.main()
-'''
+
 ## ## ORBITAL PARAMETER FORWARD MODELING
 ## ## SENSITIVITY
 sensitivity.main()
+'''

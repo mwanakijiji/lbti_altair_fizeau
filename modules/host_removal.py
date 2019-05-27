@@ -228,9 +228,12 @@ class HostRemovalCube:
         # for memory's sake
         del self.cube_frames
 
+        '''
+        # test
         fits.writeto(filename = "junk2.fits",
                      data = host_subt_cube,
                      overwrite = True)
+        '''
         print("Writing out host_removed frame ")
 
         # return cube of non-derotated, host-star-subtracted frames

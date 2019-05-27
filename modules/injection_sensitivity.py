@@ -10,7 +10,7 @@ from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
 from modules import *
-from modules import host_removal
+from modules import host_removal, detection
 
 # import the PCA machinery for making backgrounds
 from .basic_red import BackgroundPCACubeMaker 
@@ -141,7 +141,7 @@ class FakePlanetInjector:
 
             print(self.experiment_vector)
 
-            fake_angle_e_of_n_deg = self.experiment_vector["angle_deg"][elem_num]
+            fake_angle_e_of_n_deg = self.experiment_vector["angle_deg_EofN"][elem_num]
             fake_radius_asec = self.experiment_vector["rad_asec"][elem_num]
             fake_contrast_rel = self.experiment_vector["ampl_linear_norm"][elem_num]
 
@@ -168,7 +168,8 @@ class FakePlanetInjector:
 
             # find the injection angle, given the PA of the image
             # (i.e., add angle east of true North, and parallactic angle; don't de-rotate the image)
-            angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,header_sci["LBT_PARA"])
+            angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,
+                                                  header_sci["LBT_PARA"])
 
             # shift the image to the right location
             reconImg_shifted = scipy.ndimage.interpolation.shift(
@@ -240,7 +241,7 @@ class FakePlanetInjectorCube:
         abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
         fake_params_pre_permute: angles (relative to PA up), radii, and amplitudes (normalized to host star) of fake PSFs
-                       ex.: fake_params = {"angle_deg": [0., 60., 120.], "rad_asec": [0.3, 0.4], "ampl_linear_norm": [1., 0.9]}
+                       ex.: fake_params = {"angle_deg_EofN": [0., 60., 120.], "rad_asec": [0.3, 0.4], "ampl_linear_norm": [1., 0.9]}
                        -> all permutations of these parameters will be computed later
         config_data: configuration data, as usual
         '''
@@ -330,19 +331,35 @@ class FakePlanetInjectorCube:
             # (N.b. each element represents one fake planet)
 
 
-            fake_angle_e_of_n_deg = self.fake_params["angle_deg"]
+            fake_angle_e_of_n_deg = self.fake_params["angle_deg_EofN"]
             fake_radius_asec = self.fake_params["rad_asec"]
             fake_contrast_rel = self.fake_params["ampl_linear_norm"]
 
             # find the injection angle, given the PA of the image
             # (i.e., add angle east of true North, and parallactic angle; don't de-rotate the image)
-            angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,header_sci["LBT_PARA"])
+            #angle_static_frame_injection = np.add(fake_angle_e_of_n_deg,header_sci["LBT_PARA"])
+
+            # now calculate where in (y,x) space the fake planet should be injected in the
+            # frame as projected in ALT-AZ mode, BEFORE it is de-rotated
+            pos_info = polar_to_xy(pos_info = self.fake_params,
+                                   pa = header_sci["LBT_PARA"])
+            
+            print('pa in header:')
+            print(header_sci["LBT_PARA"])
+            print('fake angle E of N:')
+            print(fake_angle_e_of_n_deg)
+            print('angle_static_frame_injection:')
+            #print(angle_static_frame_injection)
 
             # shift the PSF image to the location of the fake planet
             reconImg_shifted = scipy.ndimage.interpolation.shift(
                 fit_unsat["recon_2d"],
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
+
+            print('fake_params y x')
+            print(self.fake_params["y_pix_coord"])
+            print(self.fake_params["x_pix_coord"])
 
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
@@ -357,9 +374,9 @@ class FakePlanetInjectorCube:
                 
 
             ## TEST: WRITE OUT
-            #hdu = fits.PrimaryHDU(training_cube)
-            #hdulist = fits.HDUList([hdu])
-            #hdu.writeto("junk.fits", clobber=True)
+            hdu = fits.PrimaryHDU(reconImg_shifted)
+            hdulist = fits.HDUList([hdu])
+            hdu.writeto("junk_fake.fits", clobber=True)
             ## END TEST
 
         fits.writeto(filename = "junk.fits",
@@ -391,7 +408,7 @@ def main():
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
     # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg": [0., 60., 120., 180., 240., 300.],
+    fake_params_pre_permute = {"angle_deg_EofN": [0., 60., 120., 180., 240., 300.],
                                "rad_asec": [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6],
                                "ampl_linear_norm": [1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]}
 
@@ -407,13 +424,12 @@ def main():
     ## ## file to be deg E of N, and in asec
     experiment_vector["rad_pix"] = np.divide(experiment_vector["rad_asec"],
                                              np.float(config["instrum_params"]["LMIR_PS"]))
-    pos_info = polar_to_xy(experiment_vector)
     
     # loop over fake planet parameters
     ## ## INCREASE RANGE
     for param_config in range(0,1):#len(experiment_vector)):
 
-        # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
+        ## inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
         print("-------------------------------------------------")
         print("Injecting fake planet corresponding to parameter")
         print(experiment_vector)
@@ -428,7 +444,7 @@ def main():
         # call
         injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
                                      
-        # remove host from each frame in the cube
+        ## remove host from each frame in the cube
         # instantiate
         remove_hosts = host_removal.HostRemovalCube(cube_frames = injected_fake_psfs_cube,
                                                     n_PCA = 100,
@@ -436,15 +452,18 @@ def main():
                                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits")
-
+        # call
         removed_hosts_cube = remove_hosts()
-        '''
-        # derotate, ADI, determine sensitivity
-        median_instance = Median()
-        make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array_one_combo,
-                                      write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
+        
+        ## derotate, ADI, determine sensitivity
+        # instantiate
+        median_instance = detection.MedianCube(host_subt_cube = removed_hosts_cube,
+                                 pa_array = pas_array)
+        fake_params_string = "STANDIN"
+        make_median = median_instance(write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
                                       write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
                                       fake_planet = True)
+        '''
         detection
 
         # append to a csv

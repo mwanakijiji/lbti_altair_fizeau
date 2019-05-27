@@ -153,6 +153,114 @@ class Median:
         print("Wrote median of stack, " + os.path.basename(write_adi_name))
 
 
+class MedianCube:
+    '''
+    Derotate frames in series, take median
+    '''
+
+    def __init__(self,
+                 host_subt_cube,
+                 pa_array,
+                 config_data = config):
+        '''
+        INPUTS:
+        host_subt_cube: cube of host-star-subtracted frames
+        pa_array: array of PAs
+        config_data: configuration data, as usual
+        '''
+
+        self.host_subt_cube = host_subt_cube
+        self.pa_array = pa_array
+        self.config_data = config_data
+
+
+        ##########
+
+
+    def __call__(self,
+                 write_cube_name,
+                 write_adi_name,
+                 fake_planet = False):
+        '''
+        Make the stack and take median
+
+        INPUTS:
+
+        abs_sci_name: the array of absolute paths of the science frames we want to combine
+        write_adi_name: absolute path filename for writing out the ADI frame
+        fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
+        '''
+
+        # read in a first array to get the shape
+        #shape_test, header = fits.getdata(abs_sci_name_array[0], 0, header=True)
+
+        # initialize a cube
+        #cube_derotated_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(shape_test)[0],np.shape(shape_test)[1]))
+        #del shape_test
+
+        # sort the name array to read in consecutive frames
+        #sorted_abs_sci_name_array = sorted(abs_sci_name_array)
+
+        # initialize cube to contain de-rotated frames
+        cube_derotated_frames = np.nan*np.ones(np.shape(self.host_subt_cube))
+
+        # loop over individual slices to derotate them and put them in to a cube
+        for t in range(0,np.shape(self.host_subt_cube)[0]):
+
+            # read in the pre-derotated frames, derotate them, and put them into a cube
+            sci = self.host_subt_cube[t,:,:]
+
+            # derotate according to PA
+            sci_derotated = scipy.ndimage.rotate(sci, self.pa_array[t], reshape=False)
+
+            # put into cube
+            cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)
+
+        # take median
+        median_stack = np.nanmedian(cube_derotated_frames, axis=0)
+    
+        
+        # generate the header
+        '''
+        hdr_write = fits.Header()
+        hdr_write["NUMFRAME"] = np.shape(cube_derotated_frames)[0] # number of frames we're taking median of
+        if fake_planet:
+            hdr_write["FAKEAEON"] = header_sci["FAKEAEON"] # angle of fake companion, E of N
+            hdr_write["FAKERADA"] = header_sci["FAKERADA"] # radial distance of fake companion, asec
+            hdr_write["FAKECREL"] = header_sci["FAKECREL"] # contrast ratio of fake companion
+        '''
+
+        '''
+        # write cube
+        fits.writeto(filename = write_cube_name,
+                     data = cube_derotated_frames,
+                     header = hdr_write,
+                     overwrite = True)
+        print("Wrote cube of derotated frames, " + os.path.basename(write_cube_name))
+
+        # take median and write
+        median_stack = np.nanmedian(cube_derotated_frames, axis=0)
+        fits.writeto(filename = write_adi_name,
+                     data = median_stack,
+                     header = hdr_write,
+                     overwrite = True)
+        print("Wrote median of stack, " + os.path.basename(write_adi_name))
+        '''
+        
+        # write cube
+        fits.writeto(filename = "junk3.fits",
+                     data = cube_derotated_frames,
+                     overwrite = True)
+        print("Wrote cube of derotated frames ")
+
+        # take median and write
+        median_stack = np.nanmedian(cube_derotated_frames, axis=0)
+        fits.writeto(filename = "junk4.fits",
+                     data = median_stack,
+                     overwrite = True)
+        print("Wrote median of stack")
+
+
 class Detection:
     '''
     Do analysis on ONE median frame

@@ -3,11 +3,20 @@ language: python
 python:
   - "3.5.4"
 
-install:
-  - pip install -r requirements.txt
+#install:
+#  - pip install -r requirements.txt
+#  - pip install -e .
 
-env:
-  - TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR
+script:
+  - python -m pytest -vs tests/
+#  - pytest -vs tests/ # this when 'install' is ready
+
+#env:
+#  - TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR
+
+#before_install:
+#  - echo "$PATH"
+#  - echo "$TRAVIS_BUILD_DIR"
 
 notifications:
   - email: false

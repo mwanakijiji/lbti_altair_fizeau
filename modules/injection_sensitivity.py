@@ -252,6 +252,7 @@ def main():
                                           write = True)
                                           
         # call
+        import pdb; pdb.set_trace()
         injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
                                      
         ## remove host from each frame in the cube

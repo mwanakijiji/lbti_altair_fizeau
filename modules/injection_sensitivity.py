@@ -117,6 +117,7 @@ class FakePlanetInjectorCube:
             print("fit_unsat")
             print(fit_unsat)
             if not fit_unsat: # if the dimensions were incompatible, skip this science frame
+                print("Incompatible dimensions; skipping this frame...")
                 continue
 
             # get absolute amplitude of the host star
@@ -254,7 +255,6 @@ def main():
                                           write = True)
                                           
         # call
-        import pdb; pdb.set_trace()
         injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
                                      
         ## remove host from each frame in the cube

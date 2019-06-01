@@ -114,6 +114,8 @@ class FakePlanetInjectorCube:
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
             fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=100)
+            print("fit_unsat")
+            print(fit_unsat)
             if not fit_unsat: # if the dimensions were incompatible, skip this science frame
                 return
 

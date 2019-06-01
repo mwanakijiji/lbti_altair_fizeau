@@ -117,7 +117,7 @@ class FakePlanetInjectorCube:
             print("fit_unsat")
             print(fit_unsat)
             if not fit_unsat: # if the dimensions were incompatible, skip this science frame
-                return
+                continue
 
             # get absolute amplitude of the host star
             ampl_host_star = np.max(fit_unsat["recon_2d"])

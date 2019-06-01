@@ -66,20 +66,33 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
     if (south and north):
         raw_input("Nonsensical flags: target is in both south and north!")
 
-    # if target is in north, flip the sign of the angular offsets from true North
-    if north:
-        pos_info["angle_deg_EofN"] = -pos_info["angle_deg_EofN"]
-
     # if radius is in asec
     if asec:
         pos_info["rad_pix"] = np.divide(pos_info["rad_asec"],
                                         np.float(config["instrum_params"]["LMIR_PS"]))
 
-    # convert to x,y
+    # Convert to x,y
+    
+    # Consider variables
+    # PA: parallactic angle
+    # theta: angle E of true N (i.e., CCW from +y axis for a southern target, after derotation of image)
+    # R: radial distance from origin (which is at the central host star)
+    
+    # In non-derotated frame, the coordinate of interest is
+    # (x,y) = R*( sin(-PA-theta), cos(-PA-theta) )
+    
     pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
-                                          np.sin(np.multiply(np.add(pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+                                          np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
     pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],
-                                          np.cos(np.multiply(np.add(pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+                                          np.cos(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+
+    # if target is in north (but higher than Polaris), use the same relations except take -pa -> +pa
+    if north:
+        print("Calculating coordinates for a northern target...")
+        pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
+                                          np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
+        pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],
+                                          np.cos(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
 
     return pos_info
 

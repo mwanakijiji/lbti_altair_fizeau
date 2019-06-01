@@ -3,7 +3,7 @@ matplotlib.use('Agg')
 from modules import *
 import pandas as pd
 
-def test_polar_to_xy():
+def test_polar_to_xy_southern():
     '''
     polar_to_xy() is supposed to
 
@@ -36,46 +36,48 @@ def test_polar_to_xy():
     # tests with PA = 0
     pa = 0
     
-    result_1a = polar_to_xy(pos_info_a, pa, asec = False, south = True)
-    assert result_1a["x_pix_coord"][0] == 0
-    assert result_1a["y_pix_coord"][0] == 10
+    result_1a = polar_to_xy(pos_info_a, pa, asec = False, south = True) # E of N: zero
+    assert round(result_1a["x_pix_coord"][0],2) == round(0,2)
+    assert round(result_1a["y_pix_coord"][0],2) == round(10,2)
 
-    result_1b = polar_to_xy(pos_info_b, pa, asec = False, south = True)
-    assert result_1b["x_pix_coord"][0] == -10
-    assert result_1b["y_pix_coord"][0] == 0
+    result_1b = polar_to_xy(pos_info_b, pa, asec = False, south = True) # E of N: +90
+    assert round(result_1b["x_pix_coord"][0],2) == round(-10,2)
+    assert round(result_1b["y_pix_coord"][0],2) == round(0,2)
 
-    # tests with PA = 40
-    pa = 40
+    # tests with PA = -40
+    pa = -40
     
-    result_2a = polar_to_xy(pos_info_a, pa, asec = False, south = True)
-    assert result_2a["x_pix_coord"][0] == 0
-    assert result_2a["y_pix_coord"][0] == 10
+    result_2a = polar_to_xy(pos_info_a, pa, asec = False, south = True) # E of N: zero
+    assert round(result_2a["x_pix_coord"][0],2) == 6.43
+    assert round(result_2a["y_pix_coord"][0],2) == 7.66
 
-    result_2b = polar_to_xy(pos_info_b, pa, asec = False, south = True)
-    assert result_2b["x_pix_coord"][0] == -10
-    assert result_2b["y_pix_coord"][0] == 0
+    result_2b = polar_to_xy(pos_info_b, pa, asec = False, south = True) # E of N: +90
+    assert round(result_2b["x_pix_coord"][0],2) == -7.66
+    assert round(result_2b["y_pix_coord"][0],2) == 6.43
 
 
-    # tests with PA = -30
-    pa = -30
+    # tests with PA = +30
+    pa = 30
     
-    result_3a = polar_to_xy(pos_info_a, pa, asec = False, south = True)
-    assert result_3a["x_pix_coord"][0] == 0
-    assert result_3a["y_pix_coord"][0] == 10
+    result_3a = polar_to_xy(pos_info_a, pa, asec = False, south = True) # E of N: zero
+    assert round(result_3a["x_pix_coord"][0],2) == round(-5,2)
+    assert round(result_3a["y_pix_coord"][0],2) == 8.66
 
-    result_3b = polar_to_xy(pos_info_b, pa, asec = False, south = True)
-    assert result_3b["x_pix_coord"][0] == -10
-    assert result_3b["y_pix_coord"][0] == 0
+    result_3b = polar_to_xy(pos_info_b, pa, asec = False, south = True) # E of N: +90
+    assert round(result_3b["x_pix_coord"][0],2) == -8.66
+    assert round(result_3b["y_pix_coord"][0],2) == round(-5,2)
 
     
-    # a test in the North    
-    result_3a_n = polar_to_xy(pos_info_a, pa, asec = False, north = True)
-    assert result_3a_n["x_pix_coord"][0] == 0
-    assert result_3a_n["y_pix_coord"][0] == 10
+    # a test in the North, PA = +150
+    pa = 150
+    
+    result_3a_n = polar_to_xy(pos_info_a, pa, asec = False, south = False, north = True) # E of N: zero
+    assert round(result_3a_n["x_pix_coord"][0],2) == round(5,2)
+    assert round(result_3a_n["y_pix_coord"][0],2) == -8.66
 
-    result_3b_n = polar_to_xy(pos_info_b, pa, asec = False, north = True)
-    assert result_3b_n["x_pix_coord"][0] == -10
-    assert result_3b_n["y_pix_coord"][0] == 0
+    result_3b_n = polar_to_xy(pos_info_b, pa, asec = False, north = True) # E of N: +90
+    assert round(result_3b_n["x_pix_coord"][0],2) == 8.66
+    assert round(result_3b_n["y_pix_coord"][0],2) == round(5,2)
     
 
     return

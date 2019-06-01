@@ -125,14 +125,19 @@ class HostRemovalCube:
     '''
 
     def __init__(self,
+                 fake_params,
                  cube_frames,
                  n_PCA,
                  outdir,
                  abs_PCA_name,
-                 config_data = config):
+                 config_data = config,
+                 write = False):
         '''
         INPUTS:
-        cube_frames: the cube of frames to use
+        fake_params: fake planet parameters (if applicable; this is just for making the
+            file name string if we are writing out to disk; if not applicable, but
+            in some other size-3 Pandas DataFrame of strings)
+        cube_frames: the cube of frames to use, before host-star subtraction
         n_PCA: number of principal components to use
         outdir: directory to deposit the host-subtracted images in (this has to be
                        defined at the function call because the images may or may not
@@ -140,13 +145,16 @@ class HostRemovalCube:
         abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
         config_data: configuration data, as usual
+        write: flag as to whether data product should be written to disk (for checking)
         '''
 
+        self.fake_params = fake_params
         self.cube_frames = cube_frames
         self.n_PCA = n_PCA
         self.outdir = outdir
         self.abs_PCA_name = abs_PCA_name
         self.config_data = config_data
+        self.write = write
 
         # read in the PCA vector cube for this series of frames
         # (note the PCA needs to correspond to saturated PSFs, since I am subtracting
@@ -225,16 +233,27 @@ class HostRemovalCube:
 
             host_subt_cube[slice_num,:,:] = image_host_removed
 
+        # if writing to disk for checking
+        if self.write:
+
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "host_removed_cube_" + \
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+
+            hdr = fits.Header()
+            hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
+            hdr["RADASEC"] = self.fake_params["rad_asec"]
+            hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+              
+            fits.writeto(filename = file_name,
+                         data = host_subt_cube,
+                         header = hdr,
+                         overwrite = True)
+            print("Wrote host-removed-cube to disk as " + file_name)
+            
         # for memory's sake
         del self.cube_frames
 
-        '''
-        # test
-        fits.writeto(filename = "junk2.fits",
-                     data = host_subt_cube,
-                     overwrite = True)
-        '''
-        print("Writing out host_removed frame ")
+        print("Returning cube of host-removed frames ")
 
         # return cube of non-derotated, host-star-subtracted frames
         return host_subt_cube

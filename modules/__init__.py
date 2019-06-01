@@ -39,9 +39,10 @@ def get_git_hash():
     print(sha)
 
 
-def polar_to_xy(pos_info, pa, asec = False):
+def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
     '''
     Converts polar vectors (deg, pix) to xy vectors (pix, pix)
+    which incorporate the parallactic angle
     (Note degrees are CCW from +x axis)
 
     INPUTS:
@@ -51,12 +52,23 @@ def polar_to_xy(pos_info, pa, asec = False):
         "angle_deg_EofN": angle in degrees E of true N
     pa: parallactic angle (or if no rotation compensation
         desired, just use 0)
+    asec: flag as to whether the radius is in asec
+        (otherwise, it should be in pix)
+    south: flag as to whether target is in south
+    north: flag as to whether target is in south
 
     OUTPUTS:
     dictionary with the addition of keys
         "x_pix_coord": position in x in pixels
         "y_pix_coord": position in y in pixels
     '''
+    # sanity check
+    if (south and north):
+        raw_input("Nonsensical flags: target is in both south and north!")
+
+    # if target is in north, flip the sign of the angular offsets from true North
+    if north:
+        pos_info["angle_deg_EofN"] = -pos_info["angle_deg_EofN"]
 
     # if radius is in asec
     if asec:
@@ -64,8 +76,10 @@ def polar_to_xy(pos_info, pa, asec = False):
                                         np.float(config["instrum_params"]["LMIR_PS"]))
 
     # convert to x,y
-    pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],np.sin(np.multiply(np.add(pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
-    pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],np.cos(np.multiply(np.add(pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+    pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
+                                          np.sin(np.multiply(np.add(pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+    pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],
+                                          np.cos(np.multiply(np.add(pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
 
     return pos_info
 

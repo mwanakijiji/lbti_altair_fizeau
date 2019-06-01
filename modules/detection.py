@@ -159,19 +159,25 @@ class MedianCube:
     '''
 
     def __init__(self,
+                 fake_params,
                  host_subt_cube,
                  pa_array,
-                 config_data = config):
+                 config_data = config,
+                 write_cube = False):
         '''
         INPUTS:
+        fake_params: fake planet parameters
         host_subt_cube: cube of host-star-subtracted frames
         pa_array: array of PAs
         config_data: configuration data, as usual
+        write_cube: flag as to whether cube of frames should be written to disk (for checking)
         '''
 
+        self.fake_params = fake_params
         self.host_subt_cube = host_subt_cube
         self.pa_array = pa_array
         self.config_data = config_data
+        self.write_cube = write_cube
 
 
         ##########
@@ -216,42 +222,22 @@ class MedianCube:
             # put into cube
             cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)
 
-        # take median
-        median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-    
-        
-        # generate the header
-        '''
-        hdr_write = fits.Header()
-        hdr_write["NUMFRAME"] = np.shape(cube_derotated_frames)[0] # number of frames we're taking median of
-        if fake_planet:
-            hdr_write["FAKEAEON"] = header_sci["FAKEAEON"] # angle of fake companion, E of N
-            hdr_write["FAKERADA"] = header_sci["FAKERADA"] # radial distance of fake companion, asec
-            hdr_write["FAKECREL"] = header_sci["FAKECREL"] # contrast ratio of fake companion
-        '''
+        # if writing cube of frames to disk for checking
+        if self.write_cube:
 
-        '''
-        # write cube
-        fits.writeto(filename = write_cube_name,
-                     data = cube_derotated_frames,
-                     header = hdr_write,
-                     overwrite = True)
-        print("Wrote cube of derotated frames, " + os.path.basename(write_cube_name))
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_just_before_median_ADI_" + \
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
 
-        # take median and write
-        median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        fits.writeto(filename = write_adi_name,
-                     data = median_stack,
-                     header = hdr_write,
-                     overwrite = True)
-        print("Wrote median of stack, " + os.path.basename(write_adi_name))
-        '''
-        
-        # write cube
-        fits.writeto(filename = "junk3.fits",
-                     data = cube_derotated_frames,
-                     overwrite = True)
-        print("Wrote cube of derotated frames ")
+            hdr = fits.Header()
+            hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
+            hdr["RADASEC"] = self.fake_params["rad_asec"]
+            hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+              
+            fits.writeto(filename = file_name,
+                         data = cube_derotated_frames,
+                         header = hdr,
+                         overwrite = True)
+            print("Wrote cube-just-before-median to disk as " + file_name)  
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
@@ -260,6 +246,9 @@ class MedianCube:
                      overwrite = True)
         print("Wrote median of stack")
 
+        # for memory's sake
+        del cube_derotated_frames
+
 
 class Detection:
     '''
@@ -267,6 +256,7 @@ class Detection:
     '''
 
     def __init__(self,
+                 fake_params,
                  adi_frame_name,
                  csv_record,
                  config_data = config):
@@ -277,6 +267,7 @@ class Detection:
         config_data: configuration data, as usual
         '''
 
+        self.fake_params
         self.config_data = config_data
         self.adi_frame_name = adi_frame_name
 
@@ -297,6 +288,7 @@ class Detection:
         '''
         INPUTS:
         blind_search/fake_planet flags: these are either/or modes, but both defaults set to false
+        #write: flag as to whether data product should be written to disk (for checking)
         '''
 
         # read in a centered PSF model to use for companion search
@@ -435,7 +427,7 @@ class Detection:
         injection_loc_df.to_csv(self.csv_record, sep = ",", mode = "a", header = (not exists))
         print("---------------------")
         print("Appended data to csv ")
-        print(str(self.csv_record))
+        print(str(self.csv_record))  
 
         # write out as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))

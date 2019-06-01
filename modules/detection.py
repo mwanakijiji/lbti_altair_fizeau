@@ -74,85 +74,6 @@ def circ_mask(input_array, mask_center, mask_radius, invert=False):
     return mask_array
 
 
-class Median:
-    '''
-    Derotate frames in series, take median
-    '''
-
-    def __init__(self,
-                 config_data = config):
-        '''
-        INPUTS:
-        config_data: configuration data, as usual
-        '''
-
-        self.config_data = config_data
-
-
-        ##########
-
-
-    def __call__(self,
-                 abs_sci_name_array,
-                 write_cube_name,
-                 write_adi_name,
-                 fake_planet = False):
-        '''
-        Make the stack and take median
-
-        INPUTS:
-
-        abs_sci_name: the array of absolute paths of the science frames we want to combine
-        write_adi_name: absolute path filename for writing out the ADI frame
-        fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
-        '''
-
-        # read in a first array to get the shape
-        shape_test, header = fits.getdata(abs_sci_name_array[0], 0, header=True)
-
-        # initialize a cube
-        cube_derotated_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(shape_test)[0],np.shape(shape_test)[1]))
-        del shape_test
-
-        # sort the name array to read in consecutive frames
-        sorted_abs_sci_name_array = sorted(abs_sci_name_array)
-
-        # loop over individual frames to derotate them and put them in to a cube
-        for t in range(0,len(sorted_abs_sci_name_array)):
-
-            # read in the pre-derotated frames, derotate them, and put them into a cube
-            sci, header_sci = fits.getdata(sorted_abs_sci_name_array[t], 0, header=True)
-
-            # derotate
-            sci_derotated = scipy.ndimage.rotate(sci, header_sci["LBT_PARA"], reshape=False)
-
-            # put into cube
-            cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)
-
-        # generate the header
-        hdr_write = fits.Header()
-        hdr_write["NUMFRAME"] = np.shape(cube_derotated_frames)[0] # number of frames we're taking median of
-        if fake_planet:
-            hdr_write["FAKEAEON"] = header_sci["FAKEAEON"] # angle of fake companion, E of N
-            hdr_write["FAKERADA"] = header_sci["FAKERADA"] # radial distance of fake companion, asec
-            hdr_write["FAKECREL"] = header_sci["FAKECREL"] # contrast ratio of fake companion
-
-        # write cube
-        fits.writeto(filename = write_cube_name,
-                     data = cube_derotated_frames,
-                     header = hdr_write,
-                     overwrite = True)
-        print("Wrote cube of derotated frames, " + os.path.basename(write_cube_name))
-
-        # take median and write
-        median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        fits.writeto(filename = write_adi_name,
-                     data = median_stack,
-                     header = hdr_write,
-                     overwrite = True)
-        print("Wrote median of stack, " + os.path.basename(write_adi_name))
-
-
 class MedianCube:
     '''
     Derotate frames in series, take median
@@ -184,28 +105,15 @@ class MedianCube:
 
 
     def __call__(self,
-                 write_cube_name,
-                 write_adi_name,
                  fake_planet = False):
         '''
         Make the stack and take median
 
         INPUTS:
 
-        abs_sci_name: the array of absolute paths of the science frames we want to combine
-        write_adi_name: absolute path filename for writing out the ADI frame
+        write_cube_name: cube of frames to write out if we want to check it
         fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
         '''
-
-        # read in a first array to get the shape
-        #shape_test, header = fits.getdata(abs_sci_name_array[0], 0, header=True)
-
-        # initialize a cube
-        #cube_derotated_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(shape_test)[0],np.shape(shape_test)[1]))
-        #del shape_test
-
-        # sort the name array to read in consecutive frames
-        #sorted_abs_sci_name_array = sorted(abs_sci_name_array)
 
         # initialize cube to contain de-rotated frames
         cube_derotated_frames = np.nan*np.ones(np.shape(self.host_subt_cube))
@@ -225,7 +133,7 @@ class MedianCube:
         # if writing cube of frames to disk for checking
         if self.write_cube:
 
-            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_just_before_median_ADI_" + \
+            cube_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_just_before_median_ADI_" + \
               str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
 
             hdr = fits.Header()
@@ -233,18 +141,21 @@ class MedianCube:
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
               
-            fits.writeto(filename = file_name,
+            fits.writeto(filename = cube_file_name,
                          data = cube_derotated_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote cube-just-before-median to disk as " + file_name)  
+            print("Wrote cube-just-before-median to disk as " + cube_file_name)  
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        fits.writeto(filename = "junk4.fits",
+        adi_file_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "adi_frame_" + \
+          str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+        fits.writeto(filename = adi_file_name,
                      data = median_stack,
+                     header = hdr,
                      overwrite = True)
-        print("Wrote median of stack")
+        print("Wrote median of stack as " + adi_file_name)
 
         # for memory's sake
         del cube_derotated_frames
@@ -478,15 +389,14 @@ def main():
         fake_contrast_rel = np.power(10.,-np.divide(raw_contrast,100.)) # scale is relative and linear
     
         # specify parameters of fake companion
-        fake_params_string = param_list[t]
+        fake_params_string = str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"])
 
         # list of files corresponding to that combination of fake planet parameters
         hosts_removed_fake_psf_08a_name_array_one_combo = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*"+fake_params_string+"*.fits")))
 
         # make a median of all frames
-        median_instance = Median()
+        median_instance = MedianCube()
         make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array_one_combo,
-                                      write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
                                       write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
                                       fake_planet = True)
 

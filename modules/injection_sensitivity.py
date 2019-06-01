@@ -185,14 +185,13 @@ class FakePlanetInjectorCube:
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
 
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "fake_planet_injected_cube_" + \
-              str(self.fake_params[0]) + "_" + str(self.fake_params[1]) + "_" + str(self.fake_params[2]) + ".fits"
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
             fits.writeto(filename = file_name,
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
             print("Wrote fake-planet-injected cube to disk as " + file_name)
         
-        print("Writing out fake-planet-injected cube as ")
         print("Array of PA")
         print(pa_array)
 
@@ -236,15 +235,13 @@ def main():
                                              np.float(config["instrum_params"]["LMIR_PS"]))
     
     # loop over fake planet parameters
-    ## ## INCREASE RANGE
-    for param_config in range(110,111):#len(experiment_vector)):
+    for param_config in range(0,len(experiment_vector)):
 
         time_start = time.time()
 
         ## inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
         print("-------------------------------------------------")
         print("Injecting fake planet corresponding to parameter")
-        print(experiment_vector)
         print(experiment_vector.iloc[param_config])
         # instantiate
         inject_fake_psfs = FakePlanetInjectorCube(fake_params = experiment_vector.iloc[param_config],
@@ -266,8 +263,9 @@ def main():
                                                     abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                          write = True)
-        # call
+                                                    write = True)
+
+        # call and return cube of host-removed frames
         removed_hosts_cube = remove_hosts()
         
         ## derotate, ADI, determine sensitivity
@@ -277,9 +275,7 @@ def main():
                                                pa_array = pas_array,
                                                write_cube = True)
         fake_params_string = "STANDIN"
-        make_median = median_instance(write_cube_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS_CUBE"] + "cube_"+fake_params_string+".fits",
-                                      write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
-                                      fake_planet = True)
+        make_median = median_instance(fake_planet = True)
 
         elapsed_time = np.subtract(time.time(), time_start)
 

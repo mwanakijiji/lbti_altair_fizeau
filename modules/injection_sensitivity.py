@@ -72,7 +72,7 @@ class FakePlanetInjectorCube:
         abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
         '''
 
-        print("length of science frame array")
+        "length of science frame array")
 
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
@@ -114,8 +114,6 @@ class FakePlanetInjectorCube:
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
             fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=100)
-            print("fit_unsat")
-            print(fit_unsat)
             if not fit_unsat: # if the dimensions were incompatible, skip this science frame
                 print("Incompatible dimensions; skipping this frame...")
                 continue
@@ -286,9 +284,3 @@ def main():
         print("Completed " + str(param_config) + " fake planet parameter configurations, out of " + str(len(experiment_vector)))
         print("Elapsed time (sec): ")
         print(str(int(elapsed_time)))
-        
-        '''
-        detection
-
-        # append to a csv
-        '''

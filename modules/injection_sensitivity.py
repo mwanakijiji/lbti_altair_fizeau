@@ -87,8 +87,7 @@ class FakePlanetInjectorCube:
         # loop over frames to inject fake planets in each of them
         for frame_num in range(0,len(abs_sci_name_array)):
             print("---------------")
-            print("Doing frame ")
-            print(frame_num)
+            print("Injecting a fake planet into cube slice " + str(frame_num))
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
@@ -187,7 +186,8 @@ class FakePlanetInjectorCube:
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
 
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "fake_planet_injected_cube_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
+              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
             fits.writeto(filename = file_name,
                          data = cube_frames,
                          header = hdr,
@@ -270,9 +270,6 @@ def main():
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/config.ini")
 
-    # multiprocessing instance
-    #pool = multiprocessing.Pool(ncpu)
-
     # fake planet injection parameters
     fake_params_pre_permute = {"angle_deg_EofN": [0., 60., 120., 180., 240., 300.],
                                "rad_asec": [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6],
@@ -293,15 +290,9 @@ def main():
 
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)
-    #experiment_vector.iloc[param_config_num]
-    #print(experiment_vector)
-    #print(experiment_vector.iloc[1])
-    #print(experiment_vector.iloc[1]["angle_deg_EofN"])
-    print('ha ha')
-    print(experiment_vector.iloc[1].to_dict())
-    testing = [experiment_vector.iloc[1].to_dict(),experiment_vector.iloc[2].to_dict()]
 
     # create list of dictionaries of fake planet parameters
+    # (one dictionary is fed to each core at a time)
     param_dict_list= []
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())

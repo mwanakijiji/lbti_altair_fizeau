@@ -72,8 +72,6 @@ class FakePlanetInjectorCube:
         abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
         '''
 
-        "length of science frame array")
-
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
@@ -211,7 +209,7 @@ def main():
     config.read("modules/config.ini")
 
     # multiprocessing instance
-    pool = multiprocessing.Pool(ncpu)
+    #pool = multiprocessing.Pool(ncpu)
 
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
@@ -234,30 +232,30 @@ def main():
     ## ## file to be deg E of N, and in asec
     experiment_vector["rad_pix"] = np.divide(experiment_vector["rad_asec"],
                                              np.float(config["instrum_params"]["LMIR_PS"]))
-    
-    # loop over fake planet parameters
-    for param_config in range(0,len(experiment_vector)):
+
+    def inject_remove_adi(param_config_num):
+        '''
+        To parallelize a serial operation across cores, I need to define a function that goes through
+        the fake planet injection, host star removal, and ADI steps for a given combination of fake planet parameters
+        '''
 
         time_start = time.time()
 
         ## inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
         print("-------------------------------------------------")
         print("Injecting fake planet corresponding to parameter")
-        print(experiment_vector.iloc[param_config])
-        # instantiate
-        inject_fake_psfs = FakePlanetInjectorCube(fake_params = experiment_vector.iloc[param_config],
+        print(experiment_vector.iloc[param_config_num])
+
+        # instantiate fake planet injection
+        inject_fake_psfs = FakePlanetInjectorCube(fake_params = experiment_vector.iloc[param_config_num],
                                           n_PCA = 100,
                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
                                           write = True)
-                                          
-        # call
-        injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
-                                     
-        ## remove host from each frame in the cube
-        # instantiate
-        remove_hosts = host_removal.HostRemovalCube(fake_params = experiment_vector.iloc[param_config],
+
+        # instantiate removal of host star from each frame in the cube
+        remove_hosts = host_removal.HostRemovalCube(fake_params = experiment_vector.iloc[param_config_num],
                                                     cube_frames = injected_fake_psfs_cube,
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
@@ -266,16 +264,21 @@ def main():
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
                                                     write = True)
 
-        # call and return cube of host-removed frames
-        removed_hosts_cube = remove_hosts()
-        
-        ## derotate, ADI, determine sensitivity
-        # instantiate
-        median_instance = detection.MedianCube(fake_params = experiment_vector.iloc[param_config],
+        # instantiate derotation, ADI, sensitivity determination
+        median_instance = detection.MedianCube(fake_params = experiment_vector.iloc[param_config_num],
                                                host_subt_cube = removed_hosts_cube,
                                                pa_array = pas_array,
                                                write_cube = True)
+
+        # call fake planet injection
+        injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
+                                     
+        # call and return cube of host-removed frames
+        removed_hosts_cube = remove_hosts()
+
         fake_params_string = "STANDIN"
+
+        # call derotation, ADI, sensitivity determination
         make_median = median_instance(fake_planet = True)
 
         elapsed_time = np.subtract(time.time(), time_start)
@@ -284,3 +287,11 @@ def main():
         print("Completed " + str(param_config) + " fake planet parameter configurations, out of " + str(len(experiment_vector)))
         print("Elapsed time (sec): ")
         print(str(int(elapsed_time)))
+
+        
+    # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
+    pool = multiprocessing.Pool(ncpu)
+    pool.map(inject_remove_adi, np.arange(len(experiment_vector)))
+
+
+

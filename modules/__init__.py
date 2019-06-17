@@ -282,8 +282,6 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     '''
 
     # apply mask over weird regions to PCA cube
-    print(type(pca_cube))
-    #print(type(mask_weird[0]))
     try:
         pca_cube_masked = np.multiply(pca_cube,mask_weird)
     except:

@@ -224,7 +224,7 @@ def inject_remove_adi(this_param_combo):
                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                          write = True)
+                                          write = False)
 
     # call fake planet injection
     injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
@@ -237,7 +237,7 @@ def inject_remove_adi(this_param_combo):
                                                     abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    write = True)
+                                                    write = False)
 
     # call and return cube of host-removed frames
     removed_hosts_cube = remove_hosts()
@@ -246,7 +246,7 @@ def inject_remove_adi(this_param_combo):
     median_instance = detection.MedianCube(fake_params = this_param_combo,
                                                host_subt_cube = removed_hosts_cube,
                                                pa_array = pas_array,
-                                               write_cube = True)
+                                               write_cube = False)
 
     fake_params_string = "STANDIN"
 

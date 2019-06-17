@@ -130,16 +130,17 @@ class MedianCube:
             # put into cube
             cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)
 
+        # define header
+        hdr = fits.Header()
+        hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
+        hdr["RADASEC"] = self.fake_params["rad_asec"]
+        hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+
         # if writing cube of frames to disk for checking
         if self.write_cube:
 
             cube_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_just_before_median_ADI_" + \
               str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
-
-            hdr = fits.Header()
-            hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
-            hdr["RADASEC"] = self.fake_params["rad_asec"]
-            hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
               
             fits.writeto(filename = cube_file_name,
                          data = cube_derotated_frames,

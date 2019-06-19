@@ -203,7 +203,7 @@ class FakePlanetInjectorCube:
 
 def inject_remove_adi(this_param_combo):
     '''
-    To parallelize a serial operation across cores, I need to define a function that goes through
+    To parallelize a serial operation across cores, I need to define this function that goes through
     the fake planet injection, host star removal, and ADI steps for a given combination of fake planet parameters
     '''
 
@@ -263,7 +263,7 @@ def inject_remove_adi(this_param_combo):
 
 def main():
     '''
-    Carry out steps to write out PSF PCA cubes
+    Make grid of fake planet parameters, and inject fake planets
     '''
 
     # configuration data
@@ -271,9 +271,9 @@ def main():
     config.read("modules/config.ini")
 
     # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg_EofN": [0., 60., 120., 180., 240., 300.],
-                               "rad_asec": [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6],
-                               "ampl_linear_norm": [1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]}
+    fake_params_pre_permute = {"angle_deg_EofN": [0., 60., 200.],
+                               "rad_asec": [0.3, 0.45, 0.6],
+                               "ampl_linear_norm": [0.1, 1e-3, 1e-5]}
 
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
 
@@ -293,7 +293,7 @@ def main():
 
     # create list of dictionaries of fake planet parameters
     # (one dictionary is fed to each core at a time)
-    param_dict_list= []
+    param_dict_list = []
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())
     pool.map(inject_remove_adi, param_dict_list)

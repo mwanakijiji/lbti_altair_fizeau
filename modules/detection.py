@@ -139,8 +139,11 @@ class MedianCube:
         # if writing cube of frames to disk for checking
         if self.write_cube:
 
-            cube_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_just_before_median_ADI_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            cube_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+              "cube_just_before_median_ADI_" + \
+              str(self.fake_params["angle_deg_EofN"]) + "_" + \
+              str(self.fake_params["rad_asec"]) + "_" + \
+              str(self.fake_params["ampl_linear_norm"]) + ".fits"
               
             fits.writeto(filename = cube_file_name,
                          data = cube_derotated_frames,
@@ -150,8 +153,10 @@ class MedianCube:
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        adi_file_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "adi_frame_" + \
-          str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+        adi_file_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+          "adi_frame_" + str(self.fake_params["angle_deg_EofN"]) + "_" + \
+          str(self.fake_params["rad_asec"]) + "_" + \
+          str(self.fake_params["ampl_linear_norm"]) + ".fits"
         fits.writeto(filename = adi_file_name,
                      data = median_stack,
                      header = hdr,

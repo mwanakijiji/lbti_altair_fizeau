@@ -391,7 +391,8 @@ class BackgroundPCASubtSingle:
 
         # define region
         psf_loc = find_airy_psf(sciImg) # center of science PSF
-        print("PSF location in " + os.path.basename(abs_sci_name) + ": [" + str(psf_loc[0]) + ", " + str(psf_loc[1]) + "]")
+        print("PSF location in " + os.path.basename(abs_sci_name) + \
+              ": [" + str(psf_loc[0]) + ", " + str(psf_loc[1]) + "]")
         radius = 30. # radius around PSF that will be masked
         center = PixCoord(x=psf_loc[1], y=psf_loc[0])
         region = CirclePixelRegion(center, radius)
@@ -429,9 +430,11 @@ class BackgroundPCASubtSingle:
         ## PCA-decompose
 
         # flatten the science array and PCA cube
-        pca_not_masked_1ds = np.reshape(self.pca_cube,(np.shape(self.pca_cube)[0],np.shape(self.pca_cube)[1]*np.shape(self.pca_cube)[2]))
+        pca_not_masked_1ds = np.reshape(self.pca_cube,(np.shape(self.pca_cube)[0],
+                                                       np.shape(self.pca_cube)[1]*np.shape(self.pca_cube)[2]))
         sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_masked)[0]*np.shape(sciImg_masked)[1]))
-        pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
+        pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],
+                                                     np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
 
         ## remove nans from the linear algebra
 
@@ -439,7 +442,8 @@ class BackgroundPCASubtSingle:
         idx = np.logical_and(np.isfinite(pca_masked_1ds[0,:]), np.isfinite(sci_masked_1d))
 
         # reconstitute only the finite elements together in another PCA cube and a science image
-        pca_masked_1ds_noNaN = np.nan*np.ones((len(pca_masked_1ds[:,0]),np.sum(idx))) # initialize array with slices the length of number of finite elements
+        pca_masked_1ds_noNaN = np.nan*np.ones((len(pca_masked_1ds[:,0]),
+                                               np.sum(idx))) # initialize array with slices the length of number of finite elements
         for t in range(0,len(pca_masked_1ds[:,0])): # for each PCA component, populate the arrays without nans with the finite elements
             pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
         sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
@@ -454,8 +458,10 @@ class BackgroundPCASubtSingle:
         recon_backgrnd_2d = np.dot(self.pca_cube[0:self.n_PCA,:,:].T, soln_vector[0]).T
 
         # now do the same, but for the channel bias variation contributions only (assumes 32 elements only)
-        recon_backgrnd_2d_channels_only_no_psf_masking = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # without PSF masking
-        recon_backgrnd_2d_channels_only_psf_masked = np.dot(self.pca_cube[0:32,:,:].T, soln_vector[0][0:32]).T # with PSF masking
+        recon_backgrnd_2d_channels_only_no_psf_masking = np.dot(self.pca_cube[0:32,:,:].T, \
+                                                                soln_vector[0][0:32]).T # without PSF masking
+        recon_backgrnd_2d_channels_only_psf_masked = np.dot(self.pca_cube[0:32,:,:].T, \
+                                                            soln_vector[0][0:32]).T # with PSF masking
 
         # do the actual subtraction:
         # all-background subtraction
@@ -465,7 +471,8 @@ class BackgroundPCASubtSingle:
         #sciImg_subtracted_channels_only_no_psf_masking = np.subtract(sciImg_psf_not_masked,recon_backgrnd_2d_channels_only)
         # with PSF masking
         sciImg_subtracted_channels_only_psf_masked = np.subtract(sciImg_psf_masked,
-                                                                 np.multiply(recon_backgrnd_2d_channels_only_psf_masked,np.multiply(self.pca_cube,psf_mask))) 
+                                                                 np.multiply(recon_backgrnd_2d_channels_only_psf_masked,\
+                                                                             np.multiply(self.pca_cube,psf_mask))) 
 
 
         # add last reduction step to header
@@ -603,7 +610,9 @@ class BackgroundPCASubtSingle:
         # Histogram of counts before any background-subtraction
         array_ravelPre = np.ravel(sci_img_pre)
         iiPre = np.isfinite(array_ravelPre)
-        axes[0,0].set_title('Pre-backgd subtraction\nMedian: '+str(np.nanmedian(sci_img_pre))+'\nStdev: '+str(np.nanstd(sci_img_pre)))
+        axes[0,0].set_title('Pre-backgd subtraction\nMedian: '+\
+                            str(np.nanmedian(sci_img_pre))+'\nStdev: '+\
+                            str(np.nanstd(sci_img_pre)))
         axes[0,0].hist(array_ravelPre[iiPre], bins=200)
         axes[0,0].set_xlim([-1000,1000])
 
@@ -629,9 +638,15 @@ class BackgroundPCASubtSingle:
 
         print('----------------------')
         # some tests of regions where the background is not being oversubtracted due to the PSF
-        print('before any subt, '+file_base_name+': std='+str(np.nanstd(sci_img_pre[:,0:760]))+', med='+str(np.nanmedian(sci_img_pre[:,0:760])))
-        print('after channels only, '+file_base_name+': std='+str(np.nanstd(sci_img_post_channel_subt[:,0:760]))+', med='+str(np.nanmedian(sci_img_post_channel_subt[:,0:760])))
-        print('after all, '+file_base_name+': std='+str(np.nanstd(sci_img_post_all_subt[:,0:760]))+', med='+str(np.nanmedian(sci_img_post_all_subt[:,0:760])))
+        print('before any subt, '+file_base_name+\
+              ': std='+str(np.nanstd(sci_img_pre[:,0:760]))+\
+              ', med='+str(np.nanmedian(sci_img_pre[:,0:760])))
+        print('after channels only, '+file_base_name+\
+              ': std='+str(np.nanstd(sci_img_post_channel_subt[:,0:760]))+\
+              ', med='+str(np.nanmedian(sci_img_post_channel_subt[:,0:760])))
+        print('after all, '+file_base_name+\
+              ': std='+str(np.nanstd(sci_img_post_all_subt[:,0:760]))+\
+              ', med='+str(np.nanmedian(sci_img_post_all_subt[:,0:760])))
 
         # Histogram of counts after BOTH channel bias and other noise subtraction
         array_ravelPost_all_subt = np.ravel(sci_img_post_all_subt)

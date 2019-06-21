@@ -184,7 +184,7 @@ class BackgroundPCACubeMaker:
                  config_data = config):
         '''
         INPUTS:
-        file_list: list of ALL filenames in the directory
+        file_list: list of ALL filenames in the directory; these will not necessarily all be put into the cube
         n_PCA: number of PCA components to save in the cube
         -> (does NOT include possible separate components representing
         -> individual channel variations)
@@ -228,39 +228,36 @@ class BackgroundPCACubeMaker:
 
         # loop over frames and add them to cube
         for frame_num in range(start_frame_num, stop_frame_num+1):
-
+            print(frame_num)
             # get name of file that this number corresponds to
             abs_matching_file_array = [s for s in self.file_list if str("{:0>6d}".format(frame_num)) in s]
-            abs_matching_file = abs_matching_file_array[0] # get the name
 
-            # if there was a match
-            if (len(abs_matching_file) != 0):
+            # check for matches
+            print(abs_matching_file_array)
+            if (len(abs_matching_file_array) == 1):
+                abs_matching_file = abs_matching_file_array[0] # get the name
+            elif (len(abs_matching_file_array) == 0):
+                print("Frame " + str(frame_num) + " not found; skipping...")
+                continue
+            elif (len(abs_matching_file_array) > 1):
+                print("Something is amiss with your frame number choice. There seem to have been multiple matches for frame number " + \
+                      str(frame_num) + "; skipping...")
+                continue
 
-                # read in the science frame from raw data directory
-                sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
+            # read in the science frame from raw data directory
+            sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
 
-                # add to cube
-                training_cube[slice_counter,:,:] = sci
+            # add image to cube
+            training_cube[slice_counter,:,:] = sci
 
-                # advance counter
-                slice_counter += 1
-
-            # if there was no match
-            elif (len(abs_matching_file) == 0):
-
-                print("Frame " + os.path.basename(abs_matching_file) + " not found.")
-
-            # if there were multiple matches
-            else:
-
-                print("Something is amiss with your frame number choice.")
-                return
+            # advance counter
+            slice_counter += 1
 
         # remove the unused slices
         training_cube = training_cube[0:slice_counter,:,:]
 
         # mask the raw training set
-        training_cube_masked_weird = mask_weird(training_cube,quad_choice)
+        training_cube_masked_weird = make_first_pass_mask(training_cube,quad_choice)
         del training_cube
 
         ## at this point, test_cube holds the (masked) background frames to be used as a training set
@@ -268,7 +265,7 @@ class BackgroundPCACubeMaker:
         # find the 2D median across all background arrays, and subtract it from each individual background array
         # (N.b. the region of the PSF itself will look funny, but we'll mask this in due course)
         median_2d_bckgrd = np.nanmedian(training_cube_masked_weird, axis=0)
-        for t in range(0,stop_frame_num-start_frame_num+1):
+        for t in range(0,np.shape(training_cube_masked_weird)[0]):
             training_cube_masked_weird[t,:,:] = np.subtract(training_cube_masked_weird[t,:,:],median_2d_bckgrd)
 
         ## at this point, test_cube holds the background frames which are dark- and 2D median-subtracted
@@ -280,7 +277,7 @@ class BackgroundPCACubeMaker:
             print("Removing channel pedestals...")
 
             # loop over each frame in the cube
-            for slice_num in range(0,stop_frame_num-start_frame_num+1):
+            for slice_num in range(0,np.shape(training_cube_masked_weird)[0]):
 
                 # loop over each channel in that frame (assumes 32 channels across, each 64 pixels wide)
                 for ch_num in range(0,32): 
@@ -309,7 +306,6 @@ class BackgroundPCACubeMaker:
                      header=None,
                      overwrite=True)
         print("Wrote out background PCA cube " + str(abs_pca_cube_name))
-        print("Wrote out background PCA cube " + os.path.basename(abs_pca_cube_name))
 
 class BackgroundPCASubtSingle:
     '''
@@ -427,6 +423,9 @@ class BackgroundPCASubtSingle:
         # apply the PSF mask to PCA slices, with which we will do the fitting
         pca_cube_masked = np.multiply(self.pca_cube,psf_mask)
 
+        ### keep only the channel variation parts: an experiment --2019 June 20 by E.S.
+        ###pca_cube_masked = pca_cube_masked[0:32,:,:]
+
         ## PCA-decompose
 
         # flatten the science array and PCA cube
@@ -448,7 +447,7 @@ class BackgroundPCASubtSingle:
             pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
         sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
         sci_masked_1d_noNaN = sci_masked_1d[idx]
-
+        
         # the vector of component amplitudes
         soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:self.n_PCA,:].T, sci_masked_1d_noNaN)
 
@@ -743,6 +742,8 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
+    '''
+    COMMENTED OUT BECAUSE I ALREADY HAVE RAMP-SUBTRACTED FRAMES AND WANT TO OPTIMIZE DOWNSTREAM --19 JUNE 2019
     # make a list of the raw files
     raw_00_directory = str(config["data_dirs"]["DIR_RAW_DATA"])
     raw_00_name_array = list(glob.glob(os.path.join(raw_00_directory, "*.fits")))
@@ -769,7 +770,8 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
-
+    '''
+    
     # make lists of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
     # all files in directory
@@ -780,17 +782,17 @@ def main():
     # in the down nod (quadrant 3): 7927 - 11408
 
     # the below are for the up nod---
-    # (assembling this list is kind of awkward)
-    ramp_subted_04_name_array_up = list(glob.glob(os.path.join(ramp_subted_04_directory, "*_00[0123456]*.fits")))
-    ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_007[0123456]*.fits")))
-    ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_0077[012]*.fits")))
-    ramp_subted_04_name_array_up.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_00773[01234]*.fits")))
+    # (assembling this list is kind of awkward, but I don't know a better way)
+    ramp_subted_03_name_array_up = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[0123456]*.fits")))
+    ramp_subted_03_name_array_up.extend(glob.glob(os.path.join(ramp_subted_03_directory, "*_007[0123456]*.fits")))
+    ramp_subted_03_name_array_up.extend(glob.glob(os.path.join(ramp_subted_03_directory, "*_0077[012]*.fits")))
+    ramp_subted_03_name_array_up.extend(glob.glob(os.path.join(ramp_subted_03_directory, "*_00773[01234]*.fits")))
 
     # the below are for the down nod--
-    ramp_subted_04_name_array_down = list(glob.glob(os.path.join(ramp_subted_04_directory, "*_00792[789]*.fits")))
-    ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_0079[3456789]*.fits")))
-    ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_00[89]*.fits")))
-    ramp_subted_04_name_array_down.extend(glob.glob(os.path.join(ramp_subted_04_directory, "*_01*.fits")))
+    ramp_subted_03_name_array_down = list(glob.glob(os.path.join(ramp_subted_03_directory, "*_00792[789]*.fits")))
+    ramp_subted_03_name_array_down.extend(glob.glob(os.path.join(ramp_subted_03_directory, "*_0079[3456789]*.fits")))
+    ramp_subted_03_name_array_down.extend(glob.glob(os.path.join(ramp_subted_03_directory, "*_00[89]*.fits")))
+    ramp_subted_03_name_array_down.extend(glob.glob(os.path.join(ramp_subted_03_directory, "*_01*.fits")))
 
     ## ## CAN COMMENT THIS OUT TO SAVE TIME
     # generate PCA cubes for backgrounds
@@ -802,6 +804,7 @@ def main():
 
     ## ## This is commented out for the time being to save time
     # make background PCA cube for PSFs in quadrant 2
+    '''
     pca_backg_maker(start_frame_num = 9000,
                    stop_frame_num = 9099,
                    quad_choice = 2,
@@ -812,6 +815,8 @@ def main():
                    stop_frame_num = 6299,
                    quad_choice = 3,
                    indiv_channel = True)
+    '''
+    pca_backg_maker_channels_only()
 
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")

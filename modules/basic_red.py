@@ -730,6 +730,28 @@ class CookieCutout:
                      overwrite=True)
 
 
+def pca_backg_maker_channels_only():
+    '''
+    Generates a very simple PCA vector basis consisting of channel variations alone
+    '''
+    
+    # configuration data
+    config = configparser.ConfigParser() # for parsing values in .init file
+    config.read("modules/config.ini")
+
+    pca_comp_cube = channels_PCA_cube()
+
+    # write out the PCA vector cube
+    abs_pca_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                                "background_PCA_vector_channel_vars_only.fits")
+    fits.writeto(filename=abs_pca_cube_name,
+                     data=pca_comp_cube,
+                     header=None,
+                     overwrite=True)
+    print("Wrote out background PCA cube, consisting of channel variations only, as " + str(abs_pca_cube_name))
+    
+        
+
 def main():
     '''
     Carry out the basic data-preparation steps
@@ -816,7 +838,10 @@ def main():
                    quad_choice = 3,
                    indiv_channel = True)
     '''
+    # make a PCA vector involving channel variations only
     pca_backg_maker_channels_only()
+
+    ### STOPPED HERE 2019 JUNE 20
 
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")

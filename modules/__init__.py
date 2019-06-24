@@ -126,7 +126,6 @@ def make_first_pass_mask(image, quadChoice):
     mask_weird: array of nans and 1s for multiplying with the array to be masked
     '''
 
-    # Original manifestation, up to 2019 June 20
     # if image is 2D
     if (len(np.shape(image)) == 2):
         image[0:10,:] = np.nan
@@ -136,11 +135,14 @@ def make_first_pass_mask(image, quadChoice):
         image[:,1500:] = np.nan # unreliable bad pixel mask
         image[:,:440] = np.nan # unreliable bad pixel mask
         # The below was commented out to try subtracting only the channel variations and get more radius around star
+        '''
         if quadChoice == 3: # if we want science on the third quadrant
             image[260:,:] = np.nan # get rid of whole top half
         if quadChoice == 2: # if we want science on the third quadrant
             image[:260,:] = np.nan # get rid of whole bottom half
+        '''
 
+    # if image is a 3D cube
     elif (len(np.shape(image)) == 3):
         image[:,0:10,:] = np.nan
         image[:,-9:,:] = np.nan # edge
@@ -149,10 +151,12 @@ def make_first_pass_mask(image, quadChoice):
         image[:,:,1500:] = np.nan # unreliable bad pixel mask
         image[:,:,:440] = np.nan # unreliable bad pixel mask
         # The below was commented out to try subtracting only the channel variations and get more radius around star
+        '''
         if quadChoice == 3: # if we want science on the third quadrant
             image[:,260:,:] = np.nan # get rid of whole top half
         if quadChoice == 2: # if we want science on the third quadrant
             image[:,:260,:] = np.nan # get rid of whole bottom half
+        '''
 
     # deal with a bug associated with 32-bit floats,
     # where stray pixels (in my experience, just one) can be assigned value +-2.1474842e+09
@@ -160,7 +164,8 @@ def make_first_pass_mask(image, quadChoice):
     image[np.abs(image) > 1e+05] = 0
 
     if np.logical_and(quadChoice!=2,quadChoice!=3):
-        print('No detector science quadrant chosen!')
+        print('No detector science quadrant chosen! (But that may not be a problem if you are just ' + \
+              'subtracting the channel variations.)')
 
     return image
 
@@ -246,9 +251,6 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     print("Doing PCA to make PCA basis cube...")
     pca = PCA(n_components = n_PCA, svd_solver = "randomized") # initialize object
     #pca = RandomizedPCA(n_PCA) # for Python 2.7
-    print('---a---')
-    print(np.isnan(training_set_1ds_noNaN).any())
-    print(training_set_1ds_noNaN)
     test_pca = pca.fit(training_set_1ds_noNaN) # calculate PCA basis set
     del training_set_1ds_noNaN # clear memory
 

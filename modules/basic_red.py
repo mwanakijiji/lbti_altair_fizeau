@@ -837,7 +837,8 @@ def main():
 
 
     ### MOMENTARY KLUDGE TO NAB FILES THAT GOT MISSED ###
-    kludge_dir = str(config["data_dirs"]["DIR_RAMP_REMOVD"]) + "../pipeline_04_pcab_subted/escrow_old/"
+    kludge_dir = str(config["data_dirs"]["DIR_HOME"]) + "pipeline_04_pcab_subted/escrow_old/"
+    print(kludge_dir)
     names = [os.path.basename(x) for x in glob.glob(kludge_dir)]
     print(names)
     ramp_subted_03_name_array = list(os.path.join(ramp_subted_03_directory, names))

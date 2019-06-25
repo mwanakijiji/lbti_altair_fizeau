@@ -224,7 +224,7 @@ def inject_remove_adi(this_param_combo):
                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                          write = True)
+                                          write = False)
 
     # call fake planet injection
     injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
@@ -237,7 +237,7 @@ def inject_remove_adi(this_param_combo):
                                                     abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    write = True)
+                                                    write = False)
 
     # call and return cube of host-removed frames
     removed_hosts_cube = remove_hosts()
@@ -246,7 +246,7 @@ def inject_remove_adi(this_param_combo):
     median_instance = detection.MedianCube(fake_params = this_param_combo,
                                                host_subt_cube = removed_hosts_cube,
                                                pa_array = pas_array,
-                                               write_cube = True)
+                                               write_cube = False)
 
     fake_params_string = "STANDIN"
 
@@ -271,9 +271,9 @@ def main():
     config.read("modules/config.ini")
 
     # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg_EofN": [0., 60., 120., 180., 240., 300.],
-                               "rad_asec": [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6],
-                               "ampl_linear_norm": [1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]}
+    fake_params_pre_permute = {"angle_deg_EofN": [0., 80., 200.],
+                               "rad_asec": [0.3, 0.45, 0.6],
+                               "ampl_linear_norm": [0.1, 1e-3, 1e-5]}
 
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
 

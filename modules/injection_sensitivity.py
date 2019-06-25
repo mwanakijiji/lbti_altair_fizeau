@@ -271,9 +271,9 @@ def main():
     config.read("modules/config.ini")
 
     # fake planet injection parameters
-    fake_params_pre_permute = {"angle_deg_EofN": [0., 80., 200.],
-                               "rad_asec": [0.3, 0.45, 0.6],
-                               "ampl_linear_norm": [0.1, 1e-3, 1e-5]}
+    fake_params_pre_permute = {"angle_deg_EofN": [270.],
+                               "rad_asec": [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9],
+                               "ampl_linear_norm": [1e-3, 1e-4, 1e-5]}
 
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
 

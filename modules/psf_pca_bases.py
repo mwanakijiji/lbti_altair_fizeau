@@ -111,9 +111,11 @@ class PSFPCACubeMaker:
         training_cube = training_cube[0:slice_counter,:,:]
 
         ## TEST: WRITE OUT
+        '''
         hdu = fits.PrimaryHDU(training_cube)
         hdulist = fits.HDUList([hdu])
         hdu.writeto("junk.fits", clobber=True)
+        '''
         ## END TEST
 
         # mask the raw training set

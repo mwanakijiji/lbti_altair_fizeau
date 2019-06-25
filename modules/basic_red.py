@@ -845,7 +845,7 @@ def main():
     names = [str(kludge_dir)+str(os.path.basename(y)) for y in kludge_glob]
     #names = np.array(names)
     print(names)
-    ramp_subted_03_name_array = list(os.path.join(ramp_subted_03_directory,*names))
+    ramp_subted_03_name_array = names #list(os.path.join(ramp_subted_03_directory,*names))
     #print(ramp_subted_03_name_array)
     ### END MOMENTARY KLUDGE
 

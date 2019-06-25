@@ -829,29 +829,26 @@ def main():
     print("Subtracting artifact ramps with " + str(ncpu) + " CPUs...")
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
-    '''
+
     # make lists of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
     # all files in directory
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
-
+    '''
 
     # begin handy snippet of code if I need to take file basenames from one directory and attach them
     # to a different path stem
-    '''
-    kludge_dir = str(config["data_dirs"]["DIR_HOME"]) + "/pipeline_04_pcab_subted/escrow_old/"
-    kludge_glob = list(glob.glob(kludge_dir + "*.fits"))
-    names = [str(kludge_dir)+str(os.path.basename(y)) for y in kludge_glob]
-    ramp_subted_03_name_array = names
-    '''
-    # end handy code
+    #kludge_dir = str(config["data_dirs"]["DIR_HOME"]) + "/pipeline_04_pcab_subted/escrow_old/"
+    #kludge_glob = list(glob.glob(kludge_dir + "*.fits"))
+    #names = [str(kludge_dir)+str(os.path.basename(y)) for y in kludge_glob]
+    #ramp_subted_03_name_array = names
+    # end handy snippet of code
 
     '''
     COMMENTED OUT TO SAVE TIME
     # make a PCA vector involving channel variations only
     pca_backg_maker_channels_only(abs_pca_cube_file_name = str(config["data_dirs"]["DIR_OTHER_FITS"] + \
                                                                "background_PCA_vector_channel_vars_only.fits"))
-    '''
 
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
@@ -877,4 +874,3 @@ def main():
     ## ## might add functionality to override the found 'center' of the PSF
     make_cookie_cuts = CookieCutout(quad_choice = -9999)
     pool.map(make_cookie_cuts, pcab_subted_04_names)
-    '''

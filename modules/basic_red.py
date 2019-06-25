@@ -719,25 +719,40 @@ class CookieCutout:
         # cut out squares centered around that region
         psf_loc = find_airy_psf(sciImg)
 
+        # PSF location in original coordinates, in case image has to be padded
+        psf_loc_old = np.copy(psf_loc) 
+
         # check: if region of interest goes beyond edge of array in y, pad the array with a bunch of NaNs
         # and try again
-        if (psf_loc[0]-int(self.buffer_fac*self.ao_ctrl_pix) < 0):
+        #print("psf loc? " + str(int(psf_loc[0])))
+        #print("Overflow? " + str(int(psf_loc[0]-int(self.buffer_fac*self.ao_ctrl_pix))))
+        radius_from_host = int(self.buffer_fac*self.ao_ctrl_pix)
+        if (psf_loc[0]-radius_from_host < 0):
 
+            overflow = np.abs(psf_loc[0]-radius_from_host) # number of pixels overflow
+                                      
             sciImg = np.pad(sciImg,
-                            pad_width = 100,
+                            pad_width = overflow,
                             mode = "constant",
-                            constant_values = -9999)
+                            constant_values = -999999)
 
             # I can't pad directly with nans, so slip in nans in place of zeros here
             sciImg = sciImg.astype(np.float32)
-            sciImg[sciImg == -9999] = np.nan
+            sciImg[sciImg < -999998] = np.nan # just turns to zero later, for some reason; see kludge below
 
             # find the PSF again, in the coordinates of the padded image
             psf_loc = find_airy_psf(sciImg)
             
 
-        cookie_cut_out = sciImg[psf_loc[0]-int(self.buffer_fac*self.ao_ctrl_pix):psf_loc[0]+int(self.buffer_fac*self.ao_ctrl_pix),
-                                psf_loc[1]-int(self.buffer_fac*self.ao_ctrl_pix):psf_loc[1]+int(self.buffer_fac*self.ao_ctrl_pix)]
+        # cut out cookies, keeping float32s to preserve the NaNs
+        cookie_cut_out = sciImg[psf_loc[0]-radius_from_host:psf_loc[0]+radius_from_host,
+                                psf_loc[1]-radius_from_host:psf_loc[1]+radius_from_host]
+
+        if (psf_loc_old[0]-radius_from_host < 0):
+            # kludge to replace overflow region with NaNs
+            print("Replacing some array overflow with NaNs...")
+            cookie_cut_out[0:overflow,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow,:]))
+            cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
 
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_cutout"
@@ -815,15 +830,17 @@ def main():
     do_ramp_subt = RemoveStrayRamp(config)
     pool.map(do_ramp_subt, fixpixed_02_name_array)
     '''
-    
     # make lists of the ramp-removed files
     ramp_subted_03_directory = str(config["data_dirs"]["DIR_RAMP_REMOVD"])
     # all files in directory
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
 
+    '''
+    COMMENTED OUT TO SAVE TIME
     # make a PCA vector involving channel variations only
     pca_backg_maker_channels_only(abs_pca_cube_file_name = str(config["data_dirs"]["DIR_OTHER_FITS"] + \
                                                                "background_PCA_vector_channel_vars_only.fits"))
+    '''
 
     # PCA-based background subtraction in parallel
     print("Subtracting backgrounds with " + str(ncpu) + " CPUs...")
@@ -839,11 +856,11 @@ def main():
     param_array = [-9999, -9999, 32, -9999]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array, config, simple_channel = True)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array)
-
+    
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
     pcab_subted_04_names = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))
-
+    
     # make cookie cutouts of the PSFs
     ## ## might add functionality to override the found 'center' of the PSF
     make_cookie_cuts = CookieCutout(quad_choice = -9999)

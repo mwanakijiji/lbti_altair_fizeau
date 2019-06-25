@@ -835,6 +835,13 @@ def main():
     # all files in directory
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
 
+
+    ### MOMENTARY KLUDGE TO NAB FILES THAT GOT MISSED ###
+    kludge_dir = str(config["data_dirs"]["DIR_RAMP_REMOVD"]) + "../pipeline_04_pcab_subted/escrow_old/"
+    names = [os.path.basename(x) for x in glob.glob(kludge_dir)]
+    ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, names)))
+    ### END MOMENTARY KLUDGE
+
     '''
     COMMENTED OUT TO SAVE TIME
     # make a PCA vector involving channel variations only
@@ -856,7 +863,8 @@ def main():
     param_array = [-9999, -9999, 32, -9999]
     do_pca_back_subt = BackgroundPCASubtSingle(param_array, config, simple_channel = True)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array)
-    
+
+    '''
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
     pcab_subted_04_names = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))
@@ -865,3 +873,4 @@ def main():
     ## ## might add functionality to override the found 'center' of the PSF
     make_cookie_cuts = CookieCutout(quad_choice = -9999)
     pool.map(make_cookie_cuts, pcab_subted_04_names)
+    '''

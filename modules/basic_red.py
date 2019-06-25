@@ -836,18 +836,15 @@ def main():
     ramp_subted_03_name_array = list(glob.glob(os.path.join(ramp_subted_03_directory, "*.fits")))
 
 
-    ### MOMENTARY KLUDGE TO NAB FILES THAT GOT MISSED ###
+    # begin handy snippet of code if I need to take file basenames from one directory and attach them
+    # to a different path stem
+    '''
     kludge_dir = str(config["data_dirs"]["DIR_HOME"]) + "/pipeline_04_pcab_subted/escrow_old/"
     kludge_glob = list(glob.glob(kludge_dir + "*.fits"))
-    np.concatenate
-    #print(kludge_dir)
-    #print(list(glob.glob(kludge_dir + "*.fits")))
     names = [str(kludge_dir)+str(os.path.basename(y)) for y in kludge_glob]
-    #names = np.array(names)
-    print(names)
-    ramp_subted_03_name_array = names #list(os.path.join(ramp_subted_03_directory,*names))
-    #print(ramp_subted_03_name_array)
-    ### END MOMENTARY KLUDGE
+    ramp_subted_03_name_array = names
+    '''
+    # end handy code
 
     '''
     COMMENTED OUT TO SAVE TIME

@@ -237,7 +237,8 @@ class HostRemovalCube:
         if self.write:
 
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "host_removed_cube_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
+              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
 
             hdr = fits.Header()
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]

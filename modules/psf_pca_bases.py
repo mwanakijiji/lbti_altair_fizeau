@@ -60,7 +60,8 @@ class PSFPCACubeMaker:
         shape_img = np.shape(test_img)
 
         print("Initializing a PCA cube...")
-        training_cube = np.nan*np.ones((stop_frame_num-start_frame_num+1,shape_img[0],shape_img[1]), dtype = np.float32)
+        training_cube = np.nan*np.ones((stop_frame_num-start_frame_num+1,shape_img[0],shape_img[1]),
+                                       dtype = np.float32)
 
         ## ## MASKING DEACTIVATED FOR THE MOMENT; IN FACT IT MIGHT NOT BE NEEDED AT THIS STEP
         #mask_weird = make_first_pass_mask(quad_choice) # make the right mask

@@ -842,10 +842,10 @@ def main():
     #print(kludge_dir)
     #print(list(glob.glob(kludge_dir + "*.fits")))
     names = [os.path.basename(x) for x in kludge_glob]
-    names = np.array(names)
+    #names = np.array(names)
     print(names)
     ramp_subted_03_name_array = list(os.path.join(ramp_subted_03_directory,*names))
-    print(ramp_subted_03_name_array)
+    #print(ramp_subted_03_name_array)
     ### END MOMENTARY KLUDGE
 
     '''

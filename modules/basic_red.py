@@ -750,6 +750,7 @@ class CookieCutout:
         cookie_cut_out = sciImg[psf_loc[0]-radius_from_host:psf_loc[0]+radius_from_host,
                                 psf_loc[1]-radius_from_host:psf_loc[1]+radius_from_host]
 
+        '''
         # case of overflow below the readout (i.e., the cookie cutout extends into y<0)
         if (psf_loc_old[0]-radius_from_host < 0):
             overflow_below = np.abs(psf_loc[0]-radius_from_host)
@@ -764,7 +765,25 @@ class CookieCutout:
             # kludge to replace overflow region with NaNs
             print("Replacing some array above-overflow with NaNs...")
             cookie_cut_out[-overflow_above:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow_above:,:]))
-            cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros        
+            cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
+        '''
+        # case of overflow below the readout (i.e., the cookie cutout extends into y<0)
+        if (psf_loc_old[0]-radius_from_host < 0):
+            overflow_below = np.abs(psf_loc[0]-radius_from_host)
+            # kludge to replace overflow region with NaNs
+            print("Replacing some array below-overflow with NaNs...")
+            #cookie_cut_out[0:overflow_below,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow_below,:]))
+            cookie_cut_out[cookie_cut_out< -999998] = np.nan # some of the NaNs from a previous module have turned to zeros
+
+        # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
+        elif (psf_loc_old[0]+radius_from_host > sciImg_shape_old[0]):
+            overflow_above = np.abs((radius_from_host+psf_loc[0]) - sciImg_shape_old[0]) # number of pixels overflow
+            # kludge to replace overflow region with NaNs
+            print("Replacing some array above-overflow with NaNs...")
+            #cookie_cut_out[-overflow_above:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow_above:,:]))
+            #cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
+            cookie_cut_out[cookie_cut_out< -999998] = np.nan 
+        
 
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_cutout"

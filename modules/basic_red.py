@@ -783,8 +783,8 @@ class CookieCutout:
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
 
             # test
-            fits.writeto(filename="cookie_cut_out_below.fits",data=cookie_cut_out,overwrite=False)
-            fits.writeto(filename="testing_nan_below.fits",data=cookie_mask,overwrite=False)
+            fits.writeto(filename="cookie_cut_out_below.fits",data=cookie_cut_out,overwrite=True)
+            fits.writeto(filename="testing_nan_below.fits",data=cookie_mask,overwrite=True)
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
         elif (psf_loc_old[0]+radius_from_host > sciImg_shape_old[0]):
@@ -800,8 +800,8 @@ class CookieCutout:
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
 
             # test
-            fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=False)
-            fits.writeto(filename="testing_nan_above.fits",data=cookie_mask,overwrite=False)
+            fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
+            fits.writeto(filename="testing_nan_above.fits",data=cookie_mask,overwrite=True)
         
 
         # add a line to the header indicating last reduction step

@@ -752,7 +752,7 @@ class CookieCutout:
             overflow_below = np.abs(psf_loc[0]-radius_from_host)
             # kludge to replace overflow region with NaNs
             print("Replacing some array below-overflow with NaNs...")
-            cookie_cut_out[0:overflow,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow,:]))
+            cookie_cut_out[0:overflow_below,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow_below,:]))
             cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
@@ -760,7 +760,7 @@ class CookieCutout:
             overflow_above = np.abs(radius_from_host-psf_loc[0]) # number of pixels overflow
             # kludge to replace overflow region with NaNs
             print("Replacing some array above-overflow with NaNs...")
-            cookie_cut_out[-overflow:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow:,:]))
+            cookie_cut_out[-overflow_above:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow_above:,:]))
             cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros        
 
         # add a line to the header indicating last reduction step

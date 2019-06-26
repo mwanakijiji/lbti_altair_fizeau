@@ -225,12 +225,14 @@ def inject_remove_adi(this_param_combo):
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[0123456]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[89]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_011*.fits")))
+
+    print("number of frames being considered for ADI: " + str(len(cookies_centered_06_name_array)))
     
 
     ## Inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
     print("-------------------------------------------------")
     print("Injecting fake planet corresponding to parameter")
-    print()
+    print(this_param_combo)
 
     # instantiate fake planet injection
     inject_fake_psfs = FakePlanetInjectorCube(fake_params = this_param_combo,

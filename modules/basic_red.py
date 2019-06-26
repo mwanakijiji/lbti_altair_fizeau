@@ -696,7 +696,7 @@ class CookieCutout:
                       np.float(self.config_data["instrum_params"]["N_SUBAP_DIAM"])) # intersubaperture spacing (m)
         r_c = np.divide(np.float(self.config_data["observ_params"]["WAVEL_C_UM"]),2*d)*(10**-6)*asec_per_rad # r_c (m)
         self.ao_ctrl_pix = np.divide(r_c,np.float(self.config_data["instrum_params"]["LMIR_PS"])) # r_c (pix)
-        self.buffer_fac = 1. # multiple of r_c we want to cut out around the PSF
+        self.buffer_fac = 1.429 # multiple of r_c we want to cut out around the PSF (1.429 is equiv to 200 pix)
         self.quad_choice = quad_choice
 
     def __call__(self, abs_sci_name):

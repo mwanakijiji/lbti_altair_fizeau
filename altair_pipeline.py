@@ -24,10 +24,10 @@ make_dirs()
 fits_meta_data = fits_hdr.main()
 
 ## ## BACKGROUND PCA BASIS GENERATION HERE!
-'''
+
 ## ## BASIC REDUCTIONS
 basic_red.main()
-
+'''
 ## ## CENTERING OF PSFS
 centering.main()
 

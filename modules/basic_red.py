@@ -774,10 +774,9 @@ class CookieCutout:
         if (psf_loc_old[0]-radius_from_host < 0):
             overflow_below = np.abs(psf_loc_old[0]-radius_from_host)
             # kludge to replace overflow region with NaNs
-            print("Replacing some array below-overflow with NaNs...")
-            #cookie_cut_out[0:overflow_below,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow_below,:]))
-            #cookie_cut_out = cookie_cut_out.astype(float)
-            #cookie_cut_out[cookie_cut_out< -999998] = np.nan
+            print("Replacing some array above-overflow with NaNs...")
+
+            # the below awkwardness is necessary to get the right pixels to be NaNs
             cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
             cookie_mask2 = np.copy(cookie_mask1)
             cookie_mask1[cookie_cut_out < -999998] = np.nan
@@ -786,18 +785,16 @@ class CookieCutout:
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
 
             # test
-            fits.writeto(filename="cookie_cut_out_below.fits",data=cookie_cut_out,overwrite=True)
-            fits.writeto(filename="testing_nan_below.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
+            #fits.writeto(filename="cookie_cut_out_below.fits",data=cookie_cut_out,overwrite=True)
+            #fits.writeto(filename="testing_nan_below.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
         elif (psf_loc_old[0]+radius_from_host > sciImg_shape_old[0]):
             overflow_above = np.abs((radius_from_host+psf_loc[0]) - sciImg_shape_old[0]) # number of pixels overflow
             # kludge to replace overflow region with NaNs
             print("Replacing some array above-overflow with NaNs...")
-            #cookie_cut_out[-overflow_above:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow_above:,:]))
-            #cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
-            #cookie_cut_out = cookie_cut_out.astype(float)
-            #cookie_cut_out[cookie_cut_out< -999998] = np.nan
+
+            # the below awkwardness is necessary to get the right pixels to be NaNs
             cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
             cookie_mask2 = np.copy(cookie_mask1)
             cookie_mask1[cookie_cut_out < -999998] = np.nan
@@ -806,8 +803,8 @@ class CookieCutout:
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
 
             # test
-            fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
-            fits.writeto(filename="testing_nan_above.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
+            #fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
+            #fits.writeto(filename="testing_nan_above.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
         
 
         # add a line to the header indicating last reduction step

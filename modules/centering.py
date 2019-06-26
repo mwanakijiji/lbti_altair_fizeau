@@ -84,6 +84,14 @@ class Centering:
         # shift in [+y,+x] convention
         sci_shifted = scipy.ndimage.interpolation.shift(sci, shift = [y_true_center-y_mean, x_true_center-x_mean])
 
+        # turn unphysical pixels to NaNs
+        # the below awkwardness is necessary to get the right pixels to be NaNs
+        # (unphysical pixels at this stage should be approx -999999)
+        cookie_mask1 = np.zeros(np.shape(sci_shifted))
+        cookie_mask1[sci_shifted < -900000] = np.nan
+        sci_shifted = np.add(sci_shifted,cookie_mask1)
+        # (unphysical pixels at this stage should be NaNs)
+
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_centered"
 

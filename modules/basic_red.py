@@ -777,10 +777,11 @@ class CookieCutout:
             print("Replacing some array above-overflow with NaNs...")
 
             # the below awkwardness is necessary to get the right pixels to be NaNs
+            # (don't turn the -999999 to nans yet, because that would gum up the centering routine)
             cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
             cookie_mask2 = np.copy(cookie_mask1)
-            cookie_mask1[cookie_cut_out < -999998] = np.nan
-            cookie_mask2[cookie_cut_out == 0] = np.nan
+            cookie_mask1[cookie_cut_out < -999998] = -999999
+            cookie_mask2[cookie_cut_out == 0] = -999999
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask1)
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
 
@@ -795,10 +796,11 @@ class CookieCutout:
             print("Replacing some array above-overflow with NaNs...")
 
             # the below awkwardness is necessary to get the right pixels to be NaNs
+            # (don't turn the -999999 to nans yet, because that would gum up the centering routine)
             cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
             cookie_mask2 = np.copy(cookie_mask1)
-            cookie_mask1[cookie_cut_out < -999998] = np.nan
-            cookie_mask2[cookie_cut_out == 0] = np.nan
+            cookie_mask1[cookie_cut_out < -999998] = -999999
+            cookie_mask2[cookie_cut_out == 0] = -999999
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask1)
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
 

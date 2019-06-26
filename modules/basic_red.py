@@ -776,8 +776,8 @@ class CookieCutout:
             # kludge to replace overflow region with NaNs
             print("Replacing some array below-overflow with NaNs...")
             #cookie_cut_out[0:overflow_below,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow_below,:]))
-            cookie_cut_out = cookie_cut_out.astype(float)
-            cookie_cut_out[cookie_cut_out< -999998] = np.nan
+            #cookie_cut_out = cookie_cut_out.astype(float)
+            #cookie_cut_out[cookie_cut_out< -999998] = np.nan
             cookie_mask = np.zeros(np.shape(cookie_cut_out))
             cookie_mask[cookie_cut_out< -999998] = np.nan
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
@@ -789,11 +789,14 @@ class CookieCutout:
             print("Replacing some array above-overflow with NaNs...")
             #cookie_cut_out[-overflow_above:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow_above:,:]))
             #cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
-            cookie_cut_out = cookie_cut_out.astype(float)
-            cookie_cut_out[cookie_cut_out< -999998] = np.nan
+            #cookie_cut_out = cookie_cut_out.astype(float)
+            #cookie_cut_out[cookie_cut_out< -999998] = np.nan
             cookie_mask = np.zeros(np.shape(cookie_cut_out))
             cookie_mask[cookie_cut_out< -999998] = np.nan
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
+
+            # test
+            fits.writeto(filename="testing_nan.fits",data=cookie_mask,overwrite=False)
         
 
         # add a line to the header indicating last reduction step

@@ -739,7 +739,7 @@ class CookieCutout:
             sciImg = np.pad(sciImg,
                             pad_width = radius_from_host,
                             mode = "constant",
-                            constant_values = -999999)
+                            constant_values = 0)
 
             # I can't pad directly with nans, so slip in nans in place of zeros here
             #sciImg = sciImg.astype(np.float32)
@@ -778,12 +778,15 @@ class CookieCutout:
 
             # the below awkwardness is necessary to get the right pixels to be NaNs
             # (don't turn the -999999 to nans yet, because that would gum up the centering routine)
+            '''
             cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
             cookie_mask2 = np.copy(cookie_mask1)
             #cookie_mask1[cookie_cut_out < -999998] = -999999
             cookie_mask2[cookie_cut_out == 0] = -999999
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask1)
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
+            '''
+            cookie_cut_out[cookie_cut_out == 0] = -999999
 
             # test
             #fits.writeto(filename="cookie_cut_out_below.fits",data=cookie_cut_out,overwrite=True)
@@ -797,14 +800,17 @@ class CookieCutout:
 
             # the below awkwardness is necessary to get the right pixels to be NaNs
             # (don't turn the -999999 to nans yet, because that would gum up the centering routine)
+            '''
             cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
             cookie_mask2 = np.copy(cookie_mask1)
             #cookie_mask1[cookie_cut_out < -999998] = -999999
             cookie_mask2[cookie_cut_out == 0] = -999999
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask1)
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
+            '''
+            cookie_cut_out[cookie_cut_out == 0] = -999999
 
-            # test
+            # Test
             #fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
             #fits.writeto(filename="testing_nan_above.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
         

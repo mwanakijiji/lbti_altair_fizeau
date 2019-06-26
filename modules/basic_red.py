@@ -795,10 +795,12 @@ class CookieCutout:
             #cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
             #cookie_cut_out = cookie_cut_out.astype(float)
             #cookie_cut_out[cookie_cut_out< -999998] = np.nan
-            cookie_mask = np.zeros(np.shape(cookie_cut_out))
-            cookie_mask[cookie_cut_out < -999998] = np.nan
-            cookie_mask[cookie_cut_out == 0] = np.nan
-            cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
+            cookie_mask1 = np.zeros(np.shape(cookie_cut_out))
+            cookie_mask2 = np.copy(cookie_mask1)
+            cookie_mask1[cookie_cut_out < -999998] = np.nan
+            cookie_mask2[cookie_cut_out == 0] = np.nan
+            cookie_cut_out = np.add(cookie_cut_out,cookie_mask1)
+            cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
 
             # test
             fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)

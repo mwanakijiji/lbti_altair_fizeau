@@ -723,16 +723,15 @@ class CookieCutout:
         psf_loc_old = np.copy(psf_loc) 
 
         # check: if region of interest goes beyond edge of array in y, pad the array with a bunch of NaNs
-        # and try again
-        #print("psf loc? " + str(int(psf_loc[0])))
-        #print("Overflow? " + str(int(psf_loc[0]-int(self.buffer_fac*self.ao_ctrl_pix))))
+        # and try again (note that for this data, overflow is either above or below readout, but not both cases;
+        # we need this condition in the if-elif further below)
         radius_from_host = int(self.buffer_fac*self.ao_ctrl_pix)
-        if (psf_loc[0]-radius_from_host < 0):
+        if np.logical_or((psf_loc[0]-radius_from_host < 0),
+                         (radius_from_host-psf_loc[0] > (np.shape(sciImg)[0]-psf_loc[0]))):
 
-            overflow = np.abs(psf_loc[0]-radius_from_host) # number of pixels overflow
-                                      
+            # pad the image in preparation for taking a cutout
             sciImg = np.pad(sciImg,
-                            pad_width = overflow,
+                            pad_width = radius_from_host,
                             mode = "constant",
                             constant_values = -999999)
 
@@ -744,15 +743,25 @@ class CookieCutout:
             psf_loc = find_airy_psf(sciImg)
             
 
-        # cut out cookies, keeping float32s to preserve the NaNs
+        # cut out cookies
         cookie_cut_out = sciImg[psf_loc[0]-radius_from_host:psf_loc[0]+radius_from_host,
                                 psf_loc[1]-radius_from_host:psf_loc[1]+radius_from_host]
 
+        # case of overflow below the readout (i.e., the cookie cutout extends into y<0)
         if (psf_loc_old[0]-radius_from_host < 0):
+            overflow_below = np.abs(psf_loc[0]-radius_from_host)
             # kludge to replace overflow region with NaNs
-            print("Replacing some array overflow with NaNs...")
+            print("Replacing some array below-overflow with NaNs...")
             cookie_cut_out[0:overflow,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow,:]))
             cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
+
+        # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
+        elif (psf_loc_old[0]+radius_from_host > np.shape(sciImg)[0]):
+            overflow_above = np.abs(radius_from_host-psf_loc[0]) # number of pixels overflow
+            # kludge to replace overflow region with NaNs
+            print("Replacing some array above-overflow with NaNs...")
+            cookie_cut_out[-overflow:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow:,:]))
+            cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros        
 
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_cutout"

@@ -779,7 +779,7 @@ class CookieCutout:
             #cookie_cut_out = cookie_cut_out.astype(float)
             #cookie_cut_out[cookie_cut_out< -999998] = np.nan
             cookie_mask = np.zeros(np.shape(cookie_cut_out))
-            cookie_mask[cookie_cut_out< -999998] = np.nan
+            cookie_mask[cookie_cut_out < -999998] = np.nan
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
@@ -792,10 +792,11 @@ class CookieCutout:
             #cookie_cut_out = cookie_cut_out.astype(float)
             #cookie_cut_out[cookie_cut_out< -999998] = np.nan
             cookie_mask = np.zeros(np.shape(cookie_cut_out))
-            cookie_mask[cookie_cut_out< -999998] = np.nan
+            cookie_mask[cookie_cut_out < -999998] = np.nan
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
 
             # test
+            fits.writeto(filename="cookie_cut_out.fits",data=cookie_cut_out,overwrite=False)
             fits.writeto(filename="testing_nan.fits",data=cookie_mask,overwrite=False)
         
 

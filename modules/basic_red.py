@@ -799,7 +799,7 @@ class CookieCutout:
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
         elif ((radius_from_host-psf_loc_old[0]) > (sciImg_shape_old[0]-psf_loc_old[0])):
-            
+            print('TRIPPED')
             overflow_above = ((radius_from_host-psf_loc_old[0]) - (sciImg_shape_old[0]-psf_loc_old[0])) # number of pixels overflow
             # kludge to replace overflow region with NaNs
             print("Replacing some array above-overflow with NaNs...")

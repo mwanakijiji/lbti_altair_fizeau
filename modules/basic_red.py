@@ -720,7 +720,10 @@ class CookieCutout:
         psf_loc = find_airy_psf(sciImg)
 
         # PSF location in original coordinates, in case image has to be padded
-        psf_loc_old = np.copy(psf_loc) 
+        psf_loc_old = np.copy(psf_loc)
+
+        # get original shape in case overflow_above has to be defined
+        sciImg_old_shape = np.shape(sciImg)
 
         # check: if region of interest goes beyond edge of array in y, pad the array with a bunch of NaNs
         # and try again (note that for this data, overflow is either above or below readout, but not both cases;
@@ -728,9 +731,6 @@ class CookieCutout:
         radius_from_host = int(self.buffer_fac*self.ao_ctrl_pix)
         if np.logical_or((psf_loc[0]-radius_from_host < 0),
                          (radius_from_host-psf_loc[0] > (np.shape(sciImg)[0]-psf_loc[0]))):
-
-            # get original shape to define overflow_above further below
-            sciImg_old_shape = np.shape(sciImg)
             
             # pad the image in preparation for taking a cutout
             sciImg = np.pad(sciImg,

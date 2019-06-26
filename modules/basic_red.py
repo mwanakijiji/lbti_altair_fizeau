@@ -773,6 +773,9 @@ class CookieCutout:
             cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
         '''
         # case of overflow below the readout (i.e., the cookie cutout extends into y<0)
+        print('test check')
+        print('rad from host '+ str(radius_from_host-psf_loc_old[0]))
+        print('sciImg shape '+ str(sciImg_shape_old[0]-psf_loc_old[0]))
         if (psf_loc_old[0]-radius_from_host < 0):
             overflow_below = np.abs(psf_loc_old[0]-radius_from_host)
             # kludge to replace overflow region with NaNs

@@ -88,7 +88,7 @@ class Centering:
         # the below awkwardness is necessary to get the right pixels to be NaNs
         # (unphysical pixels at this stage should be approx -999999)
         cookie_mask1 = np.zeros(np.shape(sci_shifted))
-        cookie_mask1[sci_shifted < -900000] = np.nan
+        cookie_mask1[sci_shifted == 0] = np.nan
         sci_shifted = np.add(sci_shifted,cookie_mask1)
         # (unphysical pixels at this stage should be NaNs)
 

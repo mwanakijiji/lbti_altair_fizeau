@@ -790,7 +790,7 @@ class CookieCutout:
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask1)
             cookie_cut_out = np.add(cookie_cut_out,cookie_mask2)
             '''
-            cookie_cut_out[cookie_cut_out == 0] = -999999
+            #cookie_cut_out[cookie_cut_out == 0] = -999999
 
             # test
             #fits.writeto(filename="cookie_cut_out_below.fits",data=cookie_cut_out,overwrite=True)
@@ -815,11 +815,11 @@ class CookieCutout:
             '''
 
             # BEGIN Test
-            fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
+            #fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
             #fits.writeto(filename="testing_nan_above.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
             # END TEST
 
-            cookie_cut_out[cookie_cut_out == 0] = -999999
+            #cookie_cut_out[cookie_cut_out == 0] = -999999
         
 
         # add a line to the header indicating last reduction step

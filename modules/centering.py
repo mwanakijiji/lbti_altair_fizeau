@@ -82,7 +82,10 @@ class Centering:
         x_true_center = 0.5*np.shape(sci)[1]-0.5
 
         # shift in [+y,+x] convention
-        sci_shifted = scipy.ndimage.interpolation.shift(sci, shift = [y_true_center-y_mean, x_true_center-x_mean])
+        sci_shifted = scipy.ndimage.interpolation.shift(sci,
+                                                        shift = [y_true_center-y_mean, x_true_center-x_mean],
+                                                        mode = "constant",
+                                                        cval = 0.0)
 
         # turn unphysical pixels to NaNs
         # the below awkwardness is necessary to get the right pixels to be NaNs

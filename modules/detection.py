@@ -169,42 +169,44 @@ class MedianCube:
 
 class Detection:
     '''
-    Do analysis on ONE median frame
+    Do analysis on ONE ADI frame, be it
+    1. A frame with a fake planet whose position is known, or
+    2. A science frame where we search blindly for a planet
     '''
 
     def __init__(self,
-                 fake_params,
-                 adi_frame_name,
-                 csv_record,
+                 adi_frame_file_name,
+                 csv_record_file_name,
+                 fake_params = None,
                  config_data = config):
         '''
         INPUTS:
-        adi_frame_name: absolute name of the ADI frame to be analyzed
+        adi_frame_file_name: absolute name of the ADI frame to be analyzed
         csv_record: absolute name of the csv file in which S/N data is recorded
+        fake_params: parameters of a fake planet, if the frame involves a fake planet
         config_data: configuration data, as usual
         '''
 
-        self.fake_params
+        self.fake_params = fake_params
         self.config_data = config_data
-        self.adi_frame_name = adi_frame_name
+        self.adi_frame_file_name = adi_frame_file_name
 
         # read in the single frame produced by previous module
         ## ## REPLACE FILENAME HERE WITH CONFIG PARAM
-        self.master_frame, self.header = fits.getdata(self.adi_frame_name, 0, header=True)
+        self.master_frame, self.header = fits.getdata(self.adi_frame_file_name, 0, header=True)
 
         # radius of aperture around planet candidate (pix)
         self.comp_rad = 10
 
         # csv file to save S/N data
-        self.csv_record = csv_record
+        self.csv_record_file_name = csv_record_file_name
 
 
     def __call__(self,
-                 blind_search = False,
-                 fake_planet = False):
+                 blind_search = True):
         '''
         INPUTS:
-        blind_search/fake_planet flags: these are either/or modes, but both defaults set to false
+        blind_search flag: is this a real science frame, where we don't know where a planet is?
         #write: flag as to whether data product should be written to disk (for checking)
         '''
 
@@ -222,10 +224,12 @@ class Detection:
 
             # location of the companion/maximum
             loc_vec = np.where(fake_corr == np.max(fake_corr))
+            print("Location vector of best correlation with PSF template:")
+            print(loc_vec)
 
         # case 2: this is an ADI frame involving an injected fake companion, and we already know
         # where it is and just want to determine its amplitude relative to the noise
-        elif fake_planet:
+        else:
 
             # fake planet injection parameters in ADI frame are from the header
             # (note units are asec, and deg E of N)
@@ -236,11 +240,8 @@ class Detection:
             print(injection_loc_dict)
             injection_loc = pd.DataFrame(injection_loc_dict)
             loc_vec = polar_to_xy(pos_info = injection_loc, asec = True)
+            print("Location vector of fake companion:")
             print(loc_vec)
-            
-        # data type N/A
-        else:
-            print("Pipeline doesn't know if this data is real or has fake planets!")
             
         # convert to DataFrame
         ## ## note that this is at pixel-level accuracy; refine this later to allow sub-pixel precision
@@ -340,11 +341,11 @@ class Detection:
         # append to csv
         injection_loc_df = pd.DataFrame(injection_loc_dict)
         # check if csv file exists; if it does, don't repeat the header
-        exists = os.path.isfile(self.csv_record)
-        injection_loc_df.to_csv(self.csv_record, sep = ",", mode = "a", header = (not exists))
+        exists = os.path.isfile(self.csv_record_file_name)
+        injection_loc_df.to_csv(self.csv_record_file_name, sep = ",", mode = "a", header = (not exists))
         print("---------------------")
         print("Appended data to csv ")
-        print(str(self.csv_record))  
+        print(str(self.csv_record_file_name))  
 
         # write out as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
@@ -352,10 +353,10 @@ class Detection:
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
         sn_check_cube[2,:,:] = noise_smoothed # the noise ring
         sn_check_cube[3,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
-        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_name),
+        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)
-        print("Wrote out S/N cube for " + os.path.basename(self.adi_frame_name))
+        print("Wrote out S/N cube for " + os.path.basename(self.adi_frame_file_name))
 
 
 def main():
@@ -372,16 +373,19 @@ def main():
     ## ## IMAGES WITH FAKE PLANETS, TO DETERMINE SENSITIVITY
     
     # make a list of the images WITH fake planets
-    hosts_removed_fake_psf_08a_directory = str(config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"])
+    hosts_removed_fake_psf_09a_directory = str(config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"])
 
-    # find all combinations of available fake planet parameters
-    hosts_removed_fake_psf_08a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory,"*.fits"))) # list of all files
+    # find all combinations of available fake planet parameters using the file names
+    hosts_removed_fake_psf_09a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_09a_directory,
+                                                                        "*.fits"))) # list of all files
     # list fake planet parameter patterns from fake_planet_xxxxx_xxxxx_xxxxx_lm_YYMMDD_NNNNNN.fits
-    print(hosts_removed_fake_psf_08a_name_array[0].split("fake_planet_"))
-    degen_param_list = [i.split("fake_planet_")[1].split("_lm_")[0] for i in hosts_removed_fake_psf_08a_name_array] # list which may have repeats
+    print(hosts_removed_fake_psf_09a_name_array[0].split("fake_planet_"))
+    degen_param_list = [i.split("fake_planet_")[1].split("_lm_")[0] for i in hosts_removed_fake_psf_09a_name_array] # list which may have repeats
     param_list = list(frozenset(degen_param_list)) # remove repeats
 
     # loop over all fake planet parameter combinations and make ADI frames
+    '''
+    THIS SHOULD NOT HAVE TO BE NECESSARY, SINCE ADI FRAMES HAVE ALREADY BEEN GENERATED IN INJECTION_SENSITIVITY
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints
@@ -395,16 +399,20 @@ def main():
         fake_contrast_rel = np.power(10.,-np.divide(raw_contrast,100.)) # scale is relative and linear
     
         # specify parameters of fake companion
-        fake_params_string = str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + "_" + str(self.fake_params["ampl_linear_norm"])
+        fake_params_string = str(self.fake_params["angle_deg_EofN"]) + "_" + \
+          str(self.fake_params["rad_asec"]) + "_" + \
+          str(self.fake_params["ampl_linear_norm"])
 
         # list of files corresponding to that combination of fake planet parameters
-        hosts_removed_fake_psf_08a_name_array_one_combo = list(glob.glob(os.path.join(hosts_removed_fake_psf_08a_directory, "*"+fake_params_string+"*.fits")))
+        hosts_removed_fake_psf_09a_name_array_one_combo = list(glob.glob(os.path.join(hosts_removed_fake_psf_09a_directory,
+                                                                                      "*"+fake_params_string+"*.fits")))
 
         # make a median of all frames
         median_instance = MedianCube()
-        make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_08a_name_array_one_combo,
+        make_median = median_instance(abs_sci_name_array = hosts_removed_fake_psf_09a_name_array_one_combo,
                                       write_adi_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
                                       fake_planet = True)
+    '''
 
     # file which will record all S/N calculations, for each fake planet parameter
     csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
@@ -412,10 +420,10 @@ def main():
     # check if csv file exists; I want to start with a new one
     exists = os.path.isfile(csv_file)
     if exists:
-        input("A CSV file already exists! Hit [Enter] to delete it and continue.")
+        input("A fake planet detection CSV file already exists! Hit [Enter] to delete it and continue.")
         os.remove(csv_file)
         
-    # loop again over all fake planet parameter combinations to retrieve ADI frames and look for signal
+    # loop over all fake planet parameter combinations to retrieve ADI frames and look for signal
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints
@@ -432,24 +440,19 @@ def main():
         fake_params_string = param_list[t]
 
         # initialize and detect
-        detection_blind_search = Detection(adi_frame_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
-                                           csv_record = csv_file)
-        detection_blind_search(fake_planet = True)
-        #detection_blind_search(blind_search = True)
+        detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
+                                           csv_record_file_name = csv_file)
+        detection_blind_search(blind_search = False)
     
     ###########################################################
     ## ## IMAGES WITHOUT FAKE PLANETS; I.E., ACTUAL SCIENCE
         
-    '''
-    # make a list of the images WITHOUT fake planets
-    hosts_removed_no_fake_psf_08b_directory = str(config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"])
-    hosts_removed_no_fake_psf_08b_name_array = list(glob.glob(os.path.join(hosts_removed_no_fake_psf_08b_directory, "*.fits")))
+    # MAKE LIST OF ADI FRAMES IN A DIRECTORY (MAY BE JUST 1)
 
-    # make a median of all frames
-    median_instance = Median()
-    make_median = median_instance(hosts_removed_no_fake_psf_08b_name_array)
-    '''
+    # DO CROSS-CORRELATION TO FIND MOST LIKELY SPOT WHERE A PLANET EXISTS
 
-    # multiprocessing instance
-    #pool = multiprocessing.Pool(ncpu)
-    #pool.map(detection_blind_search, hosts_removed_no_fake_psf_08b_name_array)
+    # FIND THE S/N OF THE 'DETECTION'
+
+    # WRITE DATA TO CSV
+
+    # WHILE S/N >2, DO IT AGAIN (WHILE MASKING THE PRECEDING CANDIDATE FOOTPRINTS)

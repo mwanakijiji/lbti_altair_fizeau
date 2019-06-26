@@ -729,8 +729,8 @@ class CookieCutout:
         # and try again (note that for this data, overflow is either above or below readout, but not both cases;
         # we need this condition in the if-elif further below)
         radius_from_host = int(self.buffer_fac*self.ao_ctrl_pix)
-        if np.logical_or((psf_loc[0]-radius_from_host < 0),
-                         (radius_from_host-psf_loc[0]) > (np.shape(sciImg)[0]-psf_loc[0])):
+        if np.logical_or((psf_loc_old[0]-radius_from_host < 0),
+                         (radius_from_host-psf_loc_old[0]) > (sciImg_shape_old[0]-psf_loc_old[0])):
 
             print("Overflow in frame " + abs_sci_name)
 
@@ -795,9 +795,9 @@ class CookieCutout:
             #fits.writeto(filename="testing_nan_below.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
-        elif (radius_from_host-psf_loc[0]) > (np.shape(sciImg)[0]-psf_loc[0]):
+        elif ((radius_from_host-psf_loc_old[0]) > (sciImg_shape_old[0]-psf_loc_old[0])):
             
-            overflow_above = np.abs((radius_from_host+psf_loc[0]) - sciImg_shape_old[0]) # number of pixels overflow
+            overflow_above = ((radius_from_host-psf_loc_old[0]) - (sciImg_shape_old[0]-psf_loc_old[0])) # number of pixels overflow
             # kludge to replace overflow region with NaNs
             print("Replacing some array above-overflow with NaNs...")
 

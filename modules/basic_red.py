@@ -732,6 +732,8 @@ class CookieCutout:
         if np.logical_or((psf_loc[0]-radius_from_host < 0),
                          (radius_from_host-psf_loc[0] > (np.shape(sciImg)[0]-psf_loc[0]))):
 
+            print("Overflow in frame " + abs_sci_name)
+
             overflow_below_nosign_change = psf_loc_old[0]-radius_from_host
             overflow_above_nosign_change = psf_loc_old[0]+radius_from_host > sciImg_shape_old[0]
             

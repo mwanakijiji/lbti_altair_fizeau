@@ -211,9 +211,23 @@ def inject_remove_adi(this_param_combo):
 
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+    
+    '''
+    COMMENTED OUT TO JUST USE FRAMES FROM SEQUENCES A AND D
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
+    '''
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[012]*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[0123456]*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[89]*.fits")))
+    cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_011*.fits")))
+    
 
-    ## inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
+    ## Inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
     print("-------------------------------------------------")
     print("Injecting fake planet corresponding to parameter")
     print()

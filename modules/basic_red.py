@@ -777,7 +777,10 @@ class CookieCutout:
             print("Replacing some array below-overflow with NaNs...")
             #cookie_cut_out[0:overflow_below,:] = np.nan*np.ones(np.shape(cookie_cut_out[0:overflow_below,:]))
             cookie_cut_out = cookie_cut_out.astype(float)
-            cookie_cut_out[cookie_cut_out< -999998] = np.nan # some of the NaNs from a previous module have turned to zeros
+            cookie_cut_out[cookie_cut_out< -999998] = np.nan
+            cookie_mask = np.zeros(np.shape(cookie_cut_out))
+            cookie_mask[cookie_cut_out< -999998] = np.nan
+            cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
 
         # case of overflow above the readout (i.e., the cookie cutout extends beyond the top of the readout)
         elif (psf_loc_old[0]+radius_from_host > sciImg_shape_old[0]):
@@ -787,7 +790,10 @@ class CookieCutout:
             #cookie_cut_out[-overflow_above:,:] = np.nan*np.ones(np.shape(cookie_cut_out[-overflow_above:,:]))
             #cookie_cut_out[cookie_cut_out == 0] = np.nan # some of the NaNs from a previous module have turned to zeros
             cookie_cut_out = cookie_cut_out.astype(float)
-            cookie_cut_out[cookie_cut_out< -999998] = np.nan 
+            cookie_cut_out[cookie_cut_out< -999998] = np.nan
+            cookie_mask = np.zeros(np.shape(cookie_cut_out))
+            cookie_mask[cookie_cut_out< -999998] = np.nan
+            cookie_cut_out = np.add(cookie_cut_out,cookie_mask)
         
 
         # add a line to the header indicating last reduction step

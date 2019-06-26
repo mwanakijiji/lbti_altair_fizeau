@@ -742,8 +742,8 @@ class CookieCutout:
                             constant_values = -999999)
 
             # I can't pad directly with nans, so slip in nans in place of zeros here
-            sciImg = sciImg.astype(np.float32)
-            sciImg[sciImg < -999998] = np.nan # just turns to zero later, for some reason; see kludge below
+            #sciImg = sciImg.astype(np.float32)
+            #sciImg[sciImg < -999998] = np.nan # just turns to zero later, for some reason; see kludge below
 
             # find the PSF again, in the coordinates of the padded image
             psf_loc = find_airy_psf(sciImg)

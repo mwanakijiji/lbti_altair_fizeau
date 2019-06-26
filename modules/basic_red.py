@@ -807,7 +807,7 @@ class CookieCutout:
 
             # test
             fits.writeto(filename="cookie_cut_out_above.fits",data=cookie_cut_out,overwrite=True)
-            fits.writeto(filename="testing_nan_above.fits",data=cookie_mask1,overwrite=True)
+            fits.writeto(filename="testing_nan_above.fits",data=np.add(cookie_mask1,cookie_mask2),overwrite=True)
         
 
         # add a line to the header indicating last reduction step

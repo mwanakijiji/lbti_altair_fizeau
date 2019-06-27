@@ -262,7 +262,7 @@ def inject_remove_adi(this_param_combo):
     median_instance = detection.MedianCube(fake_params = this_param_combo,
                                                host_subt_cube = removed_hosts_cube,
                                                pa_array = pas_array,
-                                               write_cube = False)
+                                               write_cube = True)
 
     fake_params_string = "STANDIN"
 

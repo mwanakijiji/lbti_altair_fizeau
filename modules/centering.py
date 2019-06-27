@@ -81,17 +81,28 @@ class Centering:
         y_true_center = 0.5*np.shape(sci)[0]-0.5
         x_true_center = 0.5*np.shape(sci)[1]-0.5
 
+        # locate bad pixels, so we can shift them and turn their counterparts in the science image into NaNs
+        mask_pixels = np.zeros(np.shape(sci))
+        mask_pixels[sci == 0] = 1 # these are the bad pixels
+
         # shift in [+y,+x] convention
         sci_shifted = scipy.ndimage.interpolation.shift(sci,
                                                         shift = [y_true_center-y_mean, x_true_center-x_mean],
                                                         mode = "constant",
-                                                        cval = np.nan)
+                                                        cval = 0.0)
+
+        # shift the mask, too
+        mask_pixels_shifted = scipy.ndimage.interpolation.shift(mask_pixels,
+                                                                shift = [y_true_center-y_mean, x_true_center-x_mean],
+                                                                order = 0,
+                                                                mode = "constant",
+                                                                cval = 1.0)
 
         # turn unphysical pixels to NaNs
         # the below awkwardness is necessary to get the right pixels to be NaNs
         # (unphysical pixels at this stage should be approx -999999)
-        cookie_mask1 = np.zeros(np.shape(sci_shifted))
-        cookie_mask1[np.abs(sci_shifted) < 1e-3] = np.nan
+        cookie_mask1 = np.zeros(np.shape(mask_pixels_shifted))
+        cookie_mask1[mask_pixels_shifted == 1] = np.nan
         sci_shifted = np.add(sci_shifted,cookie_mask1)
         # (unphysical pixels at this stage should be NaNs)
 

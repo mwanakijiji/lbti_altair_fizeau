@@ -85,13 +85,13 @@ class Centering:
         sci_shifted = scipy.ndimage.interpolation.shift(sci,
                                                         shift = [y_true_center-y_mean, x_true_center-x_mean],
                                                         mode = "constant",
-                                                        cval = 0.0)
+                                                        cval = np.nan)
 
         # turn unphysical pixels to NaNs
         # the below awkwardness is necessary to get the right pixels to be NaNs
         # (unphysical pixels at this stage should be approx -999999)
         cookie_mask1 = np.zeros(np.shape(sci_shifted))
-        cookie_mask1[sci_shifted == 0] = np.nan
+        cookie_mask1[np.abs(sci_shifted) < 1e-3] = np.nan
         sci_shifted = np.add(sci_shifted,cookie_mask1)
         # (unphysical pixels at this stage should be NaNs)
 

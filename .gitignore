@@ -1,0 +1,5 @@
+# Anything in the environment directory
+altair_env/
+
+# config file, with home directory unique to local system
+modules/config.ini

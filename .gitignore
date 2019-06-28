@@ -1,5 +1,6 @@
-# Anything in the environment directory
-altair_env/
+# anything in the environment directories
+**/altair_env
+**/py354
 
-# config file, with home directory unique to local system
+# the config file
 modules/config.ini

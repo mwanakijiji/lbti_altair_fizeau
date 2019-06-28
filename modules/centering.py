@@ -98,6 +98,7 @@ class Centering:
                                                                 mode = "constant",
                                                                 cval = 1.0)
 
+        '''
         # turn unphysical pixels to NaNs
         # the below awkwardness is necessary to get the right pixels to be NaNs
         # (unphysical pixels at this stage should be approx -999999)
@@ -105,7 +106,8 @@ class Centering:
         cookie_mask1[mask_pixels_shifted == 1] = np.nan
         sci_shifted = np.add(sci_shifted,cookie_mask1)
         # (unphysical pixels at this stage should be NaNs)
-
+        '''
+        
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_centered"
 

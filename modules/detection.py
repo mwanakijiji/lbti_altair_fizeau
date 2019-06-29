@@ -107,7 +107,7 @@ class MedianCube:
 
 
     def __call__(self,
-                 apply_mask_after_derot = None,
+                 apply_mask_after_derot = False,
                  fake_planet = False):
         '''
         Make the stack and take median
@@ -116,7 +116,6 @@ class MedianCube:
 
         write_cube_name: cube of frames to write out if we want to check it
         apply_mask_after_derot: should a mask be generated so as to make bad pixels in a given cube slice NaNs?
-           - options: None, nod_up, nod_down (nods up and down are made for the Altair 180507 dataset)
         fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
         '''
 
@@ -133,36 +132,43 @@ class MedianCube:
             sci_derotated = scipy.ndimage.rotate(sci, self.pa_array[t], reshape=False)
 
             ### BEGIN READ IN THE RIGHT MASK
+            if apply_mask_after_derot:
 
-            # initialize mask (whether or not it will be needed)
-            mask_nan_regions = np.ones(np.shape(sci))
+                # initialize mask (whether or not it will be needed)
+                mask_nan_regions = np.ones(np.shape(sci))
 
-            # for Altair 180507 dataset,
-            # mask for nod up: mask of borders 10 pixels around the edges
-            # mask for nod down: same, but also top-right corner (340:,375:), and bottom 100 pixels
-            # convention: 0: bad pixels we will mask; 1: pixels to pass
-            if (apply_mask_after_derot == "nod_up"):
-                print("Applying mask to frame after derotation, nod up")
-                mask_nan_regions[:10,:] = 0
-                mask_nan_regions[-10:,:] = 0
-                mask_nan_regions[:,:10] = 0
-                mask_nan_regions[:,-10:] = 0
-            elif (apply_mask_after_derot == "nod_down"):
-                print("Applying mask to frame after derotation, nod down")
-                mask_nan_regions[:10,:] = 0
-                mask_nan_regions[-10:,:] = 0
-                mask_nan_regions[:,:10] = 0
-                mask_nan_regions[:,-10:] = 0
-                mask_nan_regions[340:,375:] = 0
-                mask_nan_regions[:100,:] = 0
+                # choose the mask based on the frame number
+                if (frame_array[t] <= 7734):
+                    nod_position = "nod_up"
+                else:
+                    nod_position = "nod_down"
 
-            # derotate the mask in the same way as the science image
-            mask_derotated = scipy.ndimage.rotate(mask_nan_regions, self.pa_array[t], reshape=False)
+                # for Altair 180507 dataset,
+                # mask for nod up: mask of borders 10 pixels around the edges
+                # mask for nod down: same, but also top-right corner (340:,375:), and bottom 100 pixels
+                # convention: 0: bad pixels we will mask; 1: pixels to pass
+                if (nod_position == "nod_up"):
+                    print("Applying mask to frame after derotation, nod up")
+                    mask_nan_regions[:10,:] = 0
+                    mask_nan_regions[-10:,:] = 0
+                    mask_nan_regions[:,:10] = 0
+                    mask_nan_regions[:,-10:] = 0
+                elif (nod_position == "nod_down"):
+                    print("Applying mask to frame after derotation, nod down")
+                    mask_nan_regions[:10,:] = 0
+                    mask_nan_regions[-10:,:] = 0
+                    mask_nan_regions[:,:10] = 0
+                    mask_nan_regions[:,-10:] = 0
+                    mask_nan_regions[340:,375:] = 0
+                    mask_nan_regions[:100,:] = 0
+
+                # derotate the mask in the same way as the science image
+                mask_derotated = scipy.ndimage.rotate(mask_nan_regions, self.pa_array[t], reshape=False)
             
-            # multiply the science image by the mask
-            # note the derotation causes some of the edge pixels to be neither 0 nor 1
-            mask_derotated[np.abs(mask_derotated < 0.5)] = np.nan
-            sci_derotated = np.multiply(sci_derotated,mask_derotated)
+                # multiply the science image by the mask
+                # note the derotation causes some of the edge pixels to be neither 0 nor 1
+                mask_derotated[np.abs(mask_derotated < 0.5)] = np.nan
+                sci_derotated = np.multiply(sci_derotated,mask_derotated)
 
 
             # test

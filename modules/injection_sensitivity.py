@@ -288,7 +288,7 @@ def inject_remove_adi(this_param_combo):
     fake_params_string = "STANDIN"
 
     # call derotation, ADI, sensitivity determination
-    make_median = median_instance(fake_planet = True)
+    make_median = median_instance(apply_mask_after_derot = True, fake_planet = True)
 
     elapsed_time = np.subtract(time.time(), time_start)
 

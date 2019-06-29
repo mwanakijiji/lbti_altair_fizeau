@@ -172,15 +172,15 @@ class MedianCube:
 
 
             # test
+            '''
             fits.writeto(filename = "junk_mask_derotated.fits",
                      data = mask_derotated,
                      overwrite = True)
             fits.writeto(filename = "junk_sci_derotated.fits",
                      data = sci_derotated,
-                     overwrite = True)            
+                     overwrite = True)
+            '''
             ### END READ IN THE RIGHT MASK
-
-
 
             # put into cube
             cube_derotated_frames[t,:,:] = sci_derotated.astype(np.float32)

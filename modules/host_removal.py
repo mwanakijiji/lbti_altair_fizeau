@@ -155,7 +155,7 @@ class HostRemovalCube:
         self.n_PCA = n_PCA
         self.outdir = outdir
         self.abs_PCA_name = abs_PCA_name
-        self.frame_num_array = frame_num_array
+        self.frame_num_array = frame_array
         self.config_data = config_data
         self.write = write
 

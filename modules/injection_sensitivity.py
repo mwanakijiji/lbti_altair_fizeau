@@ -225,9 +225,9 @@ def inject_remove_adi(this_param_combo):
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
     '''
 
-    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
     '''
     THE BELOW COMMENTED OUT TO AVOID MEMORY ERRORS
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
@@ -237,6 +237,9 @@ def inject_remove_adi(this_param_combo):
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[89]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_011*.fits")))
     '''
+
+    # THIS LINE IS AN ERSATZ FOR TESTING ONLY; WILL NEED TO INCLUDE MORE AND BETTER FRAMES NEXT
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_00902*.fits")))
 
     print("number of frames being considered for ADI: " + str(len(cookies_centered_06_name_array)))
     

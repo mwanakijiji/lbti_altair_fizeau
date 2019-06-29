@@ -263,7 +263,7 @@ def inject_remove_adi(this_param_combo):
                                                     abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    frame_array = frame_array_0
+                                                    frame_array = frame_array_0,
                                                     write = False)
 
     # call and return cube of host-removed frames

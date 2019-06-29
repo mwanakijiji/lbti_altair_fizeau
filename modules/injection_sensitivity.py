@@ -82,6 +82,8 @@ class FakePlanetInjectorCube:
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
         # initialize cube to hold the frames
+        print("Memory error, 0 " + str(len(abs_sci_name_array)))
+        print("Memory error, shape " + str(np.shape(test_image)))
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))

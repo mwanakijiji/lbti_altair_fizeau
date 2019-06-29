@@ -276,7 +276,7 @@ def inject_remove_adi(this_param_combo):
                                                     write = False)
 
     # call and return cube of host-removed frames
-    removed_hosts_cub, frame_array_1 = remove_hosts()
+    removed_hosts_cube, frame_array_1 = remove_hosts()
 
     # instantiate derotation, ADI, sensitivity determination
     median_instance = detection.MedianCube(fake_params = this_param_combo,

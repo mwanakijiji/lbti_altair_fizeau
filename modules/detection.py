@@ -168,11 +168,9 @@ class MedianCube:
             # test
             fits.writeto(filename = "junk_mask_derotated.fits",
                      data = mask_derotated,
-                     header = hdr,
                      overwrite = True)
             fits.writeto(filename = "junk_sci_derotated.fits",
                      data = sci_derotated,
-                     header = hdr,
                      overwrite = True)            
             ### END READ IN THE RIGHT MASK
 

@@ -138,7 +138,7 @@ class MedianCube:
                 mask_nan_regions = np.ones(np.shape(sci))
 
                 # choose the mask based on the frame number
-                if (frame_array[t] <= 7734):
+                if (self.frame_array[t] <= 7734):
                     nod_position = "nod_up"
                 else:
                     nod_position = "nod_down"

@@ -26,7 +26,9 @@ class FakePlanetInjectorCube:
     based on a grid of fake planet parameters
 
     RETURNS:
-    Cube of non-derotated frames with fake planets injected, and array of parallactic angles
+    Cube of non-derotated frames with fake planets injected
+    An array of parallactic angles
+    An array of integers indicating the frame number (from the original file name)
     '''
 
     def __init__(self,
@@ -83,6 +85,9 @@ class FakePlanetInjectorCube:
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))
+        # initialize the array to hold the frame numbers (to define masks to apply over pixel regions to make them
+        #    NaNs before taking the median of a cube)
+        frame_nums_array = np.ones(len(abs_sci_name_array)).astype(int)
 
         # loop over frames to inject fake planets in each of them
         for frame_num in range(0,len(abs_sci_name_array)):
@@ -166,9 +171,10 @@ class FakePlanetInjectorCube:
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
 
-            # add image to cube and add PA to array
+            # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
             pa_array[frame_num] = header_sci["LBT_PARA"]
+            frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
                 
 
             ## TEST: WRITE OUT
@@ -198,7 +204,7 @@ class FakePlanetInjectorCube:
         print(pa_array)
 
         # return cube of frames and array of PAs
-        return cube_frames, pa_array
+        return cube_frames, pa_array, frame_nums_array
 
 
 def inject_remove_adi(this_param_combo):
@@ -243,7 +249,11 @@ def inject_remove_adi(this_param_combo):
                                           write = False)
 
     # call fake planet injection
-    injected_fake_psfs_cube, pas_array = inject_fake_psfs(cookies_centered_06_name_array)
+    injected_fake_psfs_cube, pas_array, frame_array_0 = inject_fake_psfs(cookies_centered_06_name_array)
+
+    # fyi
+    print("Frames into which we will inject fake planets: ")
+    print(frame_nums_array)
 
     # instantiate removal of host star from each frame in the cube
     remove_hosts = host_removal.HostRemovalCube(fake_params = this_param_combo,
@@ -253,15 +263,17 @@ def inject_remove_adi(this_param_combo):
                                                     abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
+                                                    frame_array = frame_array_0
                                                     write = False)
 
     # call and return cube of host-removed frames
-    removed_hosts_cube = remove_hosts()
+    removed_hosts_cub, frame_array_1 = remove_hosts()
 
     # instantiate derotation, ADI, sensitivity determination
     median_instance = detection.MedianCube(fake_params = this_param_combo,
                                                host_subt_cube = removed_hosts_cube,
                                                pa_array = pas_array,
+                                               frame_array = frame_array_1,
                                                write_cube = True)
 
     fake_params_string = "STANDIN"

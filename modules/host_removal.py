@@ -130,6 +130,7 @@ class HostRemovalCube:
                  n_PCA,
                  outdir,
                  abs_PCA_name,
+                 frame_num_array,
                  config_data = config,
                  write = False):
         '''
@@ -144,6 +145,7 @@ class HostRemovalCube:
                        contain fake planet PSFs, and I want to keep them separate)
         abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
+        frame_num_array: array of integers corresponding to the frame file name numbers
         config_data: configuration data, as usual
         write: flag as to whether data product should be written to disk (for checking)
         '''
@@ -153,6 +155,7 @@ class HostRemovalCube:
         self.n_PCA = n_PCA
         self.outdir = outdir
         self.abs_PCA_name = abs_PCA_name
+        self.frame_num_array = frame_num_array
         self.config_data = config_data
         self.write = write
 
@@ -168,14 +171,20 @@ class HostRemovalCube:
     def __call__(self):
         '''
         Reconstruct and subtract the host star from each slice
-
+        
         INPUTS:
-
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
+
+        Outputs:
+        host_subt_cube: a cube of non-derotated frames
+        file_bases_list: a list of file basenames in the same order as the slices 
         '''
 
         # make a cube that is the same shape as the input
         host_subt_cube = np.nan*np.ones(np.shape(self.cube_frames))
+
+        # initialize the file list
+        file_bases_list = [["NaN"] for i in range(len(self.cube_frames))]
 
         for slice_num in range(0,len(self.cube_frames)):
 
@@ -257,7 +266,7 @@ class HostRemovalCube:
         print("Returning cube of host-removed frames ")
 
         # return cube of non-derotated, host-star-subtracted frames
-        return host_subt_cube
+        return host_subt_cube, file_bases_list, self.frame_num_array
 
 
 def main():

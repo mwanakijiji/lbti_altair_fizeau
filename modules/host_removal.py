@@ -130,7 +130,7 @@ class HostRemovalCube:
                  n_PCA,
                  outdir,
                  abs_PCA_name,
-                 frame_num_array,
+                 frame_array,
                  config_data = config,
                  write = False):
         '''

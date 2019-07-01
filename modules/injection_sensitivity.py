@@ -252,6 +252,7 @@ def inject_remove_adi(this_param_combo):
     print(this_param_combo)
 
     # instantiate fake planet injection
+    ## ## NOTE THAT WE WANT TO USE DIFFERENT PCA CUBES DEPENDING ON THE FRAMES BEIGN REDUCED
     inject_fake_psfs = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
@@ -328,7 +329,10 @@ def main():
                                              np.float(config["instrum_params"]["LMIR_PS"]))
 
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
-    pool = multiprocessing.Pool(ncpu)
+    #pool = multiprocessing.Pool(ncpu)
+
+    # TRYING IT OVER 8 CORES AS OPPOSED TO 16 TO SEE IF I AVOID TOO MUCH MEMORY LEAKAGE
+    pool = multiprocessing.Pool(8)
 
     # create list of dictionaries of fake planet parameters
     # (one dictionary is fed to each core at a time)

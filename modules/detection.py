@@ -187,11 +187,12 @@ class MedianCube:
 
         # define header
         hdr = fits.Header()
-        hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
-        hdr["RADASEC"] = self.fake_params["rad_asec"]
-        hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+        hdr["ANGEOFN"] = self.fake_params["ANGEOFN"]
+        hdr["RADASEC"] = self.fake_params["RADASEC"]
+        hdr["AMPLIN"] = self.fake_params["AMPLIN"]
 
         # if writing cube of frames to disk for checking
+        #OBSOLETE, SINCE WE ONLY USE THE FINAL ADI FRAMES ANYWAY
         if self.write_cube:
 
             cube_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
@@ -204,7 +205,7 @@ class MedianCube:
                          data = cube_derotated_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote cube-just-before-median to disk as " + cube_file_name)  
+            print("Wrote cube-just-before-median to disk as " + cube_file_name)
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
@@ -288,13 +289,14 @@ class Detection:
 
             # fake planet injection parameters in ADI frame are from the header
             # (note units are asec, and deg E of N)
-            injection_loc_dict = {"angle_deg": [self.header["FAKEAEON"]],
-                                  "rad_asec": [self.header["FAKERADA"]],
-                                  "ampl_linear_norm": [self.header["FAKECREL"]]}
+            injection_loc_dict = {"angle_deg": [self.header["ANGEOFN"]],
+                                  "rad_asec": [self.header["RADASEC"]],
+                                  "ampl_linear_norm": [self.header["AMPLIN"]]}
 
             print(injection_loc_dict)
             injection_loc = pd.DataFrame(injection_loc_dict)
-            loc_vec = polar_to_xy(pos_info = injection_loc, asec = True)
+            injection_loc["angle_deg_EofN"] = injection_loc["angle_deg"] # this step a kludge due to some name changesangle_deg_EofN
+            loc_vec = polar_to_xy(pos_info = injection_loc, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
             print("Location vector of fake companion:")
             print(loc_vec)
             
@@ -482,9 +484,9 @@ def main():
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints
-        raw_angle = int(param_list[t].split("_")[0])
-        raw_radius = int(param_list[t].split("_")[1])
-        raw_contrast = int(param_list[t].split("_")[2])
+        raw_angle = int(float(param_list[t].split("_")[0]))
+        raw_radius = int(float(param_list[t].split("_")[1]))
+        raw_contrast = int(float(param_list[t].split("_")[2]))
 
         # get physical values
         fake_angle_e_of_n_deg = np.divide(raw_angle,100.)
@@ -495,7 +497,7 @@ def main():
         fake_params_string = param_list[t]
 
         # initialize and detect
-        detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "median_"+fake_params_string+".fits",
+        detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "adi_frame_"+fake_params_string+".fits",
                                            csv_record_file_name = csv_file)
         detection_blind_search(blind_search = False)
     

@@ -33,13 +33,13 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-'''
+
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_sensitivity.main()
 '''
 ## ## DETECTION
 detection.main()
-
+'''
 ## ## ORBITAL PARAMETER FORWARD MODELING
 ## ## SENSITIVITY
 sensitivity.main()

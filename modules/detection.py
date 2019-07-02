@@ -433,9 +433,9 @@ def main():
     # find all combinations of available fake planet parameters using the file names
     hosts_removed_fake_psf_09a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_09a_directory,
                                                                         "*.fits"))) # list of all files
-    # list fake planet parameter patterns from fake_planet_xxxxx_xxxxx_xxxxx_lm_YYMMDD_NNNNNN.fits
-    print(hosts_removed_fake_psf_09a_name_array[0].split("fake_planet_"))
-    degen_param_list = [i.split("fake_planet_")[1].split("_lm_")[0] for i in hosts_removed_fake_psf_09a_name_array] # list which may have repeats
+    # list fake planet parameter patterns from adi_frame_xxxxx_xxxxx_xxxxx_lm_YYMMDD_NNNNNN.fits
+    print(hosts_removed_fake_psf_09a_name_array[0].split("adi_frame_"))
+    degen_param_list = [i.split("adi_frame_")[1].split(".fits")[0] for i in hosts_removed_fake_psf_09a_name_array] # list which may have repeats
     param_list = list(frozenset(degen_param_list)) # remove repeats
 
     # loop over all fake planet parameter combinations and make ADI frames

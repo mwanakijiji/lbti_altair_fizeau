@@ -9,7 +9,7 @@ from modules import \
      fits_hdr, \
      centering, \
      psf_pca_bases, \
-     injection_sensitivity, \
+     injection_ADI, \
      detection, \
      sensitivity
 
@@ -35,7 +35,7 @@ centering.main()
 psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
-injection_sensitivity.main()
+injection_ADI.main()
 
 ## ## DETECTION
 detection.main()

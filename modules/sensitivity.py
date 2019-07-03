@@ -97,28 +97,33 @@ class OneDimContrastCurve:
                                                       data_right_rad["s2n"] >= threshold_s2n\
                                                       ).dropna()
 
-            # the row of data with the minimum S/N above the minimum threshold
-            data_right_s2n_postsort = data_right_s2n_presort.where(\
+            try:
+                # the row of data with the minimum S/N above the minimum threshold (if it exists)
+                data_right_s2n_postsort = data_right_s2n_presort.where(\
                                                                data_right_s2n_presort["s2n"] == data_right_s2n_presort["s2n"].min()\
                                                                ).dropna()
-            '''
-            print(data_right_s2n_postsort)
-            print(data_right_s2n_postsort["rad_asec"].values[0])
-            print(data_right_s2n_postsort["ampl_linear_norm"].values[0])
-            '''
+                '''
+                print(data_right_s2n_postsort)
+                print(data_right_s2n_postsort["rad_asec"].values[0])
+                print(data_right_s2n_postsort["ampl_linear_norm"].values[0])
+                '''
 
-            # append companion radius and amplitude values
-            contrast_curve_pd.at[t,"rad_asec"] = data_right_s2n_postsort["rad_asec"].values[0]
-            contrast_curve_pd.at[t,"ampl_linear_norm"] = data_right_s2n_postsort["ampl_linear_norm"].values[0]
+                # append companion radius and amplitude values
+                print(data_right_s2n_postsort)
+                contrast_curve_pd.at[t,"rad_asec"] = data_right_s2n_postsort["rad_asec"].values[0]
+                contrast_curve_pd.at[t,"ampl_linear_norm"] = data_right_s2n_postsort["ampl_linear_norm"].values[0]
 
-            '''
-            print("------------")
-            print(data_right_rad)
-            print("-")
-            print(data_right_s2n_presort)
-            print("-")
-            print(data_right_s2n_postsort)
-            '''
+                '''
+                print("------------")
+                print(data_right_rad)
+                print("-")
+                print(data_right_s2n_presort)
+                print("-")
+                print(data_right_s2n_postsort)
+                '''
+                
+            except:
+                print("No data point above min S/N at radius (asec) of " + str(unique_rad_vals[t]))
 
         # write out to csv
         file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CSV"]
@@ -126,6 +131,7 @@ class OneDimContrastCurve:
         print("Wrote out contrast curve CSV to " + file_name_cc)
 
         # make plot
+        print(contrast_curve_pd)
         file_name_cc_plot = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["CONTCURV_PLOT"]
         plt.plot(contrast_curve_pd["rad_asec"],contrast_curve_pd["ampl_linear_norm"])
         plt.xlabel("Radius from host star (asec)")

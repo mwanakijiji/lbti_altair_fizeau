@@ -128,18 +128,16 @@ class MedianCube:
             # read in the pre-derotated frames, derotate them, and put them into a cube
             sci = self.host_subt_cube[t,:,:]
 
-            ## A GLITCH IS HAPPENING BETWEEN HERE...
+            # replace nans with zeros to let the rotation work (we'll mask the regions of zeros downstream)
+            print("protot")
+            sci[~np.isfinite(sci)] = 0
 
-            print("pa_array")
-            print(self.pa_array)
             # derotate according to PA
             sci_derotated = scipy.ndimage.rotate(sci, self.pa_array[t], reshape=False)
 
-            ## ... AND HERE; OOH: I KNOW; THE PRE-DEROTATED FRAME HAS NANS
-
             # TEST ONLY
-            fits.writeto(filename = "sci_derotated"+str(t)+".fits",
-                         data = sci_derotated,
+            fits.writeto(filename = "junk_sci.fits",
+                         data = sci,
                          overwrite = True)
 
             ### BEGIN READ IN THE RIGHT MASK

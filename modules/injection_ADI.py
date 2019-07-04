@@ -19,6 +19,110 @@ import matplotlib
 matplotlib.use('agg') # avoids some crashes when multiprocessing
 import matplotlib.pyplot as plt
 
+class JustPutIntoCube:
+    '''
+    Just put centered science frames into a cube, and return it along with info for derotation
+
+    RETURNS:
+    Cube of non-derotated frames WITHOUT any fake planets injected
+    An array of parallactic angles
+    An array of integers indicating the frame number (from the original file name)
+    '''
+
+    def __init__(self,
+                 fake_params,
+                 abs_PCA_name,
+                 config_data = config,
+                 write = False):
+        '''
+        INPUTS:
+        n_PCA: number of principal components to use
+        abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
+                       for making a fake planet (i.e., without saturation effects)
+        config_data: configuration data, as usual
+        write: flag as to whether data product should be written to disk (for checking)
+        '''
+
+        self.fake_params = fake_params
+        self.abs_PCA_name = abs_PCA_name
+        self.config_data = config_data
+        self.write = write
+
+        # read in the PCA vector cube for this series of frames
+        self.pca_basis_cube_unsat, self.header_pca_basis_cube_unsat = fits.getdata(self.abs_PCA_name, 0, header=True)
+
+
+
+    def __call__(self,
+                 abs_sci_name_array):
+        '''
+        INPUTS:
+
+        abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
+        '''
+
+        # read in one frame to get the shape
+        test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
+
+        # initialize cube to hold the frames
+        cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
+        # initialize the array to hold the parallactic angles (for de-rotation later)
+        pa_array = np.nan*np.ones(len(abs_sci_name_array))
+        # initialize the array to hold the frame numbers (to define masks to apply over pixel regions to make them
+        #    NaNs before taking the median of a cube)
+        frame_nums_array = np.ones(len(abs_sci_name_array)).astype(int)
+
+        # loop over frames
+        for frame_num in range(0,len(abs_sci_name_array)):
+            print("---------------")
+
+            # read in the cutout science frames
+            sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
+
+            # define the mask of this science frame
+            ## ## fine-tune this step later!
+            mask_weird = np.ones(np.shape(sci))
+            no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
+            mask_weird[sci > 55000] = np.nan # mask saturating region
+
+            # check if PCA can be done at all; if not, skip this science frame
+            # (we don't need a PCA reconstruction quite yet, but this is just a check)
+            print(np.shape(self.pca_basis_cube_unsat))
+            print(np.shape(sci))
+            fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=1)
+            if not fit_unsat:
+                print("Incompatible dimensions; skipping this frame...")
+                continue
+
+            # add image to cube, add PA to array, and add frame number to array
+            cube_frames[frame_num] = sci
+            pa_array[frame_num] = header_sci["LBT_PARA"]
+            frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
+
+
+        # if writing to disk for checking
+        if self.write:
+
+            hdr = fits.Header()
+            # parameters of fake planets are meaningless, since none are injected,
+            # but we need these values to be populated for downstream
+            hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
+            hdr["RADASEC"] = self.fake_params["rad_asec"]
+            hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "no_fake_planet_injected_cube.fits"
+            fits.writeto(filename = file_name,
+                         data = cube_frames,
+                         header = hdr,
+                         overwrite = True)
+            print("Wrote cube (without fake planets) to disk as " + file_name)
+        
+        print("Array of PA")
+        print(pa_array)
+
+        # return cube of frames and array of PAs
+        return cube_frames, pa_array, frame_nums_array
+
 
 class FakePlanetInjectorCube:
     '''
@@ -121,6 +225,8 @@ class FakePlanetInjectorCube:
             # do the PCA fit of masked host star
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
+            print(np.shape(self.pca_basis_cube_unsat))
+            print(np.shape(sci))
             fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=100)
             if not fit_unsat: # if the dimensions were incompatible, skip this science frame
                 print("Incompatible dimensions; skipping this frame...")
@@ -213,6 +319,8 @@ def inject_remove_adi(this_param_combo):
     '''
     To parallelize a serial operation across cores, I need to define this function that goes through
     the fake planet injection, host star removal, and ADI steps for a given combination of fake planet parameters
+
+    injection = True: actually inject a fake PSF; False with just remove the host star and do ADI
     '''
 
     time_start = time.time()
@@ -245,38 +353,62 @@ def inject_remove_adi(this_param_combo):
 
     print("number of frames being considered for ADI: " + str(len(cookies_centered_06_name_array)))
     
+    # injecting fake PSFs?
+    if (int(this_param_combo["rad_pix"]) == int(0)):
+        # just remove hosts and do ADI
 
-    ## Inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
-    print("-------------------------------------------------")
-    print("Injecting fake planet corresponding to parameter")
-    print(this_param_combo)
+        print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
-    # instantiate fake planet injection
-    ## ## NOTE THAT WE WANT TO USE DIFFERENT PCA CUBES DEPENDING ON THE FRAMES BEIGN REDUCED
-    inject_fake_psfs = FakePlanetInjectorCube(fake_params = this_param_combo,
+        # instantiate FakePlanetInjectorCube to put frames into a cube, but no fakes are injected into the frames
+        ## ## NOTE THAT WE WANT TO USE DIFFERENT PCA CUBES DEPENDING ON THE FRAMES BEIGN REDUCED
+        frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
+                                         abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                          + "pca_cubes_psfs/" \
+                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
+                                          write = True)
+
+        # call fake planet injection
+        cube_pre_removal, pas_array, frame_array_0 = frames_in_cube(cookies_centered_06_name_array)
+
+        # fyi
+        print("Frames into which we will inject fake planets: ")
+        print(frame_array_0) 
+        
+    else:
+        
+        ## Inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
+        print("-------------------------------------------------")
+        print("Injecting fake planet corresponding to parameter")
+        print(this_param_combo)
+
+        # instantiate fake planet injection
+        ## ## NOTE THAT WE WANT TO USE DIFFERENT PCA CUBES DEPENDING ON THE FRAMES BEIGN REDUCED
+        inject_fake_psfs = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
                                           abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
                                           write = False)
 
-    # call fake planet injection
-    injected_fake_psfs_cube, pas_array, frame_array_0 = inject_fake_psfs(cookies_centered_06_name_array)
+        # call fake planet injection
+        cube_pre_removal, pas_array, frame_array_0 = inject_fake_psfs(cookies_centered_06_name_array)
 
-    # fyi
-    print("Frames into which we will inject fake planets: ")
-    print(frame_array_0)
+        # fyi
+        print("Frames into which we will inject fake planets: ")
+        print(frame_array_0)
+
+
 
     # instantiate removal of host star from each frame in the cube
     remove_hosts = host_removal.HostRemovalCube(fake_params = this_param_combo,
-                                                    cube_frames = injected_fake_psfs_cube,
+                                                    cube_frames = cube_pre_removal,
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
                                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
                                                     frame_array = frame_array_0,
-                                                    write = False)
+                                                    write = True)
 
     # call and return cube of host-removed frames
     removed_hosts_cube, frame_array_1 = remove_hosts()
@@ -314,9 +446,16 @@ def main():
     config.read("modules/config.ini")
 
     # fake planet injection parameters
+    '''
+    for NO injection of fake planets (and only host star removal and ADI), set rad_asec equal to zero and the others to one element each
+    i.e, {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
+
+    fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
+    '''
     fake_params_pre_permute = {"angle_deg_EofN": [270.],
-                               "rad_asec": [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9],
+                               "rad_asec": [0.5, 1.5],
                                "ampl_linear_norm": [1e-3, 1e-4, 1e-5]}
+
 
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
 

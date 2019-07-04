@@ -195,7 +195,7 @@ class HostRemovalCube:
             #mask_weird[sci > 1e8] = np.nan # mask saturating region
 
             ## TEST: WRITE OUT
-            #hdu = fits.PrimaryHDU(mask_weird)
+            #hdu = fits.PrimaryHDU(sci)
             #hdulist = fits.HDUList([hdu])
             #hdu.writeto("junk_mask.fits", clobber=True)
             ## END TEST
@@ -207,10 +207,11 @@ class HostRemovalCube:
             # do the PCA fit of masked host star
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
+            print(sci)
             try:
                 fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
             except:
-                return
+                continue
 
             # subtract the PCA-reconstructed host star
             image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
@@ -282,8 +283,6 @@ def main():
     # make a list of the images WITH fake planets
     fake_planet_frames_07_directory = str(config["data_dirs"]["DIR_FAKE_PSFS"])
     fake_planet_frames_07_name_array = list(glob.glob(os.path.join(fake_planet_frames_07_directory, "*.fits")))
-    print('ppp')
-    print(fake_planet_frames_07_name_array)
 
     '''
     # make a list of the images WITHOUT fake planets

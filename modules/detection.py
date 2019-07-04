@@ -128,8 +128,19 @@ class MedianCube:
             # read in the pre-derotated frames, derotate them, and put them into a cube
             sci = self.host_subt_cube[t,:,:]
 
+            ## A GLITCH IS HAPPENING BETWEEN HERE...
+
+            print("pa_array")
+            print(self.pa_array)
             # derotate according to PA
             sci_derotated = scipy.ndimage.rotate(sci, self.pa_array[t], reshape=False)
+
+            ## ... AND HERE; OOH: I KNOW; THE PRE-DEROTATED FRAME HAS NANS
+
+            # TEST ONLY
+            fits.writeto(filename = "sci_derotated"+str(t)+".fits",
+                         data = sci_derotated,
+                         overwrite = True)
 
             ### BEGIN READ IN THE RIGHT MASK
             if apply_mask_after_derot:
@@ -187,9 +198,9 @@ class MedianCube:
 
         # define header
         hdr = fits.Header()
-        hdr["ANGEOFN"] = self.fake_params["ANGEOFN"]
-        hdr["RADASEC"] = self.fake_params["RADASEC"]
-        hdr["AMPLIN"] = self.fake_params["AMPLIN"]
+        hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
+        hdr["RADASEC"] = self.fake_params["rad_asec"]
+        hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
 
         # if writing cube of frames to disk for checking
         #OBSOLETE, SINCE WE ONLY USE THE FINAL ADI FRAMES ANYWAY
@@ -497,7 +508,8 @@ def main():
         fake_params_string = param_list[t]
 
         # initialize and detect
-        detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + "adi_frame_"+fake_params_string+".fits",
+        detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+                                           "adi_frame_"+fake_params_string+".fits",
                                            csv_record_file_name = csv_file)
         detection_blind_search(blind_search = False)
     

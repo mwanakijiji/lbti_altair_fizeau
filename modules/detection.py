@@ -292,6 +292,8 @@ class Detection:
             print("Location vector of best correlation with PSF template:")
             print(loc_vec)
 
+            # THIS WILL NEED TO BE FOLLOWED WITH A NEXT ITERATION FOR WHERE A COMPANION MAY LIE
+
         # case 2: this is an ADI frame involving an injected fake companion, and we already know
         # where it is and just want to determine its amplitude relative to the noise
         else:
@@ -479,6 +481,12 @@ def main():
                                            "adi_frame_"+fake_params_string+".fits",
                                            csv_record_file_name = csv_file)
         detection_blind_search(blind_search = False)
+
+        '''
+        # STAND-IN FOR A FRAME WHERE THERE IS NO FAKE PLANET, AND I JUST WANT TO MAKE A CRUDE CONTRAST CURVE BASED ON
+        # THE NOISE LEVEL IN EACH RING AROUND THE HOST STAR
+        # substitute a fake parameter list above this for-loop
+        '''
     
     ###########################################################
     ## ## IMAGES WITHOUT FAKE PLANETS; I.E., ACTUAL SCIENCE

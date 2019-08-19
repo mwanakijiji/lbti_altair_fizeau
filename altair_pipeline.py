@@ -4,14 +4,13 @@
 # In the meantime, FYI plots/tables are written out
 
 from modules import *
-from modules import \
-     basic_red,\
-     fits_hdr, \
-     centering, \
-     psf_pca_bases, \
-     injection_ADI, \
-     detection, \
-     sensitivity
+from modules import (basic_red,
+                     fits_hdr,
+                     centering,
+                     psf_pca_bases,
+                     injection_ADI,
+                     detection,
+                     sensitivity)
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
@@ -19,12 +18,11 @@ from modules import \
 
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
-'''
+
 ## ## FITS HEADER METADATA EXTRACTION
 fits_meta_data = fits_hdr.main()
 
-## ## BACKGROUND PCA BASIS GENERATION HERE!
-
+'''
 ## ## BASIC REDUCTIONS
 basic_red.main()
 
@@ -36,10 +34,10 @@ psf_pca_bases.main()
 
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main()
-'''
+
 ## ## DETECTION
 detection.main()
-'''
+
 ## ## ORBITAL PARAMETER FORWARD MODELING
 ## ## SENSITIVITY
 sensitivity.main()

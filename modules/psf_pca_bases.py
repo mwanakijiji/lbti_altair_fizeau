@@ -90,7 +90,9 @@ class PSFPCACubeMaker:
 
                 # if the phase loop was closed
                 # (note this can include stand-alone closed-loop frames;
-                # may need to refine this citerion later)
+                # may need to refine this criterion later)
+                ## ## ADD ANOTHER CRITERION BASED ON RESIDUALS WITH GAUSSIAN FIT
+                ## ## (I.E., READ IN CSV FILE POPULATED WITH RESID LEVELS)
                 if (header_sci["PCCLOSED"] == 1):
 
                     # add to cube
@@ -164,6 +166,9 @@ def main():
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
+
+    ## go through all the Gaussian/centered PSF residual frames and write those residuals
+    ## to a text file
 
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])

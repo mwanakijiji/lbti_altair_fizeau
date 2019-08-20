@@ -18,17 +18,17 @@ from modules import (basic_red,
 
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
-
+'''
 ## ## FITS HEADER METADATA EXTRACTION
 fits_meta_data = fits_hdr.main()
 
-'''
+
 ## ## BASIC REDUCTIONS
 basic_red.main()
-
+'''
 ## ## CENTERING OF PSFS
 centering.main()
-
+'''
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 

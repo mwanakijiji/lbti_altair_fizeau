@@ -185,6 +185,7 @@ def main():
 
     # populate dataframe
     for q in range(0,len(list_fits_residual_frame)):
+        print('Resid frame '+str(q))
         sciImg, header = fits.getdata(list_fits_residual_frame[q],0,header=True)
         # record frame number and residual values
         frame_num = int(list_fits_residual_frame[q].split(".")[-2].split("_")[-1])

@@ -2,6 +2,7 @@ import multiprocessing
 import configparser
 import glob
 import time
+import pandas as pd
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
@@ -88,8 +89,10 @@ class PSFPCACubeMaker:
                 abs_matching_file = abs_matching_file_array[0] # get the name
                 sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
 
-                # if the phase loop was closed
-                # (note this can include stand-alone closed-loop frames;
+                ## apply criteria for determining whether a frame should be added to a cube:
+                # 1.) if the phase loop was closed
+                #        (note this can include stand-alone closed-loop frames;
+                # 2.) residuals between ...
                 # may need to refine this criterion later)
                 ## ## ADD ANOTHER CRITERION BASED ON RESIDUALS WITH GAUSSIAN FIT
                 ## ## (I.E., READ IN CSV FILE POPULATED WITH RESID LEVELS)
@@ -167,9 +170,34 @@ def main():
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)
 
-    ## go through all the Gaussian/centered PSF residual frames and write those residuals
-    ## to a text file
+    # make a list of the Gaussian/centered PSF residual frames
+    list_fits_residual_frame = list(glob.glob(str(config["data_dirs"]["DIR_FYI_INFO"] + \
+                                     "/centering_best_fit_gaussian_resids_*.fits")))
+    print('list_resids')
+    print(list_fits_residual_frame)
 
+    ## initialize dataframe
+    # frame_num: the LMIR frame number
+    # resd_avg: the average absolute value of residuals
+    # resd_med: the median " " " 
+    # resd_int: the integrated (i.e., summed) " " "
+    df = pd.DataFrame(columns=["frame_num", "resd_avg", "resd_med", "resd_int"])
+
+    # populate dataframe
+    for q in range(0,len(list_fits_residual_frame)):
+        sciImg, header = fits.getdata(list_fits_residual_frame[q],0,header=True)
+        # record frame number and residual values
+        frame_num = int(list_fits_residual_frame[q].split(".")[-2].split("_")[-1])
+        df = df.append({"frame_num": frame_num, 
+               "resd_avg": header["RESD_AVG"], 
+               "resd_med": header["RESD_MED"],
+               "resd_int": header["RESD_INT"]}, ignore_index=True)
+
+    df.to_csv(str(config["data_dirs"]["DIR_CENTERED"] +
+                  config["file_names"]["RESID_CSV"]))
+
+    print('Done with residal reading')
+    
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))

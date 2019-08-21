@@ -181,7 +181,7 @@ def main():
     # resd_avg: the average absolute value of residuals
     # resd_med: the median " " " 
     # resd_int: the integrated (i.e., summed) " " "
-    df = pd.DataFrame(columns=["frame_num", "resd_avg", "resd_med", "resd_int"])
+    df = pd.DataFrame(columns=["frame_num", "resd_avg", "resd_med", "resd_int", "x_gauss", "y_gauss"])
 
     # populate dataframe
     for q in range(0,len(list_fits_residual_frame)):
@@ -189,10 +189,12 @@ def main():
         sciImg, header = fits.getdata(list_fits_residual_frame[q],0,header=True)
         # record frame number and residual values
         frame_num = int(list_fits_residual_frame[q].split(".")[-2].split("_")[-1])
-        df = df.append({"frame_num": frame_num, 
+        df = df.append({"frame_num": frame_num,
                "resd_avg": header["RESD_AVG"], 
                "resd_med": header["RESD_MED"],
-               "resd_int": header["RESD_INT"]}, ignore_index=True)
+               "resd_int": header["RESD_INT"],
+               "x_gauss": header["GAU_XSTD"],
+               "y_gauss": header["GAU_YSTD"]}, ignore_index=True)
 
     df.to_csv(str(config["data_dirs"]["DIR_CENTERED"] +
                   config["file_names"]["RESID_CSV"]))

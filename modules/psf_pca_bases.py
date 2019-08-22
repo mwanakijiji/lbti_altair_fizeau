@@ -171,8 +171,7 @@ def main():
     pool = multiprocessing.Pool(ncpu)
 
     # make a list of the Gaussian/centered PSF residual frames
-    list_fits_residual_frame = list(glob.glob(str(config["data_dirs"]["DIR_FYI_INFO"] + \
-                                     "/centering_best_fit_gaussian_resids_*.fits")))
+    list_fits_residual_frame = list(glob.glob(str(config["data_dirs"]["DIR_CENTERED"] + "/*.fits")))
     print('list_resids')
     print(list_fits_residual_frame)
 
@@ -181,10 +180,16 @@ def main():
     # resd_avg: the average absolute value of residuals
     # resd_med: the median " " " 
     # resd_int: the integrated (i.e., summed) " " "
-    df = pd.DataFrame(columns=["frame_num", "resd_avg", "resd_med", "resd_int", "x_gauss", "y_gauss"])
+    df = pd.DataFrame(columns=["frame_num",
+                               "resd_avg",
+                               "resd_med",
+                               "resd_int",
+                               "x_gauss",
+                               "y_gauss"])
 
     # file name to write residual data to
-    residual_file_name = str(config["data_dirs"]["DIR_BIN"] + config["file_names"]["RESID_CSV"])
+    residual_file_name = str(config["data_dirs"]["DIR_BIN"] +
+                             config["file_names"]["RESID_CSV"])
 
     # initialize the file
     df.to_csv(residual_file_name)
@@ -193,19 +198,23 @@ def main():
     for q in range(0,len(list_fits_residual_frame)):
         print('Resid frame '+str(q))
         sciImg, header = fits.getdata(list_fits_residual_frame[q],0,header=True)
+        print(list(header.keys()))
         # record frame number and residual values
         frame_num = int(list_fits_residual_frame[q].split(".")[-2].split("_")[-1])
-        df = df.append({"frame_num": frame_num,
-               "resd_avg": header["RESD_AVG"], 
-               "resd_med": header["RESD_MED"],
-               "resd_int": header["RESD_INT"],
-               "x_gauss": header["GAU_XSTD"],
-               "y_gauss": header["GAU_YSTD"]}, ignore_index=True)
+
+        d = [{"frame_num": frame_num,
+              "resd_avg": header["RESD_AVG"],
+              "resd_med": header["RESD_MED"],
+              "resd_int": header["RESD_INT"],
+              "x_gauss": header["GAU_XSTD"],
+              "y_gauss": header["GAU_YSTD"]}]
+
+        d_df = pd.DataFrame(d)
 
         # append to file
-        df.to_csv(residual_file_name, mode='a', header=False)
+        d_df.to_csv(residual_file_name, mode='a', header=False)
 
-    print('Done with residal reading')
+    print("Residual data written to " + residual_file_name)
     
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])

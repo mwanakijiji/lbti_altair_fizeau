@@ -113,12 +113,15 @@ class Centering:
         
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_centered"
+        print(x_stdev)
+        print(header_sci)
         # add more lines to record the parameters and residuals with the Gaussian fit
         header_sci["GAU_XSTD"] = x_stdev # x-width of the Gaussian
         header_sci["GAU_YSTD"] = y_stdev # y-width of the Gaussian
         header_sci["RESD_AVG"] = np.nanmean(np.abs(resids)) # mean of the abs. val. of the 2D residual array
         header_sci["RESD_MED"] = np.nanmedian(np.abs(resids)) # median of the abs. val. of the 2D residual array
         header_sci["RESD_INT"] = np.nansum(np.abs(resids)) # summed (integrated) abs. val. of residuals
+
 
         # save a FITS file of the residuals (FYI only)
         fits_residual_frame = str(self.config_data["data_dirs"]["DIR_FYI_INFO"] + \

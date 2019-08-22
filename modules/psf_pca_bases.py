@@ -183,6 +183,12 @@ def main():
     # resd_int: the integrated (i.e., summed) " " "
     df = pd.DataFrame(columns=["frame_num", "resd_avg", "resd_med", "resd_int", "x_gauss", "y_gauss"])
 
+    # file name to write residual data to
+    residual_file_name = str(config["data_dirs"]["DIR_BIN"] + config["file_names"]["RESID_CSV"])
+
+    # initialize the file
+    df.to_csv(residual_file_name)
+
     # populate dataframe
     for q in range(0,len(list_fits_residual_frame)):
         print('Resid frame '+str(q))
@@ -196,8 +202,8 @@ def main():
                "x_gauss": header["GAU_XSTD"],
                "y_gauss": header["GAU_YSTD"]}, ignore_index=True)
 
-    df.to_csv(str(config["data_dirs"]["DIR_CENTERED"] +
-                  config["file_names"]["RESID_CSV"]))
+        # append to file
+        df.to_csv(residual_file_name, mode='a', header=False)
 
     print('Done with residal reading')
     

@@ -27,9 +27,8 @@ fits_meta_data = fits_hdr.main()
 basic_red.main()
 
 ## ## CENTERING OF PSFS
-'''
 centering.main()
-
+'''
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 '''

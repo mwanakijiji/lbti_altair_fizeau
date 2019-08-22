@@ -93,6 +93,7 @@ class PSFPCACubeMaker:
                 # 1.) if the phase loop was closed
                 #        (note this can include stand-alone closed-loop frames;
                 # 2.) residuals between ...
+                # 3.) width of Gaussian fit is between ...
                 # may need to refine this criterion later)
                 ## ## ADD ANOTHER CRITERION BASED ON RESIDUALS WITH GAUSSIAN FIT
                 ## ## (I.E., READ IN CSV FILE POPULATED WITH RESID LEVELS)

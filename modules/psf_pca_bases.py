@@ -209,6 +209,7 @@ def main():
     df.to_csv(residual_file_name)
 
     # populate dataframe
+    '''
     for q in range(0,len(list_fits_residual_frame)):
         print('Resid frame '+str(q))
         sciImg, header = fits.getdata(list_fits_residual_frame[q],0,header=True)
@@ -229,14 +230,13 @@ def main():
         d_df.to_csv(residual_file_name, mode='a', header=False)
 
     print("Residual data written to " + residual_file_name)
-    
+    '''
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
     # generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
-    ## WILL NEED MORE PARAMETER ARRAYS FOR VARIOUS FRAME SEQUENCES
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100) # create instance
     # cube A

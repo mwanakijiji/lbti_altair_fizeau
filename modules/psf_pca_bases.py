@@ -47,13 +47,20 @@ class PSFPCACubeMaker:
 
     def __call__(self,
                  start_frame_num,
-                 stop_frame_num):
+                 stop_frame_num,
+                 resd_avg_limits,
+                 x_gauss_limits,
+                 y_gauss_limits):
         '''
         Make PCA cube (for future step of reconstructing) a PSF
 
         INPUTS:
         start_frame_num: starting frame number to use in PCA basis generation
         stop_frame_num: stopping [ditto], inclusive
+        resd_avg_limits: a 2-element vector with the lower- and upper limits
+            of the average of the residuals between PSF and Gaussian (acts as PSF quality criterion)
+        x_gauss_limits: " " of the stdev in x of the best-fit Gaussian (acts as PSF quality criterion)
+        y_gauss_limits: " " of the stdev in y of the best-fit Gaussian (acts as PSF quality criterion)
         '''
 
         # read in a first file to get the shape
@@ -89,21 +96,27 @@ class PSFPCACubeMaker:
                 abs_matching_file = abs_matching_file_array[0] # get the name
                 sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
 
-                ## apply criteria for determining whether a frame should be added to a cube:
+                ## apply quality criteria for determining whether a frame should be added to a cube:
                 # 1.) if the phase loop was closed
                 #        (note this can include stand-alone closed-loop frames;
-                # 2.) residuals between ...
-                # 3.) width of Gaussian fit is between ...
-                # may need to refine this criterion later)
-                ## ## ADD ANOTHER CRITERION BASED ON RESIDUALS WITH GAUSSIAN FIT
-                ## ## (I.E., READ IN CSV FILE POPULATED WITH RESID LEVELS)
-                if (header_sci["PCCLOSED"] == 1):
+                # 2.) residuals are within limits
+                # 3.) width of Gaussian fit is within limits
+                if ((header_sci["PCCLOSED"] == 1) and
+                    np.logical_and(header_sci["RESD_AVG"] > resd_avg_limits[0],
+                                   header_sci["RESD_AVG"] < resd_avg_limits[1]) and
+                    np.logical_and(header_sci["GAU_XSTD"] > x_gauss_limits[0],
+                                   header_sci["GAU_XSTD"] < x_gauss_limits[1]) and
+                    np.logical_and(header_sci["GAU_YSTD"] > y_gauss_limits[0],
+                                   header_sci["GAU_YSTD"] < y_gauss_limits[1])):
 
                     # add to cube
                     training_cube[slice_counter,:,:] = sci
 
                     # advance counter
                     slice_counter += 1
+
+                    # TEST only
+                    print([frame_num,header_sci["RESD_AVG"],header_sci["GAU_XSTD"],header_sci["GAU_YSTD"]])
 
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
@@ -228,15 +241,27 @@ def main():
                                     n_PCA = 100) # create instance
     # cube A
     pca_psf_maker(start_frame_num = 4259,
-                   stop_frame_num = 5600)
+                   stop_frame_num = 5608,
+                   resd_avg_limits = [50,62.5],
+                   x_gauss_limits = [4,6],
+                   y_gauss_limits = [4,6])
     # cube B (unsat)
-    pca_psf_maker(start_frame_num = 6335,
-                   stop_frame_num = 6921)
+    pca_psf_maker(start_frame_num = 6303,
+                   stop_frame_num = 6921,
+                   resd_avg_limits = [35.3,37.3],
+                   x_gauss_limits = [3.9,5.2],
+                   y_gauss_limits = [3.9,5.2])
     # cube C (unsat)
-    pca_psf_maker(start_frame_num = 7389,
-                   stop_frame_num = 7734)
+    pca_psf_maker(start_frame_num = 7120,
+                   stop_frame_num = 7734,
+                   resd_avg_limits = [35.4,40.6],
+                   x_gauss_limits = [3.9,4.5],
+                   y_gauss_limits = [3.9,4.5])
     # cube D 
-    pca_psf_maker(start_frame_num = 8849,
-                   stop_frame_num = 9175)
+    pca_psf_maker(start_frame_num = 7927,
+                   stop_frame_num = 11408,
+                   resd_avg_limits = [40.6,55],
+                   x_gauss_limits = [4.15,5],
+                   y_gauss_limits = [4.1,4.44])
 
 

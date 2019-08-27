@@ -240,17 +240,19 @@ def main():
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100) # create instance
     # cube A
+    '''
     pca_psf_maker(start_frame_num = 4259,
                    stop_frame_num = 5608,
                    resd_avg_limits = [50,62.5],
                    x_gauss_limits = [4,6],
                    y_gauss_limits = [4,6])
+    '''
     # cube B (unsat)
     pca_psf_maker(start_frame_num = 6303,
                    stop_frame_num = 6921,
                    resd_avg_limits = [35.3,37.3],
-                   x_gauss_limits = [3.9,5.2],
-                   y_gauss_limits = [3.9,5.2])
+                   x_gauss_limits = [3.9,6.7],
+                   y_gauss_limits = [3.9,6.7])
     # cube C (unsat)
     pca_psf_maker(start_frame_num = 7120,
                    stop_frame_num = 7734,

@@ -325,7 +325,7 @@ def inject_remove_adi(this_param_combo):
 
     time_start = time.time()
 
-    # make a list of the centered cookie cutout files
+    # make a list of ALL the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     
     '''
@@ -351,11 +351,35 @@ def inject_remove_adi(this_param_combo):
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[0123456]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[89]*.fits")))
 
+    ## lists of files are separated based on filter combination (there are four: A, B, C, D)
+
+    # combination A: frames 4259-5608 & 5826-6301 (flux-saturated)
+    cookies_A_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[012]*.fits")))
+
+    # combination B: frames 6303-6921 (flux-UNsaturated; use B as unsats for A)
+    cookies_B_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0063[123456789]*.fits")))
+    cookies_B_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[45678]*.fits")))
+    cookies_B_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0069[01]*.fits")))
+
+    # combination C: frames 7120-7734 (flux-UNsaturated; use C as unsats for D)
+    cookies_C_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0071[23456789]*.fits")))
+    cookies_C_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_007[23456]*.fits")))
+    cookies_C_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0077[012]*.fits")))
+
+    # combination D: frames 7927-11408 (flux-saturated)
+    cookies_D_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0079[3456789]*.fits")))
+    cookies_D_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
+    cookies_D_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_01[01]*.fits")))
+
     print("number of frames being considered for ADI: " + str(len(cookies_centered_06_name_array)))
     
     # injecting fake PSFs?
     if (int(this_param_combo["rad_pix"]) == int(0)):
-        # just remove hosts and do ADI
+        # no fake PSF; just remove hosts and do ADI
 
         print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
@@ -367,7 +391,6 @@ def inject_remove_adi(this_param_combo):
                                           + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
                                           write = True)
 
-        # call fake planet injection
         cube_pre_removal, pas_array, frame_array_0 = frames_in_cube(cookies_centered_06_name_array)
 
         # fyi
@@ -375,8 +398,8 @@ def inject_remove_adi(this_param_combo):
         print(frame_array_0) 
         
     else:
-        
-        ## Inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
+        # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
+
         print("-------------------------------------------------")
         print("Injecting fake planet corresponding to parameter")
         print(this_param_combo)

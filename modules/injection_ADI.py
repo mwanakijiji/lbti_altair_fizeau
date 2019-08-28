@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 class JustPutIntoCube:
     '''
     Just put centered science frames into a cube, and return it along with info for derotation
+    (No host star subtraction is done yet)
 
     RETURNS:
     Cube of non-derotated frames WITHOUT any fake planets injected
@@ -31,14 +32,14 @@ class JustPutIntoCube:
 
     def __init__(self,
                  fake_params,
-                 abs_PCA_name,
+                 abs_PCA_host_star_name,
                  config_data = config,
                  write = False):
         '''
         INPUTS:
         n_PCA: number of principal components to use
-        abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
-                       for making a fake planet (i.e., without saturation effects)
+        abs_PCA_host_star_name: absolute file name of the PCA cube to reconstruct the host star
+                       (pay attention to the filter combination and saturation status)
         config_data: configuration data, as usual
         write: flag as to whether data product should be written to disk (for checking)
         '''
@@ -49,7 +50,7 @@ class JustPutIntoCube:
         self.write = write
 
         # read in the PCA vector cube for this series of frames
-        self.pca_basis_cube_unsat, self.header_pca_basis_cube_unsat = fits.getdata(self.abs_PCA_name, 0, header=True)
+        self.pca_star_basis_cube, self.header_pca_basis_cube = fits.getdata(self.abs_PCA_host_star_name, 0, header=True)
 
 
 
@@ -87,10 +88,8 @@ class JustPutIntoCube:
 
             # check if PCA can be done at all; if not, skip this science frame
             # (we don't need a PCA reconstruction quite yet, but this is just a check)
-            print(np.shape(self.pca_basis_cube_unsat))
-            print(np.shape(sci))
-            fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=1)
-            if not fit_unsat:
+            fit_2_star = fit_pca_star(self.pca_star_basis_cube, sci, mask_weird, n_PCA=1)
+            if not fit_2_star:
                 print("Incompatible dimensions; skipping this frame...")
                 continue
 
@@ -379,18 +378,18 @@ def inject_remove_adi(this_param_combo):
     
     # injecting fake PSFs?
     if (int(this_param_combo["rad_pix"]) == int(0)):
-        # no fake PSF; just remove hosts and do ADI
+        # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
         print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
         # instantiate FakePlanetInjectorCube to put frames into a cube, but no fakes are injected into the frames
-        ## ## NOTE THAT WE WANT TO USE DIFFERENT PCA CUBES DEPENDING ON THE FRAMES BEIGN REDUCED
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
-                                         abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                         abs_PCA_host_star_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
-                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
+                                          + "TBD[...]  .fits",
                                           write = True)
 
+        # filter combo A
         cube_pre_removal, pas_array, frame_array_0 = frames_in_cube(cookies_centered_06_name_array)
 
         # fyi

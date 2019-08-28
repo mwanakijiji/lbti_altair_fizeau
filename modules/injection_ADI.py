@@ -32,25 +32,27 @@ class JustPutIntoCube:
 
     def __init__(self,
                  fake_params,
-                 abs_PCA_host_star_name,
+                 test_PCA_vector_name,
                  config_data = config,
                  write = False):
         '''
         INPUTS:
         n_PCA: number of principal components to use
-        abs_PCA_host_star_name: absolute file name of the PCA cube to reconstruct the host star
+        test_PCA_vector_name: absolute file name of the PCA cube to reconstruct the host star
                        (pay attention to the filter combination and saturation status)
         config_data: configuration data, as usual
         write: flag as to whether data product should be written to disk (for checking)
         '''
 
         self.fake_params = fake_params
-        self.abs_PCA_name = abs_PCA_name
+        self.test_PCA_vector_name = test_PCA_vector_name
         self.config_data = config_data
         self.write = write
 
-        # read in the PCA vector cube for this series of frames
-        self.pca_star_basis_cube, self.header_pca_basis_cube = fits.getdata(self.abs_PCA_host_star_name, 0, header=True)
+        # read in a test PCA vector cube for this series of frames
+        # (this is just for checking if reconstruction is possible)
+        self.pca_star_basis_cube, self.header_pca_basis_cube = fits.getdata(self.test_PCA_vector_name,
+                                                                            0, header=True)
 
 
 
@@ -136,15 +138,18 @@ class FakePlanetInjectorCube:
 
     def __init__(self,
                  fake_params,
-                 n_PCA,
-                 abs_PCA_name,
+                 n_PCA=100,
+                 abs_host_star_PCA_name,
+                 abs_fake_planet_PCA_name,
                  config_data = config,
                  write = False):
         '''
         INPUTS:
         fake_params: parameters of the fake companion
         n_PCA: number of principal components to use
-        abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
+        abs_host_star_PCA_name: absolute file name of the PCA cube to reconstruct the host star
+                       for host star subtraction
+        abs_fake_planet_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
         fake_params_pre_permute: angles (relative to PA up), radii, and amplitudes (normalized to host star) of fake PSFs
                        ex.: fake_params = {"angle_deg_EofN": [0., 60., 120.], "rad_asec": [0.3, 0.4], "ampl_linear_norm": [1., 0.9]}
@@ -384,17 +389,22 @@ def inject_remove_adi(this_param_combo):
 
         # instantiate FakePlanetInjectorCube to put frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
-                                         abs_PCA_host_star_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                         test_PCA_vector_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + "pca_cubes_psfs/" \
                                           + "TBD[...]  .fits",
                                           write = True)
 
         # filter combo A
-        cube_pre_removal, pas_array, frame_array_0 = frames_in_cube(cookies_centered_06_name_array)
+        cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(cookies_A_only_centered_06_name_array)
 
-        # fyi
-        print("Frames into which we will inject fake planets: ")
-        print(frame_array_0) 
+        # filter combo B
+        cube_pre_removal_B, pas_array_B, frame_array_0_B = frames_in_cube(cookies_B_only_centered_06_name_array)
+
+        # filter combo C
+        cube_pre_removal_C, pas_array_C, frame_array_0_C = frames_in_cube(cookies_C_only_centered_06_name_array)
+
+        # filter combo D
+        cube_pre_removal_D, pas_array_D, frame_array_0_D = frames_in_cube(cookies_D_only_centered_06_name_array)
         
     else:
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames

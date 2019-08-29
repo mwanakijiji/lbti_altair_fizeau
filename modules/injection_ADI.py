@@ -104,6 +104,9 @@ class JustPutIntoCube:
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
 
+            print("type:")
+            print(type(sci[0,0]))
+
 
         # if writing to disk for checking
         if self.write:
@@ -114,7 +117,7 @@ class JustPutIntoCube:
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
-
+            
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + str(saved_cube_basename)
             fits.writeto(filename = file_name,
                          data = cube_frames,

@@ -93,7 +93,9 @@ class JustPutIntoCube:
             mask_weird[sci > 55000] = np.nan # mask saturating region
 
             # check if PCA can be done at all; if not, skip this science frame
-            # (we don't need a PCA reconstruction quite yet, but this is just a check)
+            # (N.b. We don't need a PCA reconstruction quite yet, but this is just a check.)
+            # (N.b. Note this is the only criterion right now for deciding if a science
+            #       frame will be used.)
             fit_2_star = fit_pca_star(self.pca_star_basis_cube, sci, mask_weird, n_PCA=1)
             if not fit_2_star:
                 print("Incompatible dimensions; skipping this frame...")
@@ -105,7 +107,10 @@ class JustPutIntoCube:
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
 
             print("type:")
-            print(type(sci[0,0]))
+            print(type(sci))
+
+        # convert to numpy float 32
+        cube_frames = cube_frames.astype(np.float32)
 
 
         # if writing to disk for checking

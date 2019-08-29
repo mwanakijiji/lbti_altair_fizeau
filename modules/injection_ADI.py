@@ -46,7 +46,6 @@ class JustPutIntoCube:
 
         self.fake_params = fake_params
         self.test_PCA_vector_name = test_PCA_vector_name
-        self.saved_cube_basename = saved_cube_basename
         self.config_data = config_data
         self.write = write
 

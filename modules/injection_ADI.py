@@ -111,11 +111,17 @@ class JustPutIntoCube:
 
             ## BEGIN TEST
             if frame_num == 0:
-                fits.writeto(filename = "junk.fits",
+                fits.writeto(filename = "junk64.fits",
+                         data = sci.astype(np.float64),
+                         overwrite = True)
+                fits.writeto(filename = "junk32.fits",
                          data = sci.astype(np.float32),
                          overwrite = True)
+                fits.writeto(filename = "junk16.fits",
+                         data = sci.astype(np.float16),
+                         overwrite = True)
             break
-            # END TEST
+            ## END TEST
 
         ## ## START HERE: TRY OUT A CUBE B WITH NP.FLOAT16
         # convert to numpy float 16

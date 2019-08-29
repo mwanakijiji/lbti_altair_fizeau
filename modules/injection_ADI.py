@@ -111,7 +111,7 @@ class JustPutIntoCube:
 
             ## BEGIN TEST
             if frame_num == 0:
-            fits.writeto(filename = "junk.fits",
+                fits.writeto(filename = "junk.fits",
                          data = sci.astype(np.float32),
                          overwrite = True)
             break

@@ -366,7 +366,7 @@ def inject_remove_adi(this_param_combo):
 
         # instantiate FakePlanetInjectorCube to put frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
-                                         test_PCA_vector_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                         test_PCA_vector_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                                                     'psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits'),
                                                                     write = True)
 

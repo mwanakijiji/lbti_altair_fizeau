@@ -110,6 +110,7 @@ class JustPutIntoCube:
             print(type(sci))
 
             ## BEGIN TEST
+            if frame_num == 0:
             fits.writeto(filename = "junk.fits",
                          data = sci.astype(np.float32),
                          overwrite = True)

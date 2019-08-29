@@ -109,6 +109,13 @@ class JustPutIntoCube:
             print("type:")
             print(type(sci))
 
+            ## BEGIN TEST
+            fits.writeto(filename = "junk.fits",
+                         data = sci.astype(np.float16),
+                         overwrite = True)
+            break
+            # END TEST
+
         ## ## START HERE: TRY OUT A CUBE B WITH NP.FLOAT16
         # convert to numpy float 16
         cube_frames = cube_frames.astype(np.float16)

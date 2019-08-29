@@ -28,13 +28,13 @@ basic_red.main()
 
 ## ## CENTERING OF PSFS
 centering.main()
-'''
+
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 '''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main()
-
+'''
 ## ## DETECTION
 detection.main()
 

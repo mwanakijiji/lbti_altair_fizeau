@@ -288,7 +288,6 @@ def inject_remove_adi(this_param_combo):
                                                frame_array = frame_array_1,
                                                write_cube = True)
 
-    fake_params_string = "STANDIN"
 
     # call derotation, ADI, sensitivity determination
     make_median = median_instance(apply_mask_after_derot = True, fake_planet = True)

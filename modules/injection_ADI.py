@@ -118,7 +118,7 @@ class JustPutIntoCube:
 
         ## ## START HERE: TRY OUT A CUBE B WITH NP.FLOAT16
         # convert to numpy float 16
-        cube_frames = cube_frames.astype(np.float16)
+        #cube_frames = cube_frames.astype(np.float16)
 
 
         # if writing to disk for checking

@@ -605,6 +605,12 @@ def main():
     param_dict_list = []
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())
+
+
+    ## BEGIN THIS LINE IS A TEST ONLY
+    inject_remove_adi(param_dict_list[0])
+    ## END TEST
+        
     pool.map(inject_remove_adi, param_dict_list)
 
 

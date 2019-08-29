@@ -138,7 +138,7 @@ class FakePlanetInjectorCube:
 
     def __init__(self,
                  fake_params,
-                 n_PCA=100,
+                 n_PCA,
                  abs_host_star_PCA_name,
                  abs_fake_planet_PCA_name,
                  config_data = config,

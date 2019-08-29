@@ -111,7 +111,7 @@ class JustPutIntoCube:
 
             ## BEGIN TEST
             fits.writeto(filename = "junk.fits",
-                         data = sci.astype(np.float16),
+                         data = sci.astype(np.float32),
                          overwrite = True)
             break
             # END TEST

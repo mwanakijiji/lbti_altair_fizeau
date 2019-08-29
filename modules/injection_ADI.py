@@ -109,8 +109,9 @@ class JustPutIntoCube:
             print("type:")
             print(type(sci))
 
-        # convert to numpy float 32
-        cube_frames = cube_frames.astype(np.float32)
+        ## ## START HERE: TRY OUT A CUBE B WITH NP.FLOAT16
+        # convert to numpy float 16
+        cube_frames = cube_frames.astype(np.float16)
 
 
         # if writing to disk for checking
@@ -388,7 +389,6 @@ def inject_remove_adi(this_param_combo):
         cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_A_only_centered_06_name_array,
                                                                           saved_cube_basename = "simple_cube_A.fits")
         '''
-        
         # filter combo B
         print('22A')
         cube_pre_removal_B, pas_array_B, frame_array_0_B = frames_in_cube(abs_sci_name_array = cookies_B_only_centered_06_name_array,

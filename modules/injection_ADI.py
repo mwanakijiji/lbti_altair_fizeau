@@ -37,7 +37,7 @@ class JustPutIntoCube:
                  write = False):
         '''
         INPUTS:
-        n_PCA: number of principal components to use
+        fake_params: parameters of a fake planet (just zeros if none)
         test_PCA_vector_name: absolute file name of the PCA cube to reconstruct the host star
                        (pay attention to the filter combination and saturation status)
         config_data: configuration data, as usual
@@ -46,6 +46,7 @@ class JustPutIntoCube:
 
         self.fake_params = fake_params
         self.test_PCA_vector_name = test_PCA_vector_name
+        self.saved_cube_basename = saved_cube_basename
         self.config_data = config_data
         self.write = write
 
@@ -57,11 +58,13 @@ class JustPutIntoCube:
 
 
     def __call__(self,
-                 abs_sci_name_array):
+                 abs_sci_name_array,
+                 saved_cube_basename):
         '''
         INPUTS:
 
         abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
+        saved_cube_basename: string for the filename of the cube to be saved
         '''
 
         # read in one frame to get the shape
@@ -78,6 +81,8 @@ class JustPutIntoCube:
         # loop over frames
         for frame_num in range(0,len(abs_sci_name_array)):
             print("---------------")
+            print("Adding relative frame num " + str(frame_num) + " out of " + str(len(abs_sci_name_array)))
+            print("Corresponding to file base name " + str(os.path.basename(abs_sci_name_array[frame_num])))
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
@@ -111,7 +116,7 @@ class JustPutIntoCube:
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
 
-            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "no_fake_planet_injected_cube.fits"
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + str(saved_cube_basename)
             fits.writeto(filename = file_name,
                          data = cube_frames,
                          header = hdr,
@@ -372,19 +377,23 @@ def inject_remove_adi(this_param_combo):
 
         # filter combo A
         print('11A')
-        cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(cookies_A_only_centered_06_name_array)
+        cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_A_only_centered_06_name_array,
+                                                                          saved_cube_basename = "simple_cube_A.fits")
 
         # filter combo B
         print('22A')
-        cube_pre_removal_B, pas_array_B, frame_array_0_B = frames_in_cube(cookies_B_only_centered_06_name_array)
+        cube_pre_removal_B, pas_array_B, frame_array_0_B = frames_in_cube(abs_sci_name_array = cookies_B_only_centered_06_name_array,
+                                                                          saved_cube_basename = "simple_cube_B.fits")
 
         # filter combo C
         print('33A')
-        cube_pre_removal_C, pas_array_C, frame_array_0_C = frames_in_cube(cookies_C_only_centered_06_name_array)
+        cube_pre_removal_C, pas_array_C, frame_array_0_C = frames_in_cube(abs_sci_name_array = cookies_C_only_centered_06_name_array,
+                                                                          saved_cube_basename = "simple_cube_C.fits")
 
         # filter combo D
         print('44A')
-        cube_pre_removal_D, pas_array_D, frame_array_0_D = frames_in_cube(cookies_D_only_centered_06_name_array)
+        cube_pre_removal_D, pas_array_D, frame_array_0_D = frames_in_cube(abs_sci_name_array = cookies_D_only_centered_06_name_array,
+                                                                          saved_cube_basename = "simple_cube_D.fits")
         
     else:
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames

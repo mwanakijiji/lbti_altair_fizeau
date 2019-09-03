@@ -469,6 +469,7 @@ def inject_remove_adi(this_param_combo):
     ## ## START HERE
 
     # N.b. cube B is used as unsats for cube A
+    '''
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A,
                                                     n_PCA = 100,
@@ -484,6 +485,7 @@ def inject_remove_adi(this_param_combo):
     # call and return cube of host-removed frames
     print('66')
     removed_hosts_cube_A, frame_array_1_A = remove_hosts()
+    '''
 
     # do the same for cubes B,C,D
     print('77')

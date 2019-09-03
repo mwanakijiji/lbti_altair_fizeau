@@ -484,7 +484,7 @@ def inject_remove_adi(this_param_combo):
                                                     write = True)
     # call and return cube of host-removed frames
     print('66')
-    removed_hosts_cube_A, frame_array_1_A = remove_hosts()
+    removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
     '''
 
     # do the same for cubes B,C,D
@@ -503,7 +503,7 @@ def inject_remove_adi(this_param_combo):
                                                     frame_array = frame_array_0_B,
                                                     write = True)
     print('88')
-    removed_hosts_cube_B, frame_array_1_B = remove_hosts()
+    removed_hosts_cube_B, frame_array_1_B = remove_hosts_B()
     print('99')
     # N.b. here I just treat frames for this sequence (cube C) as both the sats and unsats for itself
     remove_hosts_C = host_removal.HostRemovalCube(fake_params = this_param_combo,
@@ -519,7 +519,7 @@ def inject_remove_adi(this_param_combo):
                                                     frame_array = frame_array_0_C,
                                                     write = True)
     print('111')
-    removed_hosts_cube_C, frame_array_1_C = remove_hosts()
+    removed_hosts_cube_C, frame_array_1_C = remove_hosts_C()
     print('222')
     remove_hosts_D = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_D,
@@ -534,7 +534,7 @@ def inject_remove_adi(this_param_combo):
                                                     frame_array = frame_array_0_D,
                                                     write = True)
     print('333')
-    removed_hosts_cube_D, frame_array_1_D = remove_hosts()
+    removed_hosts_cube_D, frame_array_1_D = remove_hosts_D()
 
     # instantiate derotation, ADI, sensitivity determination
     print('444')

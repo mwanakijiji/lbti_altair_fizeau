@@ -157,7 +157,9 @@ class HostRemovalCube:
         self.cube_frames = cube_frames
         self.n_PCA = n_PCA
         self.outdir = outdir
-        self.abs_PCA_name = abs_PCA_name
+        #self.abs_PCA_name = abs_PCA_name
+        self.abs_host_star_PCA_name = abs_host_star_PCA_name
+        self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
         self.frame_num_array = frame_array
         self.config_data = config_data
         self.write = write
@@ -165,8 +167,8 @@ class HostRemovalCube:
         # read in the PCA vector cube for this series of frames
         # (note the PCA needs to correspond to saturated PSFs, since I am subtracting
         # saturated PSFs away)
-        self.pca_basis_cube_sat, self.header_pca_basis_cube_sat = fits.getdata(self.abs_PCA_name, 0, header=True)
-
+        self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name, 0, header=True)
+        self.pca_basis_cube_fake_planet, self.header_pca_basis_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name, 0, header=True)
 
         ##########
 
@@ -178,13 +180,14 @@ class HostRemovalCube:
         INPUTS:
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
 
-        Outputs:
+        OUTPUTS:
         host_subt_cube: a cube of non-derotated frames
         '''
 
         # make a cube that is the same shape as the input
         host_subt_cube = np.nan*np.ones(np.shape(self.cube_frames))
 
+        # remove the host star from each slice
         for slice_num in range(0,len(self.cube_frames)):
 
             # select the slice from the cube
@@ -210,14 +213,15 @@ class HostRemovalCube:
             # do the PCA fit of masked host star
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
-            print(sci)
+
             try:
-                fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
+                # fit to the host star for subtraction
+                fit_host_star = fit_pca_star(self.pca_basis_cube_host_star, sci, no_mask, n_PCA=100)
             except:
                 continue
 
             # subtract the PCA-reconstructed host star
-            image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
+            image_host_removed = np.subtract(sci,fit_host_star["recon_2d"])
 
             # pickle the PCA vector
             '''

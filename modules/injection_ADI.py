@@ -465,6 +465,7 @@ def inject_remove_adi(this_param_combo):
     # instantiate removal of host star from each frame in the cube, whether or not
     # these are frames with fake planets
     print('55')
+    ## ## START HERE
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A,
                                                     n_PCA = 100,

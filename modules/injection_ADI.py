@@ -370,7 +370,7 @@ def inject_remove_adi(this_param_combo):
 
         print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
-        # instantiate FakePlanetInjectorCube to put frames into a cube, but no fakes are injected into the frames
+        # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
                                          test_PCA_vector_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                                                     'psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits'),
@@ -378,24 +378,25 @@ def inject_remove_adi(this_param_combo):
 
         # filter combo A
         print('11A')
+        '''
         cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_A_only_centered_06_name_array,
-                                                                          saved_cube_basename = "simple_cube_A.fits")
-
+                                                                          saved_cube_basename = "simple_sci_frame_cube_A.fits")
+        '''
         # filter combo B
         print('22A')
         cube_pre_removal_B, pas_array_B, frame_array_0_B = frames_in_cube(abs_sci_name_array = cookies_B_only_centered_06_name_array,
-                                                                          saved_cube_basename = "simple_cube_B.fits")
-
+                                                                          saved_cube_basename = "simple_sci_frame_cube_B.fits")
+        '''
         # filter combo C
         print('33A')
         cube_pre_removal_C, pas_array_C, frame_array_0_C = frames_in_cube(abs_sci_name_array = cookies_C_only_centered_06_name_array,
-                                                                          saved_cube_basename = "simple_cube_C.fits")
+                                                                          saved_cube_basename = "simple_sci_frame_cube_C.fits")
 
         # filter combo D
         print('44A')
         cube_pre_removal_D, pas_array_D, frame_array_0_D = frames_in_cube(abs_sci_name_array = cookies_D_only_centered_06_name_array,
-                                                                          saved_cube_basename = "simple_cube_D.fits")
-        
+                                                                          saved_cube_basename = "simple_sci_frame_cube_D.fits")
+        '''
     else:
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
 
@@ -466,14 +467,18 @@ def inject_remove_adi(this_param_combo):
     # these are frames with fake planets
     print('55')
     ## ## START HERE
+
+    # N.b. cube B is used as unsats for cube A
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A,
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
-                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    abs_fake_planet_PCA_name = [...],
+                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005608.fits",
+                                                    abs_fake_planet_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                                          + "pca_cubes_psfs/" \
+                                                          + "psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits",
                                                     frame_array = frame_array_0_A,
                                                     write = True)
     # call and return cube of host-removed frames
@@ -482,27 +487,33 @@ def inject_remove_adi(this_param_combo):
 
     # do the same for cubes B,C,D
     print('77')
+    # N.b. here I just treat frames for this sequence (cube B) as both the sats and unsats for itself
     remove_hosts_B = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_B,
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
-                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    abs_fake_planet_PCA_name = [...],
+                                                          + "psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits",
+                                                    abs_fake_planet_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                                          + "pca_cubes_psfs/" \
+                                                          + "psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits",
                                                     frame_array = frame_array_0_B,
                                                     write = True)
     print('88')
     removed_hosts_cube_B, frame_array_1_B = remove_hosts()
     print('99')
+    # N.b. here I just treat frames for this sequence (cube C) as both the sats and unsats for itself
     remove_hosts_C = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_C,
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
-                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    abs_fake_planet_PCA_name = [...],
+                                                          + "psf_PCA_vector_cookie_seqStart_007120_seqStop_007734.fits",
+                                                    abs_fake_planet_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                                          + "pca_cubes_psfs/" \
+                                                          + "psf_PCA_vector_cookie_seqStart_007120_seqStop_007734.fits",
                                                     frame_array = frame_array_0_C,
                                                     write = True)
     print('111')
@@ -514,8 +525,10 @@ def inject_remove_adi(this_param_combo):
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "pca_cubes_psfs/" \
-                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits",
-                                                    abs_fake_planet_PCA_name = [...],
+                                                          + "psf_PCA_vector_cookie_seqStart_007927_seqStop_011408.fits",
+                                                    abs_fake_planet_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                                          + "pca_cubes_psfs/" \
+                                                          + "psf_PCA_vector_cookie_seqStart_007120_seqStop_007734.fits",
                                                     frame_array = frame_array_0_D,
                                                     write = True)
     print('333')

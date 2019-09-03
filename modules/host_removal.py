@@ -190,6 +190,9 @@ class HostRemovalCube:
         # remove the host star from each slice
         for slice_num in range(0,len(self.cube_frames)):
 
+            print("Removing host star from relative slice " + str(slice_num) +
+                  " of " +str(len(self.cube_frames)))
+
             # select the slice from the cube
             # (there should be no masking of this frame downstream)
             sci = self.cube_frames[slice_num,:,:]

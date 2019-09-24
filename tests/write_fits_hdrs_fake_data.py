@@ -21,7 +21,7 @@ for u in file_name_array:
     header["GAU_XSTD"] = 0
     header["GAU_YSTD"] = 0
 
-    print(type(test_img))
+    print(type(test_img[0][0]))
     '''
     fits.writeto(filename = u,
                      data = test_img,

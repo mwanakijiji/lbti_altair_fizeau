@@ -8,7 +8,7 @@ import pandas as pd
 from astropy.io import fits
 
 # make list of files
-direct_name = "/vol_c/synthetic_fizeau_data/pipeline_05_cutouts/"
+direct_name = "/vol_c/synthetic_fizeau_data/pipeline_06_centered/"
 file_name_array = list(glob.glob(os.path.join(direct_name, "*.fits")))
 
 # loop through them

@@ -22,9 +22,9 @@ for u in file_name_array:
     header["GAU_YSTD"] = 0
 
     print(type(test_img[0][0]))
-    '''
+
     fits.writeto(filename = u,
-                     data = test_img,
+                     data = test_img.astype(np.float32),
                      header = None,
                      overwrite = True)
-    '''
+

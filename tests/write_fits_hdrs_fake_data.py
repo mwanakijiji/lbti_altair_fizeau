@@ -23,7 +23,7 @@ for u in file_name_array:
 
     print(type(test_img[0][0]))
 
-    fits.writeto(filename = u,
+    fits.writeto(filename = "/vol_c/synthetic_fizeau_data/" + u,
                      data = test_img.astype(np.float32),
                      header = None,
                      overwrite = True)

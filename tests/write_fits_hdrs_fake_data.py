@@ -29,3 +29,5 @@ for u in file_name_array:
                      header = header,
                      overwrite = True)
 
+    print(os.path.basename(u))
+

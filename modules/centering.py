@@ -39,7 +39,7 @@ class Centering:
         z = np.copy(sci)
 
         # make an initial Gaussian guess
-        p_init = models.Gaussian2D(amplitude=60000.,
+        p_init = models.Gaussian2D(amplitude=2000000000.,
                                    x_mean=np.float(0.5*np.shape(sci)[1]),
                                    y_mean=np.float(0.5*np.shape(sci)[0]),
                                    x_stddev=6.,
@@ -61,13 +61,13 @@ class Centering:
         plt.clf()
         plt.figure(figsize=(8, 2.5))
         plt.subplot(1, 3, 1)
-        plt.imshow(z, origin='lower', interpolation='nearest', vmin=-10, vmax=60000)
+        plt.imshow(z, origin='lower', interpolation='nearest', vmin=-10, vmax=2000000000)
         plt.title("Data")
         plt.subplot(1, 3, 2)
-        plt.imshow(p(x, y), origin='lower', interpolation='nearest', vmin=-10, vmax=60000)
+        plt.imshow(p(x, y), origin='lower', interpolation='nearest', vmin=-10, vmax=2000000000)
         plt.title("Model")
         plt.subplot(1, 3, 3)
-        plt.imshow(resids, origin='lower', interpolation='nearest', vmin=-10, vmax=60000)
+        plt.imshow(resids, origin='lower', interpolation='nearest', vmin=-10, vmax=2000000000)
         plt.title("Residual")
         plt.suptitle("Frame " + os.path.basename(abs_sci_name))
         abs_best_fit_gauss_png = str(self.config_data["data_dirs"]["DIR_FYI_INFO"] + \
@@ -113,8 +113,8 @@ class Centering:
         
         # add a line to the header indicating last reduction step
         header_sci["RED_STEP"] = "cookie_centered"
-        print(x_stdev)
-        print(header_sci)
+        #print(x_stdev)
+        #print(header_sci)
         # add more lines to record the parameters and residuals with the Gaussian fit
         header_sci["GAU_XSTD"] = x_stdev # x-width of the Gaussian
         header_sci["GAU_YSTD"] = y_stdev # y-width of the Gaussian

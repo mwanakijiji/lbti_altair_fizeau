@@ -1,6 +1,7 @@
 # This reads in fake FITS files and writes them out with headers so as
 # to mimic real data.
 
+import os
 import glob
 import pandas as pd
 from astropy.io import fits

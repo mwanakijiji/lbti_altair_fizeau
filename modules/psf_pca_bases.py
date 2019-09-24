@@ -75,7 +75,7 @@ class PSFPCACubeMaker:
         # (to make a circular mask, I made frames from stray code in phasecam_pupil_simulator.ipynb)
         mask_weird, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
                                         "mask_406x406_rad080.fits", 0, header=True)
-        #mask_weird = make_first_pass_mask(quad_choice) 
+        #mask_weird = make_first_pass_mask(quad_choice)
         #mask_weird = np.ones(shape_img) # no mask
 
         # initialize slice counter for removing unused slices later
@@ -144,12 +144,12 @@ class PSFPCACubeMaker:
         training_cube_masked_weird = np.multiply(training_cube, mask_weird)
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +
-                                '_seqStart_'+str("{:0>6d}".format(start_frame_num))+
+                                '_seqStart_'+str("{:0>6d}".format(start_frame_num)) +
                                 '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'.fits')
-        fits.writeto(filename=training_cube_name,
-                     data=training_cube_masked_weird,
-                     header=None,
-                     overwrite=True)
+        fits.writeto(filename = training_cube_name,
+                     data = training_cube_masked_weird,
+                     header = None,
+                     overwrite = True)
         del training_cube
         print("Wrote out PSF PCA training cube " + os.path.basename(training_cube_name) + ", with shape")
         print(training_cube_name)

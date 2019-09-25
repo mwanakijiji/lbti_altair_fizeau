@@ -16,13 +16,14 @@ for u in file_name_array:
 
     test_img, header = fits.getdata(u, 0, header=True)
 
+    '''
     header["RESD_AVG"] = 0
     header["RESD_MED"] = 0
     header["RESD_INT"] = 0
     header["GAU_XSTD"] = 0
     header["GAU_YSTD"] = 0
-
-    print(type(test_img[0][0]))
+    '''
+    header["PCCLOSED"] = 1
 
     fits.writeto(filename = "/vol_c/synthetic_fizeau_data/" + os.path.basename(u),
                      data = test_img.astype(np.float32),

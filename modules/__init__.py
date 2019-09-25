@@ -226,10 +226,11 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     '''
 
     # get shape for a single image
-    if np.shape(training_cube_masked_weird) == 3:
-        shape_img = np.shape(training_cube_masked_weird[0,:,:])
-    elif np.shape(training_cube_masked_weird) == 2:
-        shape_img = np.shape(training_cube_masked_weird[:,:])
+    # add extra dimension for 2D array; vestigial
+    if np.shape(training_cube_masked_weird) == 2:
+        training_cube_masked_weird = np.expand_dims(training_cube_masked_weird, axis=0)
+
+    shape_img = np.shape(training_cube_masked_weird[0,:,:])
 
     # flatten each individual frame into a 1D array
     print("Flattening the training cube...")

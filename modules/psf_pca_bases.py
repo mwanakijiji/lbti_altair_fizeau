@@ -154,9 +154,10 @@ class PSFPCACubeMaker:
                      header = None,
                      overwrite = True)
         del training_cube
-        print("Wrote out PSF PCA training cube " + os.path.basename(training_cube_name) + ", with shape")
-        print(training_cube_name)
-        print(np.shape(training_cube_masked_weird))
+        print("Wrote out PSF PCA training cube as \n " +
+              training_cube_name +
+              "\n with shape" +
+              np.shape(training_cube_masked_weird))
 
         # generate the PCA cube from the PSF data
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
@@ -170,8 +171,10 @@ class PSFPCACubeMaker:
                      data=pca_comp_cube,
                      header=None,
                      overwrite=True)
-        print("Wrote out PSF PCA vector cube " + os.path.basename(abs_pca_cube_name) + ", with shape")
-        print(np.shape(pca_comp_cube))
+        print("Wrote out PSF PCA vector cube as \n" +
+              os.path.basename(abs_pca_cube_name) +
+              "\n with shape" +
+              np.shape(pca_comp_cube))
         print("---------------------------")
 
 

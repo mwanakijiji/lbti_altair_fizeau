@@ -338,7 +338,7 @@ def inject_remove_adi(this_param_combo):
     # make a list of ALL the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
- 
+
     ## lists of files are separated based on filter combination (there are four: A, B, C, D)
 
     # combination A: frames 4259-5608 & 5826-6301 (flux-saturated)
@@ -585,6 +585,102 @@ def inject_remove_adi(this_param_combo):
     print(str(int(elapsed_time)))
 
 
+#######################
+
+def synthetic_fizeau_inject_remove_adi(this_param_combo):
+    '''
+    To parallelize a serial operation across cores, I need to define this function that goes through
+    the fake planet injection, host star removal, and ADI steps for a given combination of fake planet parameters
+
+    injection = True: actually inject a fake PSF; False with just remove the host star and do ADI
+    '''
+
+    time_start = time.time()
+
+    # make a list of ALL the centered cookie cutout files
+    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
+
+
+    # injecting fake PSFs?
+    if (int(this_param_combo["rad_pix"]) == int(0)):
+        # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
+
+        print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
+
+        # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
+        frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
+                                         test_PCA_vector_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                                                    'psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits'),
+                                                                    write = True)
+
+        cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_centered_06_name_array,
+                                                                          saved_cube_basename = "simple_synthetic_sci_frame_cube_A.fits")
+
+    else:
+        # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
+
+        print("-------------------------------------------------")
+        print("Injecting fake planet corresponding to parameter")
+        print(this_param_combo)
+
+        # instantiate fake planet injection
+        print('11B')
+        cube_A_PCA_vector_name = str(config["data_dirs"]["DIR_OTHER_FITS"]
+                                + "pca_cubes_psfs/"
+                                + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005608.fits")
+
+        inject_fake_psfs_A = FakePlanetInjectorCube(fake_params = this_param_combo,
+                                          n_PCA = 100,
+                                          abs_host_star_PCA_name = cube_A_PCA_vector_name,
+                                          abs_fake_planet_PCA_name = cube_B_PCA_vector_name,
+                                          write = False)
+
+        # call fake planet injection
+        print('22B')
+        cube_pre_removal_A, pas_array_A, frame_array_0_A = inject_fake_psfs(cookies_A_only_centered_06_name_array)
+
+
+
+    # instantiate removal of host star from each frame in the cube, whether or not
+    # these are frames with fake planets
+    remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
+                                                    cube_frames = cube_pre_removal_A,
+                                                    n_PCA = 100,
+                                                    outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
+                                                    abs_host_star_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
+                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005608.fits",
+                                                    abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
+                                                          + "psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits",
+                                                    frame_array = frame_array_0_A,
+                                                    write = True)
+
+    removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
+
+
+    # instantiate derotation, ADI, sensitivity determination
+    print('444')
+    median_instance_A = detection.MedianCube(fake_params = this_param_combo,
+                                               host_subt_cube = removed_hosts_cube_A,
+                                               pa_array = pas_array_A,
+                                               frame_array = frame_array_1_A,
+                                               write_cube = True)
+
+    # call derotation, ADI, sensitivity determination
+    print('555')
+    make_median_A = median_instance_A(apply_mask_after_derot = True, fake_planet = True)
+    del removed_hosts_cube_A # clear memory
+    
+    elapsed_time = np.subtract(time.time(), time_start)
+
+    print("----------------------------------------------------------------")
+    print("Completed one fake planet parameter configuration")
+    print("Elapsed time (sec): ")
+    print(str(int(elapsed_time)))
+
+#######################
+
+
 def main():
     '''
     Make grid of fake planet parameters, and inject fake planets
@@ -634,10 +730,10 @@ def main():
 
 
     ## BEGIN THIS LINE IS A TEST ONLY
-    inject_remove_adi(param_dict_list[0])
+    #inject_remove_adi(param_dict_list[0])
     ## END TEST
         
-    pool.map(inject_remove_adi, param_dict_list)
+    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
 
 
 

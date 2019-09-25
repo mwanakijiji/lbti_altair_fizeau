@@ -73,11 +73,11 @@ class PSFPCACubeMaker:
 
         # make the right mask (1=good; 0=masked)
         # (to make a circular mask, I made frames from stray code in phasecam_pupil_simulator.ipynb)
-        
+        '''
         mask_weird, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
                                         "mask_406x406_rad080.fits", 0, header=True)
-
-        import ipdb; ipdb.set_trace()
+        '''
+        #import ipdb; ipdb.set_trace()
         #mask_weird = make_first_pass_mask(quad_choice)
         mask_weird = np.ones(shape_img) # no mask
 
@@ -106,11 +106,11 @@ class PSFPCACubeMaker:
                 # 3.) width of Gaussian fit is within limits
                 if ((header_sci["PCCLOSED"] == 1) and
                     np.logical_and(header_sci["RESD_AVG"] >= resd_avg_limits[0],
-                                   header_sci["RESD_AVG"] < resd_avg_limits[1]) and
+                                   header_sci["RESD_AVG"] <= resd_avg_limits[1]) and
                     np.logical_and(header_sci["GAU_XSTD"] >= x_gauss_limits[0],
-                                   header_sci["GAU_XSTD"] < x_gauss_limits[1]) and
+                                   header_sci["GAU_XSTD"] <= x_gauss_limits[1]) and
                     np.logical_and(header_sci["GAU_YSTD"] >= y_gauss_limits[0],
-                                   header_sci["GAU_YSTD"] < y_gauss_limits[1])):
+                                   header_sci["GAU_YSTD"] <= y_gauss_limits[1])):
 
                     # add to cube
                     training_cube[slice_counter,:,:] = sci
@@ -272,7 +272,7 @@ def main():
 
     # cube of fake data
     pca_psf_maker(start_frame_num = 7000,
-                   stop_frame_num = 8500,
+                   stop_frame_num = 7500,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],
                    y_gauss_limits = [0, 0])   

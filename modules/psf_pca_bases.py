@@ -102,11 +102,11 @@ class PSFPCACubeMaker:
                 # 2.) residuals are within limits
                 # 3.) width of Gaussian fit is within limits
                 if ((header_sci["PCCLOSED"] == 1) and
-                    np.logical_and(header_sci["RESD_AVG"] > resd_avg_limits[0],
+                    np.logical_and(header_sci["RESD_AVG"] >= resd_avg_limits[0],
                                    header_sci["RESD_AVG"] < resd_avg_limits[1]) and
-                    np.logical_and(header_sci["GAU_XSTD"] > x_gauss_limits[0],
+                    np.logical_and(header_sci["GAU_XSTD"] >= x_gauss_limits[0],
                                    header_sci["GAU_XSTD"] < x_gauss_limits[1]) and
-                    np.logical_and(header_sci["GAU_YSTD"] > y_gauss_limits[0],
+                    np.logical_and(header_sci["GAU_YSTD"] >= y_gauss_limits[0],
                                    header_sci["GAU_YSTD"] < y_gauss_limits[1])):
 
                     # add to cube
@@ -240,6 +240,7 @@ def main():
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100) # create instance
     # cube A
+    '''
     pca_psf_maker(start_frame_num = 4259,
                    stop_frame_num = 5608,
                    resd_avg_limits = [50,62.5],
@@ -264,5 +265,13 @@ def main():
                    resd_avg_limits = [40.6,55],
                    x_gauss_limits = [4.15,5],
                    y_gauss_limits = [4.1,4.44])
+    '''
+
+    # cube of fake data
+    pca_psf_maker(start_frame_num = 7000,
+                   stop_frame_num = 8500,
+                   resd_avg_limits = [0, 0],
+                   x_gauss_limits = [0, 0],
+                   y_gauss_limits = [0, 0])   
 
 

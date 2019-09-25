@@ -22,8 +22,10 @@ for u in file_name_array:
     header["RESD_INT"] = 0
     header["GAU_XSTD"] = 0
     header["GAU_YSTD"] = 0
-    '''
     header["PCCLOSED"] = 1
+    '''
+    header["LBT_PARA"] = 40.*np.random.random()
+    print(header["LBT_PARA"])
 
     fits.writeto(filename = "/vol_c/synthetic_fizeau_data/" + os.path.basename(u),
                      data = test_img.astype(np.float32),

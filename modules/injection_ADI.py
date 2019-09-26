@@ -616,7 +616,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
         # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
                                          test_PCA_vector_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                                                    'psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits'),
+                                                                    'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
                                                                     write = True)
 
         cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_centered_06_name_array,
@@ -654,9 +654,9 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits",
+                                                          + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits",
+                                                          + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     frame_array = frame_array_0_A,
                                                     write = True)
 

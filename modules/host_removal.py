@@ -267,7 +267,7 @@ class HostRemovalCube:
                          data = recon_frames_cube,
                          header = hdr1,
                          overwrite = True)
-            print("Wrote PCA-reconstructed star cube to disk as " + file_name)
+            print("Wrote PCA-reconstructed star cube to disk as " + file_name_recon)
 
             # the cube of host-star-subtracted frames
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "host_removed_cube_" + \

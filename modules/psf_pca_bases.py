@@ -274,8 +274,8 @@ def main():
     '''
 
     # cube of fake data
-    pca_psf_maker(start_frame_num = 7000,
-                   stop_frame_num = 7500,
+    pca_psf_maker(start_frame_num = 0,
+                   stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],
                    y_gauss_limits = [0, 0])   

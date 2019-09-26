@@ -166,7 +166,8 @@ class PSFPCACubeMaker:
         abs_pca_cube_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                 'psf_PCA_vector_cookie' +
                                 '_seqStart_'+str("{:0>6d}".format(start_frame_num))+
-                                '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'.fits')
+                                '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'_pcaNum_'
+                                +str("{:0>4d}".format(self.n_PCA))+'.fits')
         fits.writeto(filename=abs_pca_cube_name,
                      data=pca_comp_cube,
                      header=None,
@@ -244,7 +245,7 @@ def main():
     # generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
-                                    n_PCA = 100) # create instance
+                                    n_PCA = 300) # create instance
     # cube A
     '''
     pca_psf_maker(start_frame_num = 4259,

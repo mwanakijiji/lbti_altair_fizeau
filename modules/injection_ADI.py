@@ -224,7 +224,7 @@ class FakePlanetInjectorCube:
             ## COMMENTED THIS OUT SO THAT I CAN TEST FAKE DATA
             ## mask_weird[sci > 55000] = np.nan # mask saturating region
             ## THE BELOW FOR FAKE DATA
-             mask_weird[sci > 4.5e9] = np.nan
+            mask_weird[sci > 4.5e9] = np.nan
             
 
             ## TEST: WRITE OUT

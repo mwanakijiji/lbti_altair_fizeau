@@ -651,12 +651,12 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     # these are frames with fake planets
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A,
-                                                    n_PCA = 100,
+                                                    n_PCA = 300,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
+                                                          + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000_pcaNum_0300.fits",
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
+                                                          + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000_pcaNum_0300.fits",
                                                     frame_array = frame_array_0_A,
                                                     write = True)
 

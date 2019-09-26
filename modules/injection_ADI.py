@@ -90,7 +90,7 @@ class JustPutIntoCube:
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
-            mask_weird[sci > 55000] = np.nan # mask saturating region
+            mask_weird[sci > 55000] = np.nan # mask saturating region (~55000 for empirical PSFs)
 
             # check if PCA can be done at all; if not, skip this science frame
             # (N.b. We don't need a PCA reconstruction quite yet, but this is just a check.)
@@ -628,7 +628,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
         print('11B')
         cube_A_PCA_vector_name = str(config["data_dirs"]["DIR_OTHER_FITS"]
                                 + "pca_cubes_psfs/"
-                                + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005608.fits")
+                                + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits")
 
         inject_fake_psfs_A = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
@@ -649,9 +649,9 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005608.fits",
+                                                          + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits",
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits",
+                                                          + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits",
                                                     frame_array = frame_array_0_A,
                                                     write = True)
 

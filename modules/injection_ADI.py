@@ -221,7 +221,11 @@ class FakePlanetInjectorCube:
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
-            mask_weird[sci > 55000] = np.nan # mask saturating region
+            ## COMMENTED THIS OUT SO THAT I CAN TEST FAKE DATA
+            ## mask_weird[sci > 55000] = np.nan # mask saturating region
+            ## THE BELOW FOR FAKE DATA
+             mask_weird[sci > 4.5e9] = np.nan
+            
 
             ## TEST: WRITE OUT
             #hdu = fits.PrimaryHDU(mask_weird)

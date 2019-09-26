@@ -186,6 +186,8 @@ class HostRemovalCube:
 
         # make a cube that is the same shape as the input
         host_subt_cube = np.nan*np.ones(np.shape(self.cube_frames))
+        # make a cube for storing images of the reconstructed PSFs, for checking
+        recon_frames_cube = np.copy(host_subt_cube)
 
         # remove the host star from each slice
         for slice_num in range(0,len(self.cube_frames)):
@@ -248,19 +250,33 @@ class HostRemovalCube:
             '''
 
             host_subt_cube[slice_num,:,:] = image_host_removed
+            recon_frames_cube[slice_num,:,:] = fit_host_star["recon_2d"]
 
         # if writing to disk for checking
         if self.write:
 
+            # the cube of PCA-reconstructed frames
+            file_name_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "pca_recon_star_cube_" + \
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
+              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            hdr1 = fits.Header()
+            hdr1["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
+            hdr1["RADASEC"] = self.fake_params["rad_asec"]
+            hdr1["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+            fits.writeto(filename = file_name_recon,
+                         data = recon_frames_cube,
+                         header = hdr1,
+                         overwrite = True)
+            print("Wrote PCA-reconstructed star cube to disk as " + file_name)
+
+            # the cube of host-star-subtracted frames
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "host_removed_cube_" + \
               str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
               "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
-
             hdr = fits.Header()
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
-              
             fits.writeto(filename = file_name,
                          data = host_subt_cube,
                          header = hdr,

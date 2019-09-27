@@ -343,12 +343,19 @@ def main():
     
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
+    synthetic_data_host_removal_no_fake_planets = HostRemoval(n_PCA = 100,
+                                            outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
+                                            abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                            + "pca_cubes_psfs/" \
+                                            + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits")
+
+    '''
     host_removal_fake_planets = HostRemoval(n_PCA = 100,
                                             outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
                                             abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                             + "pca_cubes_psfs/" \
                                             + "psf_PCA_vector_cookie_seqStart_004259_seqStop_005600.fits")
-    '''
+
     host_removal_no_fake_planets_A = HostRemoval(n_PCA = 100,
                                             outdir = config["data_dirs"]["DIR_NO_FAKE_PSFS_HOST_REMOVED"], \
                                             abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \

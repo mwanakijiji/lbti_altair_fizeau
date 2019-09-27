@@ -231,6 +231,9 @@ class HostRemovalCube:
 
             ## TEST
             if np.mod(slice_num,100) == 0:
+                plt.plot(fit_host_star["pca_vector"])
+                plt.show()
+                plt.savefig("junk_pca_spec_"+str(slice_num)+".pdf")
                 fits.writeto(filename = "junk_host_removed_"+str(slice_num)+".fits",
                              data = image_host_removed,
                              overwrite = True)

@@ -652,9 +652,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     ## BEGIN TEST
     import ipdb; ipdb.set_trace()
     file_name = "cube_pre_removal.fits"
-    fits.writeto(filename = file_name,
-                         data = cube_pre_removal_A
-                         overwrite = True)
+    fits.writeto(filename = file_name,data = cube_pre_removal_A,overwrite = True)
     ipdb.set_trace()
     ## END TEST
             print("Wrote fake-planet-injected cube to disk as " + file_name)

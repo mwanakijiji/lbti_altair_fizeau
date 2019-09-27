@@ -228,6 +228,20 @@ class HostRemovalCube:
             # subtract the PCA-reconstructed host star
             image_host_removed = np.subtract(sci,fit_host_star["recon_2d"])
 
+            ## TEST
+            if np.mod(slice_num,100) == 0:
+                fits.writeto(filename = "junk_host_removed_"+str(slice_num)+".fits",
+                             data = image_host_removed,
+                             overwrite = True)
+                fits.writeto(filename = "junk_sci_"+str(slice_num)+".fits",
+                             data = sci,
+                             overwrite = True)
+                fits.writeto(filename = "junk_recon_fit_"+str(slice_num)+".fits",
+                             data = fit_host_star["recon_2d"],
+                             overwrite = True)
+                print("WROTE TEST FILES")
+            ## END TEST
+
             # pickle the PCA vector
             '''
             pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,

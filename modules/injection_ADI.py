@@ -650,10 +650,10 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
 
     ## BEGIN TEST
     #import ipdb; ipdb.set_trace()
-    file_name = "junk_cube_pre_removal.fits"
-    fits.writeto(filename = file_name,data = cube_pre_removal_A,overwrite = True)
-    print("Wrote cube pre removal")
-    print(cookies_centered_06_name_array)
+    #file_name = "junk_cube_pre_removal.fits"
+    #fits.writeto(filename = file_name,data = cube_pre_removal_A,overwrite = True)
+    #print("Wrote cube pre removal")
+    #print(cookies_centered_06_name_array)
     #ipdb.set_trace()
     ## END TEST
     

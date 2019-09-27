@@ -645,16 +645,16 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
         print('22B')
         cube_pre_removal_A, pas_array_A, frame_array_0_A = inject_fake_psfs(cookies_A_only_centered_06_name_array)
 
-
-
     # instantiate removal of host star from each frame in the cube, whether or not
     # these are frames with fake planets
-    
+
     ## BEGIN TEST
-    import ipdb; ipdb.set_trace()
-    file_name = "cube_pre_removal.fits"
+    #import ipdb; ipdb.set_trace()
+    file_name = "junk_cube_pre_removal.fits"
     fits.writeto(filename = file_name,data = cube_pre_removal_A,overwrite = True)
-    ipdb.set_trace()
+    print("Wrote cube pre removal")
+    print(cookies_centered_06_name_array)
+    #ipdb.set_trace()
     ## END TEST
     
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,

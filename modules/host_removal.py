@@ -221,6 +221,9 @@ class HostRemovalCube:
 
             try:
                 # fit to the host star for subtraction
+                ## TEST HERE
+                if slice_num = 100:
+                    sci = np.ones(np.shape(sci))
                 fit_host_star = fit_pca_star(self.pca_basis_cube_host_star, sci, no_mask, n_PCA=100)
             except:
                 print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")

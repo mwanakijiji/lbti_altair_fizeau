@@ -659,7 +659,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A,
-                                                    n_PCA = 30,
+                                                    n_PCA = 10,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",

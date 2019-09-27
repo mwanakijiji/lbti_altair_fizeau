@@ -245,7 +245,7 @@ def main():
     # generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
-                                    n_PCA = 10) # create instance
+                                    n_PCA = 100) # create instance
     # cube A
     '''
     pca_psf_maker(start_frame_num = 4259,

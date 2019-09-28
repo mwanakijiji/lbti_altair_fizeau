@@ -218,7 +218,7 @@ class HostRemovalCube:
             '''
 
             mask_weird_predefined, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
-                                        "mask_100x100_ring_21_to_28.fits", 0, header=True)
+                                        "mask_100x100_rad_gtr_28.fits", 0, header=True)
             mask_weird[mask_weird_predefined == 0] = np.nan
             # end predefined mask section
 

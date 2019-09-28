@@ -249,7 +249,7 @@ class HostRemovalCube:
                     sci = np.flip(sci,axis=0)
                 '''
                 ## END TEST, 
-                fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star, sciImg=sci, mask_weird=no_mask, n_PCA=100)
+                fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star, sciImg=sci, mask_weird=mask_weird, n_PCA=100)
             except:
                 print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")
                 continue

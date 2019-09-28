@@ -226,7 +226,7 @@ class HostRemovalCube:
             #mask_weird[sci > 1e8] = np.nan # mask saturating region
 
             ## TEST: WRITE OUT
-            hdu = fits.PrimaryHDU(sci)
+            hdu = fits.PrimaryHDU(mask_weird)
             hdulist = fits.HDUList([hdu])
             hdu.writeto("junk_mask.fits", clobber=True)
             ## END TEST

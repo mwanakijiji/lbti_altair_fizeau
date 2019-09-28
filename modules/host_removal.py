@@ -200,15 +200,35 @@ class HostRemovalCube:
             sci = self.cube_frames[slice_num,:,:]
 
             # define the mask of this science frame
+            # 1= good; np.nan= masked
             ## ## fine-tune this step later!
-            mask_weird = np.ones(np.shape(sci))
+            mask_weird = np.ones(np.shape(sci)) # initialize
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing saturated PSFs
+            
+            # can read in predefined masks which have 1= good; 0= to mask
+            '''
+            Available masks:
+            mask_406x406_rad080.fits
+            mask_100x100_rad011.fits
+            mask_100x100_rad021.fits
+            mask_100x100_rad028.fits
+            mask_100x100_ring_11_to_21.fits
+            mask_100x100_ring_21_to_28.fits
+            mask_100x100_rad_gtr_28.fits
+            '''
+
+            mask_weird_predefined, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                                        "mask_100x100_rad011.fits", 0, header=True)
+            mask_weird[mask_weird_predefined == 0] = np.nan
+            # end predefined mask section
+
+            # mask based on saturation level
             #mask_weird[sci > 1e8] = np.nan # mask saturating region
 
             ## TEST: WRITE OUT
-            #hdu = fits.PrimaryHDU(sci)
-            #hdulist = fits.HDUList([hdu])
-            #hdu.writeto("junk_mask.fits", clobber=True)
+            hdu = fits.PrimaryHDU(sci)
+            hdulist = fits.HDUList([hdu])
+            hdu.writeto("junk_mask.fits", clobber=True)
             ## END TEST
 
             ###########################################

@@ -74,12 +74,25 @@ class PSFPCACubeMaker:
         # make the right mask (1=good; 0=masked)
         # (to make a circular mask, I made frames from stray code in phasecam_pupil_simulator.ipynb)
         '''
+        Available masks:
+        mask_406x406_rad080.fits
+        mask_100x100_rad011.fits
+        mask_100x100_rad021.fits
+        mask_100x100_rad028.fits
+        mask_100x100_ring_11_to_21.fits
+        mask_100x100_ring_21_to_28.fits
+        mask_100x100_rad_gtr_28.fits
+        '''
+        '''
         mask_weird, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
                                         "mask_406x406_rad080.fits", 0, header=True)
         '''
+        mask_weird, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                                        "mask_100x100_rad011.fits", 0, header=True)
+
         #import ipdb; ipdb.set_trace()
         #mask_weird = make_first_pass_mask(quad_choice)
-        mask_weird = np.ones(shape_img) # no mask
+        #mask_weird = np.ones(shape_img) # no mask
 
         # initialize slice counter for removing unused slices later
         slice_counter = 0

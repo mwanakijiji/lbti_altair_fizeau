@@ -666,6 +666,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     frame_array = frame_array_0_A,
+                                                    classical_ADI = True,
                                                     write = True)
 
     removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()

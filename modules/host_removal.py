@@ -270,11 +270,11 @@ class HostRemovalCube:
                     print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")
                     continue
 
-			    # subtract the PCA-reconstructed host star
-			    image_host_removed = np.subtract(sci,fit_host_star["recon_2d"])
+                # subtract the PCA-reconstructed host star
+                image_host_removed = np.subtract(sci,fit_host_star["recon_2d"])
 
-			    ## TEST
-			    if np.mod(slice_num,100) == 0:
+                ## TEST
+                if np.mod(slice_num,100) == 0:
                     plt.plot(fit_host_star["pca_vector"])
                     plt.show()
                     plt.savefig("junk_pca_spec_"+str(slice_num)+".pdf")

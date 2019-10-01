@@ -199,7 +199,7 @@ class HostRemovalCube:
 
         # if this is classical ADI, just subtract a median and skip the PCA part
         if self.classical_ADI:
-            host_subt_cube = np.subtract(self.cube_frames, median_frame)
+            host_subt_cube = np.subtract(self.cube_frames, median_frame) #
 
 		# or else do PCA
         else:

@@ -204,114 +204,114 @@ class HostRemovalCube:
 		# or else do PCA
         else:
 
-			# remove the host star from each slice
-			for slice_num in range(0,len(self.cube_frames)):
+		    # remove the host star from each slice
+		    for slice_num in range(0,len(self.cube_frames)):
 
-				print("Removing host star from relative slice " + str(slice_num) +
+			    print("Removing host star from relative slice " + str(slice_num) +
 					  " of " +str(len(self.cube_frames)))
 
-				# select the slice from the cube
-				# (there should be no masking of this frame downstream)
-				sci = self.cube_frames[slice_num,:,:]
+			    # select the slice from the cube
+			    # (there should be no masking of this frame downstream)
+			    sci = self.cube_frames[slice_num,:,:]
 
-				# define the mask of this science frame
-				# 1= good; np.nan= masked
-				## ## fine-tune this step later!
-				mask_weird = np.ones(np.shape(sci)) # initialize
-				no_mask = np.copy(mask_weird) # a non-mask for reconstructing saturated PSFs
+			    # define the mask of this science frame
+			    # 1= good; np.nan= masked
+			    ## ## fine-tune this step later!
+			    mask_weird = np.ones(np.shape(sci)) # initialize
+			    no_mask = np.copy(mask_weird) # a non-mask for reconstructing saturated PSFs
 
-				# can read in predefined masks which have 1= good; 0= to mask
-				'''
-				Available masks:
-				mask_406x406_rad080.fits
-				mask_100x100_rad011.fits
-				mask_100x100_rad021.fits
-				mask_100x100_rad028.fits
-				mask_100x100_ring_11_to_21.fits
-				mask_100x100_ring_21_to_28.fits
-				mask_100x100_rad_gtr_28.fits
-				'''
+			    # can read in predefined masks which have 1= good; 0= to mask
+			    '''
+			    Available masks:
+			    mask_406x406_rad080.fits
+			    mask_100x100_rad011.fits
+			    mask_100x100_rad021.fits
+			    mask_100x100_rad028.fits
+			    mask_100x100_ring_11_to_21.fits
+			    mask_100x100_ring_21_to_28.fits
+			    mask_100x100_rad_gtr_28.fits
+			    '''
 
-				mask_weird_predefined, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+			    mask_weird_predefined, header = fits.getdata(self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
 											"mask_100x100_rad_gtr_28.fits", 0, header=True)
-				mask_weird[mask_weird_predefined == 0] = np.nan
-				# end predefined mask section
+			    mask_weird[mask_weird_predefined == 0] = np.nan
+			    # end predefined mask section
 
-				# mask based on saturation level
-				#mask_weird[sci > 1e8] = np.nan # mask saturating region
+			    # mask based on saturation level
+			    #mask_weird[sci > 1e8] = np.nan # mask saturating region
 
-				## TEST: WRITE OUT
-				hdu = fits.PrimaryHDU(mask_weird)
-				hdulist = fits.HDUList([hdu])
-				hdu.writeto("junk_mask.fits", clobber=True)
-				## END TEST
+			    ## TEST: WRITE OUT
+			    hdu = fits.PrimaryHDU(mask_weird)
+			    hdulist = fits.HDUList([hdu])
+			    hdu.writeto("junk_mask.fits", clobber=True)
+			    ## END TEST
 
-				###########################################
-				# PCA-decompose the host star PSF
-				# (note no de-rotation of the image here)
+			    ###########################################
+			    # PCA-decompose the host star PSF
+			    # (note no de-rotation of the image here)
 
-				# do the PCA fit of masked host star
-				# returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
-				# N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
+			    # do the PCA fit of masked host star
+			    # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
+			    # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
 
-				try:
-					# fit to the host star for subtraction
-					## TEST HERE
-					'''
-					if slice_num == 100:
-						sci = np.ones(np.shape(sci))
-					if slice_num == 200:
-						sci = np.flip(sci,axis=0)
-					'''
-					## END TEST, 
-					fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star, sciImg=sci, mask_weird=mask_weird, n_PCA=100)
-				except:
-					print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")
-					continue
+			    try:
+				    # fit to the host star for subtraction
+				    ## TEST HERE
+				    '''
+				    if slice_num == 100:
+					    sci = np.ones(np.shape(sci))
+				    if slice_num == 200:
+					    sci = np.flip(sci,axis=0)
+				    '''
+				    ## END TEST, 
+				    fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star, sciImg=sci, mask_weird=mask_weird, n_PCA=100)
+			    except:
+				    print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")
+				    continue
 
-				# subtract the PCA-reconstructed host star
-				image_host_removed = np.subtract(sci,fit_host_star["recon_2d"])
+			    # subtract the PCA-reconstructed host star
+			    image_host_removed = np.subtract(sci,fit_host_star["recon_2d"])
 
-				## TEST
-				if np.mod(slice_num,100) == 0:
-					plt.plot(fit_host_star["pca_vector"])
-					plt.show()
-					plt.savefig("junk_pca_spec_"+str(slice_num)+".pdf")
-					fits.writeto(filename = "junk_host_removed_"+str(slice_num)+".fits",
+			    ## TEST
+			    if np.mod(slice_num,100) == 0:
+				    plt.plot(fit_host_star["pca_vector"])
+				    plt.show()
+				    plt.savefig("junk_pca_spec_"+str(slice_num)+".pdf")
+				    fits.writeto(filename = "junk_host_removed_"+str(slice_num)+".fits",
 								 data = image_host_removed,
 								 overwrite = True)
-					fits.writeto(filename = "junk_sci_"+str(slice_num)+".fits",
+				    fits.writeto(filename = "junk_sci_"+str(slice_num)+".fits",
 								 data = sci,
 								 overwrite = True)
-					fits.writeto(filename = "junk_recon_fit_"+str(slice_num)+".fits",
+				    fits.writeto(filename = "junk_recon_fit_"+str(slice_num)+".fits",
 								 data = fit_host_star["recon_2d"],
 								 overwrite = True)
-					print("WROTE TEST FILES")
-				## END TEST
+				    print("WROTE TEST FILES")
+			    ## END TEST
 
-				# pickle the PCA vector
-				'''
-				pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,
+			    # pickle the PCA vector
+			    '''
+			    pickle_stuff = {"pca_cube_file_name": self.abs_PCA_name,
 							"pca_vector": fit_unsat["pca_vector"],
 							"recons_2d_psf_unsat": fit_unsat["recon_2d"],
 							"sci_image_name": abs_sci_name}
-				print(pickle_stuff)
-				pca_fit_pickle_write_name = str(self.config_data["data_dirs"]["DIR_PICKLE"]) \
+			    print(pickle_stuff)
+			    pca_fit_pickle_write_name = str(self.config_data["data_dirs"]["DIR_PICKLE"]) \
 				  + "pickle_pca_sat_psf_info_" + str(os.path.basename(abs_sci_name).split(".")[0]) + ".pkl"
-				print(pca_fit_pickle_write_name)
-				with open(pca_fit_pickle_write_name, "wb") as f:
+			    print(pca_fit_pickle_write_name)
+			    with open(pca_fit_pickle_write_name, "wb") as f:
 					pickle.dump(pickle_stuff, f)
 
-				# add info to the header indicating last reduction step, and PCA info
-				header_sci["RED_STEP"] = "host_removed"
+			    # add info to the header indicating last reduction step, and PCA info
+			    header_sci["RED_STEP"] = "host_removed"
 
-				# write FITS file out, with fake planet params in file name
-				## ## do I actually want to write out a separate FITS file for each fake planet?
-				abs_image_host_removed_name = str(self.outdir + os.path.basename(abs_sci_name))
-				'''
+			    # write FITS file out, with fake planet params in file name
+			    ## ## do I actually want to write out a separate FITS file for each fake planet?
+			    abs_image_host_removed_name = str(self.outdir + os.path.basename(abs_sci_name))
+			    '''
 
-				host_subt_cube[slice_num,:,:] = image_host_removed
-				recon_frames_cube[slice_num,:,:] = fit_host_star["recon_2d"]
+			    host_subt_cube[slice_num,:,:] = image_host_removed
+			    recon_frames_cube[slice_num,:,:] = fit_host_star["recon_2d"]
 
         # if writing to disk for checking
         if self.write:

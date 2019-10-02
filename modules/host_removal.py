@@ -201,6 +201,11 @@ class HostRemovalCube:
         if self.classical_ADI:
             host_subt_cube = np.subtract(self.cube_frames, median_frame)
 
+            # just fyi
+            fits.writeto(filename = "junk_median_frame.fits",
+                         data = median_frame,
+                         overwrite = True)
+
         # or else do PCA
         else:
 

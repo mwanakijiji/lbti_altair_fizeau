@@ -24,6 +24,7 @@ class HostRemoval:
                  n_PCA,
                  outdir,
                  abs_PCA_name,
+                 abs_PCA_training_median,
                  config_data = config):
         '''
         INPUTS:
@@ -33,6 +34,9 @@ class HostRemoval:
                        contain fake planet PSFs, and I want to keep them separate)
         abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
+        abs_PCA_training_median: the median of the PCA cube training set, which was
+                       subtracted before the PCA basis was made; this frame will also
+                       be subtracted from the science frame
         config_data: configuration data, as usual
         '''
 
@@ -65,6 +69,10 @@ class HostRemoval:
         # read in the cutout science frame
         # (there should be no masking of this frame downstream)
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
+
+        # subtract the median of the PCA training set
+        median_frame_file_name = 
+        sci = np
 
         # define the mask of this science frame
         ## ## fine-tune this step later!
@@ -133,7 +141,7 @@ class HostRemovalCube:
                  abs_fake_planet_PCA_name,
                  frame_array,
                  config_data = config,
-                 classical_ADI = False,
+                 subtract_median_PCA_training_frame = True,
                  write = False):
         '''
         INPUTS:
@@ -151,10 +159,16 @@ class HostRemovalCube:
                        to make a fake planet (i.e., without saturation effects)
         frame_num_array: array of integers corresponding to the frame file name numbers
         config_data: configuration data, as usual
+        subtract_median_PCA_training_frame: subtract from the science frames the median frame of
+            the raw PCA training set which went into the generation of the PCA basis set (because
+            just before that PCA basis set was generated, the median was subtracted from that
+            training set)
+        write: flag as to whether data product should be written to disk (for checking)
+
+        (REMOVED:)
         classical_ADI: this just subtracts a median of the whole cube from each slice,
             as opposed to doing a subtraction individualized to each slice; note that True
             also means that the PCA cubes that are read in are ignored (default False)
-        write: flag as to whether data product should be written to disk (for checking)
         '''
 
         self.fake_params = fake_params
@@ -166,7 +180,7 @@ class HostRemovalCube:
         self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
         self.frame_num_array = frame_array
         self.config_data = config_data
-        self.classical_ADI = classical_ADI
+        self.subtract_median_PCA_training_frame = subtract_median_PCA_training_frame
         self.write = write
 
         # read in the PCA vector cube for this series of frames
@@ -197,8 +211,8 @@ class HostRemovalCube:
         # make a median (this is used in the event that the classical_ADI flag is True
         median_frame = np.median(self.cube_frames, axis = 0)
 
-        # if this is classical ADI, just subtract a median and skip the PCA part
-        if self.classical_ADI:
+        # subtract the median PCA training set frame before decomposition
+        if self.subtract_median_PCA_training_frame:
             host_subt_cube = np.subtract(self.cube_frames, median_frame)
 
             # just fyi
@@ -411,10 +425,11 @@ def main():
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
     synthetic_data_host_removal_no_fake_planets = HostRemoval(n_PCA = 100,
-                                            outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
-                                            abs_PCA_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                            + "pca_cubes_psfs/" \
-                                            + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits")
+                                                              outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"], \
+                                                              abs_PCA_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] + \
+                                                                                 "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits"),
+                                                              abs_PCA_training_median = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] + \
+                                                                          'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100.fits'))
 
     '''
     host_removal_fake_planets = HostRemoval(n_PCA = 100,
@@ -450,9 +465,9 @@ def main():
     
     # remove the host from the frames WITH fake planets
     #host_removal_fake_planets(fake_planet_frames_07_name_array[0])
+    '''
     pool.map(host_removal_fake_planets, fake_planet_frames_07_name_array)
 
-    '''
     # remove the host from the frames WITHOUT fake planets
     ## ## host_removal_no_fake_planets(cookies_centered_06_directory[0])
     pool.map(host_removal_no_fake_planets_A, sci_frames_for_cube_A)

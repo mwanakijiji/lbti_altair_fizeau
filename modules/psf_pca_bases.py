@@ -30,7 +30,8 @@ class PSFPCACubeMaker:
     def __init__(self,
                  file_list,
                  n_PCA,
-                 config_data = config):
+                 config_data = config,
+                 subtract_median = True):
         '''
         INPUTS:
         file_list: list of ALL filenames in the directory
@@ -38,11 +39,14 @@ class PSFPCACubeMaker:
         -> (does NOT include possible separate components representing
         -> individual channel variations)
         config_data: configuration data, as usual
+        subtract_median = True: the median frame will be subtracted from the
+            cube before generating the basis set
         '''
 
         self.file_list = file_list
         self.n_PCA = n_PCA
         self.config_data = config_data
+        self.subtract_median = subtract_median
 
 
     def __call__(self,
@@ -171,7 +175,20 @@ class PSFPCACubeMaker:
               "\n with shape" +
               str(np.shape(training_cube_masked_weird)))
 
-        # generate the PCA cube from the PSF data
+        ## generate the PCA cube from the PSF data
+        # first, generate and save the PCA offset frame (should be the median frame of the whole cube)
+        median_frame = np.median(training_cube_masked_weird, axis = 0)
+        median_frame_file_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                'median_frame_seqStart_' + str("{:0>6d}".format(start_frame_num)) +
+                                '_seqStop_' + str("{:0>6d}".format(stop_frame_num)) + '_pcaNum_'
+                                + str("{:0>4d}".format(self.n_PCA)) + '.fits')
+        print("Writing median frame of PCA training cube out to \n" + median_frame_file_name)
+        fits.writeto(filename=median_frame_file_name,
+                     data=median_frame,
+                     header=None,
+                     overwrite=True)
+        
+            training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.median(training_cube_masked_weird, axis = 0))
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
 
         # write out the PCA vector cube
@@ -257,7 +274,8 @@ def main():
     # generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
     pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
-                                    n_PCA = 100) # create instance
+                                    n_PCA = 100,
+                                    subtract_median = True) # create instance
     # cube A
     '''
     pca_psf_maker(start_frame_num = 4259,

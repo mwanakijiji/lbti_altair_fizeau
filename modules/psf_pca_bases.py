@@ -187,8 +187,11 @@ class PSFPCACubeMaker:
                      data=median_frame,
                      header=None,
                      overwrite=True)
-        
-            training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.median(training_cube_masked_weird, axis = 0))
+
+        # subtract the median from the training set
+        training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.median(training_cube_masked_weird, axis = 0))
+
+        # do the PCA decomposition
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
 
         # write out the PCA vector cube

@@ -213,11 +213,11 @@ class HostRemovalCube:
 
         # subtract the same median which was subtracted from the PCA training set
         if self.subtract_median_PCA_training_frame:
-            ## CONTINUE WORK HERE
+            print('yada')
 
         # subtract the median PCA training set frame before decomposition
         if False:
-            ## vestigial
+            print('yada') # this is vestigial
 
         # or else do PCA
         else:

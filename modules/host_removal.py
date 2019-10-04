@@ -24,7 +24,7 @@ class HostRemoval:
                  n_PCA,
                  outdir,
                  abs_PCA_name,
-                 abs_PCA_training_median,
+                 abs_PCA_training_median_name,
                  config_data = config):
         '''
         INPUTS:
@@ -34,8 +34,8 @@ class HostRemoval:
                        contain fake planet PSFs, and I want to keep them separate)
         abs_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        for making a fake planet (i.e., without saturation effects)
-        abs_PCA_training_median: the median of the PCA cube training set, which was
-                       subtracted before the PCA basis was made; this frame will also
+        abs_PCA_training_median_name: absolute file name of the median of the PCA cube training set,
+                       which was subtracted before the PCA basis was made; this frame will also
                        be subtracted from the science frame
         config_data: configuration data, as usual
         '''
@@ -43,10 +43,11 @@ class HostRemoval:
         self.n_PCA = n_PCA
         self.outdir = outdir
         self.abs_PCA_name = abs_PCA_name
+        self.abs_PCA_training_median_name = abs_PCA_training_median_name
         self.config_data = config_data
 
         # read in the median of the PCA training cube before this median was subtracted from that cube and the cube was decomposed
-        self.abs_PCA_training_median, self.header_abs_PCA_training_median = fits.getdata(self.abs_PCA_training_median, 0, header=True)
+        self.abs_PCA_training_median, self.header_abs_PCA_training_median = fits.getdata(self.abs_PCA_training_median_name, 0, header=True)
         
         # read in the PCA vector cube for this series of frames
         # (note the PCA needs to correspond to saturated PSFs, since I am subtracting

@@ -160,7 +160,7 @@ class PSFPCACubeMaker:
         ## END TEST
 
         # mask the raw training set
-        training_cube_masked_weird = np.nanmultiply(training_cube, mask_weird)
+        training_cube_masked_weird = np.multiply(training_cube, mask_weird)
 
         # subtract the median from the training set
         training_cube_masked_weird = np.nansubtract(training_cube_masked_weird,np.nanmedian(training_cube_masked_weird, axis = 0))

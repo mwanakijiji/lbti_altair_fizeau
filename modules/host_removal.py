@@ -339,7 +339,7 @@ class HostRemovalCube:
             file_name_to_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_to_pca_recon_" + \
               str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
               "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
-            fits.writeto(filename = file_name_recon,
+            fits.writeto(filename = file_name_to_recon,
                          data = self.cube_frames,
                          overwrite = True)
             print("Wrote cube which will be PCA-reconstructed as " + file_name_to_recon)

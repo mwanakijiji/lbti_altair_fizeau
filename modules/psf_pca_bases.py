@@ -161,6 +161,10 @@ class PSFPCACubeMaker:
 
         # mask the raw training set
         training_cube_masked_weird = np.multiply(training_cube, mask_weird)
+
+        # subtract the median from the training set
+        training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.median(training_cube_masked_weird, axis = 0))
+        
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +
                                 '_seqStart_'+str("{:0>6d}".format(start_frame_num)) +
@@ -187,9 +191,6 @@ class PSFPCACubeMaker:
                      data=median_frame,
                      header=None,
                      overwrite=True)
-
-        # subtract the median from the training set
-        training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.median(training_cube_masked_weird, axis = 0))
 
         # do the PCA decomposition
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)

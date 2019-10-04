@@ -75,7 +75,7 @@ class HostRemoval:
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
         # subtract the median of the PCA training set
-        sci = np.subtract(sci,self.abs_PCA_training_median)
+        sci = np.subtract(sci, self.abs_PCA_training_median)
 
         # define the mask of this science frame
         ## ## fine-tune this step later!
@@ -211,17 +211,13 @@ class HostRemovalCube:
         # make a cube for storing images of the reconstructed PSFs, for checking
         recon_frames_cube = np.copy(host_subt_cube)
 
-        # make a median (this is used in the event that the classical_ADI flag is True
-        median_frame = np.median(self.cube_frames, axis = 0)
+        # subtract the same median which was subtracted from the PCA training set
+        if self.subtract_median_PCA_training_frame:
+            ## CONTINUE WORK HERE
 
         # subtract the median PCA training set frame before decomposition
-        if self.subtract_median_PCA_training_frame:
-            host_subt_cube = np.subtract(self.cube_frames, median_frame)
-
-            # just fyi
-            fits.writeto(filename = "junk_median_frame.fits",
-                         data = median_frame,
-                         overwrite = True)
+        if False:
+            ## vestigial
 
         # or else do PCA
         else:

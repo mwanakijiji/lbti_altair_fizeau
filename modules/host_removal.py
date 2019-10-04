@@ -174,6 +174,11 @@ class HostRemovalCube:
             also means that the PCA cubes that are read in are ignored (default False)
         '''
 
+        ## TEST HERE
+        cube_frames[100,:,:] = np.ones(np.shape(cube_frames[0,:,:]))
+        cube_frames[200,:,:] = np.flip(cube_frames[200,:,:],axis=0)
+        ## END TEST,
+        
         self.fake_params = fake_params
         self.cube_frames = cube_frames
         self.n_PCA = n_PCA
@@ -274,12 +279,6 @@ class HostRemovalCube:
 
                 try:
                     # fit to the host star for subtraction
-                    ## TEST HERE
-                    if slice_num == 100:
-                        sci = np.ones(np.shape(sci))
-                    if slice_num == 200:
-                        sci = np.flip(sci,axis=0)
-                    ## END TEST,
                     fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star, sciImg=sci, mask_weird=mask_weird, n_PCA=100)
 
                 except:

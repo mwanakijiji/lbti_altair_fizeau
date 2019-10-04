@@ -174,10 +174,10 @@ class HostRemovalCube:
             also means that the PCA cubes that are read in are ignored (default False)
         '''
 
-        ## TEST HERE
-        cube_frames[100,:,:] = np.ones(np.shape(cube_frames[0,:,:]))
-        cube_frames[200,:,:] = np.flip(cube_frames[200,:,:],axis=0)
-        ## END TEST,
+        ## TEST HERE, to see if frames are really being individually decomposed
+        # cube_frames[100,:,:] = np.ones(np.shape(cube_frames[0,:,:]))
+        # cube_frames[200,:,:] = np.flip(cube_frames[200,:,:],axis=0)
+        ## END TEST
         
         self.fake_params = fake_params
         self.cube_frames = cube_frames

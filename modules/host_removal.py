@@ -75,8 +75,7 @@ class HostRemoval:
         sci, header_sci = fits.getdata(abs_sci_name, 0, header=True)
 
         # subtract the median of the PCA training set
-        median_frame_file_name = 
-        sci = np
+        sci = np.subtract(sci,self.abs_PCA_training_median)
 
         # define the mask of this science frame
         ## ## fine-tune this step later!

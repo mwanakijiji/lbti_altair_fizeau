@@ -656,9 +656,15 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     #print(cookies_centered_06_name_array)
     #ipdb.set_trace()
     ## END TEST
+
+    # subtract the PCA training cube median (which was subtracted from that cube before the PCA basis set was made)
+    pca_pre_decomposition_median_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] + \
+                                            'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100.fits')
+    median_frame, header_median_frame = fits.getdata(pca_pre_decomposition_median_name, 0, header=True)
+    cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
     
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
-                                                    cube_frames = cube_pre_removal_A,
+                                                    cube_frames = cube_pre_removal_A_post_pca_median_removal,
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     abs_host_star_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \

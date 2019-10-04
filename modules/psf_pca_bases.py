@@ -163,7 +163,7 @@ class PSFPCACubeMaker:
         training_cube_masked_weird = np.multiply(training_cube, mask_weird)
 
         # subtract the median from the training set
-        training_cube_masked_weird = np.nansubtract(training_cube_masked_weird,np.nanmedian(training_cube_masked_weird, axis = 0))
+        training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.nanmedian(training_cube_masked_weird, axis = 0))
         
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +

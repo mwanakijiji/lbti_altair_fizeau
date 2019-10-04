@@ -160,10 +160,10 @@ class PSFPCACubeMaker:
         ## END TEST
 
         # mask the raw training set
-        training_cube_masked_weird = np.multiply(training_cube, mask_weird)
+        training_cube_masked_weird = np.nanmultiply(training_cube, mask_weird)
 
         # subtract the median from the training set
-        training_cube_masked_weird = np.subtract(training_cube_masked_weird,np.median(training_cube_masked_weird, axis = 0))
+        training_cube_masked_weird = np.nansubtract(training_cube_masked_weird,np.nanmedian(training_cube_masked_weird, axis = 0))
         
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +
@@ -187,10 +187,10 @@ class PSFPCACubeMaker:
                                 '_seqStop_' + str("{:0>6d}".format(stop_frame_num)) + '_pcaNum_'
                                 + str("{:0>4d}".format(self.n_PCA)) + '.fits')
         print("Writing median frame of PCA training cube out to \n" + median_frame_file_name)
-        fits.writeto(filename=median_frame_file_name,
-                     data=median_frame,
-                     header=None,
-                     overwrite=True)
+        fits.writeto(filename = median_frame_file_name,
+                     data = median_frame,
+                     header = None,
+                     overwrite = True)
 
         # do the PCA decomposition
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
@@ -201,10 +201,10 @@ class PSFPCACubeMaker:
                                 '_seqStart_'+str("{:0>6d}".format(start_frame_num))+
                                 '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'_pcaNum_'
                                 +str("{:0>4d}".format(self.n_PCA))+'.fits')
-        fits.writeto(filename=abs_pca_cube_name,
-                     data=pca_comp_cube,
-                     header=None,
-                     overwrite=True)
+        fits.writeto(filename = abs_pca_cube_name,
+                     data = pca_comp_cube,
+                     header = None,
+                     overwrite = True)
         print("Wrote out PSF PCA vector cube as \n" +
               abs_pca_cube_name +
               "\n with shape" +

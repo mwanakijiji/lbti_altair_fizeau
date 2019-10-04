@@ -327,6 +327,9 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     # used to reconstruct the background
     recon_2d = np.dot(pca_cube[0:n_PCA,:,:].T, soln_vector[0]).T
 
-    d = {'pca_vector': soln_vector[0], 'recon_2d': recon_2d}
+    # also return the PCA components WITH masking of the PSF location
+    recon_2d_masked = np.multiply(recon_2d,mask_weird)
+
+    d = {'pca_vector': soln_vector[0], 'recon_2d': recon_2d, 'recon_2d_masked': recon_2d_masked}
 
     return d

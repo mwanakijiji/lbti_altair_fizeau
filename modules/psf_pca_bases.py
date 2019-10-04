@@ -181,7 +181,7 @@ class PSFPCACubeMaker:
 
         ## generate the PCA cube from the PSF data
         # first, generate and save the PCA offset frame (should be the median frame of the whole cube)
-        median_frame = np.median(training_cube_masked_weird, axis = 0)
+        median_frame = np.nanmedian(training_cube_masked_weird, axis = 0)
         median_frame_file_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                 'median_frame_seqStart_' + str("{:0>6d}".format(start_frame_num)) +
                                 '_seqStop_' + str("{:0>6d}".format(stop_frame_num)) + '_pcaNum_'

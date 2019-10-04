@@ -45,6 +45,9 @@ class HostRemoval:
         self.abs_PCA_name = abs_PCA_name
         self.config_data = config_data
 
+        # read in the median of the PCA training cube before this median was subtracted from that cube and the cube was decomposed
+        self.abs_PCA_training_median, self.header_abs_PCA_training_median = fits.getdata(self.abs_PCA_training_median, 0, header=True)
+        
         # read in the PCA vector cube for this series of frames
         # (note the PCA needs to correspond to saturated PSFs, since I am subtracting
         # saturated PSFs away)

@@ -151,7 +151,7 @@ class HostRemovalCube:
         fake_params: fake planet parameters (if applicable; this is just for making the
             file name string if we are writing out to disk; if not applicable, but
             in some other size-3 Pandas DataFrame of strings)
-        cube_frames: the cube of frames to use, before host-star subtraction
+        cube_frames: the cube of frames to host-subtract, before host-star subtraction
         n_PCA: number of principal components to use
         outdir: directory to deposit the host-subtracted images in (this has to be
                        defined at the function call because the images may or may not
@@ -334,6 +334,15 @@ class HostRemovalCube:
 
         # if writing to disk for checking
         if self.write:
+
+            # the cube of frames which are going to be PCA-reconstructed
+            file_name_to_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_to_pca_recon_" + \
+              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
+              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            fits.writeto(filename = file_name_recon,
+                         data = self.cube_frames,
+                         overwrite = True)
+            print("Wrote cube which will be PCA-reconstructed as " + file_name_to_recon)
 
             # the cube of PCA-reconstructed frames
             file_name_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "pca_recon_star_cube_" + \

@@ -126,7 +126,7 @@ class JustPutIntoCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote cube (without fake planets) to disk as " + file_name)
+            print("Wrote cube of science frames (without fake planets or any other modification) to disk as " + file_name)
         
         print("Array of PA")
         print(pa_array)
@@ -657,10 +657,13 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     #ipdb.set_trace()
     ## END TEST
 
-    # subtract the PCA training cube median (which was subtracted from that cube before the PCA basis set was made)
+    # subtract the PCA training cube median from the cube of science frames
+    # (this frame was subtracted from that cube before the PCA basis set was made)
+    ## ## weak point here: this median name is hard-coded
     pca_pre_decomposition_median_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] + \
                                             'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100.fits')
     median_frame, header_median_frame = fits.getdata(pca_pre_decomposition_median_name, 0, header=True)
+    print("Median frame being subtracted from the cube of science frames is \n" + pca_pre_decomposition_median_name)
     cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
     
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,

@@ -380,6 +380,16 @@ class HostRemovalCube:
                 # and put the host-star-subtracted image into the larger cube of all readouts
                 host_subt_cube_all_frames[slice_num,:,:] = final_host_subt_frame
 
+                ## TEST: WRITE OUT
+                hdu = fits.PrimaryHDU(final_PCA_recon_frame)
+                hdulist = fits.HDUList([hdu])
+                hdu.writeto("junk_final_PCA_recon_frame_"+str(slice_num)+".fits", clobber=True)
+
+                hdu = fits.PrimaryHDU(final_host_subt_frame)
+                hdulist = fits.HDUList([hdu])
+                hdu.writeto("junk_final_host_subt_frame_"+str(slice_num)+".fits", clobber=True)
+                ## END TEST
+
         # if writing to disk for checking
         if self.write:
 

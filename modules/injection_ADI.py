@@ -665,7 +665,12 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     median_frame, header_median_frame = fits.getdata(pca_pre_decomposition_median_name, 0, header=True)
     print("Median frame being subtracted from the cube of science frames is \n" + pca_pre_decomposition_median_name)
     cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
-    
+
+    '''
+    Masks for doing PCA in regions:
+    mask_100x100_4quad.fits
+    mask_10x10_100squares.fits
+    '''
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A_post_pca_median_removal,
                                                     n_PCA = 100,
@@ -675,7 +680,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     abs_region_mask_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                                          + "mask_100x100_4quad.fits",
+                                                          + "mask_10x10_100squares.fits",
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)

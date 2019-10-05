@@ -292,8 +292,9 @@ class HostRemovalCube:
 
                     ## combine the region mask with the weird pixel mask
 
-                    # add the masks, and take mod1 to make all non-nan values 1
-                    mask_for_region_and_weird_pixels = np.mod(np.add(this_region, mask_weird_pixels),1)
+                    # add the masks, and convert all non-nan values to 1
+                    mask_for_region_and_weird_pixels = np.add(this_region, mask_weird_pixels)
+                    mask_for_region_and_weird_pixels[np.isfinite(mask_for_region_and_weird_pixels)] = 1
 
                     ## TEST: WRITE OUT
                     hdu = fits.PrimaryHDU(mask_for_region_and_weird_pixels)

@@ -353,16 +353,15 @@ class HostRemovalCube:
                     '''
                     ## END TEST
 
-                    ## TEST: WRITE OUT
-                    if mask_slice_num == 3:
-                        hdu = fits.PrimaryHDU(cube_PCA_recon_regions_1_frame)
-                        hdulist = fits.HDUList([hdu])
-                        hdu.writeto("junk_cube_PCA_recon_regions_1_frame_"+str(mask_slice_num)+".fits", clobber=True)
+                ## TEST: WRITE OUT
+                hdu = fits.PrimaryHDU(cube_PCA_recon_regions_1_frame)
+                hdulist = fits.HDUList([hdu])
+                hdu.writeto("junk_cube_PCA_recon_regions_1_frame_"+str(slice_num)+".fits", clobber=True)
 
-                        hdu = fits.PrimaryHDU(cube_host_subt_regions_1_frame)
-                        hdulist = fits.HDUList([hdu])
-                        hdu.writeto("junk_cube_host_subt_regions_1_frame_"+str(mask_slice_num)+".fits", clobber=True)
-                    ## END TEST
+                hdu = fits.PrimaryHDU(cube_host_subt_regions_1_frame)
+                hdulist = fits.HDUList([hdu])
+                hdu.writeto("junk_cube_host_subt_regions_1_frame_"+str(slice_num)+".fits", clobber=True)
+                ## END TEST
 
                 # anything that is still zero in the recon regions cube, turn it to nan
                 cube_PCA_recon_regions_1_frame[cube_PCA_recon_regions_1_frame == 0] = np.nan

@@ -449,7 +449,7 @@ class HostRemovalCube:
         # return
         # host_subt_cube_all_frames: cube of non-derotated, host-star-subtracted frames
         # self.frame_num_array: array of the file name frame numbers (these are just passed without modification) 
-        return host_subt_cube, self.frame_num_array
+        return host_subt_cube_all_frames, self.frame_num_array
 
 
 def main():

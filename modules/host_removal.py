@@ -277,10 +277,6 @@ class HostRemovalCube:
                     # slice defining this region
                     this_region = self.abs_region_mask[mask_slice_num,:,:]
 
-                    print("this_region")
-                    print(np.shape(self.abs_region_mask))
-                    print(this_region)
-
                     # change value convention to fit the PCA decomposition
                     # 1= good; np.nan= masked
                     nan_mask = np.nan*np.ones(np.shape(this_region))
@@ -360,6 +356,7 @@ class HostRemovalCube:
 
                 ## TEST: WRITE OUT
                 # the raw regions
+                '''
                 hdu = fits.PrimaryHDU(cube_original_image_1_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_cube_original_image_1_frame_"+str(slice_num)+".fits", clobber=True)
@@ -373,6 +370,7 @@ class HostRemovalCube:
                 hdu = fits.PrimaryHDU(cube_host_subt_regions_1_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_cube_host_subt_regions_1_frame_"+str(slice_num)+".fits", clobber=True)
+                '''
                 ## END TEST
 
                 # anything that is still zero in the recon regions cube, turn it to nan
@@ -392,6 +390,7 @@ class HostRemovalCube:
                 host_subt_cube_all_frames[slice_num,:,:] = final_host_subt_frame
 
                 ## TEST: WRITE OUT
+                '''
                 hdu = fits.PrimaryHDU(final_PCA_recon_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_final_PCA_recon_frame_"+str(slice_num)+".fits", clobber=True)
@@ -399,6 +398,7 @@ class HostRemovalCube:
                 hdu = fits.PrimaryHDU(final_host_subt_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_final_host_subt_frame_"+str(slice_num)+".fits", clobber=True)
+                '''
                 ## END TEST
 
         # if writing to disk for checking

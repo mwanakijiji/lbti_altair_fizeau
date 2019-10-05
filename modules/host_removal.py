@@ -273,6 +273,7 @@ class HostRemovalCube:
                     this_region = self.abs_region_mask[mask_slice_num][:][:]
 
                     print("this_region")
+                    print(np.shape(self.abs_region_mask))
                     print(this_region)
 
                     # change value convention to fit the PCA decomposition

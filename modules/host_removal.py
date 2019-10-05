@@ -267,7 +267,7 @@ class HostRemovalCube:
 
                 # mask based on region for the PCA reconstruction;
                 # loop over each region
-                for mask_slice_num in range(len(self.abs_region_mask)):
+                for mask_slice_num in range(0,len(self.abs_region_mask)):
 
                     # slice defining this region
                     this_region = self.abs_region_mask[mask_slice_num,:,:]

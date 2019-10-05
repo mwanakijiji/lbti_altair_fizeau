@@ -243,6 +243,8 @@ class HostRemovalCube:
                 cube_PCA_recon_regions_1_frame = np.zeros(np.shape(self.abs_region_mask))
                 # ... and initialize cube to hold host-star subtracted regions
                 cube_host_subt_regions_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
+                # ... and also an FYI cube to hold regions of the original image
+                cube_original_image_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
 
                 print("Removing host star from relative slice " + str(slice_num) +
                       " of " + str(len(self.cube_frames)))
@@ -334,6 +336,9 @@ class HostRemovalCube:
                     # put the host-star-subtracted region its cube
                     cube_host_subt_regions_1_frame[mask_slice_num,:,:] = region_host_removed
 
+                    # put the region of the original image into its cube
+                    cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:]
+
                     ## TEST
                     '''
                     if np.mod(slice_num,100) == 0:
@@ -354,10 +359,17 @@ class HostRemovalCube:
                     ## END TEST
 
                 ## TEST: WRITE OUT
+                # the raw regions
+                hdu = fits.PrimaryHDU(cube_original_image_1_frame)
+                hdulist = fits.HDUList([hdu])
+                hdu.writeto("junk_cube_original_image_1_frame_"+str(slice_num)+".fits", clobber=True)
+
+                # reconstructed regions
                 hdu = fits.PrimaryHDU(cube_PCA_recon_regions_1_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_cube_PCA_recon_regions_1_frame_"+str(slice_num)+".fits", clobber=True)
 
+                # host star subtracted regions
                 hdu = fits.PrimaryHDU(cube_host_subt_regions_1_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_cube_host_subt_regions_1_frame_"+str(slice_num)+".fits", clobber=True)

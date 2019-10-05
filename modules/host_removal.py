@@ -269,6 +269,7 @@ class HostRemovalCube:
                 # loop over each region
                 for mask_slice_num in range(0,len(self.abs_region_mask)):
 
+                    import ipdb; ipdb.set_trace()
                     # slice defining this region
                     this_region = self.abs_region_mask[mask_slice_num][:][:]
 

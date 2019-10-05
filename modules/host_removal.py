@@ -284,7 +284,9 @@ class HostRemovalCube:
                     nan_mask = np.nan*np.ones(np.shape(this_region))
                     nan_mask[this_region != 0] = 1
                     this_region = this_region*nan_mask
-                    # at this point, this_region should have nans outside the region of interest
+                    # at this point, this_region should have
+                    # 1. 1s inside the region of interest, so as to define it
+                    # 2. nans outside the region of interest
                     
                     #this_region[this_region == 0] = np.nan
 
@@ -294,7 +296,11 @@ class HostRemovalCube:
                     ## TEST: WRITE OUT
                     hdu = fits.PrimaryHDU(mask_for_region_and_weird_pixels)
                     hdulist = fits.HDUList([hdu])
-                    hdu.writeto("junk_mask_"+str(mask_slice_num)+".fits", clobber=True)
+                    hdu.writeto("junk_mask_for_region_"+str(mask_slice_num)+".fits", clobber=True)
+
+                    hdu = fits.PrimaryHDU(this_region)
+                    hdulist = fits.HDUList([hdu])
+                    hdu.writeto("junk_this_region_"+str(mask_slice_num)+".fits", clobber=True)
                     ## END TEST
 
                     ###########################################

@@ -281,7 +281,10 @@ class HostRemovalCube:
 
                     # change value convention to fit the PCA decomposition
                     # 1= good; np.nan= masked
-                    this_region[this_region == 0] = np.nan
+                    nan_mask = np.nan*np.ones(np.shape(this_region))
+                    nan_mask[this_region != 0] = 1
+                    #this_region = this_region*
+                    #this_region[this_region == 0] = np.nan
 
                     # combine the region mask with the weird pixel mask
                     mask_for_region_and_weird_pixels = np.add(this_region,mask_weird_pixels)

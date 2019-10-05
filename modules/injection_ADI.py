@@ -674,7 +674,9 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
-                                                    frame_array = frame_array_0_A,
+                                                    abs_region_mask_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                                          + "mask_100x100_4quad.fits",
+                                                    frame_array = frame_array_0_A,abs_region_mask_name
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)
 

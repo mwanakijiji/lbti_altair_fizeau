@@ -191,7 +191,7 @@ class HostRemovalCube:
         #self.abs_PCA_name = abs_PCA_name
         self.abs_host_star_PCA_name = abs_host_star_PCA_name
         self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
-        self.abs_region_mask = abs_region_mask_name
+        self.abs_region_mask_name = abs_region_mask_name
         self.frame_num_array = frame_array
         self.config_data = config_data
         self.subtract_median_PCA_training_frame = subtract_median_PCA_training_frame
@@ -202,6 +202,9 @@ class HostRemovalCube:
         # saturated PSFs away)
         self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name, 0, header=True)
         self.pca_basis_cube_fake_planet, self.header_pca_basis_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name, 0, header=True)
+
+        # read in the mask
+        self.abs_region_mask, self.header_abs_region_mask = fits.getdata(self.abs_region_mask_name, 0, header=True)
 
         ##########
 
@@ -270,7 +273,7 @@ class HostRemovalCube:
                 for mask_slice_num in range(0,len(self.abs_region_mask)):
 
                     # slice defining this region
-                    this_region = self.abs_region_mask[mask_slice_num][:][:]
+                    this_region = self.abs_region_mask[mask_slice_num,:,:]
 
                     print("this_region")
                     print(np.shape(self.abs_region_mask))

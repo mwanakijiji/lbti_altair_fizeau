@@ -283,7 +283,9 @@ class HostRemovalCube:
                     # 1= good; np.nan= masked
                     nan_mask = np.nan*np.ones(np.shape(this_region))
                     nan_mask[this_region != 0] = 1
-                    #this_region = this_region*
+                    this_region = this_region*nan_mask
+                    # at this point, this_region should have nans outside the region of interest
+                    
                     #this_region[this_region == 0] = np.nan
 
                     # combine the region mask with the weird pixel mask

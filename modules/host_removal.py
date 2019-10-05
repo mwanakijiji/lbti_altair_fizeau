@@ -221,9 +221,9 @@ class HostRemovalCube:
         '''
 
         # make a cube that is the same shape as the input
-        host_subt_cube = np.nan*np.ones(np.shape(self.cube_frames))
+        host_subt_cube_all_frames = np.nan*np.ones(np.shape(self.cube_frames))
         # make a cube for storing images of the reconstructed PSFs, for checking
-        recon_frames_cube = np.copy(host_subt_cube)
+        recon_frames_cube_all_frames = np.copy(host_subt_cube_all_frames)
 
         # subtract the same median which was subtracted from the PCA training set
         if self.subtract_median_PCA_training_frame:
@@ -240,9 +240,9 @@ class HostRemovalCube:
             for slice_num in range(0,len(self.cube_frames)):
 
                 # initialize cube to hold reconstructed regions of each slice
-                cube_PCA_recon_regions = np.zeros(np.shape(self.abs_region_mask))
+                cube_PCA_recon_regions_1_frame = np.zeros(np.shape(self.abs_region_mask))
                 # ... and initialize cube to hold host-star subtracted regions
-                cube_host_subt_regions = np.copy(cube_PCA_recon_regions)
+                cube_host_subt_regions_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
 
                 print("Removing host star from relative slice " + str(slice_num) +
                       " of " + str(len(self.cube_frames)))
@@ -288,7 +288,6 @@ class HostRemovalCube:
                     # 1. 1s inside the region of interest, so as to define it
                     # 2. nans outside the region of interest
                     
-                    #this_region[this_region == 0] = np.nan
 
                     ## combine the region mask with the weird pixel mask
 
@@ -299,7 +298,7 @@ class HostRemovalCube:
                     ## TEST: WRITE OUT
                     hdu = fits.PrimaryHDU(mask_for_region_and_weird_pixels)
                     hdulist = fits.HDUList([hdu])
-                    hdu.writeto("junk_mask_for_region_"+str(mask_slice_num)+".fits", clobber=True)
+                    hdu.writeto("junk_mask_for_region_and_weird_pixels_"+str(mask_slice_num)+".fits", clobber=True)
 
                     hdu = fits.PrimaryHDU(this_region)
                     hdulist = fits.HDUList([hdu])
@@ -330,10 +329,10 @@ class HostRemovalCube:
                                                       fit_host_star["recon_2d_masked"])
 
                     # put the reconstructed region into the cube
-                    cube_recon_regions[mask_slice_num,:,:] = fit_host_star["recon_2d_masked"]
+                    cube_PCA_recon_regions_1_frame[mask_slice_num,:,:] = fit_host_star["recon_2d_masked"]
 
                     # put the host-star-subtracted region its cube
-                    cube_host_subt_regions[mask_slice_num,:,:] = region_host_removed
+                    cube_host_subt_regions_1_frame[mask_slice_num,:,:] = region_host_removed
 
                     ## TEST
                     '''
@@ -355,18 +354,20 @@ class HostRemovalCube:
                     ## END TEST
 
                 # anything that is still zero in the recon regions cube, turn it to nan
-                cube_PCA_recon_regions[cube_PCA_recon_regions == 0] = np.nan
+                cube_PCA_recon_regions_1_frame[cube_PCA_recon_regions_1_frame == 0] = np.nan
                 # take median of reconstructed frame
-                final_PCA_recon_frame = np.nanmedian(cube_PCA_recon_regions, axis=0)
+                # (this represents 1 science readout)
+                final_PCA_recon_frame = np.nanmedian(cube_PCA_recon_regions_1_frame, axis=0)
 
                 # combine the host-star subtracted regions into one frame
-                final_host_subt_frame = np.nanmedian(cube_host_subt_regions, axis=0)
+                # (again, this represents 1 science readout)
+                final_host_subt_frame = np.nanmedian(cube_host_subt_regions_1_frame, axis=0)
 
                 # put the reconstructed PSF into the larger cube of all PSFs
-                recon_frames_cube[slice_num,:,:] = final_PCA_recon_frame
+                recon_frames_cube_all_frames[slice_num,:,:] = final_PCA_recon_frame
                 
-                # and put the host-star-subtracted image into its cube
-                host_subt_cube[slice_num,:,:] = final_host_subt_frame
+                # and put the host-star-subtracted image into the larger cube of all readouts
+                host_subt_cube_all_frames[slice_num,:,:] = final_host_subt_frame
 
         # if writing to disk for checking
         if self.write:
@@ -389,7 +390,7 @@ class HostRemovalCube:
             hdr1["RADASEC"] = self.fake_params["rad_asec"]
             hdr1["AMPLIN"] = self.fake_params["ampl_linear_norm"]
             fits.writeto(filename = file_name_recon,
-                         data = recon_frames_cube,
+                         data = recon_frames_cube_all_frames,
                          header = hdr1,
                          overwrite = True)
             print("Wrote PCA-reconstructed star cube to disk as " + file_name_recon)
@@ -403,7 +404,7 @@ class HostRemovalCube:
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
             fits.writeto(filename = file_name,
-                         data = host_subt_cube,
+                         data = host_subt_cube_all_frames,
                          header = hdr,
                          overwrite = True)
             print("Wrote host-removed-cube to disk as " + file_name)
@@ -414,7 +415,7 @@ class HostRemovalCube:
         print("Returning cube of host-removed frames ")
 
         # return
-        # host_subt_cube: cube of non-derotated, host-star-subtracted frames
+        # host_subt_cube_all_frames: cube of non-derotated, host-star-subtracted frames
         # self.frame_num_array: array of the file name frame numbers (these are just passed without modification) 
         return host_subt_cube, self.frame_num_array
 

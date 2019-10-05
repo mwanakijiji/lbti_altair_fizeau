@@ -337,7 +337,7 @@ class HostRemovalCube:
                     cube_host_subt_regions_1_frame[mask_slice_num,:,:] = region_host_removed
 
                     # put the region of the original image into its cube
-                    cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:]
+                    cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
                     ## TEST
                     '''

@@ -270,7 +270,7 @@ class HostRemovalCube:
                 for mask_slice_num in range(len(self.abs_region_mask)):
 
                     # slice defining this region
-                    this_region = self.abs_region_mask_name[mask_slice_num,:,:]
+                    this_region = self.abs_region_mask[mask_slice_num,:,:]
 
                     # change value convention to fit the PCA decomposition
                     # 1= good; np.nan= masked

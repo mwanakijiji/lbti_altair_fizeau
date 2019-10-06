@@ -682,7 +682,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     abs_region_mask_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                                          + "mask_quad4_circ.fits",
+                                                          + "mask_quad4_circ_ring.fits",
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)

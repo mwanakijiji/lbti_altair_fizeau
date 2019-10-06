@@ -670,6 +670,8 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     Masks for doing PCA in regions:
     mask_100x100_4quad.fits
     mask_10x10_100squares.fits
+    mask_quad4_circ.fits
+    mask_quad4_circ_ring.fits
     '''
     remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A_post_pca_median_removal,
@@ -680,7 +682,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                     abs_fake_planet_PCA_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits",
                                                     abs_region_mask_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                                          + "mask_10x10_100squares.fits",
+                                                          + "mask_quad4_circ.fits",
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)

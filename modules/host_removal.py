@@ -294,6 +294,7 @@ class HostRemovalCube:
                     mask_for_region_and_weird_pixels[np.isfinite(mask_for_region_and_weird_pixels)] = 1
 
                     ## TEST: WRITE OUT
+                    '''
                     hdu = fits.PrimaryHDU(mask_for_region_and_weird_pixels)
                     hdulist = fits.HDUList([hdu])
                     hdu.writeto("junk_mask_for_region_and_weird_pixels_"+str(mask_slice_num)+".fits", clobber=True)
@@ -301,6 +302,7 @@ class HostRemovalCube:
                     hdu = fits.PrimaryHDU(this_region)
                     hdulist = fits.HDUList([hdu])
                     hdu.writeto("junk_this_region_"+str(mask_slice_num)+".fits", clobber=True)
+                    '''
                     ## END TEST
 
                     ###########################################
@@ -335,12 +337,18 @@ class HostRemovalCube:
                     # put the region of the original image into its cube
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
-                    ## TEST
+                    # accumulate-plot the PCA vectors
+                    plt.plot(fit_host_star["pca_vector"]) # this will be overplotted
+                    plt.xlabel("PCA mode")
+                    plt.ylabel("Amplitude")
+                    # if we're at the last region to plot the PCA vector of
+                    if mask_slice_num == len(self.abs_region_mask):
+                        plt.savefig(str(self.config_data["DIR_FYI_INFO"]) + "pca_spectrum_science_cube_frame_"+\n
+                                    str(slice_num).zfill(6)+"_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf")
+                        plt.clf()
+
+                    ## BEGIN TEST
                     '''
-                    if np.mod(slice_num,100) == 0:
-                        plt.plot(fit_host_star["pca_vector"])
-                        plt.show()
-                        plt.savefig("junk_pca_spec_"+str(slice_num)+".pdf")
                         fits.writeto(filename = "junk_host_removed_"+str(slice_num)+".fits",
 								 data = image_host_removed,
 								 overwrite = True)

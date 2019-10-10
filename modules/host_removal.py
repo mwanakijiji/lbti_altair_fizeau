@@ -343,7 +343,7 @@ class HostRemovalCube:
                     plt.ylabel("Amplitude")
                     # if we're at the last region to plot the PCA vector of
                     if mask_slice_num == len(self.abs_region_mask):
-                        plt.savefig(str(self.config_data["DIR_FYI_INFO"]) + "pca_spectrum_science_cube_frame_"+\n
+                        plt.savefig(str(self.config_data["DIR_FYI_INFO"]) + "pca_spectrum_science_cube_frame_\n" +
                                     str(slice_num).zfill(6)+"_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf")
                         plt.clf()
 

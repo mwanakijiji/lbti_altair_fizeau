@@ -6,6 +6,9 @@ import pickle
 import math
 import pandas as pd
 from astropy.io import fits
+from astropy.convolution import Gaussian2DKernel
+from astropy.convolution import convolve
+from scipy.signal import convolve as scipy_convolve
 from modules import *
 
 # import the PCA machinery for making backgrounds
@@ -261,16 +264,21 @@ class Detection:
         self.master_frame, self.header = fits.getdata(self.adi_frame_file_name, 0, header=True)
 
         # radius of aperture around planet candidate (pix)
-        self.comp_rad = 10
+        self.comp_rad = 0.5*fwhm_4um_lbt_airy_pix
 
         # csv file to save S/N data
         self.csv_record_file_name = csv_record_file_name
 
 
     def __call__(self,
+                 noise_option = "full_ring",
                  blind_search = True):
         '''
         INPUTS:
+        noise_option:
+            "full_ring"- calculate the noise using the rms of the whole smoothed annulus (minus companion location)
+            "necklace"- calculate the noise using the rms of the medians of patches within ring where
+                        companions could be
         blind_search flag: is this a real science frame, where we don't know where a planet is?
         #write: flag as to whether data product should be written to disk (for checking)
         '''
@@ -306,7 +314,7 @@ class Detection:
 
             print(injection_loc_dict)
             injection_loc = pd.DataFrame(injection_loc_dict)
-            injection_loc["angle_deg_EofN"] = injection_loc["angle_deg"] # this step a kludge due to some name changesangle_deg_EofN
+            injection_loc["angle_deg_EofN"] = injection_loc["angle_deg"] # this step a kludge due to some name changes
             loc_vec = polar_to_xy(pos_info = injection_loc, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
             print("Location vector of fake companion:")
             print(loc_vec)
@@ -323,17 +331,9 @@ class Detection:
         x_cen = 0.5*np.shape(self.master_frame)[0]-0.5
         y_cen = 0.5*np.shape(self.master_frame)[1]-0.5
 
-        ## ## BEGIN STAND-IN
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
-        kernel_scale = 5
-        smoothed_adi_frame = ndimage.filters.gaussian_filter(self.master_frame,
-                                                                 sigma = np.multiply(kernel_scale,[1,1]),
-                                                                 order = 0,
-                                                                 output = None,
-                                                                 mode = "reflect",
-                                                                 cval = 0.0,
-                                                                 truncate = 4.0)
-        ## ## END STAND-IN
+        kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
+        smoothed_adi_frame = convolve(self.master_frame, kernel)
 
         # calculate outer noise annulus radius
         print("comp loc vec")
@@ -362,13 +362,55 @@ class Detection:
         print(fake_psf_inner_edge_rad)
 
         # invert-mask the companion
+        # (i.e., 1s over the companion, NaNs everywhere else)
         comp_mask_inv = circ_mask(input_array = smoothed_adi_frame,
                       mask_center = [np.add(y_cen,companion_loc_vec["y_pix_coord"][pos_num]),
                                      np.add(x_cen,companion_loc_vec["x_pix_coord"][pos_num])],
                       mask_radius = self.comp_rad,
                       invert=True)
 
+        ### calculate the positions where other non-overlapping companions could fit within noise annulus
+        #companion_r = np.sqrt(np.power(np.subtract(y_cen,companion_loc_vec["y_pix_coord"][pos_num]),2.) +
+        #                      np.power(np.subtract(x_cen,companion_loc_vec["x_pix_coord"][pos_num]),2.))
+        #companion_theta =
+        # find circumference of circle (in pix) at the radius of the companion
+        r_pix = np.divide(injection_loc_dict["rad_asec"][0],np.float(self.config_data["instrum_params"]["LMIR_PS"]))
+        circ_length = 2*np.pi*r_pix
+        # whole number of companions that fit inside that circle, minus the companion itself
+        num_other_comps = np.floor(np.divide(circ_length,2*self.comp_rad) - 1)
+        # find angles of the other patches, going deg E of the companion
+        # angular offset between patches: theta = l/r
+        angle_offset = np.divide(2*self.comp_rad,r_pix)*np.divide(360.,2*np.pi)
+        other_angles = np.mod(injection_loc_dict["angle_deg"] + angle_offset*np.arange(1,num_other_comps+1), 360)
+        for patch_num in range(0,len(other_angles)):
+            # convert patch positions to x,y coordinates
+            patch_loc_dict = {"angle_deg_EofN": other_angles[patch_num],
+                                  "rad_asec": [self.header["RADASEC"]],
+                                  "ampl_linear_norm": [self.header["AMPLIN"]]}
+            patch_loc_vec = polar_to_xy(pos_info = patch_loc_dict, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
+            # make mask for each necklace patch
+            necklace_patch_mask = circ_mask(input_array = smoothed_adi_frame,
+                              mask_center = [np.add(y_cen,patch_loc_vec["y_pix_coord"][0]),
+                                             np.add(x_cen,patch_loc_vec["x_pix_coord"][0])],
+                                             mask_radius = self.comp_rad,
+                                             invert=False)
+            # BEGIN TEST
+            #plt.clf()
+            if patch_num == 0:
+                test_array = np.zeros(np.shape(necklace_patch_mask))
+            else:
+                #print(test_array)
+                #print(necklace_patch_mask)
+                test_array = np.add(test_array,necklace_patch_mask)
+        plt.imshow(test_array, origin="lower")
+        plt.colorbar()
+        plt.savefig("junk_" + str(patch_num) + ".png")
+        # END TEST
+
+        import ipdb; ipdb.set_trace()
+        
         # invert-mask the noise ring
+        # (i.e., 1s in the ring, NaNs everywhere else)
         noise_mask_outer_inv = circ_mask(input_array = smoothed_adi_frame,
                              mask_center = [y_cen,x_cen],
                              mask_radius = fake_psf_outer_edge_rad,
@@ -383,15 +425,27 @@ class Detection:
                       mask_radius = self.comp_rad,
                       invert=False)
 
+        # BEGIN TEST
+        #plt.clf()
+        plt.imshow(comp_mask, origin="lower")
+        plt.savefig("junk_comp_mask.png")
+        # END TEST
+
+        import ipdb; ipdb.set_trace()
+
+
         # mask involving the noise ring without the companion
         net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),
                                 comp_mask)
 
         # find S/N
-        noise_smoothed = np.multiply(smoothed_adi_frame,net_noise_mask)
+        noise_smoothed_full_annulus = np.multiply(smoothed_adi_frame,net_noise_mask)
         comp_ampl = np.multiply(smoothed_adi_frame,comp_mask_inv)
         signal = np.nanmax(comp_ampl)
-        noise = np.nanstd(noise_smoothed)
+        if (noise_option == "full_ring"):
+            noise = np.nanstd(noise_smoothed_full_annulus)
+        elif (noise_option == "necklace"):
+            noise = np.nanstd(noise_smoothed_necklace)
         s2n = np.divide(signal,noise)
 
         # append S/N info
@@ -424,7 +478,8 @@ class Detection:
         fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)
-        print("Wrote out S/N cube for " + os.path.basename(self.adi_frame_file_name))
+        print("Wrote out S/N check cube as \n" + str(config["data_dirs"]["DIR_S2N_CUBES"]) +
+              "sn_check_cube_" + os.path.basename(self.adi_frame_file_name))
 
 
 def main():
@@ -440,33 +495,45 @@ def main():
     ###########################################################
     ## ## IMAGES WITH FAKE PLANETS, TO DETERMINE SENSITIVITY
     
-    # make a list of the images WITH fake planets
+    # make a list of the images in the ADI directory
+    # N.b. fake planet parameters of all zero just indicate there is no fake planet
     hosts_removed_fake_psf_09a_directory = str(config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"])
 
     # find all combinations of available fake planet parameters using the file names
     hosts_removed_fake_psf_09a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_09a_directory,
                                                                         "*.fits"))) # list of all files
-    # list fake planet parameter patterns from adi_frame_xxxxx_xxxxx_xxxxx_lm_YYMMDD_NNNNNN.fits
+    # list fake planet parameter patterns from adi_frame_AAAAA_BBBBB_CCCCC_lm_YYMMDD_NNNNNN.fits, where
+    # AAAAA is azimuth angle in deg
+    # BBBBB is radius in asec
+    # CCCCC is contrast
+    # examples: adi_frame_270.0_1.3_0.001.fits, adi_frame_270.0_1.1_1e-05.fits
     print(hosts_removed_fake_psf_09a_name_array[0].split("adi_frame_"))
-    degen_param_list = [i.split("adi_frame_")[1].split(".fits")[0] for i in hosts_removed_fake_psf_09a_name_array] # list which may have repeats
+    # the below list may have repeats
+    degen_param_list = [i.split("adi_frame_")[1].split(".fits")[0] for i in hosts_removed_fake_psf_09a_name_array]
     param_list = list(frozenset(degen_param_list)) # remove repeats
 
-    # file which will record all S/N calculations, for each fake planet parameter
-    csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
+    # name of file which will record all S/N calculations, for each fake planet parameter
+    csv_file_name = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
 
     # check if csv file exists; I want to start with a new one
-    exists = os.path.isfile(csv_file)
+    exists = os.path.isfile(csv_file_name)
     if exists:
         input("A fake planet detection CSV file already exists! Hit [Enter] to delete it and continue.")
-        os.remove(csv_file)
+        os.remove(csv_file_name)
         
     # loop over all fake planet parameter combinations to retrieve ADI frames and look for signal
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints
+        ## ## this may be obsolete, since the values are now read in from the headers
         raw_angle = int(float(param_list[t].split("_")[0]))
         raw_radius = int(float(param_list[t].split("_")[1]))
         raw_contrast = int(float(param_list[t].split("_")[2]))
+        print(raw_angle)
+        print(raw_radius)
+        print(raw_contrast)
+        print(param_list[t].split("_")[1])
+        print("-----")
 
         # get physical values
         fake_angle_e_of_n_deg = np.divide(raw_angle,100.)
@@ -479,7 +546,7 @@ def main():
         # initialize and detect
         detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                            "adi_frame_"+fake_params_string+".fits",
-                                           csv_record_file_name = csv_file)
+                                           csv_record_file_name = csv_file_name)
         detection_blind_search(blind_search = False)
 
         '''

@@ -24,6 +24,10 @@ config.read("modules/config.ini")
 global asec_per_rad
 asec_per_rad = np.divide(3600.*180.,np.pi)
 
+# PSF constants
+lambda_over_D_pix = 9.46 # for Airy PSF, 4 um with LBT
+fwhm_4um_lbt_airy_pix = 1.028*lambda_over_D_pix # fwhm of a 4 um Airy PSF with the LBT
+
 
 ## FUNCTIONS
 

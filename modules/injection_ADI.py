@@ -638,7 +638,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
         inject_fake_psfs_A = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
                                           abs_host_star_PCA_name = cube_A_PCA_vector_name,
-                                          abs_fake_planet_PCA_name = cube_B_PCA_vector_name,
+                                          abs_fake_planet_PCA_name = cube_A_PCA_vector_name,
                                           write = False)
 
         # call fake planet injection
@@ -737,8 +737,8 @@ def main():
     fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
     '''
     fake_params_pre_permute = {"angle_deg_EofN": [270.],
-                               "rad_asec": [0.5, 1.5],
-                               "ampl_linear_norm": [1e-3, 1e-4, 1e-5]}
+                               "rad_asec": [0.5, 1.0, 1.5],
+                               "ampl_linear_norm": [1e-3]}
 
     # permutate values of fake planet parameters to get all possible combinations
     keys, values = zip(*fake_params_pre_permute.items())
@@ -763,12 +763,8 @@ def main():
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())
 
-
     ## BEGIN THIS LINE IS A TEST ONLY
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
-        
+
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
-
-
-

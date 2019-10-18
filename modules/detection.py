@@ -334,6 +334,7 @@ class Detection:
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
         smoothed_adi_frame = convolve(self.master_frame, kernel)
+        #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
 
         # calculate outer noise annulus radius
         print("comp loc vec")
@@ -381,7 +382,7 @@ class Detection:
         angle_offset = np.divide(2*self.comp_rad,r_pix)*np.divide(360.,2*np.pi)
         other_angles = np.mod(injection_loc_dict["angle_deg"] + angle_offset*np.arange(1,num_other_comps+1), 360)
         # initialize array to hold values from each patch
-        patch_median_array = np.nan*np.ones(len(other_angles))
+        patch_center_array = np.nan*np.ones(len(other_angles))
         patch_num = 0 # kludge for making sure we start at zero
         for patch_num in range(0,len(other_angles)):
             # convert patch positions to x,y coordinates
@@ -393,20 +394,21 @@ class Detection:
             necklace_patch_mask_inv = circ_mask(input_array = smoothed_adi_frame,
                               mask_center = [np.add(y_cen,patch_loc_vec["y_pix_coord"][0]),
                                              np.add(x_cen,patch_loc_vec["x_pix_coord"][0])],
-                                             mask_radius = self.comp_rad,
+                                             mask_radius = 0.75,
                                              invert=True)
             # determine the median value in the patch
             noise_smoothed_patch = np.multiply(smoothed_adi_frame,necklace_patch_mask_inv)
-            median_patch = np.nanmedian(noise_smoothed_patch)
+            center_of_patch = np.nanmedian(noise_smoothed_patch)
 
             # put into array
-            patch_median_array[patch_num] = median_patch
+            patch_center_array[patch_num] = center_of_patch
 
             # construct array to show necklace of patches
             if patch_num == 0:
                 # initialize
                 necklace_2d_array = np.zeros( np.shape(noise_smoothed_patch) )
             necklace_2d_array = np.nansum( np.dstack((necklace_2d_array,noise_smoothed_patch)),2 )
+
         # BEGIN TEST
         if (len(other_angles) > 1): # at small radii, there is not enough room for a necklace of patches
             print("patch num")
@@ -446,14 +448,23 @@ class Detection:
         net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),
                                 comp_mask)
 
+        # at small radii, there is not enough room for a necklace of patches, so just put a dummy blank in
+        if (len(other_angles) < 2):
+            necklace_2d_array = np.nan*np.ones(np.shape(smoothed_adi_frame))
+
+        # replace zeros in the necklace 2d array with NaNs
+        necklace_2d_array[necklace_2d_array == 0] = np.nan
+            
         # find S/N
         noise_smoothed_full_annulus = np.multiply(smoothed_adi_frame,net_noise_mask)
         comp_ampl = np.multiply(smoothed_adi_frame,comp_mask_inv)
         signal = np.nanmax(comp_ampl)
         if (noise_option == "full_ring"):
             noise = np.nanstd(noise_smoothed_full_annulus)
+            noise_frame = noise_smoothed_full_annulus
         elif (noise_option == "necklace"):
-            noise = np.nanmedian(patch_median_array)
+            noise = np.nanstd(patch_center_array)
+            noise_frame = necklace_2d_array
         s2n = np.divide(signal,noise)
 
         #import ipdb; ipdb.set_trace()
@@ -478,18 +489,13 @@ class Detection:
         print("---------------------")
         print("Appended data to csv ")
         print(str(self.csv_record_file_name))
-
-        # at small radii, there is not enough room for a necklace of patches, so just put a dummy blank in
-        if (len(other_angles) < 2):
-            necklace_2d_array = np.nan*np.ones(np.shape(smoothed_adi_frame))
             
         # write out frame as a check
         sn_check_cube = np.zeros((5,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
         sn_check_cube[0,:,:] = self.master_frame # the original ADI frame
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
-        sn_check_cube[2,:,:] = noise_smoothed_full_annulus # the noise ring (for full_ring mode)
-        sn_check_cube[3,:,:] = necklace_2d_array # the noise patches (for necklace mode); note this is blank if there is no room for necklace
-        sn_check_cube[4,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
+        sn_check_cube[2,:,:] = noise_frame # the noise ring (for full_ring mode); or the noise patches (for necklace mode),  note this is blank if there is no room for necklace
+        sn_check_cube[3,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
         fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)

@@ -169,7 +169,8 @@ class FakePlanetInjectorCube:
         '''
 
         self.n_PCA = n_PCA
-        self.abs_PCA_name = abs_PCA_name
+        self.abs_host_star_PCA_name = abs_host_star_PCA_name
+        self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
         self.config_data = config_data
         self.write = write
 

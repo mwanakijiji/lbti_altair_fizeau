@@ -369,19 +369,20 @@ class Detection:
                       mask_radius = self.comp_rad,
                       invert=True)
 
-        ### calculate the positions where other non-overlapping companions could fit within noise annulus
-        #companion_r = np.sqrt(np.power(np.subtract(y_cen,companion_loc_vec["y_pix_coord"][pos_num]),2.) +
-        #                      np.power(np.subtract(x_cen,companion_loc_vec["x_pix_coord"][pos_num]),2.))
-        #companion_theta =
+        ## one method of finding noise: get the medians of companion-sized patches in a necklace pattern
+        # first, calculate the positions where other non-overlapping companions could fit within noise annulus
         # find circumference of circle (in pix) at the radius of the companion
         r_pix = np.divide(injection_loc_dict["rad_asec"][0],np.float(self.config_data["instrum_params"]["LMIR_PS"]))
         circ_length = 2*np.pi*r_pix
         # whole number of companions that fit inside that circle, minus the companion itself
         num_other_comps = np.floor(np.divide(circ_length,2*self.comp_rad) - 1)
         # find angles of the other patches, going deg E of the companion
-        # angular offset between patches: theta = l/r
+        # angular offset between patches: theta_step = l_step/r
         angle_offset = np.divide(2*self.comp_rad,r_pix)*np.divide(360.,2*np.pi)
         other_angles = np.mod(injection_loc_dict["angle_deg"] + angle_offset*np.arange(1,num_other_comps+1), 360)
+        # initialize array to hold values from each patch
+        patch_median_array = np.nan*np.ones(len(other_angles))
+        patch_num = 0 # kludge for making sure we start at zero
         for patch_num in range(0,len(other_angles)):
             # convert patch positions to x,y coordinates
             patch_loc_dict = {"angle_deg_EofN": other_angles[patch_num],
@@ -389,27 +390,36 @@ class Detection:
                                   "ampl_linear_norm": [self.header["AMPLIN"]]}
             patch_loc_vec = polar_to_xy(pos_info = patch_loc_dict, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
             # make mask for each necklace patch
-            necklace_patch_mask = circ_mask(input_array = smoothed_adi_frame,
+            necklace_patch_mask_inv = circ_mask(input_array = smoothed_adi_frame,
                               mask_center = [np.add(y_cen,patch_loc_vec["y_pix_coord"][0]),
                                              np.add(x_cen,patch_loc_vec["x_pix_coord"][0])],
                                              mask_radius = self.comp_rad,
-                                             invert=False)
-            # BEGIN TEST
-            #plt.clf()
+                                             invert=True)
+            # determine the median value in the patch
+            noise_smoothed_patch = np.multiply(smoothed_adi_frame,necklace_patch_mask_inv)
+            median_patch = np.nanmedian(noise_smoothed_patch)
+
+            # put into array
+            patch_median_array[patch_num] = median_patch
+
+            # construct array to show necklace of patches
             if patch_num == 0:
-                test_array = np.zeros(np.shape(necklace_patch_mask))
-            else:
-                #print(test_array)
-                #print(necklace_patch_mask)
-                test_array = np.add(test_array,necklace_patch_mask)
-        plt.imshow(test_array, origin="lower")
-        plt.colorbar()
-        plt.savefig("junk_" + str(patch_num) + ".png")
+                # initialize
+                necklace_2d_array = np.zeros( np.shape(noise_smoothed_patch) )
+            necklace_2d_array = np.nansum( np.dstack((necklace_2d_array,noise_smoothed_patch)),2 )
+        # BEGIN TEST
+        if (len(other_angles) > 1): # at small radii, there is not enough room for a necklace of patches
+            print("patch num")
+            print(patch_num)
+            plt.imshow(necklace_2d_array, origin="lower")
+            plt.colorbar()
+            plt.savefig("junk_necklace.png")
         # END TEST
 
-        import ipdb; ipdb.set_trace()
-        
-        # invert-mask the noise ring
+        # at this point, the array of median values of necklaced patches has been made
+
+        ## another method of finding noise: take stdev of a smoothed ring at same radius of companion
+        # first, invert-mask the noise ring
         # (i.e., 1s in the ring, NaNs everywhere else)
         noise_mask_outer_inv = circ_mask(input_array = smoothed_adi_frame,
                              mask_center = [y_cen,x_cen],
@@ -426,13 +436,11 @@ class Detection:
                       invert=False)
 
         # BEGIN TEST
-        #plt.clf()
+        plt.clf()
         plt.imshow(comp_mask, origin="lower")
+        plt.colorbar()
         plt.savefig("junk_comp_mask.png")
         # END TEST
-
-        import ipdb; ipdb.set_trace()
-
 
         # mask involving the noise ring without the companion
         net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),
@@ -445,8 +453,10 @@ class Detection:
         if (noise_option == "full_ring"):
             noise = np.nanstd(noise_smoothed_full_annulus)
         elif (noise_option == "necklace"):
-            noise = np.nanstd(noise_smoothed_necklace)
+            noise = np.nanmedian(patch_median_array)
         s2n = np.divide(signal,noise)
+
+        #import ipdb; ipdb.set_trace()
 
         # append S/N info
         injection_loc_dict["signal"] = signal
@@ -467,14 +477,19 @@ class Detection:
         injection_loc_df.to_csv(self.csv_record_file_name, sep = ",", mode = "a", header = (not exists))
         print("---------------------")
         print("Appended data to csv ")
-        print(str(self.csv_record_file_name))  
+        print(str(self.csv_record_file_name))
 
+        # at small radii, there is not enough room for a necklace of patches, so just put a dummy blank in
+        if (len(other_angles) < 2):
+            necklace_2d_array = np.nan*np.ones(np.shape(smoothed_adi_frame))
+            
         # write out frame as a check
-        sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
+        sn_check_cube = np.zeros((5,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
         sn_check_cube[0,:,:] = self.master_frame # the original ADI frame
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
-        sn_check_cube[2,:,:] = noise_smoothed # the noise ring
-        sn_check_cube[3,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
+        sn_check_cube[2,:,:] = noise_smoothed_full_annulus # the noise ring (for full_ring mode)
+        sn_check_cube[3,:,:] = necklace_2d_array # the noise patches (for necklace mode); note this is blank if there is no room for necklace
+        sn_check_cube[4,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
         fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)
@@ -547,7 +562,7 @@ def main():
         detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                            "adi_frame_"+fake_params_string+".fits",
                                            csv_record_file_name = csv_file_name)
-        detection_blind_search(blind_search = False)
+        detection_blind_search(noise_option = "necklace", blind_search = False)
 
         '''
         # STAND-IN FOR A FRAME WHERE THERE IS NO FAKE PLANET, AND I JUST WANT TO MAKE A CRUDE CONTRAST CURVE BASED ON

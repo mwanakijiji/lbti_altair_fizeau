@@ -110,6 +110,13 @@ class JustPutIntoCube:
             print("type:")
             print(type(sci))
 
+        # write median to disk for reading it in downstream, smoothing it, and finding host star amplitude
+        median_just_put_into_cube = np.median(cube_frames, axis=0)
+        file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
+        fits.writeto(filename = file_name,
+                         data = median_just_put_into_cube,
+                         overwrite = True)
+        print("Wrote median of science frames (without fake planets or any other modification) to disk as \n" + file_name)
 
         # if writing to disk for checking
         if self.write:

@@ -333,9 +333,14 @@ class Detection:
         x_cen = 0.5*np.shape(self.master_frame)[0]-0.5
         y_cen = 0.5*np.shape(self.master_frame)[1]-0.5
 
+        # read in median science frame for determining host star amplitude
+        sci_median_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
+        sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
+
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
         smoothed_adi_frame = convolve(self.master_frame, kernel)
+        smoothed_sci_median_frame = convolve(sci_median_frame, kernel)
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
 
         # calculate outer noise annulus radius

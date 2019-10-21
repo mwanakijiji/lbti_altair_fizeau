@@ -92,8 +92,10 @@ class MedianCube:
         '''
         INPUTS:
         fake_params: fake planet parameters
-        host_subt_cube: cube of host-star-subtracted frames
+        host_subt_cube: cube of frames to derotate and median (in context, this may or may not
+            mean the host-star-subtracted frames
         pa_array: array of PAs
+        frame_array: array of frame numbers
         config_data: configuration data, as usual
         write_cube: flag as to whether cube of frames should be written to disk (for checking)
         '''
@@ -110,6 +112,7 @@ class MedianCube:
 
 
     def __call__(self,
+                 adi_write_name = None,
                  apply_mask_after_derot = False,
                  fake_planet = False):
         '''
@@ -117,7 +120,7 @@ class MedianCube:
 
         INPUTS:
 
-        write_cube_name: cube of frames to write out if we want to check it
+        adi_write_name: file name of written ADI frame; if None, a default will be used
         apply_mask_after_derot: should a mask be generated so as to make bad pixels in a given cube slice NaNs?
         fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
         '''
@@ -221,10 +224,16 @@ class MedianCube:
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
-        adi_file_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
-          "adi_frame_" + str(self.fake_params["angle_deg_EofN"]) + "_" + \
-          str(self.fake_params["rad_asec"]) + "_" + \
-          str(self.fake_params["ampl_linear_norm"]) + ".fits"
+        if (adi_write_name == None):
+            # default name, corresponding to an ADI frame on which to do science
+            adi_file_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+              "adi_frame_" + str(self.fake_params["angle_deg_EofN"]) + "_" + \
+              str(self.fake_params["rad_asec"]) + "_" + \
+              str(self.fake_params["ampl_linear_norm"]) + ".fits"
+        else:
+            # if it is some other median we want to save, use the user-given name
+            adi_file_name = adi_write_name
+
         fits.writeto(filename = adi_file_name,
                      data = median_stack,
                      header = hdr,
@@ -340,7 +349,7 @@ class Detection:
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
         smoothed_adi_frame = convolve(self.master_frame, kernel)
-        smoothed_sci_median_frame = convolve(sci_median_frame, kernel)
+        smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
 
         # calculate outer noise annulus radius

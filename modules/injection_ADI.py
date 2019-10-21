@@ -614,6 +614,8 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
+    # write out a median frame 
+
 
     # injecting fake PSFs?
     if (int(this_param_combo["rad_pix"]) == int(0)):
@@ -699,6 +701,22 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
 
     print("Done with host removal from cube of science frames.")
+
+    # instantiate MedianCube for derotating science frames and taking the median(and before any host
+    # star was subtracted), for determining host star amplitude
+    print('aaa')
+    median_instance_sci = detection.MedianCube(fake_params = this_param_combo,
+                                               host_subt_cube = cube_pre_removal_A,
+                                               pa_array = pas_array_A,
+                                               frame_array = frame_array_0_A,
+                                               write_cube = True)
+    # call it
+    print('bbb')
+    make_median_sci = median_instance_sci(adi_write_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                          + config["file_names"]["MEDIAN_SCI_FRAME"],
+                                          apply_mask_after_derot = True,
+                                          fake_planet = True)
+    import ipdb; ipdb.set_trace()
 
 
     # instantiate derotation, ADI, sensitivity determination

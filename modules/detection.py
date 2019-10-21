@@ -272,6 +272,7 @@ class Detection:
 
     def __call__(self,
                  noise_option = "full_ring",
+                 noise_annulus_half_width_pix = 0.5*fwhm_4um_lbt_airy_pix,
                  blind_search = True):
         '''
         INPUTS:
@@ -279,6 +280,7 @@ class Detection:
             "full_ring"- calculate the noise using the rms of the whole smoothed annulus (minus companion location)
             "necklace"- calculate the noise using the rms of the medians of patches within ring where
                         companions could be
+        noise_annulus_half_width_pix: 0.5*thickness of noise annulus ring (if noise_option=="full_ring")
         blind_search flag: is this a real science frame, where we don't know where a planet is?
         #write: flag as to whether data product should be written to disk (for checking)
         '''
@@ -343,12 +345,13 @@ class Detection:
         print(self.comp_rad)
         #print(np.power(companion_loc_vec["x_pix_coord"][pos_num]-xn,1))
         #print(np.power(companion_loc_vec["y_pix_coord"][pos_num]-y_cen,1))
+
         fake_psf_outer_edge_rad = np.add(\
                                          np.sqrt(\
                                                  np.power(companion_loc_vec["x_pix_coord"][pos_num],2) + \
                                                  np.power(companion_loc_vec["y_pix_coord"][pos_num],2)\
                                                  ),\
-                                                 self.comp_rad)
+                                                 noise_annulus_half_width_pix)
         print("fake_psf_outer_edge_rad")
         print(fake_psf_outer_edge_rad)
 
@@ -358,7 +361,7 @@ class Detection:
                                                  np.power(companion_loc_vec["x_pix_coord"][pos_num],2) + \
                                                  np.power(companion_loc_vec["y_pix_coord"][pos_num],2)\
                                                  ),\
-                                                 self.comp_rad)
+                                                 noise_annulus_half_width_pix)
         print("fake_psf_inner_edge_rad")
         print(fake_psf_inner_edge_rad)
 
@@ -568,7 +571,9 @@ def main():
         detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                            "adi_frame_"+fake_params_string+".fits",
                                            csv_record_file_name = csv_file_name)
-        detection_blind_search(noise_option = "necklace", blind_search = False)
+        detection_blind_search(noise_option = "full_ring",
+                               noise_annulus_half_width_pix = 0.5,
+                               blind_search = False)
 
         '''
         # STAND-IN FOR A FRAME WHERE THERE IS NO FAKE PLANET, AND I JUST WANT TO MAKE A CRUDE CONTRAST CURVE BASED ON

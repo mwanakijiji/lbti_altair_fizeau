@@ -445,7 +445,7 @@ def inject_remove_adi(this_param_combo):
                                           abs_fake_planet_PCA_name = [...],
                                           write = False)
         print('44B')
-        cube_pre_removal_B, pas_array_B, frame_array_0_B = inject_fake_psfs(cookies_B_only_centered_06_name_array)
+        cube_pre_removal_B, pas_array_B, frame_array_0_B = inject_fake_psfs_B(cookies_B_only_centered_06_name_array)
         print('55B')
         inject_fake_psfs_C = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
@@ -455,7 +455,7 @@ def inject_remove_adi(this_param_combo):
                                           abs_fake_planet_PCA_name = [...],
                                           write = False)
         print('66B')
-        cube_pre_removal_C, pas_array_C, frame_array_0_C = inject_fake_psfs(cookies_C_only_centered_06_name_array)
+        cube_pre_removal_C, pas_array_C, frame_array_0_C = inject_fake_psfs_C(cookies_C_only_centered_06_name_array)
         print('77B')
         inject_fake_psfs_D = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
@@ -465,7 +465,7 @@ def inject_remove_adi(this_param_combo):
                                           abs_fake_planet_PCA_name = [...],
                                           write = False)
         print('88B')
-        cube_pre_removal_D, pas_array_D, frame_array_0_D = inject_fake_psfs(cookies_D_only_centered_06_name_array) 
+        cube_pre_removal_D, pas_array_D, frame_array_0_D = inject_fake_psfs_D(cookies_D_only_centered_06_name_array) 
 
 
 

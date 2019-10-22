@@ -154,6 +154,7 @@ class PSFPCACubeMaker:
             n = int((prog_bar_width+1)* (frame_num-start_frame_num) / np.subtract(stop_frame_num,start_frame_num))
             sys.stdout.write("\r[{0}{1}]".format("#" * n, " " * (prog_bar_width - n)))
 
+        print("\n") # space
         # remove the unused slices
         training_cube = training_cube[0:slice_counter,:,:]
 
@@ -181,10 +182,12 @@ class PSFPCACubeMaker:
                      header = None,
                      overwrite = True)
         del training_cube
-        print("\nWrote out PSF PCA training cube as \n " +
+        
+        print("Wrote out PSF PCA training cube as \n " +
               training_cube_name +
               "\n with shape" +
-              str(np.shape(training_cube_masked_weird)))
+              str(np.shape(training_cube_masked_weird)) + "\n" +
+              prog_bar_width*"-")
 
         ## generate the PCA cube from the PSF data
         # first, generate and save the PCA offset frame (should be the median frame of the whole cube)
@@ -192,11 +195,13 @@ class PSFPCACubeMaker:
                                 'median_frame_seqStart_' + str("{:0>6d}".format(start_frame_num)) +
                                 '_seqStop_' + str("{:0>6d}".format(stop_frame_num)) + '_pcaNum_'
                                 + str("{:0>4d}".format(self.n_PCA)) + '.fits')
-        print("Writing median frame of PCA training cube out to \n" + median_frame_file_name)
         fits.writeto(filename = median_frame_file_name,
                      data = median_frame,
                      header = None,
                      overwrite = True)
+        print("Wrote median frame of PCA training cube out to \n" +
+              median_frame_file_name + "\n" +
+              prog_bar_width*"-")
 
         # do the PCA decomposition
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
@@ -214,8 +219,8 @@ class PSFPCACubeMaker:
         print("Wrote out PSF PCA vector cube as \n" +
               abs_pca_cube_name +
               "\n with shape" +
-              str(np.shape(pca_comp_cube)))
-        print("---------------------------")
+              str(np.shape(pca_comp_cube)) +
+              prog_bar_width*"-")
 
 
 def main():

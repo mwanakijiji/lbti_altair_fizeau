@@ -142,7 +142,7 @@ class PSFPCACubeMaker:
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
 
-                print("psf_pca_bases: Frame " + str("{:0>6d}".format(frame_num)) + " not found.\n")
+                print("\rpsf_pca_bases: Frame " + str("{:0>6d}".format(frame_num)) + " not found.\n")
 
             # if there were multiple matches
             else:

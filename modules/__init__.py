@@ -16,6 +16,9 @@ from sklearn.decomposition import PCA
 # number of CPUs for parallelization
 ncpu = multiprocessing.cpu_count()
 
+# length of progress bar for dusplay
+prog_bar_width = 30
+
 # configuration data
 config = configparser.ConfigParser() # for parsing values in .init file
 config.read("modules/config.ini")

@@ -148,6 +148,11 @@ class PSFPCACubeMaker:
                 print("Something is amiss with your frame number choice.")
                 break
 
+            # update progress bar
+            print("Adding frames to PCA training cube")
+            n = int((prog_bar_width+1)* (frame_num-start_frame_num) / np.subtract(stop_frame_num,start_frame_num))
+            sys.stdout.write("\r[{0}{1}]".format("#" * n, " " * (prog_bar_width - n)))
+
         # remove the unused slices
         training_cube = training_cube[0:slice_counter,:,:]
 
@@ -277,9 +282,20 @@ def main():
 
     # generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
-    pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
+
+    # cube for subtracting the host star
+    # (median value must be subtracted since host star residuals-relative-to-the-median
+    # will be subtracted from frames)
+    pca_psf_maker_subt_host = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
-                                    subtract_median = True) # create instance
+                                    subtract_median = True)
+
+    # cube for reconstructing the full host star PSF
+    # (median value is NOT subtracted since this is for making fake planet PSFs without
+    # saturation effects, and determining the host star amplitude)
+    pca_psf_maker_recon_host = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
+                                    n_PCA = 100,
+                                    subtract_median = False)
     # cube A
     '''
     pca_psf_maker(start_frame_num = 4259,

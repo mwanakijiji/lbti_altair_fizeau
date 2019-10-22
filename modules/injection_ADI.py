@@ -149,8 +149,12 @@ class FakePlanetInjectorCube:
 
     RETURNS:
     Cube of non-derotated frames with fake planets injected
+    Cube of non-derotated frames with reconstructed host star
+        (i.e., saturated region is reconstructed; this is for
+        determining average host star amplitude downstream)
     An array of parallactic angles
-    An array of integers indicating the frame number (from the original file name)
+    An array of integers indicating the frame number (from the
+        original file name)
     '''
 
     def __init__(self,
@@ -208,10 +212,11 @@ class FakePlanetInjectorCube:
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
-        # initialize cube to hold the frames
+        # initialize cubes to hold the frames
         print("Memory error, 0 " + str(len(abs_sci_name_array)))
         print("Memory error, shape " + str(np.shape(test_image)))
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
+        cube_frames_recon_host = np.copy(cube_frames)
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))
         # initialize the array to hold the frame numbers (to define masks to apply over pixel regions to make them
@@ -307,6 +312,7 @@ class FakePlanetInjectorCube:
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
+            cube_frames_recon_host[frame_num] = fit_fake_planet["recon_2d"]
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
                 
@@ -315,13 +321,25 @@ class FakePlanetInjectorCube:
         cube_frames = cube_frames.astype(np.float32)
 
         # if writing to disk for checking
-        if self.write:
+        if self.write: # option deprected; should always be True
 
             hdr = fits.Header()
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
 
+            if (frame_num == 0):
+                # write cube of host-star-reconstructed frames (just need to do this once)
+                file_name_host_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "host_recon_cube_" + \
+                  str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
+                  "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+                fits.writeto(filename = file_name_host_recon,
+                         data = cube_frames_recon_host,
+                         header = hdr,
+                         overwrite = True)
+                print("Wrote host-star-reconstructed cube to disk as \n" + file_name_host_recon)
+
+            # write fake-planet-injected cubecube_frames_recon_host (need to do this for each fake planet config)
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "fake_planet_injected_cube_" + \
               str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
               "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
@@ -329,7 +347,7 @@ class FakePlanetInjectorCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote fake-planet-injected cube to disk as " + file_name)
+            print("Wrote fake-planet-injected cube to disk as \n" + file_name)
         
         print("Array of PA")
         print(pa_array)
@@ -702,7 +720,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
 
     print("Done with host removal from cube of science frames.")
 
-    # instantiate MedianCube for derotating science frames and taking the median(and before any host
+    # instantiate MedianCube for derotating science frames and taking the median (and before any host
     # star was subtracted), for determining host star amplitude
     print('aaa')
     median_instance_sci = detection.MedianCube(fake_params = this_param_combo,

@@ -176,10 +176,8 @@ class PSFPCACubeMaker:
         median_frame = np.nanmedian(training_cube_masked_weird, axis = 0)
         if self.subtract_median:
             # subtract the median from the training set
+            # (shouldn't make a difference for making a PCA basis set, though)
             training_cube_masked_weird = np.subtract(training_cube_masked_weird, median_frame)
-            # BEGIN TEST
-            training_cube_masked_weird[:,40:60,:] = 0
-            # END TEST
         
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +
@@ -206,7 +204,7 @@ class PSFPCACubeMaker:
                      data = median_frame,
                      header = None,
                      overwrite = True)
-        print("psf_pca_bases: Wrote median frame of PCA training cube out to \n" +
+        print("psf_pca_bases: Wrote median frame of pre-median-subtracted PCA training cube out to \n" +
               median_frame_file_name + "\n" +
               prog_bar_width*"-")
 

@@ -109,7 +109,7 @@ class PSFPCACubeMaker:
             # if there was a match
             if (len(abs_matching_file_array) != 0):
 
-                print("Reading in frame "+str("{:0>6d}".format(frame_num)))
+                #print("Reading in frame "+str("{:0>6d}".format(frame_num)))
 
                 # read in the science frame from raw data directory
                 abs_matching_file = abs_matching_file_array[0] # get the name
@@ -135,7 +135,7 @@ class PSFPCACubeMaker:
                     slice_counter += 1
 
                     # TEST only
-                    print([frame_num,header_sci["RESD_AVG"],header_sci["GAU_XSTD"],header_sci["GAU_YSTD"]])
+                    #print([frame_num,header_sci["RESD_AVG"],header_sci["GAU_XSTD"],header_sci["GAU_YSTD"]])
 
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
@@ -231,8 +231,8 @@ def main():
 
     # make a list of the Gaussian/centered PSF residual frames
     list_fits_residual_frame = list(glob.glob(str(config["data_dirs"]["DIR_CENTERED"] + "/*.fits")))
-    print('list_resids')
-    print(list_fits_residual_frame)
+    #print('list_resids')
+    #print(list_fits_residual_frame)
 
     ## initialize dataframe
     # frame_num: the LMIR frame number
@@ -325,10 +325,16 @@ def main():
     '''
 
     # cube of fake data
-    pca_psf_maker(start_frame_num = 0,
+    pca_psf_maker_subt_host(start_frame_num = 0,
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],
-                   y_gauss_limits = [0, 0])   
+                   y_gauss_limits = [0, 0])
+
+     pca_psf_maker_recon_host(start_frame_num = 0,
+                   stop_frame_num = 10000,
+                   resd_avg_limits = [0, 0],
+                   x_gauss_limits = [0, 0],
+                   y_gauss_limits = [0, 0])  
 
 

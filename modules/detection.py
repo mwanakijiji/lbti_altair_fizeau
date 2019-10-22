@@ -354,8 +354,8 @@ class Detection:
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
 
         # find amplitude of host star
-        center_sci_median_frame = [int(0.5*np.shape(sci_median_frame[0])),
-                                   int(0.5*np.shape(sci_median_frame[1]))]
+        center_sci_median_frame = [int(0.5*np.shape(sci_median_frame)[0]),
+                                   int(0.5*np.shape(sci_median_frame)[1])]
         host_ampl = np.nanmax(sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
                                                center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
         print("host_ampl")

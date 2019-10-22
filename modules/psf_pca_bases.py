@@ -324,14 +324,15 @@ def main():
                    y_gauss_limits = [4.1,4.44])
     '''
 
-    # cube of fake data
+    # make cube for subtracting host star
     pca_psf_maker_subt_host(start_frame_num = 0,
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],
                    y_gauss_limits = [0, 0])
 
-     pca_psf_maker_recon_host(start_frame_num = 0,
+    # make cube for reconstructing full PSF
+    pca_psf_maker_recon_host(start_frame_num = 0,
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],

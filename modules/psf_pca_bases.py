@@ -72,7 +72,7 @@ class PSFPCACubeMaker:
         test_img, header = fits.getdata(self.file_list[0], 0, header=True)
         shape_img = np.shape(test_img)
 
-        print("Initializing a PCA cube...")
+        print("psf_pca_bases: Initializing a PCA cube... \n" + prog_bar_width*"-")
         training_cube = np.nan*np.ones((stop_frame_num-start_frame_num+1,shape_img[0],shape_img[1]),
                                        dtype = np.float32)
 
@@ -102,7 +102,7 @@ class PSFPCACubeMaker:
         slice_counter = 0
 
         # loop over frames to add them to training cube
-        print("Adding frames to PCA training cube")
+        print("psf_pca_bases: Adding frames to PCA training cube \n" + prog_bar_width*"-")
         for frame_num in range(start_frame_num, stop_frame_num+1):
 
             # get name of file that this number corresponds to
@@ -111,7 +111,7 @@ class PSFPCACubeMaker:
             # if there was a match
             if (len(abs_matching_file_array) != 0):
 
-                #print("Reading in frame "+str("{:0>6d}".format(frame_num)))
+                #print("psf_pca_bases: Reading in frame "+str("{:0>6d}".format(frame_num)))
 
                 # read in the science frame from raw data directory
                 abs_matching_file = abs_matching_file_array[0] # get the name
@@ -142,12 +142,12 @@ class PSFPCACubeMaker:
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
 
-                print("Frame " + str("{:0>6d}".format(frame_num)) + " not found.\n")
+                print("psf_pca_bases: Frame " + str("{:0>6d}".format(frame_num)) + " not found.\n")
 
             # if there were multiple matches
             else:
 
-                print("Something is amiss with your frame number choice.")
+                print("psf_pca_bases: Something is amiss with your frame number choice.")
                 break
 
             # update progress bar
@@ -183,7 +183,7 @@ class PSFPCACubeMaker:
                      overwrite = True)
         del training_cube
         
-        print("Wrote out PSF PCA training cube as \n " +
+        print("psf_pca_bases: Wrote out PSF PCA training cube as \n " +
               training_cube_name +
               "\n with shape" +
               str(np.shape(training_cube_masked_weird)) + "\n" +
@@ -199,7 +199,7 @@ class PSFPCACubeMaker:
                      data = median_frame,
                      header = None,
                      overwrite = True)
-        print("Wrote median frame of PCA training cube out to \n" +
+        print("psf_pca_bases: Wrote median frame of PCA training cube out to \n" +
               median_frame_file_name + "\n" +
               prog_bar_width*"-")
 
@@ -216,10 +216,8 @@ class PSFPCACubeMaker:
                      data = pca_comp_cube,
                      header = None,
                      overwrite = True)
-        print("Wrote out PSF PCA vector cube as \n" +
-              abs_pca_cube_name +
-              "\n with shape" +
-              str(np.shape(pca_comp_cube)) +
+        print("psf_pca_bases: Wrote out PSF PCA vector cube as \n" +
+              abs_pca_cube_name + "\n" +
               prog_bar_width*"-")
 
 

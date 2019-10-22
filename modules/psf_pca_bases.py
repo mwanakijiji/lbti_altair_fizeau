@@ -177,6 +177,9 @@ class PSFPCACubeMaker:
         if self.subtract_median:
             # subtract the median from the training set
             training_cube_masked_weird = np.subtract(training_cube_masked_weird, median_frame)
+            # BEGIN TEST
+            training_cube_masked_weird[40:60] = 100*median_frame[40:60]
+            # END TEST
         
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +

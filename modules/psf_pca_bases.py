@@ -2,6 +2,7 @@ import multiprocessing
 import configparser
 import glob
 import time
+import sys
 import pandas as pd
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans

@@ -184,9 +184,7 @@ class PSFPCACubeMaker:
         del training_cube
         
         print("psf_pca_bases: Wrote out PSF PCA training cube as \n " +
-              training_cube_name +
-              "\n with shape" +
-              str(np.shape(training_cube_masked_weird)) + "\n" +
+              training_cube_name + "\n" +
               prog_bar_width*"-")
 
         ## generate the PCA cube from the PSF data

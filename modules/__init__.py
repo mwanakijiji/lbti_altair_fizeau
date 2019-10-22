@@ -95,7 +95,7 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
 
     # if target is in north (but higher than Polaris), use the same relations except take -pa -> +pa
     if north:
-        print("Calculating coordinates for a northern target...")
+        print("init: Calculating coordinates for a northern target...")
         pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
                                           np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
         pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],
@@ -112,12 +112,12 @@ def make_dirs():
     # loop over all directory paths we will need
     for vals in config["data_dirs"]:
         abs_path_name = str(config["data_dirs"][vals])
-        print("Directory exists: " + abs_path_name)
+        print("init: Directory exists: " + abs_path_name)
 
         # if directory does not exist, create it
         if not os.path.exists(abs_path_name):
             os.makedirs(abs_path_name)
-            print("Made directory " + abs_path_name)
+            print("init: Made directory " + abs_path_name)
 
 
 def make_first_pass_mask(image, quadChoice):
@@ -241,7 +241,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     shape_img = np.shape(training_cube_masked_weird[0,:,:])
 
     # flatten each individual frame into a 1D array
-    print("Flattening the training cube... \n" + prog_bar_width*"-")
+    print("init: Flattening the training cube... \n" + prog_bar_width*"-")
     test_cube_1_1ds = np.reshape(training_cube_masked_weird,
                                      (np.shape(training_cube_masked_weird)[0],
                                       np.shape(training_cube_masked_weird)[1]*np.shape(training_cube_masked_weird)[2])
@@ -260,7 +260,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
         training_set_1ds_noNaN[t,:] = test_cube_1_1ds[t,idx]
 
     # do PCA on the flattened `cube' with no NaNs
-    print("Doing PCA to make PCA basis cube... \n" + prog_bar_width*"-")
+    print("init: Doing PCA to make PCA basis cube... \n" + prog_bar_width*"-")
     pca = PCA(n_components = n_PCA, svd_solver = "randomized") # initialize object
     #pca = RandomizedPCA(n_PCA) # for Python 2.7
     test_pca = pca.fit(training_set_1ds_noNaN) # calculate PCA basis set
@@ -268,7 +268,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
 
     ## reinsert the NaN values into each 1D slice of the PCA basis set
 
-    print("Putting PCA components into cube... \n" + prog_bar_width*"-")
+    print("init: Putting PCA components into cube... \n" + prog_bar_width*"-")
 
     # initialize a cube of 2D slices
     pca_comp_cube = np.nan*np.ones((n_PCA, shape_img[0], shape_img[1]), dtype = np.float32)
@@ -302,7 +302,7 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     try:
         pca_cube_masked = np.multiply(pca_cube,mask_weird)
     except:
-        print("Mask and input image have incompatible dimensions!")
+        print("init: Mask and input image have incompatible dimensions!")
         return
 
     # apply mask over weird detector regions to science image

@@ -360,7 +360,6 @@ class Detection:
                                                center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
         print("host_ampl")
         print(host_ampl)
-        import ipdb; ipdb.set_trace()
 
         # calculate outer noise annulus radius
         print("comp loc vec")
@@ -497,10 +496,13 @@ class Detection:
         #import ipdb; ipdb.set_trace()
 
         # append S/N info
+        injection_loc_dict["host_ampl"] = host_ampl
         injection_loc_dict["signal"] = signal
         injection_loc_dict["noise"] = noise
         injection_loc_dict["s2n"] = s2n
-        
+
+        print("Host star amplitude:")
+        print(host_ampl)      
         print("Signal:")
         print(signal)
         print("Noise:")

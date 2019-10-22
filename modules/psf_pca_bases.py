@@ -55,7 +55,9 @@ class PSFPCACubeMaker:
                  stop_frame_num,
                  resd_avg_limits,
                  x_gauss_limits,
-                 y_gauss_limits):
+                 y_gauss_limits,
+                 unique_read_string,
+                 unique_write_string):
         '''
         Make PCA cube (for future step of reconstructing) a PSF
 
@@ -66,6 +68,8 @@ class PSFPCACubeMaker:
             of the average of the residuals between PSF and Gaussian (acts as PSF quality criterion)
         x_gauss_limits: " " of the stdev in x of the best-fit Gaussian (acts as PSF quality criterion)
         y_gauss_limits: " " of the stdev in y of the best-fit Gaussian (acts as PSF quality criterion)
+        unique_read_string: unique string (immediately before file extension) for reading in files
+        unique_write_string: unique string (immediately before file extension) for writing out files
         '''
 
         # read in a first file to get the shape
@@ -183,7 +187,7 @@ class PSFPCACubeMaker:
                      overwrite = True)
         del training_cube
         
-        print("psf_pca_bases: Wrote out PSF PCA training cube as \n " +
+        print("psf_pca_bases: Wrote out PSF PCA training cube as \n" +
               training_cube_name + "\n" +
               prog_bar_width*"-")
 
@@ -192,7 +196,7 @@ class PSFPCACubeMaker:
         median_frame_file_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                 'median_frame_seqStart_' + str("{:0>6d}".format(start_frame_num)) +
                                 '_seqStop_' + str("{:0>6d}".format(stop_frame_num)) + '_pcaNum_'
-                                + str("{:0>4d}".format(self.n_PCA)) + '.fits')
+                                + str("{:0>4d}".format(self.n_PCA)) + unique_write_string + '.fits')
         fits.writeto(filename = median_frame_file_name,
                      data = median_frame,
                      header = None,
@@ -209,7 +213,7 @@ class PSFPCACubeMaker:
                                 'psf_PCA_vector_cookie' +
                                 '_seqStart_'+str("{:0>6d}".format(start_frame_num))+
                                 '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'_pcaNum_'
-                                +str("{:0>4d}".format(self.n_PCA))+'.fits')
+                                +str("{:0>4d}".format(self.n_PCA)) + unique_write_string + '.fits')
         fits.writeto(filename = abs_pca_cube_name,
                      data = pca_comp_cube,
                      header = None,
@@ -331,13 +335,17 @@ def main():
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],
-                   y_gauss_limits = [0, 0])
+                   y_gauss_limits = [0, 0],
+                   unique_read_string = " ",
+                   unique_write_string = "_for_subt_host_synth")
 
     # make cube for reconstructing full PSF
     pca_psf_maker_recon_host(start_frame_num = 0,
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
                    x_gauss_limits = [0, 0],
-                   y_gauss_limits = [0, 0])  
+                   y_gauss_limits = [0, 0],
+                   unique_read_string = " ",
+                   unique_write_string = "_for_recon_host_synth") 
 
 

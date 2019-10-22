@@ -142,7 +142,7 @@ class PSFPCACubeMaker:
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
 
-                print("Frame " + str("{:0>6d}".format(frame_num)) + " not found.")
+                print("Frame " + str("{:0>6d}".format(frame_num)) + " not found.\n")
 
             # if there were multiple matches
             else:
@@ -181,7 +181,7 @@ class PSFPCACubeMaker:
                      header = None,
                      overwrite = True)
         del training_cube
-        print("Wrote out PSF PCA training cube as \n " +
+        print("\nWrote out PSF PCA training cube as \n " +
               training_cube_name +
               "\n with shape" +
               str(np.shape(training_cube_masked_weird)))

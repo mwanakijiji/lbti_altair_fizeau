@@ -102,6 +102,7 @@ class PSFPCACubeMaker:
         slice_counter = 0
 
         # loop over frames to add them to training cube
+        print("Adding frames to PCA training cube")
         for frame_num in range(start_frame_num, stop_frame_num+1):
 
             # get name of file that this number corresponds to
@@ -150,7 +151,6 @@ class PSFPCACubeMaker:
                 break
 
             # update progress bar
-            print("Adding frames to PCA training cube")
             n = int((prog_bar_width+1)* (frame_num-start_frame_num) / np.subtract(stop_frame_num,start_frame_num))
             sys.stdout.write("\r[{0}{1}]".format("#" * n, " " * (prog_bar_width - n)))
 

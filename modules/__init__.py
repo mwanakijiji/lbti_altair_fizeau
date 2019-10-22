@@ -241,7 +241,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     shape_img = np.shape(training_cube_masked_weird[0,:,:])
 
     # flatten each individual frame into a 1D array
-    print("Flattening the training cube...")
+    print("Flattening the training cube... \n" + prog_bar_width*"-")
     test_cube_1_1ds = np.reshape(training_cube_masked_weird,
                                      (np.shape(training_cube_masked_weird)[0],
                                       np.shape(training_cube_masked_weird)[1]*np.shape(training_cube_masked_weird)[2])

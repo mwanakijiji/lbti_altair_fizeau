@@ -344,6 +344,7 @@ class Detection:
 
         # read in median science frame for determining host star amplitude
         sci_median_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
+        print("Reading in median science frame for determining host star amplitude")
         sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
 
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
@@ -351,6 +352,15 @@ class Detection:
         smoothed_adi_frame = convolve(self.master_frame, kernel)
         smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
+
+        # find amplitude of host star
+        center_sci_median_frame = [int(0.5*np.shape(sci_median_frame[0])),
+                                   int(0.5*np.shape(sci_median_frame[1]))]
+        host_ampl = np.nanmax(sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
+                                               center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
+        print("host_ampl")
+        print(host_ampl)
+        import ipdb; ipdb.set_trace()
 
         # calculate outer noise annulus radius
         print("comp loc vec")

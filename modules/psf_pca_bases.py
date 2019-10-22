@@ -146,7 +146,7 @@ class PSFPCACubeMaker:
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
 
-                print("\rpsf_pca_bases: Frame " + str("{:0>6d}".format(frame_num)) + " not found.\n")
+                print("\rpsf_pca_bases: Frame " + str("{:0>6d}".format(frame_num)) + " not found.")
 
             # if there were multiple matches
             else:
@@ -180,7 +180,8 @@ class PSFPCACubeMaker:
         training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
                                 'psf_PCA_training_cube' +
                                 '_seqStart_'+str("{:0>6d}".format(start_frame_num)) +
-                                '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'.fits')
+                                '_seqStop_'+str("{:0>6d}".format(stop_frame_num)) +
+                                unique_write_string + '.fits')
         fits.writeto(filename = training_cube_name,
                      data = training_cube_masked_weird,
                      header = None,

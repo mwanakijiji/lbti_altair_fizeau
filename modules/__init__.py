@@ -260,7 +260,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
         training_set_1ds_noNaN[t,:] = test_cube_1_1ds[t,idx]
 
     # do PCA on the flattened `cube' with no NaNs
-    print("Doing PCA to make PCA basis cube...")
+    print("Doing PCA to make PCA basis cube... \n" + prog_bar_width*"-")
     pca = PCA(n_components = n_PCA, svd_solver = "randomized") # initialize object
     #pca = RandomizedPCA(n_PCA) # for Python 2.7
     test_pca = pca.fit(training_set_1ds_noNaN) # calculate PCA basis set
@@ -268,7 +268,7 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
 
     ## reinsert the NaN values into each 1D slice of the PCA basis set
 
-    print('Putting PCA components into cube...')
+    print("Putting PCA components into cube... \n" + prog_bar_width*"-")
 
     # initialize a cube of 2D slices
     pca_comp_cube = np.nan*np.ones((n_PCA, shape_img[0], shape_img[1]), dtype = np.float32)

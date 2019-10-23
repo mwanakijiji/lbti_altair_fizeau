@@ -346,11 +346,15 @@ class Detection:
         y_cen = 0.5*np.shape(self.master_frame)[1]-0.5
 
         # read in median science frame for determining host star amplitude
-        print("Reading in median science frame for determining host star amplitude")
+        print("Reading in median science frame for determining host star amplitude from")
+        print(sci_median_file_name)
+        print("-"*prog_bar_width)
         sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
 
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
+        print("Convolving ADI and median science frames with same kernel")
+        print("-"*prog_bar_width)
         smoothed_adi_frame = convolve(self.master_frame, kernel)
         smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL

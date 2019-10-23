@@ -672,6 +672,23 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     print("-"*prog_bar_width)
     cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 
+    # instantiate MedianCube for derotating 'raw' science frames and taking the median (before any host
+    # star was subtracted), for determining host star amplitude
+    # (note this is being repeated each time a fake planet is injected; it's not efficient, but I
+    # don't know of a better/clearer way of doing it)
+    median_instance_sci = detection.MedianCube(fake_params = this_param_combo,
+                                               host_subt_cube = cube_pre_removal_A,
+                                               pa_array = pas_array_A,
+                                               frame_array = frame_array_0_A,
+                                               write_cube = True)
+    print("injection_ADI: Writing out median of derotated 'raw' science frames, for finding host star amplitude.")
+    make_median_sci = median_instance_sci(adi_write_name = config["data_dirs"]["DIR_OTHER_FITS"] \
+                                          + config["file_names"]["MEDIAN_SCI_FRAME"],
+                                          apply_mask_after_derot = True,
+                                          fake_planet = True)
+    import ipdb; ipdb.set_trace()
+    print("-"*prog_bar_width)
+    
     '''
     Masks for doing PCA in regions:
     mask_100x100pix_whole_frame.fits (simple whole frame)
@@ -697,23 +714,6 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
 
     print("injection_ADI: Done with host removal from cube of science frames.")
-    print("-"*prog_bar_width)
-
-    # instantiate MedianCube for derotating 'raw' science frames and taking the median (before any host
-    # star was subtracted), for determining host star amplitude
-    # (note this is being repeated each time a fake planet is injected; it's not efficient, but I
-    # don't know of a better/clearer way of doing it)
-    median_instance_sci = detection.MedianCube(fake_params = this_param_combo,
-                                               host_subt_cube = cube_pre_removal_A,
-                                               pa_array = pas_array_A,
-                                               frame_array = frame_array_0_A,
-                                               write_cube = True)
-    print("injection_ADI: Writing out median of derotated 'raw' science frames, for finding host star amplitude.")
-    make_median_sci = median_instance_sci(adi_write_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                          + config["file_names"]["MEDIAN_SCI_FRAME"],
-                                          apply_mask_after_derot = True,
-                                          fake_planet = True)
-    import ipdb; ipdb.set_trace()
     print("-"*prog_bar_width)
 
     # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames

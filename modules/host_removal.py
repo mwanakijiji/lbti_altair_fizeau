@@ -176,6 +176,10 @@ class HostRemovalCube:
             training set)
         write: flag as to whether data product should be written to disk (for checking)
 
+        RETURNS:
+        [0]: cube of non-derotated, host-star-subtracted frames
+        [1]: array of the file name frame numbers (these are just passed without modification) 
+
         (REMOVED:)
         classical_ADI: this just subtracts a median of the whole cube from each slice,
             as opposed to doing a subtraction individualized to each slice; note that True
@@ -203,14 +207,16 @@ class HostRemovalCube:
 
         # read in the PCA vector cubes for this series of frames: that of saturated PSFs (for
         # host star subtraction) and unsaturated (for fake planet PSF generation)
-        self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name, 0, header=True)
-        self.pca_basis_cube_fake_planet, self.header_pca_basis_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name, 0, header=True)
+        self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name,
+                                                                                           0, header=True)
+        self.pca_basis_cube_fake_planet, self.header_pca_basis_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name,
+                                                                                          0, header=True)
 
         # read in median frame
         self.pre_median_subt_pca_training_median = fits.getdata(self.pre_median_subt_pca_training_median_name,
                                                                                           0, header=False)
 
-        # read in the mask
+        # read in the tesselation pattern for PCA reconstruction of each region
         self.abs_region_mask, self.header_abs_region_mask = fits.getdata(self.abs_region_mask_name, 0, header=True)
 
         ##########
@@ -227,8 +233,10 @@ class HostRemovalCube:
         host_subt_cube: a cube of non-derotated frames
         '''
 
-        # make a cube that is the same shape as the input
+        # initialize cube for holding host-star-subtracted frames
         host_subt_cube_all_frames = np.nan*np.ones(np.shape(self.cube_frames))
+        # make a cube for holding the fully reconstructed host star PSFs
+        full_recon_host_star_PSFs = np.copy(host_subt_cube_all_frames)
         # make a cube for storing images of the reconstructed PSFs, for checking
         recon_frames_cube_all_frames = np.copy(host_subt_cube_all_frames)
 
@@ -252,6 +260,7 @@ class HostRemovalCube:
                 cube_host_subt_regions_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
                 # ... and also an FYI cube to hold regions of the original image
                 cube_original_image_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
+                
 
                 print("Removing host star from relative slice " + str(slice_num) +
                       " of " + str(len(self.cube_frames)))

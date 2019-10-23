@@ -611,7 +611,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     if (int(this_param_combo["rad_pix"]) == int(0)):
         # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
-        print("No fake planets being injected. (Input radius of fake planets is set to zero.) \n" + prog_bar_width*"-")
+        print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.) \n" + prog_bar_width*"-")
 
         # put science frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
@@ -624,7 +624,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     else:
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
 
-        print("Injecting fake planet corresponding to parameter")
+        print("injection_ADI: Injecting fake planet corresponding to parameter")
         print(this_param_combo)
         print(prog_bar_width*"-")
 
@@ -652,7 +652,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     pca_training_pre_median_subt_median_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] + \
                                             'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100_for_recon_host_synth.fits')
     median_frame, header_median_frame = fits.getdata(pca_training_pre_median_subt_median_name, 0, header=True)
-    print("Median frame being subtracted from the cube of science frames is \n" +
+    print("injection_ADI: Median frame being subtracted from the cube of science frames is \n" +
           pca_training_pre_median_subt_median_name + "\n" + prog_bar_width*"-"))
     cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 
@@ -676,15 +676,15 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                           + "_0100_for_subt_host_synth.fits",
                                                     abs_region_mask_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                                           + "mask_100x100pix_whole_frame.fits",
-                                                    pre_median_subt_pca_training_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
-                                                          + "median_frame_seqStart_000000_seqStop_010000_pcaNum_0100_for_recon_host_synth.fits"
+                                                    pre_median_subt_pca_training_median_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
+                                                          + "median_frame_seqStart_000000_seqStop_010000_pcaNum_0100_for_recon_host_synth.fits",
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)
 
     removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
 
-    print("Done with host removal from cube of science frames.\n" + prog_bar_width*"-")
+    print("injection_ADI: Done with host removal from cube of science frames.\n" + prog_bar_width*"-")
 
     # instantiate MedianCube for derotating science frames and taking the median (and before any host
     # star was subtracted), for determining host star amplitude
@@ -694,11 +694,12 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
     make_median_sci = median_instance_sci(adi_write_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                          + config["file_names"]["MEDIAN_SCI_FRAME"],
+                                          + "median_science_frame_synth.fits",
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
 
-    print("Wrote out median of derotated science frames, for finding host star amplitude.\n" + prog_bar_width*"-")
+    print("injection_ADI: Wrote out median of derotated science frames, for finding host star amplitude.\n"
+          + prog_bar_width*"-")
 
 
     # instantiate derotation, ADI, sensitivity determination
@@ -714,7 +715,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     
     elapsed_time = np.subtract(time.time(), time_start)
 
-    print("Completed one fake planet parameter configuration")
+    print("injection_ADI: Completed one fake planet parameter configuration")
     print("Elapsed time (sec): ")
     print(str(int(elapsed_time)))
     

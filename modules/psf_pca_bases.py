@@ -187,7 +187,7 @@ class PSFPCACubeMaker:
 
         ## generate the PCA cube from the PSF data
         # first, generate and save the PCA offset frame (should be the median frame of the whole cube)
-        print("psf_pca_bases: Writing median frame of PCA training cube out to \n" + median_frame_file_name)
+        print("psf_pca_bases: Writing median frame of PCA training cube out to \n" + write_median_frame_file_name)
         fits.writeto(filename = write_median_frame_file_name,
                      data = median_frame,
                      header = None,

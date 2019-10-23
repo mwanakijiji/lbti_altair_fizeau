@@ -653,7 +653,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                             'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100_for_recon_host_synth.fits')
     median_frame, header_median_frame = fits.getdata(pca_training_pre_median_subt_median_name, 0, header=True)
     print("injection_ADI: Median frame being subtracted from the cube of science frames is \n" +
-          pca_training_pre_median_subt_median_name + "\n" + prog_bar_width*"-"))
+          pca_training_pre_median_subt_median_name + "\n" + prog_bar_width*"-")
     cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 
     '''

@@ -503,6 +503,7 @@ class Detection:
         injection_loc_dict["noise"] = noise
         injection_loc_dict["s2n"] = s2n
 
+        print("-"*prog_bar_width)
         print("Host star amplitude:")
         print(host_ampl)      
         print("Signal:")
@@ -511,15 +512,16 @@ class Detection:
         print(noise)
         print("S/N:")
         print(s2n)
+        print("-"*prog_bar_width)
 
         # append to csv
         injection_loc_df = pd.DataFrame(injection_loc_dict)
         # check if csv file exists; if it does, don't repeat the header
         exists = os.path.isfile(self.csv_record_file_name)
         injection_loc_df.to_csv(self.csv_record_file_name, sep = ",", mode = "a", header = (not exists))
-        print("---------------------")
         print("Appended data to csv ")
         print(str(self.csv_record_file_name))
+        print("-"*prog_bar_width)
             
         # write out frame as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))

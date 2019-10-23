@@ -713,6 +713,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                           + config["file_names"]["MEDIAN_SCI_FRAME"],
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
+    import ipdb; ipdb.set_trace()
     print("-"*prog_bar_width)
 
     # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames

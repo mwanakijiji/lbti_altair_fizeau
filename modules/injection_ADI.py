@@ -106,16 +106,16 @@ class JustPutIntoCube:
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
 
-            print("injection_ADI: type:")
-            print(type(sci))
-
         # write median to disk for reading it in downstream, smoothing it, and finding host star amplitude
         median_just_put_into_cube = np.median(cube_frames, axis=0)
         file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
         fits.writeto(filename = file_name,
                          data = median_just_put_into_cube,
                          overwrite = True)
-        print("injection_ADI: Wrote median of science frames (without fake planets or any other modification) to disk as \n" + file_name)
+        print("injection_ADI: Wrote median of science frames (without fake planets or any other modification) to disk as \n" +
+              file_name + "\n" +
+              prog_bar_width*"-")
+        
 
         # if writing to disk for checking
         if self.write:
@@ -132,10 +132,12 @@ class JustPutIntoCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: Wrote cube of science frames (without fake planets or any other modification) to disk as " + file_name)
+            print("injection_ADI: Wrote cube of science frames (without fake planets or any other modification) to disk as \n" +
+                  file_name + "\n" +
+                  prog_bar_width*"-")
         
-        print("injection_ADI: Array of PA")
-        print(pa_array)
+        #print("injection_ADI: Array of PA")
+        #print(pa_array)
 
         # return cube of frames and array of PAs
         return cube_frames, pa_array, frame_nums_array
@@ -334,7 +336,9 @@ class FakePlanetInjectorCube:
                          data = cube_frames_recon_host,
                          header = hdr,
                          overwrite = True)
-                print("injection_ADI: Wrote host-star-reconstructed cube to disk as \n" + file_name_host_recon)
+                print("injection_ADI: Wrote host-star-reconstructed cube to disk as \n" +
+                      file_name_host_recon + "\n" +
+                      prog_bar_width*"-")
 
             # write fake-planet-injected cubecube_frames_recon_host (need to do this for each fake planet config)
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "fake_planet_injected_cube_" + \
@@ -344,10 +348,12 @@ class FakePlanetInjectorCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: Wrote fake-planet-injected cube to disk as \n" + file_name)
+            print("injection_ADI: Wrote fake-planet-injected cube to disk as \n" +
+                  file_name + "\n" +
+                  prog_bar_width*"-")
         
-        print("injection_ADI: Array of PA")
-        print(pa_array)
+        #print("injection_ADI: Array of PA")
+        #print(pa_array)
 
         # return cube of frames and array of PAs
         return cube_frames, pa_array, frame_nums_array
@@ -675,7 +681,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                           + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000_pcaNum" \
                                                           + "_0100_for_subt_host_synth.fits",
                                                     abs_region_mask_name = config["data_dirs"]["DIR_OTHER_FITS"] \
-                                                          + "mask_100x100pix_whole_frame.fits",
+                                                          + "mask_quad4_circ_ring.fits",
                                                     pre_median_subt_pca_training_median_name = config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                           + "median_frame_seqStart_000000_seqStop_010000_pcaNum_0100_for_recon_host_synth.fits",
                                                     frame_array = frame_array_0_A,

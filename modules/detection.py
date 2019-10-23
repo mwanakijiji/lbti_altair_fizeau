@@ -599,7 +599,7 @@ def main():
         detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                                "adi_frame_"+fake_params_string+".fits",
                                            sci_median_file_name = configa["data_dirs"]["DIR_OTHER_FITS"] + \
-                                               config["file_names"]["MEDIAN_SCI_FRAME"]
+                                               config["file_names"]["MEDIAN_SCI_FRAME"],
                                            csv_record_file_name = csv_file_name)
         detection_blind_search(noise_option = "full_ring",
                                noise_annulus_half_width_pix = 0.5,

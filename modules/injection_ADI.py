@@ -719,7 +719,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-    print("injection_ADI: Writing out median of derotated science frames, for finding host star amplitude.")
+    print("injection_ADI: Writing out median of derotated 'raw' science frames, for finding host star amplitude.")
     make_median_sci = median_instance_sci(adi_write_name = config["data_dirs"]["DIR_OTHER_FITS"] \
                                           + config["file_names"]["MEDIAN_SCI_FRAME"],
                                           apply_mask_after_derot = True,

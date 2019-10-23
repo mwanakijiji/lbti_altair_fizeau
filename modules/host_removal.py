@@ -132,7 +132,7 @@ class HostRemoval:
 class HostRemovalCube:
     '''
     PCA-decompose a saturated host star PSF and remove it, using a cube of frames in memory
-    N.b. This does no de-rotation (is blind to parallactic angle) or fake planet injection
+    N.b. This does no de-rotation; is blind to parallactic angle
     '''
 
     def __init__(self,
@@ -143,7 +143,6 @@ class HostRemovalCube:
                  abs_host_star_PCA_name,
                  abs_fake_planet_PCA_name,
                  abs_region_mask_name,
-                 pre_median_subt_pca_training_median_name,
                  frame_array,
                  config_data = config,
                  subtract_median_PCA_training_frame = True,
@@ -166,8 +165,6 @@ class HostRemovalCube:
                        a cube, where each slice defines a region to PCA-decompose in turn (one
                        single frame would mean just one region is being used for the PCA decomposition);
                        the individual PCA reconstructions are combined into the final image
-        pre_median_subt_pca_training_median_name: absolute file name of median to add back in to the
-                       residuals to make a fake planet PSF
         frame_array: array of integers corresponding to the frame file name numbers
         config_data: configuration data, as usual
         subtract_median_PCA_training_frame: subtract from the science frames the median frame of
@@ -175,10 +172,6 @@ class HostRemovalCube:
             just before that PCA basis set was generated, the median was subtracted from that
             training set)
         write: flag as to whether data product should be written to disk (for checking)
-
-        RETURNS:
-        [0]: cube of non-derotated, host-star-subtracted frames
-        [1]: array of the file name frame numbers (these are just passed without modification) 
 
         (REMOVED:)
         classical_ADI: this just subtracts a median of the whole cube from each slice,
@@ -199,24 +192,18 @@ class HostRemovalCube:
         self.abs_host_star_PCA_name = abs_host_star_PCA_name
         self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
         self.abs_region_mask_name = abs_region_mask_name
-        self.pre_median_subt_pca_training_median_name = pre_median_subt_pca_training_median_name
         self.frame_num_array = frame_array
         self.config_data = config_data
         self.subtract_median_PCA_training_frame = subtract_median_PCA_training_frame
         self.write = write
 
-        # read in the PCA vector cubes for this series of frames: that of saturated PSFs (for
-        # host star subtraction) and unsaturated (for fake planet PSF generation)
-        self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name,
-                                                                                           0, header=True)
-        self.pca_basis_cube_fake_planet, self.header_pca_basis_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name,
-                                                                                          0, header=True)
+        # read in the PCA vector cube for this series of frames
+        # (note the PCA needs to correspond to saturated PSFs, since I am subtracting
+        # saturated PSFs away)
+        self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name, 0, header=True)
+        self.pca_basis_cube_fake_planet, self.header_pca_basis_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name, 0, header=True)
 
-        # read in median frame
-        self.pre_median_subt_pca_training_median = fits.getdata(self.pre_median_subt_pca_training_median_name,
-                                                                                          0, header=False)
-
-        # read in the tesselation pattern for PCA reconstruction of each region
+        # read in the mask
         self.abs_region_mask, self.header_abs_region_mask = fits.getdata(self.abs_region_mask_name, 0, header=True)
 
         ##########
@@ -233,10 +220,8 @@ class HostRemovalCube:
         host_subt_cube: a cube of non-derotated frames
         '''
 
-        # initialize cube for holding host-star-subtracted frames
+        # make a cube that is the same shape as the input
         host_subt_cube_all_frames = np.nan*np.ones(np.shape(self.cube_frames))
-        # make a cube for holding the fully reconstructed host star PSFs
-        full_recon_host_star_PSFs = np.copy(host_subt_cube_all_frames)
         # make a cube for storing images of the reconstructed PSFs, for checking
         recon_frames_cube_all_frames = np.copy(host_subt_cube_all_frames)
 
@@ -260,7 +245,6 @@ class HostRemovalCube:
                 cube_host_subt_regions_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
                 # ... and also an FYI cube to hold regions of the original image
                 cube_original_image_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
-                
 
                 print("Removing host star from relative slice " + str(slice_num) +
                       " of " + str(len(self.cube_frames)))
@@ -330,13 +314,8 @@ class HostRemovalCube:
                     # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
 
                     try:
-                        # fit to the host star residuals for subtraction, within the region corresponding to this mask slice
+                        # fit to the host star for subtraction, within the region corresponding to this mask slice
                         fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star,
-                                                 sciImg=sci,
-                                                 mask_weird=mask_for_region_and_weird_pixels,
-                                                 n_PCA=100)
-                        # fit to the host star (where the median is being added back in) to make fake planet PSFs
-                        fit_fake_planet = fit_pca_star(pca_cube=self.pca_basis_cube_fake_planet,
                                                  sciImg=sci,
                                                  mask_weird=mask_for_region_and_weird_pixels,
                                                  n_PCA=100)

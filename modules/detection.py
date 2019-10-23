@@ -135,7 +135,7 @@ class MedianCube:
             sci = self.host_subt_cube[t,:,:]
 
             # replace nans with zeros to let the rotation work (we'll mask the regions of zeros downstream)
-            print("detection: protot")
+            print("protot")
             sci[~np.isfinite(sci)] = 0
 
             # derotate according to PA
@@ -163,13 +163,13 @@ class MedianCube:
                 # mask for nod down: same, but also top-right corner (340:,375:), and bottom 100 pixels
                 # convention: 0: bad pixels we will mask; 1: pixels to pass
                 if (nod_position == "nod_up"):
-                    print("detection: Applying mask to frame after derotation, nod up")
+                    print("Applying mask to frame after derotation, nod up")
                     mask_nan_regions[:10,:] = 0
                     mask_nan_regions[-10:,:] = 0
                     mask_nan_regions[:,:10] = 0
                     mask_nan_regions[:,-10:] = 0
                 elif (nod_position == "nod_down"):
-                    print("detection: Applying mask to frame after derotation, nod down")
+                    print("Applying mask to frame after derotation, nod down")
                     mask_nan_regions[:10,:] = 0
                     mask_nan_regions[-10:,:] = 0
                     mask_nan_regions[:,:10] = 0
@@ -220,7 +220,7 @@ class MedianCube:
                          data = cube_derotated_frames,
                          header = hdr,
                          overwrite = True)
-            print("detection: Wrote cube-just-before-median to disk as " + cube_file_name)
+            print("Wrote cube-just-before-median to disk as " + cube_file_name)
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
@@ -238,9 +238,7 @@ class MedianCube:
                      data = median_stack,
                      header = hdr,
                      overwrite = True)
-        print("detection: Wrote median of stack as " +
-              adi_file_name + "\n" +
-              prog_bar_width*"-")
+        print("Wrote median of stack as " + adi_file_name)
 
         # for memory's sake
         del cube_derotated_frames
@@ -310,7 +308,7 @@ class Detection:
 
             # location of the companion/maximum
             loc_vec = np.where(fake_corr == np.max(fake_corr))
-            print("detection: Location vector of best correlation with PSF template:")
+            print("Location vector of best correlation with PSF template:")
             print(loc_vec)
 
             # THIS WILL NEED TO BE FOLLOWED WITH A NEXT ITERATION FOR WHERE A COMPANION MAY LIE
@@ -329,7 +327,7 @@ class Detection:
             injection_loc = pd.DataFrame(injection_loc_dict)
             injection_loc["angle_deg_EofN"] = injection_loc["angle_deg"] # this step a kludge due to some name changes
             loc_vec = polar_to_xy(pos_info = injection_loc, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
-            print("detection: Location vector of fake companion:")
+            print("Location vector of fake companion:")
             print(loc_vec)
             
         # convert to DataFrame
@@ -346,7 +344,7 @@ class Detection:
 
         # read in median science frame for determining host star amplitude
         sci_median_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
-        print("detection: Reading in median science frame for determining host star amplitude")
+        print("Reading in median science frame for determining host star amplitude")
         sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
 
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
@@ -358,13 +356,13 @@ class Detection:
         # find amplitude of host star
         center_sci_median_frame = [int(0.5*np.shape(sci_median_frame)[0]),
                                    int(0.5*np.shape(sci_median_frame)[1])]
-        host_ampl = np.nanmax(sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
+        host_ampl = np.nanmax(smoothed_sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
                                                center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
-        print("detection: host_ampl")
+        print("host_ampl")
         print(host_ampl)
 
         # calculate outer noise annulus radius
-        print("detection: comp loc vec")
+        print("comp loc vec")
         print(companion_loc_vec["x_pix_coord"][pos_num])
         print(companion_loc_vec["y_pix_coord"][pos_num])
         print(self.comp_rad)
@@ -377,7 +375,7 @@ class Detection:
                                                  np.power(companion_loc_vec["y_pix_coord"][pos_num],2)\
                                                  ),\
                                                  noise_annulus_half_width_pix)
-        print("detection: fake_psf_outer_edge_rad")
+        print("fake_psf_outer_edge_rad")
         print(fake_psf_outer_edge_rad)
 
         # calculate inner noise annulus radius
@@ -387,7 +385,7 @@ class Detection:
                                                  np.power(companion_loc_vec["y_pix_coord"][pos_num],2)\
                                                  ),\
                                                  noise_annulus_half_width_pix)
-        print("detection: fake_psf_inner_edge_rad")
+        print("fake_psf_inner_edge_rad")
         print(fake_psf_inner_edge_rad)
 
         # invert-mask the companion
@@ -439,7 +437,7 @@ class Detection:
 
         # BEGIN TEST
         if (len(other_angles) > 1): # at small radii, there is not enough room for a necklace of patches
-            print("detection: patch num")
+            print("patch num")
             print(patch_num)
             plt.imshow(necklace_2d_array, origin="lower")
             plt.colorbar()
@@ -503,13 +501,13 @@ class Detection:
         injection_loc_dict["noise"] = noise
         injection_loc_dict["s2n"] = s2n
 
-        print("detection: Host star amplitude:")
+        print("Host star amplitude:")
         print(host_ampl)      
-        print("detection: Signal:")
+        print("Signal:")
         print(signal)
-        print("detection: Noise:")
+        print("Noise:")
         print(noise)
-        print("detection: S/N:")
+        print("S/N:")
         print(s2n)
 
         # append to csv
@@ -517,11 +515,12 @@ class Detection:
         # check if csv file exists; if it does, don't repeat the header
         exists = os.path.isfile(self.csv_record_file_name)
         injection_loc_df.to_csv(self.csv_record_file_name, sep = ",", mode = "a", header = (not exists))
-        print("detection: Appended data to csv ")
+        print("---------------------")
+        print("Appended data to csv ")
         print(str(self.csv_record_file_name))
             
         # write out frame as a check
-        sn_check_cube = np.zeros((5,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
+        sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
         sn_check_cube[0,:,:] = self.master_frame # the original ADI frame
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
         sn_check_cube[2,:,:] = noise_frame # the noise ring (for full_ring mode); or the noise patches (for necklace mode),  note this is blank if there is no room for necklace
@@ -529,7 +528,7 @@ class Detection:
         fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)
-        print("detection: Wrote out S/N check cube as \n" + str(config["data_dirs"]["DIR_S2N_CUBES"]) +
+        print("Wrote out S/N check cube as \n" + str(config["data_dirs"]["DIR_S2N_CUBES"]) +
               "sn_check_cube_" + os.path.basename(self.adi_frame_file_name))
 
 
@@ -584,6 +583,7 @@ def main():
         print(raw_radius)
         print(raw_contrast)
         print(param_list[t].split("_")[1])
+        print("-----")
 
         # get physical values
         fake_angle_e_of_n_deg = np.divide(raw_angle,100.)

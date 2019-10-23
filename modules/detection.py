@@ -283,6 +283,7 @@ class Detection:
     def __call__(self,
                  noise_option = "full_ring",
                  noise_annulus_half_width_pix = 0.5*fwhm_4um_lbt_airy_pix,
+                 sci_median_file_name,
                  blind_search = True):
         '''
         INPUTS:
@@ -291,6 +292,7 @@ class Detection:
             "necklace"- calculate the noise using the rms of the medians of patches within ring where
                         companions could be
         noise_annulus_half_width_pix: 0.5*thickness of noise annulus ring (if noise_option=="full_ring")
+        sci_median_file_name: name of file which will be used to find host star amplitude
         blind_search flag: is this a real science frame, where we don't know where a planet is?
         #write: flag as to whether data product should be written to disk (for checking)
         '''
@@ -344,7 +346,6 @@ class Detection:
         y_cen = 0.5*np.shape(self.master_frame)[1]-0.5
 
         # read in median science frame for determining host star amplitude
-        sci_median_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
         print("Reading in median science frame for determining host star amplitude")
         sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
 
@@ -596,7 +597,9 @@ def main():
 
         # initialize and detect
         detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
-                                           "adi_frame_"+fake_params_string+".fits",
+                                               "adi_frame_"+fake_params_string+".fits",
+                                           sci_median_file_name = configa["data_dirs"]["DIR_OTHER_FITS"] + \
+                                               config["file_names"]["MEDIAN_SCI_FRAME"]
                                            csv_record_file_name = csv_file_name)
         detection_blind_search(noise_option = "full_ring",
                                noise_annulus_half_width_pix = 0.5,

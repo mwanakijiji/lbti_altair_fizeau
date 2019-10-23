@@ -54,7 +54,10 @@ class PSFPCACubeMaker:
                  stop_frame_num,
                  resd_avg_limits,
                  x_gauss_limits,
-                 y_gauss_limits):
+                 y_gauss_limits,
+                 write_training_cube_name,
+                 write_median_frame_file_name,
+                 write_abs_pca_cube_name):
         '''
         Make PCA cube (for future step of reconstructing) a PSF
 
@@ -65,6 +68,10 @@ class PSFPCACubeMaker:
             of the average of the residuals between PSF and Gaussian (acts as PSF quality criterion)
         x_gauss_limits: " " of the stdev in x of the best-fit Gaussian (acts as PSF quality criterion)
         y_gauss_limits: " " of the stdev in y of the best-fit Gaussian (acts as PSF quality criterion)
+        write_training_cube_name: file under which to save the PCA training cube
+        write_median_frame_file_name: file under which to save the median frame of the data which goes into
+            the PCA training cube, BEFORE any median subtraction of that cube
+        write_abs_pca_cube_name: file under which to save the PCA vector cube
         '''
 
         # read in a first file to get the shape
@@ -166,42 +173,31 @@ class PSFPCACubeMaker:
         median_frame = np.nanmedian(training_cube_masked_weird, axis = 0)
         training_cube_masked_weird = np.subtract(training_cube_masked_weird, median_frame)
         
-        training_cube_name = str(self.config_data["data_dirs"]["DIR_OTHER_FITS"] +
-                                'psf_PCA_training_cube' +
-                                '_seqStart_'+str("{:0>6d}".format(start_frame_num)) +
-                                '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'.fits')
-        fits.writeto(filename = training_cube_name,
+        fits.writeto(filename = write_training_cube_name,
                      data = training_cube_masked_weird,
                      header = None,
                      overwrite = True)
         del training_cube
         print("Wrote out PSF PCA training cube as \n " +
-              training_cube_name +
+              write_training_cube_name +
               "\n with shape" +
               str(np.shape(training_cube_masked_weird)))
+        print("-"*prog_bar_width)
 
         ## generate the PCA cube from the PSF data
         # first, generate and save the PCA offset frame (should be the median frame of the whole cube)
-        median_frame_file_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                'median_frame_seqStart_' + str("{:0>6d}".format(start_frame_num)) +
-                                '_seqStop_' + str("{:0>6d}".format(stop_frame_num)) + '_pcaNum_'
-                                + str("{:0>4d}".format(self.n_PCA)) + '.fits')
         print("Writing median frame of PCA training cube out to \n" + median_frame_file_name)
-        fits.writeto(filename = median_frame_file_name,
+        fits.writeto(filename = write_median_frame_file_name,
                      data = median_frame,
                      header = None,
                      overwrite = True)
+        print("-"*prog_bar_width)
 
         # do the PCA decomposition
         pca_comp_cube = PCA_basis(training_cube_masked_weird, n_PCA = self.n_PCA)
 
         # write out the PCA vector cube
-        abs_pca_cube_name = str(self.config_data["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                'psf_PCA_vector_cookie' +
-                                '_seqStart_'+str("{:0>6d}".format(start_frame_num))+
-                                '_seqStop_'+str("{:0>6d}".format(stop_frame_num))+'_pcaNum_'
-                                +str("{:0>4d}".format(self.n_PCA))+'.fits')
-        fits.writeto(filename = abs_pca_cube_name,
+        fits.writeto(filename = write_abs_pca_cube_name,
                      data = pca_comp_cube,
                      header = None,
                      overwrite = True)
@@ -209,7 +205,7 @@ class PSFPCACubeMaker:
               abs_pca_cube_name +
               "\n with shape" +
               str(np.shape(pca_comp_cube)))
-        print("---------------------------")
+        print("-"*prog_bar_width)
 
 
 def main():
@@ -275,11 +271,43 @@ def main():
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
-    # generate PCA cubes for PSFs
+    ## generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
-    pca_psf_maker = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
+
+    # for PCA basis set for subtracting host star residuals
+    pca_psf_maker_host_resids = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
-                                    subtract_median = True) # create instance
+                                    subtract_median = True)
+    # for PCA basis set for reconstructing host star (subtraction of median may not make
+    # any difference, though
+    pca_psf_maker_host_recon = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
+                                    n_PCA = 100,
+                                    subtract_median = False)
+
+    # cube of fake data
+    pca_psf_maker_host_resids(start_frame_num = 0,
+                   stop_frame_num = 10000,
+                   resd_avg_limits = [0, 0],
+                   x_gauss_limits = [0, 0],
+                   y_gauss_limits = [0, 0],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                                                  'psf_PCA_training_cube_seqStart_00000_seqStop_10000_host_resids.fits'),
+                    write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                                       'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits'),
+                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits')
+    pca_psf_maker_host_recon(start_frame_num = 0,
+                   stop_frame_num = 10000,
+                   resd_avg_limits = [0, 0],
+                   x_gauss_limits = [0, 0],
+                   y_gauss_limits = [0, 0],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                                                  'psf_PCA_training_cube_seqStart_00000_seqStop_10000_host_recon.fits'),
+                    write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                                       'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
+                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits')
+    
     # cube A
     '''
     pca_psf_maker(start_frame_num = 4259,
@@ -306,13 +334,6 @@ def main():
                    resd_avg_limits = [40.6,55],
                    x_gauss_limits = [4.15,5],
                    y_gauss_limits = [4.1,4.44])
-    '''
-
-    # cube of fake data
-    pca_psf_maker(start_frame_num = 0,
-                   stop_frame_num = 10000,
-                   resd_avg_limits = [0, 0],
-                   x_gauss_limits = [0, 0],
-                   y_gauss_limits = [0, 0])   
+    ''' 
 
 

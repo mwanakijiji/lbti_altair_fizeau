@@ -358,7 +358,7 @@ class Detection:
         # find amplitude of host star
         center_sci_median_frame = [int(0.5*np.shape(sci_median_frame)[0]),
                                    int(0.5*np.shape(sci_median_frame)[1])]
-        host_ampl = np.nanmax(smoothed_sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
+        host_ampl = np.nanmax(sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
                                                center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
         print("detection: host_ampl")
         print(host_ampl)
@@ -521,7 +521,7 @@ class Detection:
         print(str(self.csv_record_file_name))
             
         # write out frame as a check
-        sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
+        sn_check_cube = np.zeros((5,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
         sn_check_cube[0,:,:] = self.master_frame # the original ADI frame
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
         sn_check_cube[2,:,:] = noise_frame # the noise ring (for full_ring mode); or the noise patches (for necklace mode),  note this is blank if there is no room for necklace

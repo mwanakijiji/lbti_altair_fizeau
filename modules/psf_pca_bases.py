@@ -296,7 +296,7 @@ def main():
                     write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                                        'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits'),
                     write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits')
+                                'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits'))
     pca_psf_maker_host_recon(start_frame_num = 0,
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
@@ -307,7 +307,7 @@ def main():
                     write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                                        'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
                     write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits')
+                                'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'))
     
     # cube A
     '''

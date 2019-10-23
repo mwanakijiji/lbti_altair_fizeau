@@ -282,7 +282,7 @@ class Detection:
 
     def __call__(self,
                  sci_median_file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
-                     self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
+                     self.config_data["file_names"]["MEDIAN_SCI_FRAME"],
                  noise_option = "full_ring",
                  noise_annulus_half_width_pix = 0.5*fwhm_4um_lbt_airy_pix,
                  blind_search = True):

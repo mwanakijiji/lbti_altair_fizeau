@@ -227,11 +227,11 @@ class HostRemovalCube:
 
         # subtract the same median which was subtracted from the PCA training set
         if self.subtract_median_PCA_training_frame:
-            print('yada')
+            print('')
 
         # subtract the median PCA training set frame before decomposition
         if False:
-            print('yada') # this is vestigial
+            print('') # this is vestigial
 
         # or else do PCA
         else:
@@ -400,11 +400,11 @@ class HostRemovalCube:
                 ## TEST: WRITE OUT
                 hdu = fits.PrimaryHDU(final_PCA_recon_frame)
                 hdulist = fits.HDUList([hdu])
-                hdu.writeto("junk_final_PCA_recon_frame_"+str(slice_num)+".fits", clobber=True)
+                hdu.writeto("junk_final_PCA_recon_frame_"+str(slice_num)+".fits", overwrite=True)
 
                 hdu = fits.PrimaryHDU(final_host_subt_frame)
                 hdulist = fits.HDUList([hdu])
-                hdu.writeto("junk_final_host_subt_frame_"+str(slice_num)+".fits", clobber=True)
+                hdu.writeto("junk_final_host_subt_frame_"+str(slice_num)+".fits", overwrite=True)
                 ## END TEST
 
         # if writing to disk for checking

@@ -239,6 +239,7 @@ class MedianCube:
                      header = hdr,
                      overwrite = True)
         print("Wrote median of stack as " + adi_file_name)
+        print("-"*prog_bar_width)
 
         # for memory's sake
         del cube_derotated_frames

@@ -78,9 +78,10 @@ class PSFPCACubeMaker:
         test_img, header = fits.getdata(self.file_list[0], 0, header=True)
         shape_img = np.shape(test_img)
 
-        print("Initializing a PCA cube...")
+        print("psf_pca_bases: Initializing a PCA cube...")
         training_cube = np.nan*np.ones((stop_frame_num-start_frame_num+1,shape_img[0],shape_img[1]),
                                        dtype = np.float32)
+        print("-"*prog_bar_width)
 
         # make the right mask (1=good; 0=masked)
         # (to make a circular mask, I made frames from stray code in phasecam_pupil_simulator.ipynb)
@@ -116,7 +117,7 @@ class PSFPCACubeMaker:
             # if there was a match
             if (len(abs_matching_file_array) != 0):
 
-                print("Reading in frame "+str("{:0>6d}".format(frame_num)))
+                print("psf_pca_bases: Reading in frame "+str("{:0>6d}".format(frame_num)))
 
                 # read in the science frame from raw data directory
                 abs_matching_file = abs_matching_file_array[0] # get the name
@@ -147,12 +148,12 @@ class PSFPCACubeMaker:
             # if there was no match
             elif (len(abs_matching_file_array) == 0):
 
-                print("Frame " + str("{:0>6d}".format(frame_num)) + " not found.")
+                print("psf_pca_bases: Frame " + str("{:0>6d}".format(frame_num)) + " not found.")
 
             # if there were multiple matches
             else:
 
-                print("Something is amiss with your frame number choice.")
+                print("psf_pca_bases: Something is amiss with your frame number choice.")
                 break
 
         # remove the unused slices
@@ -178,7 +179,7 @@ class PSFPCACubeMaker:
                      header = None,
                      overwrite = True)
         del training_cube
-        print("Wrote out PSF PCA training cube as \n " +
+        print("psf_pca_bases: Wrote out PSF PCA training cube as \n " +
               write_training_cube_name +
               "\n with shape" +
               str(np.shape(training_cube_masked_weird)))
@@ -186,7 +187,7 @@ class PSFPCACubeMaker:
 
         ## generate the PCA cube from the PSF data
         # first, generate and save the PCA offset frame (should be the median frame of the whole cube)
-        print("Writing median frame of PCA training cube out to \n" + median_frame_file_name)
+        print("psf_pca_bases: Writing median frame of PCA training cube out to \n" + median_frame_file_name)
         fits.writeto(filename = write_median_frame_file_name,
                      data = median_frame,
                      header = None,
@@ -201,7 +202,7 @@ class PSFPCACubeMaker:
                      data = pca_comp_cube,
                      header = None,
                      overwrite = True)
-        print("Wrote out PSF PCA vector cube as \n" +
+        print("psf_pca_bases: Wrote out PSF PCA vector cube as \n" +
               abs_pca_cube_name +
               "\n with shape" +
               str(np.shape(pca_comp_cube)))
@@ -265,7 +266,7 @@ def main():
         # append to file
         d_df.to_csv(residual_file_name, mode='a', header=False)
 
-    print("Residual data written to " + residual_file_name)
+    print("psf_pca_bases: Residual data written to " + residual_file_name)
     '''
     # make a list of the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])

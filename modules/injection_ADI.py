@@ -699,18 +699,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     print("injection_ADI: Done with host removal from cube of science frames.")
     print("-"*prog_bar_width)
 
-    # instantiate derotation, ADI, sensitivity determination
-    median_instance_A = detection.MedianCube(fake_params = this_param_combo,
-                                               host_subt_cube = removed_hosts_cube_A,
-                                               pa_array = pas_array_A,
-                                               frame_array = frame_array_1_A,
-                                               write_cube = True)
-
-    # call derotation, ADI, sensitivity determination
-    make_median_A = median_instance_A(apply_mask_after_derot = True, fake_planet = True)
-    del removed_hosts_cube_A # clear memory
-
-    # instantiate MedianCube for derotating science frames and taking the median (and before any host
+    # instantiate MedianCube for derotating 'raw' science frames and taking the median (before any host
     # star was subtracted), for determining host star amplitude
     # (note this is being repeated each time a fake planet is injected; it's not efficient, but I
     # don't know of a better/clearer way of doing it)
@@ -725,6 +714,17 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
     print("-"*prog_bar_width)
+
+    # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames
+    median_instance_A = detection.MedianCube(fake_params = this_param_combo,
+                                               host_subt_cube = removed_hosts_cube_A,
+                                               pa_array = pas_array_A,
+                                               frame_array = frame_array_1_A,
+                                               write_cube = True)
+    # call derotation, ADI, sensitivity determination
+    make_median_A = median_instance_A(apply_mask_after_derot = True,
+                                      fake_planet = True)
+    del removed_hosts_cube_A # clear memory
     
     elapsed_time = np.subtract(time.time(), time_start)
 

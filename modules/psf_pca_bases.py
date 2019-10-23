@@ -172,7 +172,8 @@ class PSFPCACubeMaker:
 
         # subtract the median from the training set
         median_frame = np.nanmedian(training_cube_masked_weird, axis = 0)
-        training_cube_masked_weird = np.subtract(training_cube_masked_weird, median_frame)
+        if self.subtract_median:
+            training_cube_masked_weird = np.subtract(training_cube_masked_weird, median_frame)
         
         fits.writeto(filename = write_training_cube_name,
                      data = training_cube_masked_weird,

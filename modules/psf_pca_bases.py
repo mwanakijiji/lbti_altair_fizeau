@@ -203,7 +203,7 @@ class PSFPCACubeMaker:
                      header = None,
                      overwrite = True)
         print("psf_pca_bases: Wrote out PSF PCA vector cube as \n" +
-              abs_pca_cube_name +
+              write_abs_pca_cube_name +
               "\n with shape" +
               str(np.shape(pca_comp_cube)))
         print("-"*prog_bar_width)

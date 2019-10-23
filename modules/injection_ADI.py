@@ -79,9 +79,8 @@ class JustPutIntoCube:
 
         # loop over frames
         for frame_num in range(0,len(abs_sci_name_array)):
-            print("---------------")
-            print("Adding relative frame num " + str(frame_num) + " out of " + str(len(abs_sci_name_array)))
-            print("Corresponding to file base name " + str(os.path.basename(abs_sci_name_array[frame_num])))
+            print("injection_ADI: Adding relative frame num " + str(frame_num) + " out of " + str(len(abs_sci_name_array)))
+            print("injection_ADI: Corresponding to file base name " + str(os.path.basename(abs_sci_name_array[frame_num])))
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
@@ -99,7 +98,7 @@ class JustPutIntoCube:
             #       frame will be used.)
             fit_2_star = fit_pca_star(self.pca_star_basis_cube, sci, mask_weird, n_PCA=1)
             if not fit_2_star:
-                print("Incompatible dimensions; skipping this frame...")
+                print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue
 
             # add image to cube, add PA to array, and add frame number to array
@@ -107,16 +106,14 @@ class JustPutIntoCube:
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
 
-            print("type:")
-            print(type(sci))
-
         # write median to disk for reading it in downstream, smoothing it, and finding host star amplitude
         median_just_put_into_cube = np.median(cube_frames, axis=0)
         file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
         fits.writeto(filename = file_name,
                          data = median_just_put_into_cube,
                          overwrite = True)
-        print("Wrote median of science frames (without fake planets or any other modification) to disk as \n" + file_name)
+        print("injection_ADI: Wrote median of science frames (without fake planets or any other modification) to disk as \n" + file_name)
+        print("-"*prog_bar_width)
 
         # if writing to disk for checking
         if self.write:
@@ -133,10 +130,8 @@ class JustPutIntoCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote cube of science frames (without fake planets or any other modification) to disk as " + file_name)
-        
-        print("Array of PA")
-        print(pa_array)
+            print("injection_ADI: Wrote cube of science frames (without fake planets or any other modification) to disk as " + file_name)
+            print("-"*prog_bar_width)
 
         # return cube of frames and array of PAs
         return cube_frames, pa_array, frame_nums_array
@@ -201,16 +196,15 @@ class FakePlanetInjectorCube:
         abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
         '''
 
-        print('-----')
-        print(self.fake_params)
-        print(self.fake_params["angle_deg_EofN"])
+        #print(self.fake_params)
+        #print(self.fake_params["angle_deg_EofN"])
 
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
         # initialize cube to hold the frames
-        print("Memory error, 0 " + str(len(abs_sci_name_array)))
-        print("Memory error, shape " + str(np.shape(test_image)))
+        print("injection_ADI: Memory error, 0 " + str(len(abs_sci_name_array)))
+        print("injection_ADI: Memory error, shape " + str(np.shape(test_image)))
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))
@@ -220,8 +214,7 @@ class FakePlanetInjectorCube:
 
         # loop over frames to inject fake planets in each of them
         for frame_num in range(0,len(abs_sci_name_array)):
-            print("---------------")
-            print("Injecting a fake planet into cube slice " + str(frame_num))
+            print("injection_ADI: Injecting a fake planet into cube slice " + str(frame_num))
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
@@ -255,7 +248,7 @@ class FakePlanetInjectorCube:
             fit_host_star = fit_pca_star(self.pca_basis_cube_host_star, sci, no_mask, n_PCA=100)
             fit_fake_planet = fit_pca_star(self.pca_basis_cube_fake_planet, sci, mask_weird, n_PCA=100)
             if np.logical_or(not fit_host_star, not fit_fake_planet): # if the dimensions were incompatible, skip this science frame
-                print("Incompatible dimensions; skipping this frame...")
+                print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue
 
             # get absolute amplitude of the host star (reconstructing over the saturated region)
@@ -283,10 +276,10 @@ class FakePlanetInjectorCube:
             pos_info = polar_to_xy(pos_info = self.fake_params,
                                    pa = header_sci["LBT_PARA"])
             
-            print('pa in header:')
-            print(header_sci["LBT_PARA"])
-            print('fake angle E of N:')
-            print(fake_angle_e_of_n_deg)
+            #print('pa in header:')
+            #print(header_sci["LBT_PARA"])
+            #print('fake angle E of N:')
+            #print(fake_angle_e_of_n_deg)
 
             # shift the PSF image to the location of the fake planet
             reconImg_shifted = scipy.ndimage.interpolation.shift(
@@ -294,9 +287,9 @@ class FakePlanetInjectorCube:
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
 
-            print('fake_params y x')
-            print(self.fake_params["y_pix_coord"])
-            print(self.fake_params["x_pix_coord"])
+            #print('fake_params y x')
+            #print(self.fake_params["y_pix_coord"])
+            #print(self.fake_params["x_pix_coord"])
 
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
@@ -329,10 +322,11 @@ class FakePlanetInjectorCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote fake-planet-injected cube to disk as " + file_name)
-        
-        print("Array of PA")
-        print(pa_array)
+            print("injection_ADI: Wrote fake-planet-injected cube to disk as " + file_name)
+            print("-"*prog_bar_width)
+            
+        #print("injection_ADI: Array of PA")
+        #print(pa_array)
 
         # return cube of frames and array of PAs
         return cube_frames, pa_array, frame_nums_array
@@ -381,7 +375,7 @@ def inject_remove_adi(this_param_combo):
     if (int(this_param_combo["rad_pix"]) == int(0)):
         # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
-        print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
+        print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
         # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
@@ -414,7 +408,7 @@ def inject_remove_adi(this_param_combo):
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
 
         print("-------------------------------------------------")
-        print("Injecting fake planet corresponding to parameter")
+        print("injection_ADI: Injecting fake planet corresponding to parameter")
         print(this_param_combo)
 
         # instantiate fake planet injection
@@ -593,8 +587,8 @@ def inject_remove_adi(this_param_combo):
     elapsed_time = np.subtract(time.time(), time_start)
 
     print("----------------------------------------------------------------")
-    print("Completed one fake planet parameter configuration")
-    print("Elapsed time (sec): ")
+    print("injection_ADI: Completed one fake planet parameter configuration")
+    print("injection_ADI: Elapsed time (sec): ")
     print(str(int(elapsed_time)))
 
 
@@ -623,7 +617,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     if (int(this_param_combo["rad_pix"]) == int(0)):
         # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
-        print("No fake planets being injected. (Input radius of fake planets is set to zero.)")
+        print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
         # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
@@ -637,8 +631,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     else:
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
 
-        print("-------------------------------------------------")
-        print("Injecting fake planet corresponding to parameter")
+        print("injection_ADI: Injecting fake planet corresponding to parameter")
         print(this_param_combo)
 
         # instantiate fake planet injection
@@ -675,7 +668,7 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     pca_pre_decomposition_median_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] + \
                                             'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100.fits')
     median_frame, header_median_frame = fits.getdata(pca_pre_decomposition_median_name, 0, header=True)
-    print("Median frame being subtracted from the cube of science frames is \n" + pca_pre_decomposition_median_name)
+    print("injection_ADI: Median frame being subtracted from the cube of science frames is \n" + pca_pre_decomposition_median_name)
     cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 
     '''
@@ -702,7 +695,8 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
 
     removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
 
-    print("Done with host removal from cube of science frames.")
+    print("injection_ADI: Done with host removal from cube of science frames.")
+    print("-"*prog_bar_width)
 
     # instantiate MedianCube for derotating science frames and taking the median(and before any host
     # star was subtracted), for determining host star amplitude
@@ -717,7 +711,8 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
 
-    print("Wrote out median of derotated science frames, for finding host star amplitude.")
+    print("injection_ADI: Wrote out median of derotated science frames, for finding host star amplitude.")
+    print("-"*prog_bar_width)
 
 
     # instantiate derotation, ADI, sensitivity determination
@@ -735,10 +730,10 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
     
     elapsed_time = np.subtract(time.time(), time_start)
 
-    print("----------------------------------------------------------------")
-    print("Completed one fake planet parameter configuration")
-    print("Elapsed time (sec): ")
+    print("injection_ADI: Completed one fake planet parameter configuration")
+    print("injection_ADI: Elapsed time (sec): ")
     print(str(int(elapsed_time)))
+    print("-"*prog_bar_width)
 
 #######################
 

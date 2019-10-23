@@ -20,6 +20,9 @@ ncpu = multiprocessing.cpu_count()
 config = configparser.ConfigParser() # for parsing values in .init file
 config.read("modules/config.ini")
 
+# status/progress/parse bar length
+prog_bar_width = 30
+
 # arcsec per radian
 global asec_per_rad
 asec_per_rad = np.divide(3600.*180.,np.pi)

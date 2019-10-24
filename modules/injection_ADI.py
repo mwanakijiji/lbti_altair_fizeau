@@ -728,7 +728,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     write_name_abs_host_star_PCA = self.abs_host_star_PCA_name,
                                                     read_name_abs_fake_planet_PCA = self.read_name_abs_fake_planet_PCA,
-                                                    abs_region_mask_name = self.pca_tesselation,
+                                                    abs_region_mask_name = self.read_name_abs_pca_tesselation_pattern,
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)

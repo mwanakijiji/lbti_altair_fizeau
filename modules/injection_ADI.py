@@ -622,7 +622,7 @@ class SyntheticFizeauInjectRemoveADI:
         pca_tesselation_pattern_name: name of tesselation cube
         '''
 
-        self.test_PCA_vector = fits.getdata(test_PCA_vector_name, 0, header=True)
+        self.test_PCA_vector_name = test_PCA_vector_name
         self.cube_put_frames_into_it_simple_name = cube_put_frames_into_it_simple_name
         self.cube_A_PCA_vector_name = cube_A_PCA_vector_name
         self.pca_pre_decomposition_median_name = pca_pre_decomposition_median_name

@@ -642,7 +642,7 @@ class SyntheticFizeauInjectRemoveADI:
         injection = True: actually inject a fake PSF; False with just remove the host star
             and do ADI
         '''
-
+        import ipdb; ipdb.set_trace()
         time_start = time.time()
 
         # make a list of ALL the centered cookie cutout files
@@ -843,8 +843,11 @@ def main():
                                                                     abs_fake_planet_PCA_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                                                                    + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits"),
                                                                     pca_tesselation_pattern_name = str(config["data_dirs"]["DIR_OTHER_FITS"]) + "mask_quad4_circ_ring.fits")
-    import ipdb; ipdb.set_trace()
-    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+
+    synthetic_fizeau_inject_remove_adi(param_dict_list[0])
+
+    
+    #pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
 
 
     # instantiate

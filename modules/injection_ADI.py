@@ -601,21 +601,25 @@ def inject_remove_adi(this_param_combo):
 class SyntheticFizeauInjectRemoveADI:
 
     def __init__(self,
+                 file_name_list,
+                 n_PCA_host_removal,
                  read_name_abs_test_PCA_vector,
                  write_name_abs_cube_put_frames_into_it_simple,
                  write_name_abs_cube_A_PCA_vector,
-                 write_name_abs_pca_pre_decomposition_median,
+                 read_name_abs_pca_pre_decomposition_median,
                  write_name_abs_derotated_sci_median,
                  write_name_abs_host_star_PCA,
                  read_name_abs_fake_planet_PCA,
                  read_name_abs_pca_tesselation_pattern):
         '''
+        file_name_list: list of names of files to operate on
+        n_PCA_host_removal: number of PCA modes to use for subtracting out the host star
         read_name_abs_test_PCA_vector: name of a test PCA vector cube file just to see if
             decomposition can be done at all
         write_name_abs_cube_put_frames_into_it_simple: if no fakes are being injected,
             this file name contains the stack of all the frames
         write_name_abs_cube_A_PCA_vector: name of PCA vector
-        write_name_abs_pca_pre_decomposition_median: median of non-derotated science frames, to
+        read_name_abs_pca_pre_decomposition_median: median of non-derotated science frames, to
             subtract from frames before PCA decomposition
         write_name_abs_derotated_sci_median: name of median of derotated science frames, to find
             host star amplitude
@@ -626,10 +630,12 @@ class SyntheticFizeauInjectRemoveADI:
         read_name_abs_pca_tesselation_pattern: name of tesselation cube
         '''
 
+        self.cookies_centered_06_name_array = file_name_list
+        self.n_PCA_host_removal = n_PCA_host_removal
         self.test_PCA_vector_name = read_name_abs_test_PCA_vector
         self.cube_put_frames_into_it_simple_name = write_name_abs_cube_put_frames_into_it_simple
         self.write_name_abs_cube_A_PCA_vector = write_name_abs_cube_A_PCA_vector
-        self.pca_pre_decomposition_median_name = write_name_abs_pca_pre_decomposition_median
+        self.pca_pre_decomposition_median_name = read_name_abs_pca_pre_decomposition_median
         self.write_name_abs_derotated_sci_median = write_name_abs_derotated_sci_median
         self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.read_name_abs_fake_planet_PCA = read_name_abs_fake_planet_PCA
@@ -637,21 +643,15 @@ class SyntheticFizeauInjectRemoveADI:
 
     def __call__(self, this_param_combo):
         '''
-        To parallelize a serial operation across cores, I need to define this function
+        To parallelize a serial operation across cores, I need to define this class
         that goes through the fake planet injection, host star removal, and ADI steps
         for a given combination of fake planet parameters
-
-        Note that a lot of file names in this function have to be hard-coded.
 
         injection = True: actually inject a fake PSF; False with just remove the host star
             and do ADI
         '''
 
         time_start = time.time()
-
-        # make a list of ALL the centered cookie cutout files
-        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-        cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
         # injecting fake PSFs?
         if (int(this_param_combo["rad_pix"]) == int(0)):
@@ -663,7 +663,7 @@ class SyntheticFizeauInjectRemoveADI:
                                              test_PCA_vector_name = self.test_PCA_vector_name,
                                              write = True)
 
-            cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_centered_06_name_array,
+            cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = self.cookies_centered_06_name_array,
                                                                               saved_cube_basename = self.cube_put_frames_into_it_simple_name)
 
         else:
@@ -729,7 +729,7 @@ class SyntheticFizeauInjectRemoveADI:
         '''
         remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A_post_pca_median_removal,
-                                                    n_PCA = 100,
+                                                    n_PCA = self.n_PCA_host_removal,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     write_name_abs_host_star_PCA = self.abs_host_star_PCA_name,
                                                     abs_fake_planet_PCA_name = self.read_name_abs_fake_planet_PCA,
@@ -761,19 +761,6 @@ class SyntheticFizeauInjectRemoveADI:
         print(str(int(elapsed_time)))
         print("-"*prog_bar_width)
 
-#######################
-'''
-class TestClass:
-
-    def __init__(self, image_name):
-
-        self.image_file = fits.getdata(image_name, 0, header=True)
-
-    def __call__(self, thing):
-
-        print("tada")
-'''
-#######################
 
 
 def main():
@@ -827,15 +814,21 @@ def main():
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
 
+    # make a list of ALL the centered cookie cutout files
+    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+    cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
+
     # instantiate
     synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(
+        file_name_list = cookies_centered_06_name_array,
+        n_PCA_host_removal = 5,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                             'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                 + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits"),
-        write_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                           + 'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100.fits'),
         write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
                                                   + config["file_names"]["MEDIAN_SCI_FRAME"]),

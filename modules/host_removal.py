@@ -180,17 +180,11 @@ class HostRemovalCube:
             as opposed to doing a subtraction individualized to each slice; note that True
             also means that the PCA cubes that are read in are ignored (default False)
         '''
-
-        ## TEST HERE, to see if frames are really being individually decomposed
-        # cube_frames[100,:,:] = np.ones(np.shape(cube_frames[0,:,:]))
-        # cube_frames[200,:,:] = np.flip(cube_frames[200,:,:],axis=0)
-        ## END TEST
         
         self.fake_params = fake_params
         self.cube_frames = cube_frames
         self.n_PCA = n_PCA
         self.outdir = outdir
-        #self.abs_PCA_name = abs_PCA_name
         self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
         self.abs_region_mask_name = abs_region_mask_name

@@ -829,7 +829,7 @@ def main():
     ## END TEST
 
     # instantiate
-    synthetic_reduction_instance = SyntheticFizeauInjectRemoveADI(test_PCA_vector_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+    synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(test_PCA_vector_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                                                     'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
                                                                     cube_put_frames_into_it_simple_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                                                                               + "simple_synthetic_sci_frame_cube_A.fits"),

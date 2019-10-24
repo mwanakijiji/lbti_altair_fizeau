@@ -609,8 +609,7 @@ class SyntheticFizeauInjectRemoveADI:
         test_PCA_vector_name: name of a test PCA vector cube file just to see if
             decomposition can be done at all
         cube_put_frames_into_it_simple_name: if no fakes are being injected, this file
-            name contains the
-            stack of all the frames
+            name contains the stack of all the frames
         cube_A_PCA_vector_name: name of PCA vector
         pca_pre_decomposition_median_name: median of non-derotated science frames, to
             subtract from frames before PCA decomposition
@@ -844,9 +843,9 @@ def main():
                                                                     abs_fake_planet_PCA_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] \
                                                                                                    + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits"),
                                                                     pca_tesselation_pattern_name = str(config["data_dirs"]["DIR_OTHER_FITS"]) + "mask_quad4_circ_ring.fits")
+    import ipdb; ipdb.set_trace()
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
 
-    #pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
 
     # instantiate
     #test_instance = TestClass(image_name = config["data_dirs"]["DIR_OTHER_FITS"] + "mask_quad4_circ_ring.fits")

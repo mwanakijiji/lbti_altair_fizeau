@@ -314,7 +314,7 @@ class HostRemovalCube:
                         fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star,
                                                  sciImg=sci,
                                                  mask_weird=mask_for_region_and_weird_pixels,
-                                                 n_PCA=100)
+                                                 n_PCA=self.n_PCA)
 
                     except:
                         print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")

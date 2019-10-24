@@ -703,6 +703,7 @@ class SyntheticFizeauInjectRemoveADI:
         print("-"*prog_bar_width)
         cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 
+        ###############################################################################################
         # instantiate MedianCube for derotating 'raw' science frames and taking the median (before any host
         # star was subtracted), for determining host star amplitude
         # (note this is being repeated each time a fake planet is injected; it's not efficient, but I
@@ -718,15 +719,9 @@ class SyntheticFizeauInjectRemoveADI:
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
         print("-"*prog_bar_width)
-    
-        '''
-        Masks for doing PCA in regions:
-        mask_100x100pix_whole_frame.fits (simple whole frame)
-        mask_100x100_4quad.fits
-        mask_10x10_100squares.fits
-        mask_quad4_circ.fits
-        mask_quad4_circ_ring.fits
-        '''
+
+        ###############################################################################################
+        # now actually do the host star subtraction
         remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A_post_pca_median_removal,
                                                     n_PCA = self.n_PCA_host_removal,
@@ -737,12 +732,9 @@ class SyntheticFizeauInjectRemoveADI:
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)
-
         removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
-
         print("injection_ADI: Done with host removal from cube of science frames.")
         print("-"*prog_bar_width)
-
         # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames
         median_instance_A = detection.MedianCube(fake_params = this_param_combo,
                                                host_subt_cube = removed_hosts_cube_A,

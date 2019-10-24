@@ -107,6 +107,8 @@ class JustPutIntoCube:
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
 
         # write median to disk for reading it in downstream, smoothing it, and finding host star amplitude
+        '''
+        # REMOVE THIS SECTION; IT LOOKS LIKE ITS WRITING OUT A MEDIAN WITHOUT DEROTATION
         median_just_put_into_cube = np.median(cube_frames, axis=0)
         file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + self.config_data["file_names"]["MEDIAN_SCI_FRAME"]
         fits.writeto(filename = file_name,
@@ -114,6 +116,7 @@ class JustPutIntoCube:
                          overwrite = True)
         print("injection_ADI: Wrote median of science frames (without fake planets or any other modification) to disk as \n" + file_name)
         print("-"*prog_bar_width)
+        '''
 
         # if writing to disk for checking
         if self.write:

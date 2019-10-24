@@ -191,7 +191,7 @@ class HostRemovalCube:
         self.n_PCA = n_PCA
         self.outdir = outdir
         #self.abs_PCA_name = abs_PCA_name
-        self.abs_host_star_PCA_name = abs_host_star_PCA_name
+        self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
         self.abs_region_mask_name = abs_region_mask_name
         self.frame_num_array = frame_array

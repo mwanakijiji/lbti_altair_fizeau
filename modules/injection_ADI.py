@@ -736,6 +736,18 @@ def synthetic_fizeau_inject_remove_adi(this_param_combo):
 
 #######################
 
+class TestClass:
+
+    def __init__(self, image_name):
+
+        self.image_file = fits.getdata(self.image_name, 0, header=True)
+
+    def __call__(self, thing):
+
+        print("tada")
+        
+#######################
+
 
 def main():
     '''
@@ -788,4 +800,8 @@ def main():
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
 
-    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+    #pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+
+    # instantiate
+    test_instance = TestClass(image_name = config["data_dirs"]["DIR_OTHER_FITS"] + "mask_quad4_circ_ring.fits")
+    pool.map(test_instance,[1,2,3])

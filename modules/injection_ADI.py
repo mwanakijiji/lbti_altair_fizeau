@@ -642,7 +642,7 @@ class SyntheticFizeauInjectRemoveADI:
         injection = True: actually inject a fake PSF; False with just remove the host star
             and do ADI
         '''
-        import ipdb; ipdb.set_trace()
+
         time_start = time.time()
 
         # make a list of ALL the centered cookie cutout files

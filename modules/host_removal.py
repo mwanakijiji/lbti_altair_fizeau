@@ -126,7 +126,9 @@ class HostRemoval:
                      data = image_host_removed,
                      header = header_sci,
                      overwrite = True)
-        print("Writing out host_removed frame " + os.path.basename(abs_sci_name))
+        print("Writing out host_removed frame \n"
+              + abs_image_host_removed_name)
+        print("-"*prog_bar_width)
 
 
 class HostRemovalCube:

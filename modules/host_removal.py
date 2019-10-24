@@ -4,6 +4,7 @@ import glob
 import time
 import pickle
 import math
+import datetime
 from astropy.io import fits
 from modules import *
 
@@ -398,7 +399,7 @@ class HostRemovalCube:
                 hdu = fits.PrimaryHDU(final_PCA_recon_frame)
                 hdulist = fits.HDUList([hdu])
                 hdu.writeto("junk_final_PCA_recon_frame_"+str(slice_num)+".fits", overwrite=True)
-                #print("Wrote junk_final_PCA_recon_frame_"+str(slice_num)+".fits as test")
+                #print(": Wrote junk_final_PCA_recon_frame_"+str(slice_num)+".fits as test")
 
                 hdu = fits.PrimaryHDU(final_host_subt_frame)
                 hdulist = fits.HDUList([hdu])
@@ -416,7 +417,7 @@ class HostRemovalCube:
             fits.writeto(filename = file_name_to_recon,
                          data = self.cube_frames,
                          overwrite = True)
-            print("host_removal: "+str(datetime.datetime.now())+"Wrote cube which will be PCA-reconstructed as " + file_name_to_recon)
+            print("host_removal: "+str(datetime.datetime.now())+": Wrote cube which will be PCA-reconstructed as " + file_name_to_recon)
             print("-"*prog_bar_width)
 
             # the cube of PCA-reconstructed frames
@@ -431,7 +432,7 @@ class HostRemovalCube:
                          data = recon_frames_cube_all_frames,
                          header = hdr1,
                          overwrite = True)
-            print("host_removal: "+str(datetime.datetime.now())+"Wrote PCA-reconstructed star cube to disk as " + file_name_recon)
+            print("host_removal: "+str(datetime.datetime.now())+": Wrote PCA-reconstructed star cube to disk as " + file_name_recon)
             print("-"*prog_bar_width)
 
             # the cube of host-star-subtracted frames
@@ -446,7 +447,7 @@ class HostRemovalCube:
                          data = host_subt_cube_all_frames,
                          header = hdr,
                          overwrite = True)
-            print("host_removal: "+str(datetime.datetime.now())+"Wrote host-removed-cube to disk as " + file_name)
+            print("host_removal: "+str(datetime.datetime.now())+": Wrote host-removed-cube to disk as " + file_name)
             print("-"*prog_bar_width)
             
         # for memory's sake

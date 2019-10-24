@@ -597,37 +597,37 @@ def inject_remove_adi(this_param_combo):
 class SyntheticFizeauInjectRemoveADI:
 
     def __init__(self,
-                 test_PCA_vector_name,
+                 read_name_abs_test_PCA_vector,
                  write_name_abs_cube_put_frames_into_it_simple,
                  write_name_abs_cube_A_PCA_vector,
-                 pca_pre_decomposition_median_name,
+                 write_name_abs_pca_pre_decomposition_median,
                  write_name_abs_derotated_sci_median,
-                 abs_host_star_PCA_name,
+                 write_name_abs_host_star_PCA,
                  read_name_abs_fake_planet_PCA,
                  read_name_abs_pca_tesselation_pattern):
         '''
-        test_PCA_vector_name: name of a test PCA vector cube file just to see if
+        read_name_abs_test_PCA_vector: name of a test PCA vector cube file just to see if
             decomposition can be done at all
         write_name_abs_cube_put_frames_into_it_simple: if no fakes are being injected,
             this file name contains the stack of all the frames
         write_name_abs_cube_A_PCA_vector: name of PCA vector
-        pca_pre_decomposition_median_name: median of non-derotated science frames, to
+        write_name_abs_pca_pre_decomposition_median: median of non-derotated science frames, to
             subtract from frames before PCA decomposition
         write_name_abs_derotated_sci_median: name of median of derotated science frames, to find
             host star amplitude
-        abs_host_star_PCA_name: name of PCA cube to use for host star decomposition, for
+        write_name_abs_host_star_PCA: name of PCA cube to use for host star decomposition, for
             subtraction
         read_name_abs_fake_planet_PCA: name of PCA cube to use for host star decomposition
             such that the full PSF is reconstructed (like to make fake planets)
         read_name_abs_pca_tesselation_pattern: name of tesselation cube
         '''
 
-        self.test_PCA_vector_name = test_PCA_vector_name
+        self.test_PCA_vector_name = read_name_abs_test_PCA_vector
         self.cube_put_frames_into_it_simple_name = write_name_abs_cube_put_frames_into_it_simple
         self.write_name_abs_cube_A_PCA_vector = write_name_abs_cube_A_PCA_vector
-        self.pca_pre_decomposition_median_name = pca_pre_decomposition_median_name
+        self.pca_pre_decomposition_median_name = write_name_abs_pca_pre_decomposition_median
         self.write_name_abs_derotated_sci_median = write_name_abs_derotated_sci_median
-        self.abs_host_star_PCA_name = abs_host_star_PCA_name
+        self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.read_name_abs_fake_planet_PCA = read_name_abs_fake_planet_PCA
         self.read_name_abs_pca_tesselation_pattern = read_name_abs_pca_tesselation_pattern
 

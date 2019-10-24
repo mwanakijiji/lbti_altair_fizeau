@@ -142,7 +142,7 @@ class HostRemovalCube:
                  cube_frames,
                  n_PCA,
                  outdir,
-                 abs_host_star_PCA_name,
+                 write_name_abs_host_star_PCA,
                  abs_fake_planet_PCA_name,
                  abs_region_mask_name,
                  frame_array,
@@ -159,7 +159,7 @@ class HostRemovalCube:
         outdir: directory to deposit the host-subtracted images in (this has to be
                        defined at the function call because the images may or may not
                        contain fake planet PSFs, and I want to keep them separate)
-        abs_host_star_PCA_name: absolute file name of the PCA cube to reconstruct the host
+        write_name_abs_host_star_PCA: absolute file name of the PCA cube to reconstruct the host
                        star for host star subtraction (i.e., this is probably with saturation)
         abs_fake_planet_PCA_name: absolute file name of the PCA cube to reconstruct the host star
                        to make a fake planet (i.e., without saturation effects)

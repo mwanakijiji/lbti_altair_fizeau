@@ -133,7 +133,8 @@ class JustPutIntoCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: Wrote cube of science frames (without fake planets or any other modification) to disk as " + file_name)
+            print("injection_ADI: Wrote cube of science frames (without fake planets or any other modification) to disk as \n"
+                  + file_name)
             print("-"*prog_bar_width)
 
         # return cube of frames and array of PAs

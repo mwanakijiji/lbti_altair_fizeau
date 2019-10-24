@@ -708,7 +708,8 @@ class SyntheticFizeauInjectRemoveADI:
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-        print("injection_ADI: Writing out median of derotated 'raw' science frames, for finding host star amplitude.")
+        print("injection_ADI: Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
+              +self.write_name_abs_derotated_sci_median)
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
@@ -727,7 +728,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                     n_PCA = 100,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
                                                     write_name_abs_host_star_PCA = self.abs_host_star_PCA_name,
-                                                    read_name_abs_fake_planet_PCA = self.read_name_abs_fake_planet_PCA,
+                                                    abs_fake_planet_PCA_name = self.read_name_abs_fake_planet_PCA,
                                                     abs_region_mask_name = self.read_name_abs_pca_tesselation_pattern,
                                                     frame_array = frame_array_0_A,
                                                     subtract_median_PCA_training_frame = True,

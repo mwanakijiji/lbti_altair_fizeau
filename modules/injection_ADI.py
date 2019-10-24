@@ -6,6 +6,7 @@ import itertools
 import pandas as pd
 import pickle
 import math
+import datetime
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
@@ -133,7 +134,7 @@ class JustPutIntoCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: Wrote cube of science frames (without fake planets or any other modification) to disk as \n"
+            print("injection_ADI: "+str(datetime.datetime.now())+"Wrote cube of science frames (without fake planets or any other modification) to disk as \n"
                   + file_name)
             print("-"*prog_bar_width)
 
@@ -326,7 +327,7 @@ class FakePlanetInjectorCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: Wrote fake-planet-injected cube to disk as " + file_name)
+            print("injection_ADI: "+str(datetime.datetime.now())+"Wrote fake-planet-injected cube to disk as " + file_name)
             print("-"*prog_bar_width)
             
         #print("injection_ADI: Array of PA")
@@ -713,7 +714,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-        print("injection_ADI: Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
+        print("injection_ADI: "+str(datetime.datetime.now())+"Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
               +self.write_name_abs_derotated_sci_median)
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,
@@ -828,7 +829,8 @@ def main():
                                            + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits"),
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"]) + "mask_quad4_circ_ring.fits")
+        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] + "mask_quad4_circ_ring.fits")
+        )
 
     # run
     synthetic_fizeau_inject_remove_adi(param_dict_list[0])

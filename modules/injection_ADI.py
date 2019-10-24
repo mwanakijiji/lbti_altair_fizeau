@@ -740,7 +740,7 @@ class TestClass:
 
     def __init__(self, image_name):
 
-        self.image_file = fits.getdata(self.image_name, 0, header=True)
+        self.image_file = fits.getdata(image_name, 0, header=True)
 
     def __call__(self, thing):
 

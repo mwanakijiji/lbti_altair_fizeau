@@ -167,11 +167,11 @@ class HostRemovalCube:
                        the individual PCA reconstructions are combined into the final image
         frame_array: array of integers corresponding to the frame file name numbers
         config_data: configuration data, as usual
-        subtract_median_PCA_training_frame: subtract from the science frames the median frame of
+        subtract_median_PCA_training_frame = True: subtract from the science frames the median frame of
             the raw PCA training set which went into the generation of the PCA basis set (because
             just before that PCA basis set was generated, the median was subtracted from that
             training set)
-        write: flag as to whether data product should be written to disk (for checking)
+        write = True: data product should be written to disk (for checking)
 
         (REMOVED:)
         classical_ADI: this just subtracts a median of the whole cube from each slice,

@@ -606,14 +606,20 @@ class SyntheticFizeauInjectRemoveADI:
                  abs_fake_planet_PCA_name,
                  pca_tesselation_pattern_name):
         '''
-        test_PCA_vector_name: name of a test PCA vector cube file just to see if decomposition can be done at all
-        cube_put_frames_into_it_simple_name: if no fakes are being injected, this file name contains the
+        test_PCA_vector_name: name of a test PCA vector cube file just to see if
+            decomposition can be done at all
+        cube_put_frames_into_it_simple_name: if no fakes are being injected, this file
+            name contains the
             stack of all the frames
         cube_A_PCA_vector_name: name of PCA vector
-        pca_pre_decomposition_median_name: median of non-derotated science frames, to subtract from frames before PCA decomposition
-        derotated_sci_median_name: name of median of derotated science frames, to find host star amplitude
-        abs_host_star_PCA_name: name of PCA cube to use for host star decomposition, for subtraction
-        abs_fake_planet_PCA_name: name of PCA cube to use for host star decomposition such that the full PSF is reconstructed (like to make fake planets)
+        pca_pre_decomposition_median_name: median of non-derotated science frames, to
+            subtract from frames before PCA decomposition
+        derotated_sci_median_name: name of median of derotated science frames, to find
+            host star amplitude
+        abs_host_star_PCA_name: name of PCA cube to use for host star decomposition, for
+            subtraction
+        abs_fake_planet_PCA_name: name of PCA cube to use for host star decomposition
+            such that the full PSF is reconstructed (like to make fake planets)
         pca_tesselation_pattern_name: name of tesselation cube
         '''
 
@@ -628,12 +634,14 @@ class SyntheticFizeauInjectRemoveADI:
 
     def __call__(self, this_param_combo):
         '''
-        To parallelize a serial operation across cores, I need to define this function that goes through
-        the fake planet injection, host star removal, and ADI steps for a given combination of fake planet parameters
+        To parallelize a serial operation across cores, I need to define this function
+        that goes through the fake planet injection, host star removal, and ADI steps
+        for a given combination of fake planet parameters
 
         Note that a lot of file names in this function have to be hard-coded.
 
-        injection = True: actually inject a fake PSF; False with just remove the host star and do ADI
+        injection = True: actually inject a fake PSF; False with just remove the host star
+            and do ADI
         '''
 
         time_start = time.time()
@@ -666,8 +674,6 @@ class SyntheticFizeauInjectRemoveADI:
             print(this_param_combo)
 
             # instantiate fake planet injection
-            
-
             inject_fake_psfs_A = FakePlanetInjectorCube(fake_params = this_param_combo,
                                           n_PCA = 100,
                                           abs_host_star_PCA_name = self.cube_A_PCA_vector_name,
@@ -692,9 +698,10 @@ class SyntheticFizeauInjectRemoveADI:
         # subtract the PCA training cube median from the cube of science frames
         # (this frame was subtracted from that cube before the PCA basis set was made)
         ## ## weak point here: this median name is hard-coded
-        
+
         median_frame, header_median_frame = fits.getdata(self.pca_pre_decomposition_median_name, 0, header=True)
-        print("injection_ADI: Median frame being subtracted from the cube of science frames is \n" + self.pca_pre_decomposition_median_name)
+        print("injection_ADI: Median frame being subtracted from the cube of science frames is \n" +
+              self.pca_pre_decomposition_median_name)
         print("-"*prog_bar_width)
         cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 

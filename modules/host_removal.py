@@ -69,7 +69,12 @@ class HostRemoval:
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
         '''
 
-        print(abs_sci_name)
+        print("Read in PCA training median \n" + self.abs_PCA_training_median_name)
+        print("-"*prog_bar_width)
+        print("Read in PCA basis cube \n" + self.abs_PCA_name)
+        print("-"*prog_bar_width)
+        print("Reading in science frame \n" + abs_sci_name)
+        print("-"*prog_bar_width)
 
         # read in the cutout science frame
         # (there should be no masking of this frame downstream)
@@ -216,6 +221,12 @@ class HostRemovalCube:
         OUTPUTS:
         host_subt_cube: a cube of non-derotated frames
         '''
+        print("Read in PCA basis for host star \n" + self.abs_host_star_PCA_name)
+        print("-"*prog_bar_width)
+        print("Read in PCA basis for fake planet \n" + self.abs_fake_planet_PCA_name)
+        print("-"*prog_bar_width)
+        print("Read in PCA tesselation file \n" + self.abs_region_mask_name)
+        print("-"*prog_bar_width)
 
         # make a cube that is the same shape as the input
         host_subt_cube_all_frames = np.nan*np.ones(np.shape(self.cube_frames))

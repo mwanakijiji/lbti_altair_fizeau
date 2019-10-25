@@ -117,10 +117,10 @@ class PSFPCACubeMaker:
             # if there was a match
             if (len(abs_matching_file_array) != 0):
 
-                print("psf_pca_bases: Reading in frame "+str("{:0>6d}".format(frame_num)))
-
                 # read in the science frame from raw data directory
                 abs_matching_file = abs_matching_file_array[0] # get the name
+                print("psf_pca_bases: Reading in frame "+str("{:0>6d}".format(frame_num)))
+                print("  corresponding to file "+abs_matching_file)
                 sci, header_sci = fits.getdata(abs_matching_file, 0, header=True)
 
                 ## apply quality criteria for determining whether a frame should be added to a cube:
@@ -246,7 +246,7 @@ def main():
     # initialize the file
     df.to_csv(residual_file_name)
 
-    # populate dataframe
+    # lframe
     '''
     for q in range(0,len(list_fits_residual_frame)):
         print('Resid frame '+str(q))

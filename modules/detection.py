@@ -220,7 +220,7 @@ class MedianCube:
                          data = cube_derotated_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote cube-just-before-median to disk as " + cube_file_name)
+            print("detection: "+str(datetime.datetime.now())+": Wrote cube-just-before-median to disk as " + cube_file_name)
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
@@ -238,7 +238,7 @@ class MedianCube:
                      data = median_stack,
                      header = hdr,
                      overwrite = True)
-        print("Wrote median of stack as " + adi_file_name)
+        print("detection: "+str(datetime.datetime.now())+": Wrote median of stack as " + adi_file_name)
         print("-"*prog_bar_width)
 
         # for memory's sake
@@ -299,7 +299,11 @@ class Detection:
 
         # read in a centered PSF model to use for companion search
         ## ## WILL NEED TO CHANGE THIS!
-        centered_psf = fits.getdata("lm_180507_009030.fits")
+        print("Reading in centered PSF model to use for companion search:")
+        centered_psf_model_file_name = "lm_180507_009030.fits"
+        print(centered_psf_model_file_name)
+        print("-"*prog_bar_width)
+        centered_psf = fits.getdata(centered_psf_model_file_name)
 
         # case 1: we don't know where a possible companion is, and we're searching blindly for it
         if blind_search:
@@ -536,7 +540,7 @@ class Detection:
         fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)
-        print("Wrote out S/N check cube as \n" + str(config["data_dirs"]["DIR_S2N_CUBES"]) +
+        print("detection: "+str(datetime.datetime.now())+": Wrote out S/N check cube as \n" + str(config["data_dirs"]["DIR_S2N_CUBES"]) +
               "sn_check_cube_" + os.path.basename(self.adi_frame_file_name))
 
 

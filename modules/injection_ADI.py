@@ -134,7 +134,7 @@ class JustPutIntoCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: "+str(datetime.datetime.now())+"Wrote cube of science frames (without fake planets or any other modification) to disk as \n"
+            print("injection_ADI: "+str(datetime.datetime.now())+": Wrote cube of science frames (without fake planets or any other modification) to disk as \n"
                   + file_name)
             print("-"*prog_bar_width)
 
@@ -201,8 +201,11 @@ class FakePlanetInjectorCube:
         abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
         '''
 
-        #print(self.fake_params)
-        #print(self.fake_params["angle_deg_EofN"])
+        print("injection_ADI: at __init__, read in PCA vector for host star \n" +
+              self.abs_host_star_PCA_name)
+        print("injection_ADI: at __init__, read in PCA vector for fake planet \n" +
+              self.abs_fake_planet_PCA_name)
+        print("-"*prog_bar_width)
 
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
@@ -220,6 +223,7 @@ class FakePlanetInjectorCube:
         # loop over frames to inject fake planets in each of them
         for frame_num in range(0,len(abs_sci_name_array)):
             print("injection_ADI: Injecting a fake planet into cube slice " + str(frame_num))
+            print(" which corresponds to file \n" + abs_sci_name_array[frame_num])
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
@@ -250,7 +254,12 @@ class FakePlanetInjectorCube:
             # do the PCA fit of masked host star
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
+            print("injection_ADI: Reading in this PCA basis for the host star: \n" +
+                  self.pca_basis_cube_host_star)
             fit_host_star = fit_pca_star(self.pca_basis_cube_host_star, sci, no_mask, n_PCA=100)
+            print("injection_ADI: Reading in this PCA basis for the fake planet: \n" +
+                  self.pca_basis_cube_fake_planet)
+            print("-"*prog_bar_width)
             fit_fake_planet = fit_pca_star(self.pca_basis_cube_fake_planet, sci, mask_weird, n_PCA=100)
             if np.logical_or(not fit_host_star, not fit_fake_planet): # if the dimensions were incompatible, skip this science frame
                 print("injection_ADI: Incompatible dimensions; skipping this frame...")
@@ -699,7 +708,7 @@ class SyntheticFizeauInjectRemoveADI:
         ## ## weak point here: this median name is hard-coded
 
         median_frame, header_median_frame = fits.getdata(self.pca_pre_decomposition_median_name, 0, header=True)
-        print("injection_ADI: Median frame being subtracted from the cube of science frames is \n" +
+        print("injection_ADI: "+str(datetime.datetime.now())+": Median frame being subtracted from the cube of science frames is read in as\n" +
               self.pca_pre_decomposition_median_name)
         print("-"*prog_bar_width)
         cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
@@ -714,7 +723,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-        print("injection_ADI: "+str(datetime.datetime.now())+"Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
+        print("injection_ADI: "+str(datetime.datetime.now())+": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
               +self.write_name_abs_derotated_sci_median)
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,

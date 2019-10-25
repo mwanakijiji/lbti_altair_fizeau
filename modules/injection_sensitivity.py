@@ -78,12 +78,14 @@ class FakePlanetInjectorCube:
         print(self.fake_params)
         print(self.fake_params["angle_deg_EofN"])
 
+        print("Read in this PCA vector cube: \n" + self.abs_PCA_name)
+
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
         # initialize cube to hold the frames
-        print("Memory error, 0 " + str(len(abs_sci_name_array)))
-        print("Memory error, shape " + str(np.shape(test_image)))
+        print("injection_sensitivity: Memory error, 0 " + str(len(abs_sci_name_array)))
+        print("injection_sensitivity: Memory error, shape " + str(np.shape(test_image)))
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))
@@ -93,11 +95,14 @@ class FakePlanetInjectorCube:
 
         # loop over frames to inject fake planets in each of them
         for frame_num in range(0,len(abs_sci_name_array)):
-            print("---------------")
-            print("Injecting a fake planet into cube slice " + str(frame_num))
+            print("-"*prog_bar_width)
+            print("injection_sensitivity: Injecting a fake planet into cube slice " + str(frame_num))
 
             # read in the cutout science frames
+            print("injection_sensitivity: Reading in file \n" +
+                  abs_sci_name_array[frame_num])
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
+            print("-"*prog_bar_width)
 
             # define the mask of this science frame
             ## ## fine-tune this step later!
@@ -123,7 +128,7 @@ class FakePlanetInjectorCube:
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
             fit_unsat = fit_pca_star(self.pca_basis_cube_unsat, sci, mask_weird, n_PCA=100)
             if not fit_unsat: # if the dimensions were incompatible, skip this science frame
-                print("Incompatible dimensions; skipping this frame...")
+                print("injection_sensitivity: Incompatible dimensions; skipping this frame...")
                 continue
 
             # get absolute amplitude of the host star
@@ -200,9 +205,9 @@ class FakePlanetInjectorCube:
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("Wrote fake-planet-injected cube to disk as " + file_name)
+            print("injection_sensitivity: Wrote fake-planet-injected cube to disk as " + file_name)
         
-        print("Array of PA")
+        print("injection_sensitivity: Array of PA")
         print(pa_array)
 
         # return cube of frames and array of PAs
@@ -243,12 +248,12 @@ def inject_remove_adi(this_param_combo):
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[0123456]*.fits")))
     cookies_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_010[89]*.fits")))
 
-    print("number of frames being considered for ADI: " + str(len(cookies_centered_06_name_array)))
+    print("injection_sensitivity: number of frames being considered for ADI: " + str(len(cookies_centered_06_name_array)))
     
 
     ## Inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
-    print("-------------------------------------------------")
-    print("Injecting fake planet corresponding to parameter")
+    print("injection_sensitivity: -------------------------------------------------")
+    print("injection_sensitivity: Injecting fake planet corresponding to parameter")
     print(this_param_combo)
 
     # instantiate fake planet injection
@@ -264,7 +269,7 @@ def inject_remove_adi(this_param_combo):
     injected_fake_psfs_cube, pas_array, frame_array_0 = inject_fake_psfs(cookies_centered_06_name_array)
 
     # fyi
-    print("Frames into which we will inject fake planets: ")
+    print("injection_sensitivity: Frames into which we will inject fake planets: ")
     print(frame_array_0)
 
     # instantiate removal of host star from each frame in the cube
@@ -295,8 +300,8 @@ def inject_remove_adi(this_param_combo):
     elapsed_time = np.subtract(time.time(), time_start)
 
     print("----------------------------------------------------------------")
-    print("Completed one fake planet parameter configuration")
-    print("Elapsed time (sec): ")
+    print("injection_sensitivity: Completed one fake planet parameter configuration")
+    print("injection_sensitivity: Elapsed time (sec): ")
     print(str(int(elapsed_time)))
 
 

@@ -4,6 +4,7 @@ import glob
 import time
 import pickle
 import math
+import datetime
 import pandas as pd
 from astropy.io import fits
 from astropy.convolution import Gaussian2DKernel
@@ -135,7 +136,6 @@ class MedianCube:
             sci = self.host_subt_cube[t,:,:]
 
             # replace nans with zeros to let the rotation work (we'll mask the regions of zeros downstream)
-            print("protot")
             sci[~np.isfinite(sci)] = 0
 
             # derotate according to PA
@@ -163,13 +163,13 @@ class MedianCube:
                 # mask for nod down: same, but also top-right corner (340:,375:), and bottom 100 pixels
                 # convention: 0: bad pixels we will mask; 1: pixels to pass
                 if (nod_position == "nod_up"):
-                    print("Applying mask to frame after derotation, nod up")
+                    print("detection: Applying mask to frame after derotation, nod up")
                     mask_nan_regions[:10,:] = 0
                     mask_nan_regions[-10:,:] = 0
                     mask_nan_regions[:,:10] = 0
                     mask_nan_regions[:,-10:] = 0
                 elif (nod_position == "nod_down"):
-                    print("Applying mask to frame after derotation, nod down")
+                    print("detection: Applying mask to frame after derotation, nod down")
                     mask_nan_regions[:10,:] = 0
                     mask_nan_regions[-10:,:] = 0
                     mask_nan_regions[:,:10] = 0

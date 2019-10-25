@@ -831,7 +831,7 @@ def main():
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                 + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits"),
         read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + 'median_frame_seqStart_000000_seqStop_010000_pcaNum_0100.fits'),
+                                                          + 'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
         write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
                                                   + config["file_names"]["MEDIAN_SCI_FRAME"]),
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]

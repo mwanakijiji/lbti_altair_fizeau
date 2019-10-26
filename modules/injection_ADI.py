@@ -254,10 +254,10 @@ class FakePlanetInjectorCube:
             # do the PCA fit of masked host star
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
-            print("injection_ADI: Reading in this PCA basis for the host star: \n" +
+            print("injection_ADI: Applying this PCA basis for the host star: \n" +
                   str(self.abs_host_star_PCA_name))
             fit_host_star = fit_pca_star(self.pca_basis_cube_host_star, sci, no_mask, n_PCA=100)
-            print("injection_ADI: Reading in this PCA basis for the fake planet: \n" +
+            print("injection_ADI: Applying this PCA basis for the fake planet: \n" +
                   str(self.abs_fake_planet_PCA_name))
             print("-"*prog_bar_width)
             fit_fake_planet = fit_pca_star(self.pca_basis_cube_fake_planet, sci, mask_weird, n_PCA=100)
@@ -842,12 +842,5 @@ def main():
         )
 
     # run
-    synthetic_fizeau_inject_remove_adi(param_dict_list[0])
-
-    
-    #pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
-
-
-    # instantiate
-    #test_instance = TestClass(image_name = config["data_dirs"]["DIR_OTHER_FITS"] + "mask_quad4_circ_ring.fits")
-    #pool.map(test_instance,[1,2,3])
+    #synthetic_fizeau_inject_remove_adi(param_dict_list[0]) # test on just one
+    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)

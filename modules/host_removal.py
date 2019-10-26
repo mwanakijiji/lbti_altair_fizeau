@@ -257,6 +257,7 @@ class HostRemovalCube:
 
                 print("Removing host star from relative slice " + str(slice_num) +
                       " of " + str(len(self.cube_frames)))
+                print("-"*prog_bar_width)
 
                 # select the slice from the cube
                 # (there should be no masking of this frame downstream)
@@ -347,7 +348,6 @@ class HostRemovalCube:
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
                     # accumulate-plot the PCA vectors
-                    print("Accumulate-plotting")
                     plt.plot(fit_host_star["pca_vector"], label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
                     plt.xlabel("PCA mode")
                     plt.ylabel("Amplitude")

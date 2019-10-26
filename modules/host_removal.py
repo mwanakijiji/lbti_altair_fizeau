@@ -5,6 +5,7 @@ import time
 import pickle
 import math
 import datetime
+import matplotlib.pyplot as plt
 from astropy.io import fits
 from modules import *
 
@@ -346,13 +347,16 @@ class HostRemovalCube:
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
                     # accumulate-plot the PCA vectors
-                    plt.plot(fit_host_star["pca_vector"]) # this will be overplotted
+                    plt.plot(fit_host_star["pca_vector"], label="tesselation region "+str(mask_slice_num)) # this will be overplotted
                     plt.xlabel("PCA mode")
                     plt.ylabel("Amplitude")
                     # if we're at the last region to plot the PCA vector of
                     if mask_slice_num == len(self.abs_region_mask):
-                        plt.savefig(str(self.config_data["DIR_FYI_INFO"]) + "pca_spectrum_science_cube_frame_\n" +
-                                    str(slice_num).zfill(6)+"_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf")
+                        plot_file_name = str(self.config_data["DIR_FYI_INFO"]) + "pca_spectrum_science_cube_frame_\n" +
+                                    str(slice_num).zfill(6)+"_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf"
+                        plt.legend()
+                        plt.savefig(plot_file_name)
+                        print("host_removal: Wrote PCA vectors to \n" + plot_file_name)
                         plt.clf()
 
                     ## BEGIN TEST

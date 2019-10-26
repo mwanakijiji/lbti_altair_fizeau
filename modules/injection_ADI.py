@@ -823,7 +823,7 @@ def main():
     # instantiate
     synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(
         file_name_list = cookies_centered_06_name_array,
-        n_PCA_host_removal = 5,
+        n_PCA_host_removal = 100,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                             'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]

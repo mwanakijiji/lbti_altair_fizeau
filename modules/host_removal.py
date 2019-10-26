@@ -348,7 +348,7 @@ class HostRemovalCube:
 
                     # accumulate-plot the PCA vectors
                     print("Accumulate-plotting")
-                    plt.plot(fit_host_star["pca_vector"], label="tesselation region "+str(mask_slice_num)) # this will be overplotted
+                    plt.plot(fit_host_star["pca_vector"], label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
                     plt.xlabel("PCA mode")
                     plt.ylabel("Amplitude")
                     # if we're at the last region to plot the PCA vector of

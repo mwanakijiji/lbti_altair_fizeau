@@ -156,8 +156,8 @@ class FakePlanetInjectorCube:
     def __init__(self,
                  fake_params,
                  n_PCA,
-                 abs_host_star_PCA_name,
-                 abs_fake_planet_PCA_name,
+                 write_name_abs_host_star_PCA,
+                 read_name_abs_fake_planet_PCA,
                  config_data = config,
                  write = False):
         '''
@@ -176,8 +176,8 @@ class FakePlanetInjectorCube:
         '''
 
         self.n_PCA = n_PCA
-        self.abs_host_star_PCA_name = abs_host_star_PCA_name
-        self.abs_fake_planet_PCA_name = abs_fake_planet_PCA_name
+        self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
+        self.abs_fake_planet_PCA_name = read_name_abs_fake_planet_PCA
         self.config_data = config_data
         self.write = write
 

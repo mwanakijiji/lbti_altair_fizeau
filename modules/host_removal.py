@@ -347,6 +347,7 @@ class HostRemovalCube:
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
                     # accumulate-plot the PCA vectors
+                    print("Accumulate-plotting")
                     plt.plot(fit_host_star["pca_vector"], label="tesselation region "+str(mask_slice_num)) # this will be overplotted
                     plt.xlabel("PCA mode")
                     plt.ylabel("Amplitude")

@@ -689,7 +689,7 @@ class SyntheticFizeauInjectRemoveADI:
                                           write = False)
 
             # call fake planet injection
-            cube_pre_removal_A, pas_array_A, frame_array_0_A = inject_fake_psfs_A(cookies_A_only_centered_06_name_array)
+            cube_pre_removal_A, pas_array_A, frame_array_0_A = inject_fake_psfs_A(self.cookies_centered_06_name_array)
 
         # instantiate removal of host star from each frame in the cube, whether or not
         # these are frames with fake planets

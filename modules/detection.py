@@ -142,9 +142,11 @@ class MedianCube:
             sci_derotated = scipy.ndimage.rotate(sci, self.pa_array[t], reshape=False)
 
             # TEST ONLY
+            '''
             fits.writeto(filename = "junk_sci.fits",
                          data = sci,
                          overwrite = True)
+            '''
 
             ### BEGIN READ IN THE RIGHT MASK
             if apply_mask_after_derot:

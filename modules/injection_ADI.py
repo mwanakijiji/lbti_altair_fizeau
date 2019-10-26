@@ -838,8 +838,17 @@ def main():
                                            + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits"),
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] + "tesselation_10_psfs_in_each_region.fits")
+        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] + "mask_100x100_4quad.fits")
         )
+    '''
+    Note that tesselation region options are
+    mask_100x100pix_whole_frame.fits
+    mask_100x100_4quad.fits
+    mask_quad4_circ.fits
+    mask_quad4_circ_ring.fits
+    tesselation_10_psfs_in_each_region.fits
+    mask_10x10_100squares.fits
+    '''
 
     # run
     #synthetic_fizeau_inject_remove_adi(param_dict_list[0]) # test on just one

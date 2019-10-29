@@ -782,13 +782,13 @@ def main():
     for NO injection of fake planets (and only host star removal and ADI), set rad_asec equal to zero and the others to one element each
     i.e, {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
     '''
-    
+    '''
     fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
     '''
     fake_params_pre_permute = {"angle_deg_EofN": [315.],
                                "rad_asec": [0.1, 0.2, 0.3, 0.4],
                                "ampl_linear_norm": [1e-3]}
-    '''
+
     # permutate values of fake planet parameters to get all possible combinations
     keys, values = zip(*fake_params_pre_permute.items())
     experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
@@ -838,7 +838,7 @@ def main():
                                            + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits"),
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] + "mask_quad4_circ_ring.fits")
+        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] + "tesselation_10_psfs_in_each_region.fits")
         )
     '''
     Note that tesselation region options are

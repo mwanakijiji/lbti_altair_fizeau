@@ -26,8 +26,8 @@ def convert_rad_xy(canvas_array, PS, rho_asec, theta_deg):
     '''
     
     # find the center of the dummy array; this will be the pivot point
-    array_center = (int(0.5*np.shape(dummy_array_0)[0]),
-                    int(0.5*np.shape(dummy_array_0)[1]))
+    array_center = (int(0.5*np.shape(canvas_array)[0]),
+                    int(0.5*np.shape(canvas_array)[1]))
     
     # find x, y offsets from center in units of display pixels
     offset_from_center_x = -np.divide(rho_asec,PS)*np.sin(np.multiply(theta_deg,np.pi/180.))
@@ -199,9 +199,9 @@ class TwoDimSensitivityMap:
         info_file = pd.read_csv(csv_file)
 
         # find unique fake planet amplitudes (on a relative, linear scale)
-        unique_ampls = info_file_grouped_rad_ampl["ampl_linear_norm"].unique()
+        unique_ampls = info_file["ampl_linear_norm"].unique()
 
-        # loop over each available amplitude
+        # loop over each available fake companion amplitude
         for ampl_num in range(0,len(unique_ampls)):
 
             # winnow data in the dataframe to involve only this amplitude
@@ -214,7 +214,7 @@ class TwoDimSensitivityMap:
             oversample_factor = 10 # oversample by this much
 
             # effective plate scale on the display area
-            pseudo_ps_LMIR = np.divide(self.config_data["instrum_params"]["LMIR_PS"],oversample_factor)
+            pseudo_ps_LMIR = np.divide(np.float(self.config_data["instrum_params"]["LMIR_PS"]),oversample_factor)
 
             # make the array with an odd number of pixels to have a center
             dummy_array_0 = np.nan*np.ones((1001,1001))
@@ -228,6 +228,7 @@ class TwoDimSensitivityMap:
             ## make a simple scatter plot, where the 3rd dimension is in the marker color
             plt.clf()
             plt.scatter(x_scatter, y_scatter, c = data_right_ampl["signal"])
+            plt.title("Signal")
             plt.ylim([0,np.shape(dummy_array_0)[0]])
             plt.xlim([0,np.shape(dummy_array_0)[1]])
             # compass rose
@@ -237,7 +238,8 @@ class TwoDimSensitivityMap:
             plt.plot([800,600],[200,200], color="k")
             # make square
             plt.gca().set_aspect('equal', adjustable='box')
-            plt.savefig("junk1.pdf")
+            plt.savefig("junk_scatter_"+str(unique_ampls[ampl_num])+".pdf")
+            print("Wrote out scatter signal map")
 
             ## make a contour plot where regions between points are interpolated
             # initialize meshgrid
@@ -251,6 +253,8 @@ class TwoDimSensitivityMap:
                    method='nearest')
             plt.clf()
             plt.imshow(grid_z0, origin="lower")
+            plt.title("Signal")
+            plt.colorbar()
             # compass rose
             plt.annotate("N", xy=(790,410), xytext=(790,410))
             plt.annotate("E", xy=(580,190), xytext=(580,190))
@@ -262,7 +266,8 @@ class TwoDimSensitivityMap:
             plt.ylim([0,np.shape(dummy_array_0)[0]])
             plt.xlim([0,np.shape(dummy_array_0)[1]])
             plt.gca().set_aspect('equal', adjustable='box')
-            plt.savefig("junk2.pdf")
+            plt.savefig("junk_contour_"+str(unique_ampls[ampl_num])+".pdf")
+            print("Wrote out contour signal map")
 
         
 
@@ -278,5 +283,11 @@ def main():
     config.read("modules/config.ini")
 
     # make a 1D contrast curve
+    '''
     one_d_contrast = OneDimContrastCurve()
     one_d_contrast()
+    '''
+
+    # make a 2D sensitivity mao
+    two_d_sensitivity = TwoDimSensitivityMap()
+    two_d_sensitivity()

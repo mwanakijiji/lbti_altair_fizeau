@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from scipy.interpolate import griddata
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from modules import *
 
 
@@ -206,6 +207,8 @@ class TwoDimSensitivityMap:
 
             # winnow data in the dataframe to involve only this amplitude
             data_right_ampl = info_file.where(info_file["ampl_linear_norm"] == unique_ampls[ampl_num])
+            # drop other nans (sometimes signal or noise is nan)
+            data_right_ampl = data_right_ampl.dropna()
 
             print(data_right_ampl)
 
@@ -247,14 +250,43 @@ class TwoDimSensitivityMap:
             y_mgrid_range = np.arange(0,np.shape(dummy_array_0)[0])
             xx, yy = np.meshgrid(x_mgrid_range, y_mgrid_range, sparse=False)
             # interpolate between the empirical points
-            grid_z0 = griddata(points=np.transpose([x_scatter,y_scatter]), 
+            print(data_right_ampl["signal"].dropna().values)
+            print(data_right_ampl["noise"].dropna().values)
+            print(x_scatter.dropna().values)
+            print(y_scatter.dropna().values)
+            ## ## BEGIN TEST
+            '''
+            #data_right_ampl["signal"] = np.ones(len(data_right_ampl["signal"]))
+            #data_right_ampl["noise"] = 0.1*np.ones(len(data_right_ampl["signal"]))
+            x_scatter = 1000*np.random.random(len(x_scatter))
+            y_scatter = 1000*np.random.random(len(x_scatter))
+            grid_z0_signal = griddata(points=np.transpose([x_scatter,y_scatter]), 
                    values=data_right_ampl["signal"].values, 
                    xi=(xx, yy), 
-                   method='nearest')
+                   method='cubic')
+            grid_z0_noise = griddata(points=np.transpose([x_scatter,y_scatter]), 
+                   values=data_right_ampl["noise"].values, 
+                   xi=(xx, yy), 
+                   method='cubic')
+            '''
+            ## ## END TEST
+            # N.b. In the interpolations, for linear and cubic options to work, x,y sampling
+            # has to be heavy enough
+            grid_z0_signal = griddata(points=np.transpose([x_scatter,y_scatter]), 
+                   values=data_right_ampl["signal"].values, 
+                   xi=(xx, yy), 
+                   method='linear')
+            grid_z0_noise = griddata(points=np.transpose([x_scatter,y_scatter]), 
+                   values=data_right_ampl["noise"].values, 
+                   xi=(xx, yy), 
+                   method='linear')
             plt.clf()
-            plt.imshow(grid_z0, origin="lower")
+            plt.figure(figsize=(10,5))
+            # subplot 1: signal
+            plt.subplot(131)
+            plt.imshow(grid_z0_signal, origin="lower")
             plt.title("Signal")
-            plt.colorbar()
+            plt.colorbar(fraction=0.046, pad=0.04)
             # compass rose
             plt.annotate("N", xy=(790,410), xytext=(790,410))
             plt.annotate("E", xy=(580,190), xytext=(580,190))
@@ -266,9 +298,63 @@ class TwoDimSensitivityMap:
             plt.ylim([0,np.shape(dummy_array_0)[0]])
             plt.xlim([0,np.shape(dummy_array_0)[1]])
             plt.gca().set_aspect('equal', adjustable='box')
-            plt.savefig("junk_contour_"+str(unique_ampls[ampl_num])+".pdf")
-            print("Wrote out contour signal map")
+            # subplot 2: noise
+            plt.subplot(132)
+            plt.imshow(grid_z0_noise, origin="lower")
+            plt.title("Noise")
+            plt.colorbar(fraction=0.046, pad=0.04)
+            # compass rose
+            plt.annotate("N", xy=(790,410), xytext=(790,410))
+            plt.annotate("E", xy=(580,190), xytext=(580,190))
+            plt.plot([800,800],[200,400], color="k")
+            plt.plot([800,600],[200,200], color="k")
+            # overplot discrete points
+            plt.scatter(x_scatter, y_scatter, s = 60, c = data_right_ampl["noise"], edgecolors="w")
+            # restrict dimensions
+            plt.ylim([0,np.shape(dummy_array_0)[0]])
+            plt.xlim([0,np.shape(dummy_array_0)[1]])
+            plt.gca().set_aspect('equal', adjustable='box')
+            # subplot 3: signal/noise
+            plt.subplot(133)
+            plt.imshow(np.divide(grid_z0_signal,grid_z0_noise), origin="lower")
+            plt.title("S/N")
+            plt.colorbar(fraction=0.046, pad=0.04)
+            # compass rose
+            plt.annotate("N", xy=(790,410), xytext=(790,410))
+            plt.annotate("E", xy=(580,190), xytext=(580,190))
+            plt.plot([800,800],[200,400], color="k")
+            plt.plot([800,600],[200,200], color="k")
+            # overplot discrete points
+            plt.scatter(x_scatter, y_scatter, s = 60,
+                        c = np.divide(data_right_ampl["signal"],data_right_ampl["noise"]),
+                        edgecolors="w")
+            # restrict dimensions
+            plt.ylim([0,np.shape(dummy_array_0)[0]])
+            plt.xlim([0,np.shape(dummy_array_0)[1]])
+            plt.gca().set_aspect('equal', adjustable='box')
+            s_and_n_map_fyi_file_name = "junk_contour_"+str(unique_ampls[ampl_num])+".pdf"
+            plt.tight_layout()
+            #ax = plt.gca()
+            #divider = make_axes_locatable(ax)
+            #cax = divider.append_axes("right", size="5%", pad=0.05)
+            plt.savefig(s_and_n_map_fyi_file_name)
+            print("Wrote out contour signal and noise map as \n" + s_and_n_map_fyi_file_name)
+            print("-"*prog_bar_width)
 
+            # put interpolated data into a cube
+            cube_file_name = self.config_data["data_dirs"]["DIR_S2N_CUBES"] + \
+              "s_to_n_cube_ampl_" + str(unique_ampls[ampl_num]) + ".fits"
+            cube_s_and_n = np.nan*np.ones((2,np.shape(grid_z0_signal)[0],np.shape(grid_z0_signal)[1]))
+            cube_s_and_n[0,:,:] = grid_z0_signal
+            cube_s_and_n[1,:,:] = grid_z0_noise
+
+            # save interpolated signal and noise data
+            print("sensitivity: Writing 3D cube of 2D signal and noise \n" + cube_file_name)
+            fits.writeto(filename = cube_file_name,
+                     data = cube_s_and_n,
+                     header = None,
+                     overwrite = True)
+            print("-"*prog_bar_width)
         
 
 

@@ -30,14 +30,14 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-
+'''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main() # finishes by writing out the median ADI frame
-
+'''
 ## ## DETECTION
 detection.main()
-'''
+
 ## ## ORBITAL PARAMETER FORWARD MODELING
 ## ## SENSITIVITY
 sensitivity.main() # produces 1-D contrast curve from csv info
-
+'''

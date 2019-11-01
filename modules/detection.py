@@ -272,7 +272,6 @@ class Detection:
         self.adi_frame_file_name = adi_frame_file_name
 
         # read in the single frame produced by previous module
-        ## ## REPLACE FILENAME HERE WITH CONFIG PARAM
         self.master_frame, self.header = fits.getdata(self.adi_frame_file_name, 0, header=True)
 
         # radius of aperture around planet candidate (pix)
@@ -341,7 +340,8 @@ class Detection:
             
         # convert to DataFrame
         ## ## note that this is at pixel-level accuracy; refine this later to allow sub-pixel precision
-        companion_loc_vec = pd.DataFrame({"y_pix_coord": loc_vec["y_pix_coord"], "x_pix_coord": loc_vec["x_pix_coord"]})
+        companion_loc_vec = pd.DataFrame({"y_pix_coord": loc_vec["y_pix_coord"],
+                                          "x_pix_coord": loc_vec["x_pix_coord"]})
 
         # find center of frame for placing of masks
         # N.b. for a 100x100 image, the physical center is at Python coordinate (49.5,49.5)

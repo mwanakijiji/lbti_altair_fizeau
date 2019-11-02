@@ -374,6 +374,6 @@ def main():
     one_d_contrast()
     '''
 
-    # make a 2D sensitivity mao
+    # make a 2D sensitivity map
     two_d_sensitivity = TwoDimSensitivityMap()
     two_d_sensitivity()

@@ -347,7 +347,8 @@ class HostRemovalCube:
                     # put the region of the original image into its cube
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
-                    # accumulate-plot the PCA vectors
+                    # accumulate-plot the PCA vectors (FYI only)
+                    '''
                     plt.plot(fit_host_star["pca_vector"], label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
                     plt.xlabel("PCA mode")
                     plt.ylabel("Amplitude")
@@ -360,6 +361,7 @@ class HostRemovalCube:
                         plt.savefig(plot_file_name)
                         plt.clf()
                         print("host_removal: Wrote PCA vectors to \n" + plot_file_name)
+                    '''
 
                     ## BEGIN TEST
                     '''

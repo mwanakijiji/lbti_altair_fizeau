@@ -784,7 +784,7 @@ def main():
     '''
 
     fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
-
+    '''
     fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.1],
                                "ampl_linear_norm": [1e-3]}

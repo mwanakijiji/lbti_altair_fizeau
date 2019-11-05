@@ -9,6 +9,7 @@ from scipy import ndimage, sqrt, stats, misc, signal
 import git
 import configparser
 import multiprocessing
+from astropy.io import fits
 from sklearn.decomposition import PCA
 
 
@@ -118,6 +119,12 @@ def make_dirs():
         if not os.path.exists(abs_path_name):
             os.makedirs(abs_path_name)
             print("Made directory " + abs_path_name)
+
+def simple_save_fits(image, file_name):
+    '''
+    Handy function to save a FITS image locally for bug-checking
+    '''
+    fits.writeto(filename = file_name,data = image,overwrite = True)
 
 
 def make_first_pass_mask(image, quadChoice):

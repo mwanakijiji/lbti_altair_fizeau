@@ -4,6 +4,7 @@ import glob
 import time
 import pickle
 import math
+import sys
 import datetime
 import pandas as pd
 from astropy.io import fits
@@ -365,7 +366,7 @@ class Detection:
         smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
         import ipdb; ipdb.set_trace()
-        # find amplitude of host star
+        # find amplitude of host star in SMOOTHED image
         center_sci_median_frame = [int(0.5*np.shape(sci_median_frame)[0]),
                                    int(0.5*np.shape(sci_median_frame)[1])]
         host_ampl = np.nanmax(smoothed_sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
@@ -374,7 +375,7 @@ class Detection:
         print(host_ampl)
         import ipdb; ipdb.set_trace()
         # calculate outer noise annulus radius
-        print("comp loc vec")
+        print("comp loc vec from center")
         print(companion_loc_vec["x_pix_coord"][pos_num])
         print(companion_loc_vec["y_pix_coord"][pos_num])
         print(self.comp_rad)
@@ -485,6 +486,14 @@ class Detection:
         # mask involving the noise ring without the companion
         net_noise_mask = np.add(np.add(noise_mask_inner,noise_mask_outer_inv),
                                 comp_mask)
+        # this addition of masks leads to values >1, so
+        # 1. do sanity check that the finite values are the same
+        # 2. normalize
+        if (np.nanmax(net_noise_mask) == np.nanmin(net_noise_mask)):
+            net_noise_mask = np.divide(net_noise_mask,np.nanmax(net_noise_mask))
+        else:
+            print("Error! The noise mask has varying values; cannot normalize to 1.")
+            sys.exit()
 
         # at small radii, there is not enough room for a necklace of patches, so just put a dummy blank in
         if (len(other_angles) < 2):
@@ -493,7 +502,7 @@ class Detection:
         # replace zeros in the necklace 2d array with NaNs
         necklace_2d_array[necklace_2d_array == 0] = np.nan
         import ipdb; ipdb.set_trace()
-        # find S/N
+        ## find S/N
         noise_smoothed_full_annulus = np.multiply(smoothed_adi_frame,net_noise_mask)
         comp_ampl = np.multiply(smoothed_adi_frame,comp_mask_inv)
         signal = np.nanmax(comp_ampl)

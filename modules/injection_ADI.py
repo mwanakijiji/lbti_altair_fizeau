@@ -227,7 +227,7 @@ class FakePlanetInjectorCube:
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
-
+            import ipdb; ipdb.set_trace()
             # define the mask of this science frame
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
@@ -236,7 +236,7 @@ class FakePlanetInjectorCube:
             ## mask_weird[sci > 55000] = np.nan # mask saturating region
             ## THE BELOW FOR FAKE DATA
             mask_weird[sci > 4.5e9] = np.nan
-            
+            import ipdb; ipdb.set_trace()
 
             ## TEST: WRITE OUT
             #hdu = fits.PrimaryHDU(mask_weird)
@@ -264,9 +264,11 @@ class FakePlanetInjectorCube:
             if np.logical_or(not fit_host_star, not fit_fake_planet): # if the dimensions were incompatible, skip this science frame
                 print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue
+            import ipdb; ipdb.set_trace()
 
             # get absolute amplitude of the host star (reconstructing over the saturated region)
             ampl_host_star = np.max(fit_fake_planet["recon_2d"])
+            import ipdb; ipdb.set_trace()
 
             ###########################################
             # inject the fake planet
@@ -300,6 +302,7 @@ class FakePlanetInjectorCube:
                 fit_fake_planet["recon_2d"],
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
+            import ipdb; ipdb.set_trace()
 
             #print('fake_params y x')
             #print(self.fake_params["y_pix_coord"])
@@ -308,9 +311,11 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
+            import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
+            import ipdb; ipdb.set_trace()
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
@@ -851,6 +856,11 @@ def main():
     mask_10x10_100squares.fits
     '''
 
+    ## ## BEGIN TEST
+    for param_num in range(0,len(param_dict_list)):
+        print("PARAM DICT:")
+        synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
+    ## ## END TEST
+
     # run
-    #synthetic_fizeau_inject_remove_adi(param_dict_list[0]) # test on just one
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)

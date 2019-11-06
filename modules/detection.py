@@ -357,7 +357,6 @@ class Detection:
         print(sci_median_file_name)
         print("-"*prog_bar_width)
         sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
-        import ipdb; ipdb.set_trace()
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
         print("Convolving ADI and median science frames with same kernel")
@@ -365,7 +364,7 @@ class Detection:
         smoothed_adi_frame = convolve(self.master_frame, kernel)
         smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
         #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
-        import ipdb; ipdb.set_trace()
+
         # find amplitude of host star in SMOOTHED image
         center_sci_median_frame = [int(0.5*np.shape(sci_median_frame)[0]),
                                    int(0.5*np.shape(sci_median_frame)[1])]
@@ -373,7 +372,6 @@ class Detection:
                                                center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
         print("host_ampl")
         print(host_ampl)
-        import ipdb; ipdb.set_trace()
         # calculate outer noise annulus radius
         print("comp loc vec from center")
         print(companion_loc_vec["x_pix_coord"][pos_num])
@@ -489,9 +487,16 @@ class Detection:
         # this addition of masks leads to values >1, so
         # 1. do sanity check that the finite values are the same
         # 2. normalize
-        if (np.nanmax(net_noise_mask) == np.nanmin(net_noise_mask)):
+        if ((np.nanmax(net_noise_mask) == np.nanmin(net_noise_mask)) and
+            np.isfinite(np.nanmax(net_noise_mask))):
+            # if finite values are the same
             net_noise_mask = np.divide(net_noise_mask,np.nanmax(net_noise_mask))
+        elif (np.isfinite(np.nanmax(net_noise_mask) == False) and
+              np.isfinite(np.nanmin(net_noise_mask) == False)):
+            # else if all values are nans
+            pass
         else:
+            # else if there are different finite values
             print("Error! The noise mask has varying values; cannot normalize to 1.")
             sys.exit()
 
@@ -501,12 +506,10 @@ class Detection:
 
         # replace zeros in the necklace 2d array with NaNs
         necklace_2d_array[necklace_2d_array == 0] = np.nan
-        import ipdb; ipdb.set_trace()
         ## find S/N
         noise_smoothed_full_annulus = np.multiply(smoothed_adi_frame,net_noise_mask)
         comp_ampl = np.multiply(smoothed_adi_frame,comp_mask_inv)
         signal = np.nanmax(comp_ampl)
-        import ipdb; ipdb.set_trace()
         if (noise_option == "full_ring"):
             noise = np.nanstd(noise_smoothed_full_annulus)
             noise_frame = noise_smoothed_full_annulus
@@ -514,8 +517,6 @@ class Detection:
             noise = np.nanstd(patch_center_array)
             noise_frame = necklace_2d_array
         s2n = np.divide(signal,noise)
-
-        #import ipdb; ipdb.set_trace()
 
         # append S/N info
         injection_loc_dict["host_ampl"] = host_ampl
@@ -542,7 +543,7 @@ class Detection:
         print("Appended data to csv ")
         print(str(self.csv_record_file_name))
         print("-"*prog_bar_width)
-        import ipdb; ipdb.set_trace()
+
         # write out frame as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
         sn_check_cube[0,:,:] = self.master_frame # the original ADI frame

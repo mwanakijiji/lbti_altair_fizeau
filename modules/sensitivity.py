@@ -369,11 +369,11 @@ def main():
     config.read("modules/config.ini")
 
     # make a 1D contrast curve
-    '''
     one_d_contrast = OneDimContrastCurve()
     one_d_contrast()
-    '''
 
+    '''
     # make a 2D sensitivity map
     two_d_sensitivity = TwoDimSensitivityMap()
     two_d_sensitivity()
+    '''

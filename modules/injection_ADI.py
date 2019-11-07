@@ -880,4 +880,6 @@ def main():
     ## ## END TEST
 
     # run
+    '''
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+    '''

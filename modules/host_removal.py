@@ -104,10 +104,15 @@ class HostRemoval:
         # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
         # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
         try:
-            fit_unsat = fit_pca_star(self.pca_basis_cube_sat, sci, no_mask, n_PCA=100)
+            fit_unsat = fit_pca_star(pca_cube = self.pca_basis_cube_sat,
+                                     sciImg = sci,
+                                     raw_pca_training_median = np.nan*np.ones(np.shape(self.pca_basis_cube_host_star[0,:,:])),
+                                     mask_weird = no_mask,
+                                     n_PCA=100,
+                                     subt_median = False)
         except:
             return
-
+        import ipdb; ipdb.set_trace()
         # subtract the PCA-reconstructed host star
         image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
 
@@ -325,10 +330,12 @@ class HostRemovalCube:
 
                     try:
                         # fit to the host star for subtraction, within the region corresponding to this mask slice
-                        fit_host_star = fit_pca_star(pca_cube=self.pca_basis_cube_host_star,
-                                                 sciImg=sci,
-                                                 mask_weird=mask_for_region_and_weird_pixels,
-                                                 n_PCA=self.n_PCA)
+                        fit_host_star = fit_pca_star(pca_cube = self.pca_basis_cube_host_star,
+                                                 sciImg = sci,
+                                                 raw_pca_training_median = np.nan*np.ones(np.shape(self.pca_basis_cube_host_star[0,:,:])),
+                                                 mask_weird = mask_for_region_and_weird_pixels,
+                                                 n_PCA = self.n_PCA,
+                                                 subt_median = False)
 
                     except:
                         print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")

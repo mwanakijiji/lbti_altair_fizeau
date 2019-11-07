@@ -705,6 +705,7 @@ class SyntheticFizeauInjectRemoveADI:
                                           n_PCA = 100,
                                           write_name_abs_host_star_PCA = self.write_name_abs_cube_A_PCA_vector,
                                           read_name_abs_fake_planet_PCA = self.write_name_abs_cube_A_PCA_vector,
+                                          read_name_raw_pca_median = self.pca_pre_decomposition_median_name,
                                           write = False)
 
             # call fake planet injection

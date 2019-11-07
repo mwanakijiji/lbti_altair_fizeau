@@ -112,7 +112,7 @@ class HostRemoval:
                                      subt_median = False)
         except:
             return
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         # subtract the PCA-reconstructed host star
         image_host_removed = np.subtract(sci,fit_unsat["recon_2d"])
 
@@ -340,7 +340,7 @@ class HostRemovalCube:
                     except:
                         print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")
                         continue
-                    import ipdb; ipdb.set_trace()
+                    #import ipdb; ipdb.set_trace()
                     # subtract the PCA-reconstructed host star (within the region corresponding to this mask slice)
                     region_host_removed = np.subtract(np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:]),
                                                       fit_host_star["recon_2d_masked"])

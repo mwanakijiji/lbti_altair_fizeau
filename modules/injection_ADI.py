@@ -241,7 +241,7 @@ class FakePlanetInjectorCube:
             ## COMMENTED THIS OUT SO THAT I CAN TEST FAKE DATA
             ## mask_weird[sci > 55000] = np.nan # mask saturating region
             ## THE BELOW FOR FAKE DATA
-            mask_weird[sci > 4.5e9] = np.nan
+            mask_weird[sci > 2.5e9] = np.nan
             #import ipdb; ipdb.set_trace()
 
             ## TEST: WRITE OUT
@@ -278,11 +278,11 @@ class FakePlanetInjectorCube:
             if np.logical_or(not fit_host_star, not fit_fake_planet): # if the dimensions were incompatible, skip this science frame
                 print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # get absolute amplitude of the host star (reconstructing over the saturated region)
             ampl_host_star = np.max(fit_fake_planet["recon_2d"])
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             ###########################################
             # inject the fake planet
@@ -316,7 +316,7 @@ class FakePlanetInjectorCube:
                 fit_fake_planet["recon_2d"],
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             #print('fake_params y x')
             #print(self.fake_params["y_pix_coord"])
@@ -325,17 +325,17 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
-                
+
 
         # convert to 32-bit float to save space
         cube_frames = cube_frames.astype(np.float32)

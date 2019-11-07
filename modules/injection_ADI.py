@@ -329,7 +329,7 @@ class FakePlanetInjectorCube:
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet

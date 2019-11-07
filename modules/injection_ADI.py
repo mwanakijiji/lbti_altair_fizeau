@@ -97,7 +97,11 @@ class JustPutIntoCube:
             # (N.b. We don't need a PCA reconstruction quite yet, but this is just a check.)
             # (N.b. Note this is the only criterion right now for deciding if a science
             #       frame will be used.)
-            fit_2_star = fit_pca_star(self.pca_star_basis_cube, sci, mask_weird, n_PCA=1)
+            fit_2_star = fit_pca_star(pca_cube = self.pca_star_basis_cube,
+                                      sciImg = sci,
+                                      raw_pca_training_median = np.zeros(np.shape(sci)),
+                                      mask_weird = mask_weird,
+                                      n_PCA=1)
             if not fit_2_star:
                 print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue

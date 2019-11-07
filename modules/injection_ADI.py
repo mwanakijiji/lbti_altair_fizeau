@@ -282,7 +282,7 @@ class FakePlanetInjectorCube:
 
             # get absolute amplitude of the host star (reconstructing over the saturated region)
             ampl_host_star = np.max(fit_fake_planet["recon_2d"])
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             ###########################################
             # inject the fake planet
@@ -316,7 +316,7 @@ class FakePlanetInjectorCube:
                 fit_fake_planet["recon_2d"],
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             #print('fake_params y x')
             #print(self.fake_params["y_pix_coord"])
@@ -325,11 +325,11 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet

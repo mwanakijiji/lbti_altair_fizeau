@@ -174,7 +174,20 @@ class PSFPCACubeMaker:
         median_frame = np.nanmedian(training_cube_masked_weird, axis = 0)
         if self.subtract_median:
             training_cube_masked_weird = np.subtract(training_cube_masked_weird, median_frame)
-        
+
+        # save the median for later use in reconstructing PSFs
+        ''' REDUNDANT WITH BELOW
+        fits.writeto(filename = raw_pca_training_median_name,
+                     data = median_frame,
+                     header = None,
+                     overwrite = True)
+        del median_frame
+        print("psf_pca_bases: Wrote out raw PCA training cube median as \n " +
+              raw_pca_training_median_name)
+        print("-"*prog_bar_width)
+        '''
+
+        # write out training cube
         fits.writeto(filename = write_training_cube_name,
                      data = training_cube_masked_weird,
                      header = None,
@@ -280,8 +293,8 @@ def main():
     pca_psf_maker_host_resids = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
                                     subtract_median = True)
-    # for PCA basis set for reconstructing host star (subtraction of median may not make
-    # any difference, though
+    # for PCA basis set for reconstructing host star (subtraction of median from the training
+    # set may not make any difference, though
     pca_psf_maker_host_recon = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
                                     subtract_median = False)

@@ -158,19 +158,19 @@ class FakePlanetInjectorCube:
                  n_PCA,
                  write_name_abs_host_star_PCA,
                  read_name_abs_fake_planet_PCA,
+                 read_name_raw_pca_median,
                  config_data = config,
                  write = False):
         '''
         INPUTS:
         fake_params: parameters of the fake companion
         n_PCA: number of principal components to use
-        abs_host_star_PCA_name: absolute file name of the PCA cube to reconstruct the host star
-                       for host star subtraction
-        abs_fake_planet_PCA_name: absolute file name of the PCA cube to reconstruct the host star
-                       for making a fake planet (i.e., without saturation effects)
-        fake_params_pre_permute: angles (relative to PA up), radii, and amplitudes (normalized to host star) of fake PSFs
-                       ex.: fake_params = {"angle_deg_EofN": [0., 60., 120.], "rad_asec": [0.3, 0.4], "ampl_linear_norm": [1., 0.9]}
-                       -> all permutations of these parameters will be computed later
+        write_name_abs_host_star_PCA: absolute file name of the PCA cube to reconstruct the host star
+            for host star subtraction
+        read_name_abs_fake_planet_PCA: absolute file name of the PCA cube to reconstruct the host star
+            for making a fake planet (i.e., without saturation effects)
+        read_name_raw_pca_median: absolute file name of the raw PCA training set median (i.e., the
+            offset not preserved by the PCA decomposition)
         config_data: configuration data, as usual
         write: flag as to whether data product should be written to disk (for checking)
         '''
@@ -184,6 +184,11 @@ class FakePlanetInjectorCube:
         # read in the PCA vector cubes for this series of frames
         self.pca_basis_cube_host_star, self.header_pca_basis_cube_host_star = fits.getdata(self.abs_host_star_PCA_name, 0, header=True)
         self.pca_basis_cube_fake_planet, self.header_pca_basis_cube_fake_planet = fits.getdata(self.abs_fake_planet_PCA_name, 0, header=True)
+
+        # read in the raw PCA training set median, to
+        # 1. subtract from a given PSF to leave only residuals
+        # 2. add back in to the PCA-recontructed residuals and reconstruct the PSF
+        self.raw_pca_basis_median = fits.getdata(self.read_name_raw_pca_median, 0, header=False)
 
         # parameters of fake companion
         # N.b. this is a SINGLE vector specifying one set of fake companion characteristics
@@ -227,7 +232,7 @@ class FakePlanetInjectorCube:
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # define the mask of this science frame
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
@@ -236,7 +241,7 @@ class FakePlanetInjectorCube:
             ## mask_weird[sci > 55000] = np.nan # mask saturating region
             ## THE BELOW FOR FAKE DATA
             mask_weird[sci > 4.5e9] = np.nan
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             ## TEST: WRITE OUT
             #hdu = fits.PrimaryHDU(mask_weird)
@@ -256,11 +261,19 @@ class FakePlanetInjectorCube:
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
             print("injection_ADI: Applying this PCA basis for the host star: \n" +
                   str(self.abs_host_star_PCA_name))
-            fit_host_star = fit_pca_star(self.pca_basis_cube_host_star, sci, no_mask, n_PCA=100)
+            fit_host_star = fit_pca_star(pca_cube = self.pca_basis_cube_host_star,
+                                         sciImg = sci,
+                                         raw_pca_training_median = self.raw_pca_basis_median,
+                                         mask_weird = no_mask,
+                                         n_PCA=100)
             print("injection_ADI: Applying this PCA basis for the fake planet: \n" +
                   str(self.abs_fake_planet_PCA_name))
             print("-"*prog_bar_width)
-            fit_fake_planet = fit_pca_star(self.pca_basis_cube_fake_planet, sci, mask_weird, n_PCA=100)
+            fit_fake_planet = fit_pca_star(pca_cube = self.pca_basis_cube_fake_planet,
+                                           sciImg = sci,
+                                           raw_pca_training_median = self.raw_pca_basis_median,
+                                           mask_weird = mask_weird,
+                                           n_PCA=100)
             if np.logical_or(not fit_host_star, not fit_fake_planet): # if the dimensions were incompatible, skip this science frame
                 print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue
@@ -268,7 +281,7 @@ class FakePlanetInjectorCube:
 
             # get absolute amplitude of the host star (reconstructing over the saturated region)
             ampl_host_star = np.max(fit_fake_planet["recon_2d"])
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             ###########################################
             # inject the fake planet
@@ -302,7 +315,7 @@ class FakePlanetInjectorCube:
                 fit_fake_planet["recon_2d"],
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             #print('fake_params y x')
             #print(self.fake_params["y_pix_coord"])
@@ -311,11 +324,11 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
@@ -637,7 +650,8 @@ class SyntheticFizeauInjectRemoveADI:
         read_name_abs_pca_pre_decomposition_median: median of non-derotated science frames, to
             subtract from frames before PCA decomposition
         write_name_abs_derotated_sci_median: name of median of derotated science frames, to find
-            host star amplitude
+            host star amplitude and to reconstruct PSFs (since PCA basis set only reconstructs
+            residuals)
         write_name_abs_host_star_PCA: name of PCA cube to use for host star decomposition, for
             subtraction
         read_name_abs_fake_planet_PCA: name of PCA cube to use for host star decomposition
@@ -728,7 +742,8 @@ class SyntheticFizeauInjectRemoveADI:
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-        print("injection_ADI: "+str(datetime.datetime.now())+": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
+        print("injection_ADI: "+str(datetime.datetime.now())
+              +": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
               +self.write_name_abs_derotated_sci_median)
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,

@@ -292,17 +292,22 @@ def PCA_basis(training_cube_masked_weird, n_PCA):
     return pca_comp_cube
 
 
-def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
+def fit_pca_star(pca_cube, sciImg, raw_pca_training_median, mask_weird, n_PCA):
     '''
     INPUTS:
     pca_cube: cube of PCA components
-    img_string: full path name of the science image
     sciImg: the science image
+    raw_pca_training_median: the median offset which needs to be subtracted
+        from the science image before reconstructing the residuals,
+        and then added back in after the PCA reconstruction
+        (if none is needed, then just feed in an array of zeros)
+    mask_weird: mask defining areas which are to be interpolated over
     n_PCA: number of PCA components
 
     RETURNS:
-    pca spectrum: spectrum of PCA vector amplitudes
-    reconstructed PSF: host star PSF as reconstructed with N PCA vector components
+    pca_vector: spectrum of PCA vector amplitudes
+    recon_2d: host star PSF as reconstructed with N PCA vector components
+    recon_2d_masked: same as recon_2d, but with the 'weird_mask'
     '''
 
     # apply mask over weird regions to PCA cube
@@ -314,6 +319,9 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
 
     # apply mask over weird detector regions to science image
     sciImg_psf_masked = np.multiply(sciImg,mask_weird)
+
+    # subtract the offset
+    sciImg_psf_masked = np.subtract(sciImg_psf_masked,raw_pca_training_median)
 
     ## PCA-decompose
 
@@ -340,6 +348,9 @@ def fit_pca_star(pca_cube, sciImg, mask_weird, n_PCA):
     # note that the PCA components WITHOUT masking of the PSF location is being
     # used to reconstruct the background
     recon_2d = np.dot(pca_cube[0:n_PCA,:,:].T, soln_vector[0]).T
+
+    # add the offset frame back in
+    recon_2d = np.add(recon_2d,raw_pca_training_median)
 
     # also return the PCA components WITH masking of the PSF location
     recon_2d_masked = np.multiply(recon_2d,mask_weird)

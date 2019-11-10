@@ -812,7 +812,7 @@ def main():
     fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
     '''
     fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40],
+                               "rad_asec": [0.,0.05,0.10,0.20,0.25,0.30,0.35,0.40],
                                "ampl_linear_norm": [1e-3]}
 
     # permutate values of fake planet parameters to get all possible combinations

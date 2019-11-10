@@ -329,7 +329,7 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
@@ -812,7 +812,7 @@ def main():
     fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
     '''
     fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.,0.05,0.10,0.20,0.25,0.30,0.35,0.40],
+                               "rad_asec": [0.30,0.35,0.40],
                                "ampl_linear_norm": [1e-3]}
 
     # permutate values of fake planet parameters to get all possible combinations
@@ -878,12 +878,10 @@ def main():
     '''
 
     ## ## BEGIN TEST
-    '''
     for param_num in range(0,len(param_dict_list)):
         print("PARAM DICT:")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
-    '''
     ## ## END TEST
 
     # run
-    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+    #pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)

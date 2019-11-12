@@ -32,12 +32,25 @@ centering.main()
 psf_pca_bases.main()
 '''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
-injection_ADI.main() # finishes by writing out the median ADI frame
+injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI frame
 '''
 ## ## DETECTION
 detection.main()
 
-## ## ORBITAL PARAMETER FORWARD MODELING
-## ## SENSITIVITY
+## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
+while True:
+    # read in detection csv, check S/N (or FPF? maybe I should add that to csv) for each fake companion
+    # companion-by-companion, change fake companion amplitude by del_X with sign depending on starting S/N
+    # re-inject and re-reduce ADI
+    # read in detection csv, check S/N for each fake companion
+    # companion-by-companion, change fake companion amplitude by del_Y with sign depending on new S/N
+    # etc., using shrinking del_Z etc.; convergence once crossover changes sign around desired S/N
+
+# interpolate amplitudes
+
+# median along azimuth
+
+# incorporate 
+
 sensitivity.main() # produces 1-D contrast curve from csv info
 '''

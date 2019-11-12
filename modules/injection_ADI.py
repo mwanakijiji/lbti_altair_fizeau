@@ -329,7 +329,7 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
@@ -791,35 +791,68 @@ class SyntheticFizeauInjectRemoveADI:
 
 
 
-def main():
+def main(inject_iteration=None):
     '''
     Make grid of fake planet parameters, and inject fake planets
 
-    no_injection = False: fake planets will not be injected; True means that
-        ADI will  
+    #no_injection = False: fake planets will not be injected; True means that
+    #    ADI will
+    
+    INPUT:
+    inject_iteration=None: no fake planets are being injected; only ADI is being performed
+    inject_iteration=int: the number of the iteration for injecting fake planets; iterations
+        continue until convergence to desired S/N
     '''
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/config.ini")
 
-    # fake planet injection parameters
+    if not inject_iteration:
+        # if NOT injecting fake planets (and only doing host star removal and ADI), set rad_asec equal to zero and the others to one element each
+        fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
+
     '''
-    for NO injection of fake planets (and only host star removal and ADI), set rad_asec equal to zero and the others to one element each
-    i.e, {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
-    '''
-    '''
-    fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
-    '''
-    fake_params_pre_permute = {"angle_deg_EofN": [0.],
+    if inject_iteration:
+        # if injecting fake planets
+
+        # fake planet injection parameters
+        fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.30,0.35,0.40],
                                "ampl_linear_norm": [1e-3]}
+    '''
 
-    # permutate values of fake planet parameters to get all possible combinations
-    keys, values = zip(*fake_params_pre_permute.items())
-    experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
+    if (inject_iteration == 0):
+        # case of fake planet injection, first pass: inject them based on all permutations of user-given parameters
+        # permutate values of fake planet parameters to get all possible combinations
+
+        # fake planet injection starting parameters
+        fake_params_pre_permute = {"angle_deg_EofN": [0.],
+                               "rad_asec": [0.30,0.35,0.40],
+                               "ampl_linear_norm": [1e-3]}
+        
+        keys, values = zip(*fake_params_pre_permute.items())
+        experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
+
+    if (inject_iteration > 0):
+        # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
+        # (do not make all permutations of companion parameters; adjust amplitudes individually)
+
+        # read in last detection() csv file
+
+        # for each row, check S/N
+        #  case 1: S/N > threshold -> make companion smaller by N
+        #  case 2: S/N < threshold -> make companion smaller by N
+
+        # re-populate fake parameter list
+
+        # fake planet injection new parameters
+        keys, values = zip(*fake_params_pre_permute.items())
+        experiments = [dict(zip(keys, v)) for v in *values]
+
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)
+
     # convert radii in asec to pixels
     ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
     ## ## file to be deg E of N, and in asec
@@ -878,10 +911,12 @@ def main():
     '''
 
     ## ## BEGIN TEST
+    '''
     for param_num in range(0,len(param_dict_list)):
         print("PARAM DICT:")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
+    '''
     ## ## END TEST
 
     # run
-    #pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)

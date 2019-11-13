@@ -832,28 +832,22 @@ def main(inject_iteration=None):
     if (inject_iteration > 0):
         sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
-        # (does not make permutations again; this adjusts amplitudes individually)
+        # (does not make permutations of user-given parameters; this adjusts amplitudes individually)
 
         # read in detection() csv file
         noise_data = pd.read_csv(csv_file_name)
 
         # make non-redundant array of (radius,azimuth)
-        #ang_rad_df = noise_data.filter(["angle_deg","rad_asec"],axis=1)
         ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
-        # erase some other stuff so as to replace with new values
-        #ang_rad_df["signal"] = np.nan
-        #ang_rad_df["noise"] = np.nan
-        #ang_rad_df["s2n"] = np.nan
-        import ipdb; ipdb.set_trace()
 
         for rad_az_num in range(0,len(ang_rad_df)):
             # For each combination of (radius,azimuth), iterate injected fake companion.
             # Basic algorithm:
             # 1. In the very first S/N determination of fake planet, if
-            #    Case 1A:  S/N is below the threshold, take the largest fake companion
+            #    Case 1A:  S/N is above the threshold, take the largest fake companion
             #                amplitude step (which is the same as the initial one) and
-            #                add it to get a larger total amplitude
-            #    Case 1B:  Same as 1A, with [below->above, add->subtract, larger->smaller]
+            #                subtract it to get a smaller total amplitude
+            #    Case 1B:  Same as 1A, with [above->below, subtract->add, smaller->larger]
             # 2. In the second step, if
             #    Case 2A:  S/N remains below/above the threshold (from the last step to this one),
             #                do the same again.
@@ -865,8 +859,20 @@ def main(inject_iteration=None):
             #                S/N threshold.)
             # 3. Repeat 2. to a cutoff criterion
 
-            if ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh:
-                #  case 1: S/N > threshold -> make companion amplitude smaller by N
+            # initialize a new dictionary corresponding to this (rad,az)
+            col_names = noise_data.columns
+            new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
+            #import ipdb; ipdb.set_trace()
+
+            if (inject_iteration == 1):
+                this_amp_step = np.nanmax(del_amplitude_progression)
+                if (ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh):
+                    #  Case 1A: S/N > threshold -> make companion amplitude smaller by largest step
+                    print('')
+
+                elif (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh):
+                    #  Case 1B: S/N > threshold -> make companion amplitude larger by largest step
+                    print('')
 
                 # determine last companion amplitude step
                 #last_amplitude_step = 
@@ -889,8 +895,8 @@ def main(inject_iteration=None):
                 ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
                                                                          this_amp_step)
 
-            elif ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh:
-                #  case 2: S/N < threshold -> make companion amplitude larger by N
+            elif ((inject_iteration == 1) and (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh)):
+                #  Case 1B: S/N < threshold -> make companion amplitude larger by N
                 print('nada')
             
 

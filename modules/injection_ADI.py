@@ -841,41 +841,66 @@ def main(inject_iteration=None):
         #ang_rad_df = noise_data.filter(["angle_deg","rad_asec"],axis=1)
         ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
         # erase some other stuff so as to replace with new values
-        ang_rad_df["signal"] = np.nan
-        ang_rad_df["noise"] = np.nan
-        ang_rad_df["s2n"] = np.nan 
+        #ang_rad_df["signal"] = np.nan
+        #ang_rad_df["noise"] = np.nan
+        #ang_rad_df["s2n"] = np.nan
+        import ipdb; ipdb.set_trace()
 
         for rad_az_num in range(0,len(ang_rad_df)):
-            # for each combination of (radius,azimuth), check S/N of last fake_iteration
+            # For each combination of (radius,azimuth), iterate injected fake companion.
+            # Basic algorithm:
+            # 1. In the very first S/N determination of fake planet, if
+            #    Case 1A:  S/N is below the threshold, take the largest fake companion
+            #                amplitude step (which is the same as the initial one) and
+            #                add it to get a larger total amplitude
+            #    Case 1B:  Same as 1A, with [below->above, add->subtract, larger->smaller]
+            # 2. In the second step, if
+            #    Case 2A:  S/N remains below/above the threshold (from the last step to this one),
+            #                do the same again.
+            #    Case 2B:  S/N has now crossed over the threshold compared with the last step,
+            #                make step size one smaller and add/subtract it with a sign determined
+            #                by the side of the S/N threshold it's on. (Ex.: If the S/N crossed from
+            #                above to below the threshold level, make the next companion amplitude
+            #                smaller and ADD it, to make the companion 'turn around' and seek the
+            #                S/N threshold.)
+            # 3. Repeat 2. to a cutoff criterion
 
             if ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh:
                 #  case 1: S/N > threshold -> make companion amplitude smaller by N
 
                 # determine last companion amplitude step
                 #last_amplitude_step = 
-                this_amplitude_step = del_amplitude_progression ang_rad_df["last_ampl_step"]
+                #this_amplitude_step = del_amplitude_progression ang_rad_df["last_ampl_step"]
 
-                # find where amplitude steps are smaller than the one before
-                indices_of_interest = np.where(del_amplitude_progression < ang_rad_df.iloc[rad_az_num]["last_ampl_step"])
-                indices_of_interest = np.array(indices_of_interest)
-                indices_of_interest = indices_of_interest.flatten()
-                # take the maximum step value left over
-                np.nanmax(del_amplitude_progression[indices_of_interest])
-                
+                # determine next companion amplitude step
+                if np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
+                    # if last amplitude step is not a NaN
+                    print('ua')
+                    indices_of_interest = np.where(del_amplitude_progression < ang_rad_df.iloc[rad_az_num]["last_ampl_step"])
+                    indices_of_interest = np.array(indices_of_interest)
+                    indices_of_interest = indices_of_interest.flatten()
+                    # take the maximum step value left over
+                    np.nanmax(del_amplitude_progression[indices_of_interest])
+                elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
+                    # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step 
+                    this_amp_step = np.nanmax(del_amplitude_progression)
+
+                # add step
                 ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
-                                                                         )
+                                                                         this_amp_step)
 
             elif ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh:
                 #  case 2: S/N < threshold -> make companion amplitude larger by N
-            
+                print('nada')
             
 
         # re-populate fake parameter list
+        '''
         param_list = list(frozenset(degen_param_list)) # remove repeats
-
-        # fake planet injection new parameters
+        fake planet injection new parameters
         keys, values = zip(*fake_params_pre_permute.items())
         experiments = [dict(zip(keys, v)) for v in values]
+        '''
 
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)

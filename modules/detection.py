@@ -259,18 +259,21 @@ class Detection:
                  adi_frame_file_name,
                  csv_record_file_name,
                  fake_params = None,
-                 config_data = config):
+                 config_data = config,
+                 inject_iteration = None):
         '''
         INPUTS:
         adi_frame_file_name: absolute name of the ADI frame to be analyzed
         csv_record: absolute name of the csv file in which S/N data is recorded
         fake_params: parameters of a fake planet, if the frame involves a fake planet
         config_data: configuration data, as usual
+        inject_iteration: iteration for injecting fake planets
         '''
 
         self.fake_params = fake_params
         self.config_data = config_data
         self.adi_frame_file_name = adi_frame_file_name
+        self.inject_iteration = inject_iteration
 
         # read in the single frame produced by previous module
         self.master_frame, self.header = fits.getdata(self.adi_frame_file_name, 0, header=True)
@@ -524,6 +527,11 @@ class Detection:
         injection_loc_dict["noise"] = noise
         injection_loc_dict["s2n"] = s2n
 
+        # last step size for fake planet injection
+        injection_loc_dict["last_ampl_step"] = np.nan
+        injection_loc_dict["inject_iteration"] = self.inject_iteration
+        injection_loc_dict["crossover_last_step"] = False
+
         print("-"*prog_bar_width)
         print("Host star amplitude:")
         print(host_ampl)      
@@ -626,7 +634,8 @@ def main(inject_iteration=None):
         # initialize and detect
         detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                                    "adi_frame_"+fake_params_string+".fits",
-                                                   csv_record_file_name = csv_file_name)
+                                                   csv_record_file_name = csv_file_name,
+                                                   inject_iteration = inject_iteration)
         detection_blind_search(sci_median_file_name = config["data_dirs"]["DIR_OTHER_FITS"] + \
                                                    config["file_names"]["MEDIAN_SCI_FRAME"],
                                                    noise_option = "full_ring",

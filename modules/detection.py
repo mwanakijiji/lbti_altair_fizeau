@@ -557,10 +557,15 @@ class Detection:
               "sn_check_cube_" + os.path.basename(self.adi_frame_file_name))
 
 
-def main():
+def main(inject_iteration=None):
     '''
     Detect companions (either fake or in a blind search within science data)
     and calculate S/N.
+
+    INPUT:
+    inject_iteration=None: not trying to detect any fake planets
+    inject_iteration=int: the number of the iteration for injecting fake planets; new
+        entries to be appended in the csv file will have a new iteration number
     '''
 
     # configuration data

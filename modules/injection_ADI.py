@@ -808,47 +808,74 @@ def main(inject_iteration=None):
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/config.ini")
 
+    # name of file to which we will append all S/N calculations, for each fake planet parameter
+    # (not used if inject_iteration==None):
+    csv_file_name = str(config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"])
+
     if not inject_iteration:
-        # if NOT injecting fake planets (and only doing host star removal and ADI), set rad_asec equal to zero and the others to one element each
+        # if NOT injecting fake planets (and only doing host star removal and ADI), set rad_asec equal
+        # to zero and the others to one element each
         fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
 
-    '''
-    if inject_iteration:
-        # if injecting fake planets
-
-        # fake planet injection parameters
-        fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.30,0.35,0.40],
-                               "ampl_linear_norm": [1e-3]}
-    '''
-
     if (inject_iteration == 0):
-        # case of fake planet injection, first pass: inject them based on all permutations of user-given parameters
-        # permutate values of fake planet parameters to get all possible combinations
+        # case of fake planet injection, first pass: inject them based on all permutations of user-given
+        # parameters, permutate values of fake planet parameters to get all possible combinations
 
         # fake planet injection starting parameters
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.30,0.35,0.40],
                                "ampl_linear_norm": [1e-3]}
         
-        keys, values = zip(*fake_params_pre_permute.items())
+        keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
     if (inject_iteration > 0):
+        sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
-        # (do not make all permutations of companion parameters; adjust amplitudes individually)
+        # (does not make permutations again; this adjusts amplitudes individually)
 
-        # read in last detection() csv file
+        # read in detection() csv file
+        noise_data = pd.read_csv(csv_file_name)
 
-        # for each row, check S/N
-        #  case 1: S/N > threshold -> make companion smaller by N
-        #  case 2: S/N < threshold -> make companion smaller by N
+        # make non-redundant array of (radius,azimuth)
+        #ang_rad_df = noise_data.filter(["angle_deg","rad_asec"],axis=1)
+        ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
+        # erase some other stuff so as to replace with new values
+        ang_rad_df["signal"] = np.nan
+        ang_rad_df["noise"] = np.nan
+        ang_rad_df["s2n"] = np.nan 
+
+        for rad_az_num in range(0,len(ang_rad_df)):
+            # for each combination of (radius,azimuth), check S/N of last fake_iteration
+
+            if ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh:
+                #  case 1: S/N > threshold -> make companion amplitude smaller by N
+
+                # determine last companion amplitude step
+                #last_amplitude_step = 
+                this_amplitude_step = del_amplitude_progression ang_rad_df["last_ampl_step"]
+
+                # find where amplitude steps are smaller than the one before
+                indices_of_interest = np.where(del_amplitude_progression < ang_rad_df.iloc[rad_az_num]["last_ampl_step"])
+                indices_of_interest = np.array(indices_of_interest)
+                indices_of_interest = indices_of_interest.flatten()
+                # take the maximum step value left over
+                np.nanmax(del_amplitude_progression[indices_of_interest])
+                
+                ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
+                                                                         )
+
+            elif ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh:
+                #  case 2: S/N < threshold -> make companion amplitude larger by N
+            
+            
 
         # re-populate fake parameter list
+        param_list = list(frozenset(degen_param_list)) # remove repeats
 
         # fake planet injection new parameters
         keys, values = zip(*fake_params_pre_permute.items())
-        experiments = [dict(zip(keys, v)) for v in *values]
+        experiments = [dict(zip(keys, v)) for v in values]
 
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)

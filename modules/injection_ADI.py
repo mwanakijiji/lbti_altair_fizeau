@@ -14,7 +14,7 @@ from modules import *
 from modules import host_removal, detection
 
 # import the PCA machinery for making backgrounds
-from .basic_red import BackgroundPCACubeMaker 
+from .basic_red import BackgroundPCACubeMaker
 
 import matplotlib
 matplotlib.use('agg') # avoids some crashes when multiprocessing
@@ -132,7 +132,7 @@ class JustPutIntoCube:
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
-            
+
             file_name = str(saved_cube_basename)
             fits.writeto(filename = file_name,
                          data = cube_frames,
@@ -309,7 +309,7 @@ class FakePlanetInjectorCube:
             # frame as projected in ALT-AZ mode, BEFORE it is de-rotated
             pos_info = polar_to_xy(pos_info = self.fake_params,
                                    pa = header_sci["LBT_PARA"])
-            
+
             #print('pa in header:')
             #print(header_sci["LBT_PARA"])
             #print('fake angle E of N:')
@@ -361,7 +361,7 @@ class FakePlanetInjectorCube:
                          overwrite = True)
             print("injection_ADI: "+str(datetime.datetime.now())+"Wrote fake-planet-injected cube to disk as " + file_name)
             print("-"*prog_bar_width)
-            
+
         #print("injection_ADI: Array of PA")
         #print(pa_array)
 
@@ -503,7 +503,7 @@ def inject_remove_adi(this_param_combo):
                                           abs_fake_planet_PCA_name = [...],
                                           write = False)
         print('88B')
-        cube_pre_removal_D, pas_array_D, frame_array_0_D = inject_fake_psfs_D(cookies_D_only_centered_06_name_array) 
+        cube_pre_removal_D, pas_array_D, frame_array_0_D = inject_fake_psfs_D(cookies_D_only_centered_06_name_array)
 
 
 
@@ -620,7 +620,7 @@ def inject_remove_adi(this_param_combo):
     print('2222')
     make_median_D = median_instance_D(apply_mask_after_derot = True, fake_planet = True)
     del removed_hosts_cube_D # clear memory
-    
+
     elapsed_time = np.subtract(time.time(), time_start)
 
     print("----------------------------------------------------------------")
@@ -782,7 +782,7 @@ class SyntheticFizeauInjectRemoveADI:
         make_median_A = median_instance_A(apply_mask_after_derot = True,
                                       fake_planet = True)
         del removed_hosts_cube_A # clear memory
-    
+
         elapsed_time = np.subtract(time.time(), time_start)
 
         print("injection_ADI: Completed one fake planet parameter configuration")
@@ -798,7 +798,7 @@ def main(inject_iteration=None):
 
     #no_injection = False: fake planets will not be injected; True means that
     #    ADI will
-    
+
     INPUT:
     inject_iteration=None: no fake planets are being injected; only ADI is being performed
     inject_iteration=int: the number of the iteration for injecting fake planets; iterations
@@ -826,14 +826,16 @@ def main(inject_iteration=None):
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.30,0.35,0.40],
                                "ampl_linear_norm": [1e-3]}
-        
+
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
     if (inject_iteration > 0):
-        sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
         # (does not make permutations of user-given parameters; this adjusts amplitudes individually)
+
+        sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
+        csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
 
         # read in detection() csv file
         noise_data = pd.read_csv(csv_file_name)
@@ -873,13 +875,13 @@ def main(inject_iteration=None):
 
             # assign new iteration number
             inject_iteration = 1+np.nanmax(old_companion_rows_all_iterations["inject_iteration"])
-            
+
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
             #import ipdb; ipdb.set_trace()
 
-            # Case of first iteration of fake planet amplitude 
+            # Case of first iteration of fake planet amplitude
             if (inject_iteration == 1):
                 this_amp_step_unsigned = np.nanmax(del_amplitude_progression)
                 if (ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh):
@@ -903,13 +905,13 @@ def main(inject_iteration=None):
                 old_companion_row_minus_2 = old_companion_row_all_iterations.where(old_companion_row_all_iterations["inject_iteration"] ==
                                                                                    all_iteration_nums_sorted[-2]).dropna()
                 import ipdb; ipdb.set_trace()
-                
+
                 if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
                     np.sign(old_companion_row_minus_1["last_ampl_step_signed"])):
                     # Case 2A: S/N remains below/above the threshold, just take the same step again
                     this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"]
                     import ipdb; ipdb.set_trace()
-                    
+
                 elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
                       -np.sign(old_companion_row_minus_2["last_ampl_step_signed"])):
                     # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
@@ -926,7 +928,7 @@ def main(inject_iteration=None):
 
             # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
             new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
-                
+
             # keep other relevant info
             ## ## HOW MUCH OF THIS IS NECESSARY? IM NOT ACTUALLY WRITING A CSV FILE, RIGHT?
             new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
@@ -938,6 +940,23 @@ def main(inject_iteration=None):
             ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
             ## ## file to be deg E of N, and in asec
             new_companion_row["rad_pix"] = np.divide(new_companion_row["rad_asec"].values[0],np.float(config["instrum_params"]["LMIR_PS"]))
+            #import ipdb; ipdb.set_trace()
+            # append new row to larger dataframe
+            noise_data = noise_data.append(new_companion_row, ignore_index=True, sort=True)
+
+        #import ipdb; ipdb.set_trace()
+        # write to csv file (note it will overwrite), with NaNs which will get
+        # filled in by detection module; note header
+        ## ## START HERE: WRITE IN HEADER IF ITER==1 ONLY
+        exists = os.path.isfile(csv_file_name_all_iters)
+        if exists:
+            input("A fake planet detection CSV file (for all iterated info) already "+\
+                "exists! Hit [Enter] to delete it and continue.")
+            os.remove(csv_file_name_all_iters)
+        noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "a", header=False)
+        print("Wrote data on iterated companion amplitudes to csv ")
+        print(str(csv_file_name_all_iters))
+        print("-"*prog_bar_width)
 
         import ipdb; ipdb.set_trace()
         # make a dictionary of the new parameters for one companion, and append it to the list of dictionaries
@@ -949,21 +968,21 @@ def main(inject_iteration=None):
         experiments = [experiments,fake_params_1_comp_dict]
         print("experiments")
         print(experiments)
-            
+
         import ipdb; ipdb.set_trace()
 
         # N.b. the new_companion_row does not contain S/N information yet, which must be calculated by detection.py
 
         '''
         elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
-                # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step 
+                # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step
                 this_amp_step = np.nanmax(del_amplitude_progression)
 
             # add step
                 ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
                                                                          this_amp_step)
         '''
-            
+
 
         # re-populate fake parameter list
         '''
@@ -975,7 +994,7 @@ def main(inject_iteration=None):
 
     # remove 'none' element
     import ipdb; ipdb.set_trace()
-    experiments = [i for i in experiments if len(i)>0] 
+    experiments = [i for i in experiments if len(i)>0]
 
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)

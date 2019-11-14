@@ -528,7 +528,7 @@ class Detection:
         injection_loc_dict["s2n"] = s2n
 
         # last step size for fake planet injection
-        injection_loc_dict["last_ampl_step"] = np.nan
+        injection_loc_dict["last_ampl_step_signed"] = np.nan
         injection_loc_dict["inject_iteration"] = self.inject_iteration
         injection_loc_dict["crossover_last_step"] = False
 

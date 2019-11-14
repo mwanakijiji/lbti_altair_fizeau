@@ -858,49 +858,60 @@ def main(inject_iteration=None):
             #                smaller and ADD it, to make the companion 'turn around' and seek the
             #                S/N threshold.)
             # 3. Repeat 2. to a cutoff criterion
-
+            import ipdb; ipdb.set_trace()
             # retrieve the row corresponding to the most recent iteration corresponding to this (rad,az)
-            old_companion_row = ## ## START HERE: GET ROWS WITH RAD, AZ, AND THEN SELECT THE ONE WITH HIGHEST INJECTION_ITERATION NUMBER
+            old_companion_rows_all_iterations = noise_data[(noise_data["rad_asec"] == ang_rad_df.iloc[rad_az_num]["rad_asec"]) &
+                                           (noise_data["angle_deg"] == ang_rad_df.iloc[rad_az_num]["angle_deg"])]
+            # ('minus_1': one step back in time)
+            old_companion_row_minus_1 = old_companion_row_all_iterations.where(old_companion_row_all_iterations["inject_iteration"] ==
+                                                                       np.nanmax(old_companion_row_all_iterations["inject_iteration"])).dropna()
 
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
             import ipdb; ipdb.set_trace()
 
+            # Case of first iteration of fake planet amplitude 
             if (inject_iteration == 1):
-                this_amp_step = np.nanmax(del_amplitude_progression)
+                this_amp_step_unsigned = np.nanmax(del_amplitude_progression)
                 if (ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh):
                     #  Case 1A: S/N > threshold -> make companion amplitude smaller by largest step
-                    new_companion_row["ampl_linear_norm"] = old_companion_row["ampl_linear_norm"] - this_amp_step
+                    this_amp_step_signed = -this_amp_step_unsigned
 
                 elif (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh):
                     #  Case 1B: S/N > threshold -> make companion amplitude larger by largest step
-                    new_companion_row["ampl_linear_norm"] = old_companion_row["ampl_linear_norm"] + this_amp_step
+                    this_amp_step_signed = this_amp_step_unsigned
 
-                # determine last companion amplitude step
-                #last_amplitude_step = 
-                #this_amplitude_step = del_amplitude_progression ang_rad_df["last_ampl_step"]
+                new_companion_row["ampl_linear_norm"] = old_companion_row["ampl_linear_norm"] + this_amp_step_signed
 
-                # determine next companion amplitude step
-                if np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
-                    # if last amplitude step is not a NaN
-                    print('ua')
-                    indices_of_interest = np.where(del_amplitude_progression < ang_rad_df.iloc[rad_az_num]["last_ampl_step"])
-                    indices_of_interest = np.array(indices_of_interest)
-                    indices_of_interest = indices_of_interest.flatten()
+            # Case of N>1 iteration, where comparison is made with previous step
+            elif (inject_iteration > 1):
+                # ('minus_2': two steps back in time)
+                all_iteration_nums_sorted = old_companion_row_all_iterations["inject_iteration"].values().sort()
+                old_companion_row_minus_2 = old_companion_row_all_iterations.where(old_companion_row_all_iterations["inject_iteration"] ==
+                                                                                   all_iteration_nums_sorted[-2]).dropna()
+                if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
+                    np.sign(old_companion_row_minus_1["last_ampl_step_signed"])):
+                    # Case 2A: S/N remains below/above the threshold, just take the same step again
+                    this_amp_step = old_companion_row_minus_1["last_ampl_step_signed"]
+                elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
+                      -np.sign(old_companion_row_minus_2["last_ampl_step_signed"])):
+                    # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
+                    # take user-defined amplitude steps and remove the previous, larger steps
+                    indices_of_interest = np.where(del_amplitude_progression < old_companion_row["last_ampl_step"])
                     # take the maximum step value left over
-                    np.nanmax(del_amplitude_progression[indices_of_interest])
-                elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
-                    # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step 
-                    this_amp_step = np.nanmax(del_amplitude_progression)
+                    this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
+                    this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"])*this_amp_step_unsigned
+
+            '''
+            elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
+                # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step 
+                this_amp_step = np.nanmax(del_amplitude_progression)
 
                 # add step
                 ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
                                                                          this_amp_step)
-
-            elif ((inject_iteration == 1) and (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh)):
-                #  Case 1B: S/N < threshold -> make companion amplitude larger by N
-                print('nada')
+            '''
             
 
         # re-populate fake parameter list

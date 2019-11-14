@@ -686,6 +686,7 @@ class SyntheticFizeauInjectRemoveADI:
         '''
 
         time_start = time.time()
+        import ipdb; ipdb.set_trace()
 
         # injecting fake PSFs?
         if (int(this_param_combo["rad_pix"]) == int(0)):
@@ -891,9 +892,9 @@ def main(inject_iteration=None):
                     this_amp_step_signed = this_amp_step_unsigned
                     #import ipdb; ipdb.set_trace()
 
-                import ipdb; ipdb.set_trace()
-                new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"] + this_amp_step_signed
-                import ipdb; ipdb.set_trace()
+                #import ipdb; ipdb.set_trace()
+                new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"].values[0] + this_amp_step_signed
+                #import ipdb; ipdb.set_trace()
 
             # Case of N>1 iteration, where comparison is made with previous step
             elif (inject_iteration > 1):
@@ -928,16 +929,26 @@ def main(inject_iteration=None):
                 
             # keep other relevant info
             ## ## HOW MUCH OF THIS IS NECESSARY? IM NOT ACTUALLY WRITING A CSV FILE, RIGHT?
-            new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"]
-            new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"]
-            new_companion_row["host_ampl"] = old_companion_row_minus_1["host_ampl"]
-            new_companion_row["inject_iteration"] = old_companion_row_minus_1["inject_iteration"]
+            new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
+            new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"].values[0]
+            new_companion_row["host_ampl"] = old_companion_row_minus_1["host_ampl"].values[0]
+            new_companion_row["inject_iteration"] = old_companion_row_minus_1["inject_iteration"].values[0]
 
+            # convert radii in asec to pixels
+            ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
+            ## ## file to be deg E of N, and in asec
+            new_companion_row["rad_pix"] = np.divide(new_companion_row["rad_asec"].values[0],np.float(config["instrum_params"]["LMIR_PS"]))
+
+        import ipdb; ipdb.set_trace()
         # make a dictionary of the new parameters for one companion, and append it to the list of dictionaries
-        fake_params_1_comp_dict = {"angle_deg_EofN": [old_companion_row_minus_1["angle_deg"]],
-                               "rad_asec": [old_companion_row_minus_1["rad_asec"]],
-                               "ampl_linear_norm": [new_companion_row["ampl_linear_norm"]]}
-        experiments = experiments.append(fake_params_1_comp_dict)
+        fake_params_1_comp_dict = {"angle_deg_EofN": [old_companion_row_minus_1["angle_deg"].values[0]],
+                               "rad_asec": [old_companion_row_minus_1["rad_asec"].values[0]],
+                               "rad_pix": [new_companion_row["rad_pix"].values[0]],
+                               "ampl_linear_norm": [new_companion_row["ampl_linear_norm"].values[0]]}
+        import ipdb; ipdb.set_trace()
+        experiments = [experiments,fake_params_1_comp_dict]
+        print("experiments")
+        print(experiments)
             
         import ipdb; ipdb.set_trace()
 
@@ -962,14 +973,15 @@ def main(inject_iteration=None):
         experiments = [dict(zip(keys, v)) for v in values]
         '''
 
+    # remove 'none' element
+    import ipdb; ipdb.set_trace()
+    experiments = [i for i in experiments if len(i)>0] 
+
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)
 
-    # convert radii in asec to pixels
-    ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
-    ## ## file to be deg E of N, and in asec
-    experiment_vector["rad_pix"] = np.divide(experiment_vector["rad_asec"],
-                                             np.float(config["instrum_params"]["LMIR_PS"]))
+    # clear
+    del experiments
 
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)

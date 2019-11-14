@@ -859,20 +859,23 @@ def main(inject_iteration=None):
             #                S/N threshold.)
             # 3. Repeat 2. to a cutoff criterion
 
+            # retrieve the row corresponding to the most recent iteration corresponding to this (rad,az)
+            old_companion_row = ## ## START HERE: GET ROWS WITH RAD, AZ, AND THEN SELECT THE ONE WITH HIGHEST INJECTION_ITERATION NUMBER
+
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             if (inject_iteration == 1):
                 this_amp_step = np.nanmax(del_amplitude_progression)
                 if (ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh):
                     #  Case 1A: S/N > threshold -> make companion amplitude smaller by largest step
-                    print('')
+                    new_companion_row["ampl_linear_norm"] = old_companion_row["ampl_linear_norm"] - this_amp_step
 
                 elif (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh):
                     #  Case 1B: S/N > threshold -> make companion amplitude larger by largest step
-                    print('')
+                    new_companion_row["ampl_linear_norm"] = old_companion_row["ampl_linear_norm"] + this_amp_step
 
                 # determine last companion amplitude step
                 #last_amplitude_step = 

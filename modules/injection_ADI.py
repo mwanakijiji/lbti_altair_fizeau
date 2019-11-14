@@ -840,6 +840,10 @@ def main(inject_iteration=None):
         # make non-redundant array of (radius,azimuth)
         ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
 
+        if (inject_iteration == 1):
+            # initialize list of fake companion parameters
+            experiments = []
+
         for rad_az_num in range(0,len(ang_rad_df)):
             # For each combination of (radius,azimuth), iterate injected fake companion.
             # Basic algorithm:
@@ -858,18 +862,21 @@ def main(inject_iteration=None):
             #                smaller and ADD it, to make the companion 'turn around' and seek the
             #                S/N threshold.)
             # 3. Repeat 2. to a cutoff criterion
-            import ipdb; ipdb.set_trace()
+
             # retrieve the row corresponding to the most recent iteration corresponding to this (rad,az)
             old_companion_rows_all_iterations = noise_data[(noise_data["rad_asec"] == ang_rad_df.iloc[rad_az_num]["rad_asec"]) &
                                            (noise_data["angle_deg"] == ang_rad_df.iloc[rad_az_num]["angle_deg"])]
             # ('minus_1': one step back in time)
-            old_companion_row_minus_1 = old_companion_row_all_iterations.where(old_companion_row_all_iterations["inject_iteration"] ==
-                                                                       np.nanmax(old_companion_row_all_iterations["inject_iteration"])).dropna()
+            old_companion_row_minus_1 = old_companion_rows_all_iterations.where(old_companion_rows_all_iterations["inject_iteration"] ==
+                                                                       np.nanmax(old_companion_rows_all_iterations["inject_iteration"]))
 
+            # assign new iteration number
+            inject_iteration = 1+np.nanmax(old_companion_rows_all_iterations["inject_iteration"])
+            
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # Case of first iteration of fake planet amplitude 
             if (inject_iteration == 1):
@@ -877,12 +884,16 @@ def main(inject_iteration=None):
                 if (ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh):
                     #  Case 1A: S/N > threshold -> make companion amplitude smaller by largest step
                     this_amp_step_signed = -this_amp_step_unsigned
+                    #import ipdb; ipdb.set_trace()
 
                 elif (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh):
                     #  Case 1B: S/N > threshold -> make companion amplitude larger by largest step
                     this_amp_step_signed = this_amp_step_unsigned
+                    #import ipdb; ipdb.set_trace()
 
-                new_companion_row["ampl_linear_norm"] = old_companion_row["ampl_linear_norm"] + this_amp_step_signed
+                import ipdb; ipdb.set_trace()
+                new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"] + this_amp_step_signed
+                import ipdb; ipdb.set_trace()
 
             # Case of N>1 iteration, where comparison is made with previous step
             elif (inject_iteration > 1):
@@ -890,28 +901,57 @@ def main(inject_iteration=None):
                 all_iteration_nums_sorted = old_companion_row_all_iterations["inject_iteration"].values().sort()
                 old_companion_row_minus_2 = old_companion_row_all_iterations.where(old_companion_row_all_iterations["inject_iteration"] ==
                                                                                    all_iteration_nums_sorted[-2]).dropna()
+                import ipdb; ipdb.set_trace()
+                
                 if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
                     np.sign(old_companion_row_minus_1["last_ampl_step_signed"])):
                     # Case 2A: S/N remains below/above the threshold, just take the same step again
-                    this_amp_step = old_companion_row_minus_1["last_ampl_step_signed"]
+                    this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"]
+                    import ipdb; ipdb.set_trace()
+                    
                 elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
                       -np.sign(old_companion_row_minus_2["last_ampl_step_signed"])):
                     # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
                     # take user-defined amplitude steps and remove the previous, larger steps
-                    indices_of_interest = np.where(del_amplitude_progression < old_companion_row["last_ampl_step"])
+                    indices_of_interest = np.where(del_amplitude_progression < old_companion_row_minus_1["last_ampl_step"])
                     # take the maximum step value left over
                     this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                     this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"])*this_amp_step_unsigned
+                    import ipdb; ipdb.set_trace()
 
-            '''
-            elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
+                # add the step to get a new absolute fake companion amplitude
+                new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"] + this_amp_step_signed
+                import ipdb; ipdb.set_trace()
+
+            # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
+            new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
+                
+            # keep other relevant info
+            ## ## HOW MUCH OF THIS IS NECESSARY? IM NOT ACTUALLY WRITING A CSV FILE, RIGHT?
+            new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"]
+            new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"]
+            new_companion_row["host_ampl"] = old_companion_row_minus_1["host_ampl"]
+            new_companion_row["inject_iteration"] = old_companion_row_minus_1["inject_iteration"]
+
+        # make a dictionary of the new parameters for one companion, and append it to the list of dictionaries
+        fake_params_1_comp_dict = {"angle_deg_EofN": [old_companion_row_minus_1["angle_deg"]],
+                               "rad_asec": [old_companion_row_minus_1["rad_asec"]],
+                               "ampl_linear_norm": [new_companion_row["ampl_linear_norm"]]}
+        experiments = experiments.append(fake_params_1_comp_dict)
+            
+        import ipdb; ipdb.set_trace()
+
+        # N.b. the new_companion_row does not contain S/N information yet, which must be calculated by detection.py
+
+        '''
+        elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
                 # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step 
                 this_amp_step = np.nanmax(del_amplitude_progression)
 
-                # add step
+            # add step
                 ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
                                                                          this_amp_step)
-            '''
+        '''
             
 
         # re-populate fake parameter list

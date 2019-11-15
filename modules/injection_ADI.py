@@ -812,7 +812,7 @@ def main(inject_iteration=None):
     # name of file to which we will append all S/N calculations, for each fake planet parameter
     # (not used if inject_iteration==None):
     csv_file_name = str(config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"])
-
+    #import ipdb; ipdb.set_trace()
     if not inject_iteration:
         # if NOT injecting fake planets (and only doing host star removal and ADI), set rad_asec equal
         # to zero and the others to one element each
@@ -829,6 +829,7 @@ def main(inject_iteration=None):
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
+        #import ipdb; ipdb.set_trace()
 
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
@@ -847,6 +848,7 @@ def main(inject_iteration=None):
             # initialize list of fake companion parameters
             experiments = []
 
+        # loop over each fake companion
         for rad_az_num in range(0,len(ang_rad_df)):
             # For each combination of (radius,azimuth), iterate injected fake companion.
             # Basic algorithm:
@@ -879,7 +881,7 @@ def main(inject_iteration=None):
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
 
             # Case of first iteration of fake planet amplitude
             if (inject_iteration == 1):
@@ -887,16 +889,16 @@ def main(inject_iteration=None):
                 if (ang_rad_df.iloc[rad_az_num]["s2n"] > sn_thresh):
                     #  Case 1A: S/N > threshold -> make companion amplitude smaller by largest step
                     this_amp_step_signed = -this_amp_step_unsigned
-                    #import ipdb; ipdb.set_trace()
+                    import ipdb; ipdb.set_trace()
 
                 elif (ang_rad_df.iloc[rad_az_num]["s2n"] < sn_thresh):
                     #  Case 1B: S/N > threshold -> make companion amplitude larger by largest step
                     this_amp_step_signed = this_amp_step_unsigned
-                    #import ipdb; ipdb.set_trace()
+                    import ipdb; ipdb.set_trace()
 
                 #import ipdb; ipdb.set_trace()
                 new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"].values[0] + this_amp_step_signed
-                #import ipdb; ipdb.set_trace()
+                import ipdb; ipdb.set_trace()
 
             # Case of N>1 iteration, where comparison is made with previous step
             elif (inject_iteration > 1):
@@ -904,13 +906,13 @@ def main(inject_iteration=None):
                 all_iteration_nums_sorted = old_companion_row_all_iterations["inject_iteration"].values().sort()
                 old_companion_row_minus_2 = old_companion_row_all_iterations.where(old_companion_row_all_iterations["inject_iteration"] ==
                                                                                    all_iteration_nums_sorted[-2]).dropna()
-                import ipdb; ipdb.set_trace()
+                #import ipdb; ipdb.set_trace()
 
                 if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
                     np.sign(old_companion_row_minus_1["last_ampl_step_signed"])):
                     # Case 2A: S/N remains below/above the threshold, just take the same step again
                     this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"]
-                    import ipdb; ipdb.set_trace()
+                    #import ipdb; ipdb.set_trace()
 
                 elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
                       -np.sign(old_companion_row_minus_2["last_ampl_step_signed"])):
@@ -920,56 +922,65 @@ def main(inject_iteration=None):
                     # take the maximum step value left over
                     this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                     this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"])*this_amp_step_unsigned
-                    import ipdb; ipdb.set_trace()
+                    #import ipdb; ipdb.set_trace()
 
                 # add the step to get a new absolute fake companion amplitude
                 new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"] + this_amp_step_signed
-                import ipdb; ipdb.set_trace()
+                #import ipdb; ipdb.set_trace()
 
-            # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
-            new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
+                # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
+                new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
 
             # keep other relevant info
-            ## ## HOW MUCH OF THIS IS NECESSARY? IM NOT ACTUALLY WRITING A CSV FILE, RIGHT?
             new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
             new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"].values[0]
             new_companion_row["host_ampl"] = old_companion_row_minus_1["host_ampl"].values[0]
-            new_companion_row["inject_iteration"] = old_companion_row_minus_1["inject_iteration"].values[0]
+            new_companion_row["inject_iteration"] = inject_iteration
 
             # convert radii in asec to pixels
             ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
             ## ## file to be deg E of N, and in asec
+            ## ## IS RAD_PIX REALLY NECESSARY HERE?
             new_companion_row["rad_pix"] = np.divide(new_companion_row["rad_asec"].values[0],np.float(config["instrum_params"]["LMIR_PS"]))
             #import ipdb; ipdb.set_trace()
             # append new row to larger dataframe
             noise_data = noise_data.append(new_companion_row, ignore_index=True, sort=True)
 
+            # make a dictionary of the new parameters for one companion, and append it to the list of dictionaries
+            fake_params_1_comp_dict = {"angle_deg_EofN": old_companion_row_minus_1["angle_deg"].values[0],
+                                               "rad_asec": old_companion_row_minus_1["rad_asec"].values[0],
+                                               "rad_pix": new_companion_row["rad_pix"].values[0],
+                                               "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
+            import ipdb; ipdb.set_trace()
+            experiments.append(fake_params_1_comp_dict)
+            print("experiments")
+            print(experiments)
+
+        # end loop over every fake companion, for one aplitude iteration
+
         #import ipdb; ipdb.set_trace()
         # write to csv file (note it will overwrite), with NaNs which will get
         # filled in by detection module; note header
         ## ## START HERE: WRITE IN HEADER IF ITER==1 ONLY
-        exists = os.path.isfile(csv_file_name_all_iters)
-        if exists:
-            input("A fake planet detection CSV file (for all iterated info) already "+\
-                "exists! Hit [Enter] to delete it and continue.")
-            os.remove(csv_file_name_all_iters)
-        noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "a", header=False)
+        #import ipdb; ipdb.set_trace()
+        if (inject_iteration == 1):
+            exists = os.path.isfile(csv_file_name_all_iters)
+            if exists:
+                input("A fake planet detection CSV file (for all iterated info) already "+\
+                    "exists! Hit [Enter] to delete it and continue.")
+                os.remove(csv_file_name_all_iters)
+            noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "w")
+        elif (inject_iteration > 1):
+            # write out to pre-existing csv, and don't put in new headers
+            noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "a", header=False)
         print("Wrote data on iterated companion amplitudes to csv ")
         print(str(csv_file_name_all_iters))
         print("-"*prog_bar_width)
 
-        import ipdb; ipdb.set_trace()
-        # make a dictionary of the new parameters for one companion, and append it to the list of dictionaries
-        fake_params_1_comp_dict = {"angle_deg_EofN": [old_companion_row_minus_1["angle_deg"].values[0]],
-                               "rad_asec": [old_companion_row_minus_1["rad_asec"].values[0]],
-                               "rad_pix": [new_companion_row["rad_pix"].values[0]],
-                               "ampl_linear_norm": [new_companion_row["ampl_linear_norm"].values[0]]}
-        import ipdb; ipdb.set_trace()
-        experiments = [experiments,fake_params_1_comp_dict]
-        print("experiments")
-        print(experiments)
+        #import ipdb; ipdb.set_trace()
 
-        import ipdb; ipdb.set_trace()
+
+        #import ipdb; ipdb.set_trace()
 
         # N.b. the new_companion_row does not contain S/N information yet, which must be calculated by detection.py
 
@@ -992,8 +1003,8 @@ def main(inject_iteration=None):
         experiments = [dict(zip(keys, v)) for v in values]
         '''
 
-    # remove 'none' element
-    import ipdb; ipdb.set_trace()
+    # remove 'none' element from initialization
+    #import ipdb; ipdb.set_trace()
     experiments = [i for i in experiments if len(i)>0]
 
     # convert to dataframe
@@ -1001,7 +1012,7 @@ def main(inject_iteration=None):
 
     # clear
     del experiments
-
+    #import ipdb; ipdb.set_trace()
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)
 
@@ -1054,12 +1065,13 @@ def main(inject_iteration=None):
     '''
 
     ## ## BEGIN TEST
-    '''
+    #import ipdb; ipdb.set_trace()
     for param_num in range(0,len(param_dict_list)):
         print("PARAM DICT:")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
-    '''
     ## ## END TEST
 
     # run
+    '''
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+    '''

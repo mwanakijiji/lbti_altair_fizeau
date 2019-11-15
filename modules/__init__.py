@@ -34,7 +34,7 @@ fwhm_4um_lbt_airy_pix = 1.028*lambda_over_D_pix # fwhm of a 4 um Airy PSF with t
 
 # change in companion amplitude (ascending iteration)
 # (in linear units normalized to star; note these are STEP sizes)
-del_amplitude_progression = [0.5e-3,1e-4,0.5e-4]
+del_amplitude_progression = np.array([0.5e-3,1e-4,0.5e-4])
 
 
 ## FUNCTIONS
@@ -84,15 +84,15 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
                                         np.float(config["instrum_params"]["LMIR_PS"]))
 
     # Convert to x,y
-    
+
     # Consider variables
     # PA: parallactic angle
     # theta: angle E of true N (i.e., CCW from +y axis for a southern target, after derotation of image)
     # R: radial distance from origin (which is at the central host star)
-    
+
     # In non-derotated frame, the coordinate of interest is
     # (x,y) = R*( sin(-PA-theta), cos(-PA-theta) )
-    
+
     pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
                                           np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
     pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],

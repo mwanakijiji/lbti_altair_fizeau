@@ -841,8 +841,8 @@ def main(inject_iteration=None):
         csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
 
         # read in detection() csv file
-        noise_data = pd.read_csv(csv_file_name)
-        import ipdb; ipdb.set_trace()
+        noise_data = pd.read_csv(csv_file_name_all_iters, index_col=0)
+        #import ipdb; ipdb.set_trace()
         # make non-redundant array of (radius,azimuth)
         ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
 
@@ -854,12 +854,12 @@ def main(inject_iteration=None):
         for rad_az_num in range(0,len(ang_rad_df)):
             # For each combination of (radius,azimuth), iterate injected fake companion.
             # Basic algorithm:
-            # 1. In the very first S/N determination of fake planet, if
+            # 1. In the very first (N=1 step) S/N determination of fake planet, if
             #    Case 1A:  S/N is above the threshold, take the largest fake companion
             #                amplitude step (which is the same as the initial one) and
             #                subtract it to get a smaller total amplitude
             #    Case 1B:  Same as 1A, with [above->below, subtract->add, smaller->larger]
-            # 2. In the second step, if
+            # 2. In the N>1 step, if
             #    Case 2A:  S/N remains below/above the threshold (from the last step to this one),
             #                do the same again.
             #    Case 2B:  S/N has now crossed over the threshold compared with the last step,
@@ -878,12 +878,12 @@ def main(inject_iteration=None):
             old_companion_row_minus_1 = old_companion_rows_all_iterations.iloc[idx_1]
 
             # assign new iteration number
-            inject_iteration = 1+np.nanmax(old_companion_rows_all_iterations["inject_iteration"])
+            #inject_iteration = 1+np.nanmax(old_companion_rows_all_iterations["inject_iteration"])
 
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # Case of first iteration of fake planet amplitude
             if (inject_iteration == 1):
@@ -905,35 +905,34 @@ def main(inject_iteration=None):
                 # ('minus_2': two steps back in time)
                 all_iteration_nums_sorted = np.sort(old_companion_rows_all_iterations["inject_iteration"].values)
                 # get the row corresponding to this companion, two iteration steps back
-                idx_2 = np.where(old_companion_rows_all_iterations["inject_iteration"] == all_iteration_nums_sorted[-2])
-                old_companion_row_minus_2 = old_companion_rows_all_iterations.iloc[idx_2]
+                #idx_2 = np.where(old_companion_rows_all_iterations["inject_iteration"] == all_iteration_nums_sorted[-2])
+                #old_companion_row_minus_2 = old_companion_rows_all_iterations.iloc[idx_2]
 
                 #import ipdb; ipdb.set_trace()
-                import ipdb; ipdb.set_trace()
-                if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
-                    np.sign(old_companion_row_minus_1["last_ampl_step_signed"])):
-                    # Case 2A: S/N remains below/above the threshold, just take the same step again
-                    this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"]
+                #import ipdb; ipdb.set_trace()
+                if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
+                    np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
+                    # Case 2A: S/N remained below/above the threshold, just take the same step again
+                    this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"].iloc[0]
                     #import ipdb; ipdb.set_trace()
-                    import ipdb; ipdb.set_trace()
 
-                elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"]) ==
-                      -np.sign(old_companion_row_minus_2["last_ampl_step_signed"])):
+                elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
+                      -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
+                    import ipdb; ipdb.set_trace()
                     # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
                     # take user-defined amplitude steps and remove the previous, larger steps
-                    indices_of_interest = np.where(del_amplitude_progression < old_companion_row_minus_1["last_ampl_step"])
+                    indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step"].iloc[0])
                     # take the maximum step value left over
                     this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
-                    this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"])*this_amp_step_unsigned
+                    this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
 
 
                 # add the step to get a new absolute fake companion amplitude
-                new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"] + this_amp_step_signed
-                #import ipdb; ipdb.set_trace()
+                new_companion_row["ampl_linear_norm"] = np.add(this_amp_step_signed,old_companion_row_minus_1["ampl_linear_norm"].iloc[0])
 
                 # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
-                import ipdb; ipdb.set_trace()
+
             # keep other relevant info, regardless of iteration number
             new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
             new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"].values[0]
@@ -949,20 +948,22 @@ def main(inject_iteration=None):
             # append new row to larger dataframe
             noise_data = noise_data.append(new_companion_row, ignore_index=True, sort=True)
 
-            # make a dictionary of the new parameters for one companion, and append it to the list of dictionaries
+            # make a dictionary of the new parameters for one companion, and
+            # append it to the list of dictionaries corresponding to this
+            # companion iteration
             fake_params_1_comp_dict = {"angle_deg_EofN": old_companion_row_minus_1["angle_deg"].values[0],
-                                               "rad_asec": old_companion_row_minus_1["rad_asec"].values[0],
-                                               "rad_pix": new_companion_row["rad_pix"].values[0],
-                                               "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
+                                        "rad_asec": old_companion_row_minus_1["rad_asec"].values[0],
+                                        "rad_pix": new_companion_row["rad_pix"].values[0],
+                                        "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
             experiments.append(fake_params_1_comp_dict)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
         # end loop over every fake companion, for one aplitude iteration
 
         #import ipdb; ipdb.set_trace()
         # write to csv file (note it will overwrite), with NaNs which will get
         # filled in by detection module; note header
         ## ## START HERE: WRITE IN HEADER IF ITER==1 ONLY
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         if (inject_iteration == 1):
             exists = os.path.isfile(csv_file_name_all_iters)
             if exists:

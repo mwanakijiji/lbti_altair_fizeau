@@ -237,7 +237,7 @@ class FakePlanetInjectorCube:
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
-            #import ipdb; ipdb.set_trace()
+            #
             # define the mask of this science frame
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
@@ -246,7 +246,7 @@ class FakePlanetInjectorCube:
             ## mask_weird[sci > 55000] = np.nan # mask saturating region
             ## THE BELOW FOR FAKE DATA
             mask_weird[sci > 4.5e9] = np.nan
-            #import ipdb; ipdb.set_trace()
+            #
 
             ## TEST: WRITE OUT
             #hdu = fits.PrimaryHDU(mask_weird)
@@ -282,11 +282,9 @@ class FakePlanetInjectorCube:
             if np.logical_or(not fit_host_star, not fit_fake_planet): # if the dimensions were incompatible, skip this science frame
                 print("injection_ADI: Incompatible dimensions; skipping this frame...")
                 continue
-            #import ipdb; ipdb.set_trace()
 
             # get absolute amplitude of the host star (reconstructing over the saturated region)
             ampl_host_star = np.max(fit_fake_planet["recon_2d"])
-            #import ipdb; ipdb.set_trace()
 
             ###########################################
             # inject the fake planet
@@ -320,7 +318,6 @@ class FakePlanetInjectorCube:
                 fit_fake_planet["recon_2d"],
                 shift = [self.fake_params["y_pix_coord"],
                          self.fake_params["x_pix_coord"]]) # shift in +y,+x convention
-            #import ipdb; ipdb.set_trace()
 
             #print('fake_params y x')
             #print(self.fake_params["y_pix_coord"])
@@ -329,11 +326,9 @@ class FakePlanetInjectorCube:
             # scale the amplitude of the host star to get the fake planet's amplitude
             reconImg_shifted_ampl = np.multiply(reconImg_shifted,
                                                 self.fake_params["ampl_linear_norm"])
-            #import ipdb; ipdb.set_trace()
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
-            #import ipdb; ipdb.set_trace()
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
@@ -686,7 +681,6 @@ class SyntheticFizeauInjectRemoveADI:
         '''
 
         time_start = time.time()
-        import ipdb; ipdb.set_trace()
 
         # injecting fake PSFs?
         if (int(this_param_combo["rad_pix"]) == int(0)):
@@ -812,7 +806,7 @@ def main(inject_iteration=None):
     # name of file to which we will append all S/N calculations, for each fake planet parameter
     # (not used if inject_iteration==None):
     csv_file_name = str(config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"])
-    #import ipdb; ipdb.set_trace()
+
     if not inject_iteration:
         # if NOT injecting fake planets (and only doing host star removal and ADI), set rad_asec equal
         # to zero and the others to one element each
@@ -829,7 +823,6 @@ def main(inject_iteration=None):
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
-        #import ipdb; ipdb.set_trace()
 
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
@@ -842,7 +835,6 @@ def main(inject_iteration=None):
 
         # read in detection() csv file
         noise_data = pd.read_csv(csv_file_name_all_iters, index_col=0)
-        #import ipdb; ipdb.set_trace()
         # make non-redundant array of (radius,azimuth)
         ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
 
@@ -883,7 +875,6 @@ def main(inject_iteration=None):
             # initialize a new dictionary corresponding to this (rad,az)
             col_names = noise_data.columns
             new_companion_row = pd.DataFrame(np.nan, index=[0], columns=col_names)
-            #import ipdb; ipdb.set_trace()
 
             # Case of first iteration of fake planet amplitude
             if (inject_iteration == 1):
@@ -896,7 +887,6 @@ def main(inject_iteration=None):
                     #  Case 1B: S/N > threshold -> make companion amplitude larger by largest step
                     this_amp_step_signed = this_amp_step_unsigned
 
-                #import ipdb; ipdb.set_trace()
                 new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"].values[0] + this_amp_step_signed
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
 
@@ -908,24 +898,19 @@ def main(inject_iteration=None):
                 #idx_2 = np.where(old_companion_rows_all_iterations["inject_iteration"] == all_iteration_nums_sorted[-2])
                 #old_companion_row_minus_2 = old_companion_rows_all_iterations.iloc[idx_2]
 
-                #import ipdb; ipdb.set_trace()
-                #import ipdb; ipdb.set_trace()
                 if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
                     np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
                     # Case 2A: S/N remained below/above the threshold, just take the same step again
                     this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"].iloc[0]
-                    #import ipdb; ipdb.set_trace()
 
                 elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
                       -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
-                    import ipdb; ipdb.set_trace()
                     # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
                     # take user-defined amplitude steps and remove the previous, larger steps
-                    indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step"].iloc[0])
+                    indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step_unsigned"].iloc[0])
                     # take the maximum step value left over
                     this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                     this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
-
 
                 # add the step to get a new absolute fake companion amplitude
                 new_companion_row["ampl_linear_norm"] = np.add(this_amp_step_signed,old_companion_row_minus_1["ampl_linear_norm"].iloc[0])
@@ -944,7 +929,6 @@ def main(inject_iteration=None):
             ## ## file to be deg E of N, and in asec
             ## ## IS RAD_PIX REALLY NECESSARY HERE?
             new_companion_row["rad_pix"] = np.divide(new_companion_row["rad_asec"].values[0],np.float(config["instrum_params"]["LMIR_PS"]))
-            #import ipdb; ipdb.set_trace()
             # append new row to larger dataframe
             noise_data = noise_data.append(new_companion_row, ignore_index=True, sort=True)
 
@@ -956,14 +940,11 @@ def main(inject_iteration=None):
                                         "rad_pix": new_companion_row["rad_pix"].values[0],
                                         "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
             experiments.append(fake_params_1_comp_dict)
-            #import ipdb; ipdb.set_trace()
         # end loop over every fake companion, for one aplitude iteration
 
-        #import ipdb; ipdb.set_trace()
         # write to csv file (note it will overwrite), with NaNs which will get
         # filled in by detection module; note header
         ## ## START HERE: WRITE IN HEADER IF ITER==1 ONLY
-        #import ipdb; ipdb.set_trace()
         if (inject_iteration == 1):
             exists = os.path.isfile(csv_file_name_all_iters)
             if exists:
@@ -978,34 +959,9 @@ def main(inject_iteration=None):
         print(str(csv_file_name_all_iters))
         print("-"*prog_bar_width)
 
-        #import ipdb; ipdb.set_trace()
-
-
-        #import ipdb; ipdb.set_trace()
-
         # N.b. the new_companion_row does not contain S/N information yet, which must be calculated by detection.py
 
-        '''
-        elif not np.isfinite(ang_rad_df.iloc[rad_az_num]["last_ampl_step"]):
-                # if last amplitude step is NaN (i.e., there was no previous step), take maximum (first) step
-                this_amp_step = np.nanmax(del_amplitude_progression)
-
-            # add step
-                ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"] = np.add(ang_rad_df.iloc[rad_az_num]["ampl_linear_norm"],
-                                                                         this_amp_step)
-        '''
-
-
-        # re-populate fake parameter list
-        '''
-        param_list = list(frozenset(degen_param_list)) # remove repeats
-        fake planet injection new parameters
-        keys, values = zip(*fake_params_pre_permute.items())
-        experiments = [dict(zip(keys, v)) for v in values]
-        '''
-
     # remove 'none' element from initialization
-    #import ipdb; ipdb.set_trace()
     experiments = [i for i in experiments if len(i)>0]
 
     # convert to dataframe
@@ -1013,7 +969,6 @@ def main(inject_iteration=None):
 
     # clear
     del experiments
-    #import ipdb; ipdb.set_trace()
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)
 
@@ -1029,7 +984,6 @@ def main(inject_iteration=None):
     ## BEGIN THIS LINE IS A TEST ONLY
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
-
     # make a list of ALL the centered cookie cutout files
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
@@ -1066,10 +1020,11 @@ def main(inject_iteration=None):
     '''
 
     ## ## BEGIN TEST
-    #import ipdb; ipdb.set_trace()
+    '''
     for param_num in range(0,len(param_dict_list)):
         print(":")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
+    '''
     ## ## END TEST
 
     # run

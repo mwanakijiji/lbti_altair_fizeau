@@ -677,11 +677,11 @@ def main(inject_iteration=None):
         print("PLACEHOLDER: NOTHING BEING INJECTED; I JUST WANT TO SEARCH FOR POSSIBLE SIGNAL")
     if (inject_iteration == 0):
         # check if csv file exists for the initial iteration; I want to start with a new one
-        exists = os.path.isfile(csv_file_name)
+        exists = os.path.isfile(csv_file_name_all_iters)
         if exists:
             input("A fake planet detection CSV file already exists, and this is " + \
                 "injection iteration number 0! Hit [Enter] to delete CSV and continue.")
-            os.remove(csv_file_name)
+            os.remove(csv_file_name_all_iters)
         csv_file_name = csv_file_name_all_iters # reassign name
     if (inject_iteration > 0):
         # read in the pre-existing file and fill in the NaNs in the rows

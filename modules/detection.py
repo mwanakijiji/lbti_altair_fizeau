@@ -551,6 +551,7 @@ class Detection:
         injection_loc_dict["signal"] = signal
         injection_loc_dict["noise"] = noise
         injection_loc_dict["s2n"] = s2n
+        injection_loc_dict["inject_iteration"] = self.injection_iteration
 
         # last step size for fake planet injection
         #injection_loc_dict["last_ampl_step_signed"] = np.nan
@@ -690,7 +691,8 @@ def main(inject_iteration=None):
         pre_existing_data_df.reset_index(inplace=True,drop=True)
         csv_file_name = csv_file_name_all_iters # reassign name
 
-    # loop over all fake planet parameter combinations to retrieve ADI frames and look for signal
+    # loop over all fake planet parameter combinations to retrieve ADI frames
+    # and look for signal
     for t in range(0,len(param_list)):
 
         # extract fake planet parameter raw values as ints

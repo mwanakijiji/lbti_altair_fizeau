@@ -50,7 +50,7 @@ class HostRemoval:
 
         # read in the median of the PCA training cube before this median was subtracted from that cube and the cube was decomposed
         self.abs_PCA_training_median, self.header_abs_PCA_training_median = fits.getdata(self.abs_PCA_training_median_name, 0, header=True)
-        
+
         # read in the PCA vector cube for this series of frames
         # (note the PCA needs to correspond to saturated PSFs, since I am subtracting
         # saturated PSFs away)
@@ -150,6 +150,7 @@ class HostRemovalCube:
     '''
 
     def __init__(self,
+                injection_iteration,
                  fake_params,
                  cube_frames,
                  n_PCA,
@@ -163,6 +164,7 @@ class HostRemovalCube:
                  write = False):
         '''
         INPUTS:
+        injection_iteration: iteration of fake planet injection (None: no fake planet)
         fake_params: fake planet parameters (if applicable; this is just for making the
             file name string if we are writing out to disk; if not applicable, but
             in some other size-3 Pandas DataFrame of strings)
@@ -192,7 +194,8 @@ class HostRemovalCube:
             as opposed to doing a subtraction individualized to each slice; note that True
             also means that the PCA cubes that are read in are ignored (default False)
         '''
-        
+
+        self.injection_iteration = injection_iteration
         self.fake_params = fake_params
         self.cube_frames = cube_frames
         self.n_PCA = n_PCA
@@ -220,7 +223,7 @@ class HostRemovalCube:
     def __call__(self):
         '''
         Reconstruct and subtract the host star from each slice
-        
+
         INPUTS:
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
 
@@ -233,6 +236,12 @@ class HostRemovalCube:
         print("-"*prog_bar_width)
         print("Read in PCA tesselation file \n" + self.abs_region_mask_name)
         print("-"*prog_bar_width)
+
+        # string for making subdirectories to place ADI frames in
+        if self.injection_iteration:
+            injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
+        else:
+            injection_iteration_string = "no_fake_planet"
 
         # make a cube that is the same shape as the input
         host_subt_cube_all_frames = np.nan*np.ones(np.shape(self.cube_frames))
@@ -300,7 +309,7 @@ class HostRemovalCube:
                     # at this point, this_region should have
                     # 1. 1s inside the region of interest, so as to define it
                     # 2. nans outside the region of interest
-                    
+
 
                     ## combine the region mask with the weird pixel mask
 
@@ -416,7 +425,7 @@ class HostRemovalCube:
 
                 # put the reconstructed PSF into the larger cube of all PSFs
                 recon_frames_cube_all_frames[slice_num,:,:] = final_PCA_recon_frame
-                
+
                 # and put the host-star-subtracted image into the larger cube of all readouts
                 host_subt_cube_all_frames[slice_num,:,:] = final_host_subt_frame
 
@@ -436,10 +445,24 @@ class HostRemovalCube:
         # if writing to disk for checking
         if self.write:
 
+            # check if injection_iteration_string directory exists; if not, make the directory
+            abs_path_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                                        injection_iteration_string + "/"
+            if not os.path.exists(abs_path_name):
+                os.makedirs(abs_path_name)
+                print("Made directory " + abs_path_name)
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                            injection_iteration_string + "/" + \
+                            "fake_planet_injected_cube_" + \
+
+
             # the cube of frames which are going to be PCA-reconstructed
-            file_name_to_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "cube_to_pca_recon_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
-              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            file_name_to_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                injection_iteration_string + "/" + \
+                "cube_to_pca_recon_" + \
+                str(self.fake_params["angle_deg_EofN"]) + \
+                "_" + str(self.fake_params["rad_asec"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
             fits.writeto(filename = file_name_to_recon,
                          data = self.cube_frames,
                          overwrite = True)
@@ -447,9 +470,12 @@ class HostRemovalCube:
             print("-"*prog_bar_width)
 
             # the cube of PCA-reconstructed frames
-            file_name_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "pca_recon_star_cube_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
-              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            file_name_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                injection_iteration_string + "/" + \
+                "pca_recon_star_cube_" + \
+                str(self.fake_params["angle_deg_EofN"]) + \
+                "_" + str(self.fake_params["rad_asec"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
             hdr1 = fits.Header()
             hdr1["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr1["RADASEC"] = self.fake_params["rad_asec"]
@@ -458,13 +484,17 @@ class HostRemovalCube:
                          data = recon_frames_cube_all_frames,
                          header = hdr1,
                          overwrite = True)
-            print("host_removal: "+str(datetime.datetime.now())+": Wrote PCA-reconstructed star cube to disk as " + file_name_recon)
+            print("host_removal: " + str(datetime.datetime.now()) + \
+                ": Wrote PCA-reconstructed star cube to disk as " + file_name_recon)
             print("-"*prog_bar_width)
 
             # the cube of host-star-subtracted frames
-            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "host_removed_cube_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
-              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                injection_iteration_string + "/" + \
+                "host_removed_cube_" + \
+                str(self.fake_params["angle_deg_EofN"]) + \
+                "_" + str(self.fake_params["rad_asec"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
             hdr = fits.Header()
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
@@ -473,9 +503,10 @@ class HostRemovalCube:
                          data = host_subt_cube_all_frames,
                          header = hdr,
                          overwrite = True)
-            print("host_removal: "+str(datetime.datetime.now())+": Wrote host-removed-cube to disk as " + file_name)
+            print("host_removal: " + str(datetime.datetime.now()) + \
+                ": Wrote host-removed-cube to disk as " + file_name)
             print("-"*prog_bar_width)
-            
+
         # for memory's sake
         del self.cube_frames
 
@@ -483,7 +514,7 @@ class HostRemovalCube:
 
         # return
         # host_subt_cube_all_frames: cube of non-derotated, host-star-subtracted frames
-        # self.frame_num_array: array of the file name frame numbers (these are just passed without modification) 
+        # self.frame_num_array: array of the file name frame numbers (these are just passed without modification)
         return host_subt_cube_all_frames, self.frame_num_array
 
 
@@ -533,7 +564,7 @@ def main():
     sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
     sci_frames_for_cube_D.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_01*.fits")))
     '''
-    
+
     # initialize and parallelize
     ## ## generalize the retrieved PCA vector cube as function of science frame range later!
     synthetic_data_host_removal_no_fake_planets = HostRemoval(n_PCA = 100,
@@ -574,7 +605,7 @@ def main():
                                             + "pca_cubes_psfs/" \
                                             + "psf_PCA_vector_cookie_seqStart_008849_seqStop_009175.fits")
     '''
-    
+
     # remove the host from the frames WITH fake planets
     #host_removal_fake_planets(fake_planet_frames_07_name_array[0])
     '''

@@ -7,6 +7,7 @@ import pandas as pd
 import pickle
 import math
 import datetime
+import os
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
@@ -158,6 +159,7 @@ class FakePlanetInjectorCube:
     '''
 
     def __init__(self,
+                injection_iteration,
                  fake_params,
                  n_PCA,
                  write_name_abs_host_star_PCA,
@@ -167,6 +169,8 @@ class FakePlanetInjectorCube:
                  write = False):
         '''
         INPUTS:
+        injection_iteration: iteration number of fake planet injection
+            (0: initial injection; >=1: successive injections)
         fake_params: parameters of the fake companion
         n_PCA: number of principal components to use
         write_name_abs_host_star_PCA: absolute file name of the PCA cube to reconstruct the host star
@@ -179,6 +183,7 @@ class FakePlanetInjectorCube:
         write: flag as to whether data product should be written to disk (for checking)
         '''
 
+        self.injection_iteration = injection_iteration
         self.n_PCA = n_PCA
         self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.abs_fake_planet_PCA_name = read_name_abs_fake_planet_PCA
@@ -211,6 +216,11 @@ class FakePlanetInjectorCube:
         abs_sci_name_array: array of the absolute path of the science frames into which we want to inject a planet
         '''
 
+        # string for making subdirectories to place ADI frames in
+        if self.injection_iteration:
+            injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
+        else:
+            injection_iteration_string = "no_fake_planet"
         print("injection_ADI: at __init__, read in PCA vector for host star \n" +
               self.abs_host_star_PCA_name)
         print("injection_ADI: at __init__, read in PCA vector for fake planet \n" +
@@ -347,9 +357,18 @@ class FakePlanetInjectorCube:
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
 
-            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + "fake_planet_injected_cube_" + \
-              str(self.fake_params["angle_deg_EofN"]) + "_" + str(self.fake_params["rad_asec"]) + \
-              "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+            # check if injection_iteration_string exists; if not, make the directory
+            abs_path_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                            injection_iteration_string + "/"
+            if not os.path.exists(abs_path_name):
+                os.makedirs(abs_path_name)
+                print("Made directory " + abs_path_name)
+            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                injection_iteration_string + "/" + \
+                "fake_planet_injected_cube_" + \
+                str(self.fake_params["angle_deg_EofN"]) + "_" + \
+                str(self.fake_params["rad_asec"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
             fits.writeto(filename = file_name,
                          data = cube_frames,
                          header = hdr,
@@ -629,6 +648,7 @@ def inject_remove_adi(this_param_combo):
 class SyntheticFizeauInjectRemoveADI:
 
     def __init__(self,
+                injection_iteration,
                  file_name_list,
                  n_PCA_host_removal,
                  read_name_abs_test_PCA_vector,
@@ -640,6 +660,8 @@ class SyntheticFizeauInjectRemoveADI:
                  read_name_abs_fake_planet_PCA,
                  read_name_abs_pca_tesselation_pattern):
         '''
+        injection_iteration: number of the fake planet injection iteration
+            (None if no planets are being injected)
         file_name_list: list of names of files to operate on
         n_PCA_host_removal: number of PCA modes to use for subtracting out the host star
         read_name_abs_test_PCA_vector: name of a test PCA vector cube file just to see if
@@ -659,6 +681,7 @@ class SyntheticFizeauInjectRemoveADI:
         read_name_abs_pca_tesselation_pattern: name of tesselation cube
         '''
 
+        self.injection_iteration = injection_iteration
         self.cookies_centered_06_name_array = file_name_list
         self.n_PCA_host_removal = n_PCA_host_removal
         self.test_PCA_vector_name = read_name_abs_test_PCA_vector
@@ -701,7 +724,9 @@ class SyntheticFizeauInjectRemoveADI:
             print(this_param_combo)
 
             # instantiate fake planet injection
-            inject_fake_psfs_A = FakePlanetInjectorCube(fake_params = this_param_combo,
+            inject_fake_psfs_A = FakePlanetInjectorCube(
+                                        injection_iteration = self.injection_iteration,
+                                        fake_params = this_param_combo,
                                           n_PCA = 100,
                                           write_name_abs_host_star_PCA = self.write_name_abs_cube_A_PCA_vector,
                                           read_name_abs_fake_planet_PCA = self.write_name_abs_cube_A_PCA_vector,
@@ -738,7 +763,8 @@ class SyntheticFizeauInjectRemoveADI:
         # star was subtracted), for determining host star amplitude
         # (note this is being repeated each time a fake planet is injected; it's not efficient, but I
         # don't know of a better/clearer way of doing it)
-        median_instance_sci = detection.MedianCube(fake_params = this_param_combo,
+        median_instance_sci = detection.MedianCube(injection_iteration = None,
+                                                fake_params = this_param_combo,
                                                host_subt_cube = cube_pre_removal_A,
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
@@ -753,7 +779,8 @@ class SyntheticFizeauInjectRemoveADI:
 
         ###############################################################################################
         # now actually do the host star subtraction
-        remove_hosts_A = host_removal.HostRemovalCube(fake_params = this_param_combo,
+        remove_hosts_A = host_removal.HostRemovalCube(injection_iteration = self.injection_iteration,
+                                                    fake_params = this_param_combo,
                                                     cube_frames = cube_pre_removal_A_post_pca_median_removal,
                                                     n_PCA = self.n_PCA_host_removal,
                                                     outdir = config["data_dirs"]["DIR_FAKE_PSFS_HOST_REMOVED"],
@@ -767,7 +794,8 @@ class SyntheticFizeauInjectRemoveADI:
         print("injection_ADI: Done with host removal from cube of science frames.")
         print("-"*prog_bar_width)
         # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames
-        median_instance_A = detection.MedianCube(fake_params = this_param_combo,
+        median_instance_A = detection.MedianCube(injection_iteration = self.injection_iteration,
+                                                fake_params = this_param_combo,
                                                host_subt_cube = removed_hosts_cube_A,
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_1_A,
@@ -990,6 +1018,7 @@ def main(inject_iteration=None):
 
     # instantiate
     synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(
+        injection_iteration = inject_iteration,
         file_name_list = cookies_centered_06_name_array,
         n_PCA_host_removal = 100,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +

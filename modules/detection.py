@@ -85,6 +85,7 @@ class MedianCube:
     '''
 
     def __init__(self,
+                injection_iteration,
                  fake_params,
                  host_subt_cube,
                  pa_array,
@@ -93,6 +94,7 @@ class MedianCube:
                  write_cube = False):
         '''
         INPUTS:
+        injection_iteration: iteration of fake planet injections (None: there is no fake planet)
         fake_params: fake planet parameters
         host_subt_cube: cube of frames to derotate and median (in context, this may or may not
             mean the host-star-subtracted frames
@@ -102,6 +104,7 @@ class MedianCube:
         write_cube: flag as to whether cube of frames should be written to disk (for checking)
         '''
 
+        self.injection_iteration = injection_iteration
         self.fake_params = fake_params
         self.host_subt_cube = host_subt_cube
         self.pa_array = pa_array
@@ -126,6 +129,12 @@ class MedianCube:
         apply_mask_after_derot: should a mask be generated so as to make bad pixels in a given cube slice NaNs?
         fake_planet: True if there is a fake companion (so we can put the info in the ADI frame header)
         '''
+
+        # string for making subdirectories to place ADI frames in
+        if self.injection_iteration:
+            injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
+        else:
+            injection_iteration_string = "no_fake_planet"
 
         # initialize cube to contain de-rotated frames
         cube_derotated_frames = np.nan*np.ones(np.shape(self.host_subt_cube))
@@ -182,7 +191,7 @@ class MedianCube:
 
                 # derotate the mask in the same way as the science image
                 mask_derotated = scipy.ndimage.rotate(mask_nan_regions, self.pa_array[t], reshape=False)
-            
+
                 # multiply the science image by the mask
                 # note the derotation causes some of the edge pixels to be neither 0 nor 1
                 mask_derotated[np.abs(mask_derotated < 0.5)] = np.nan
@@ -218,7 +227,7 @@ class MedianCube:
               str(self.fake_params["angle_deg_EofN"]) + "_" + \
               str(self.fake_params["rad_asec"]) + "_" + \
               str(self.fake_params["ampl_linear_norm"]) + ".fits"
-              
+
             fits.writeto(filename = cube_file_name,
                          data = cube_derotated_frames,
                          header = hdr,
@@ -227,9 +236,16 @@ class MedianCube:
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
+        # check if injection_iteration_string directory exists; if not, make the directory
+        abs_path_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+            injection_iteration_string + "/"
+        if not os.path.exists(abs_path_name):
+            os.makedirs(abs_path_name)
+            print("Made directory " + abs_path_name)
         if (adi_write_name == None):
             # default name, corresponding to an ADI frame on which to do science
             adi_file_name = self.config_data["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+                injection_iteration_string + "/" + \
               "adi_frame_" + str(self.fake_params["angle_deg_EofN"]) + "_" + \
               str(self.fake_params["rad_asec"]) + "_" + \
               str(self.fake_params["ampl_linear_norm"]) + ".fits"
@@ -256,6 +272,7 @@ class Detection:
     '''
 
     def __init__(self,
+                injection_iteration,
                  adi_frame_file_name,
                  csv_record_file_name,
                  fake_params = None,
@@ -263,6 +280,7 @@ class Detection:
                  inject_iteration = None):
         '''
         INPUTS:
+        injection_iteration: number of fake planet injection iteration (None: no fake planet)
         adi_frame_file_name: absolute name of the ADI frame to be analyzed
         csv_record: absolute name of the csv file in which S/N data is recorded
         fake_params: parameters of a fake planet, if the frame involves a fake planet
@@ -270,6 +288,7 @@ class Detection:
         inject_iteration: iteration for injecting fake planets
         '''
 
+        self.injection_iteration = injection_iteration
         self.fake_params = fake_params
         self.config_data = config_data
         self.adi_frame_file_name = adi_frame_file_name
@@ -312,7 +331,9 @@ class Detection:
 
         # case 1: we don't know where a possible companion is, and we're searching blindly for it
         if blind_search:
-            
+
+            injection_iteration_string = "no_fake_planet"
+
             # find where a companion might be by correlating with centered PSF
             ## ## CHANGE THIS! COMPANION PSF AT LARGE RADII WILL HAVE FRINGES WASHED OUT
             ## ## CORRELATE WITH MAYBE THE MEDIAN OF ALL HOST STARS?
@@ -329,6 +350,8 @@ class Detection:
         # where it is and just want to determine its amplitude relative to the noise
         else:
 
+            injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
+
             # fake planet injection parameters in ADI frame are from the header
             # (note units are asec, and deg E of N)
             injection_loc_dict = {"angle_deg": [self.header["ANGEOFN"]],
@@ -341,7 +364,7 @@ class Detection:
             loc_vec = polar_to_xy(pos_info = injection_loc, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
             print("Location vector of fake companion:")
             print(loc_vec)
-            
+
         # convert to DataFrame
         ## ## note that this is at pixel-level accuracy; refine this later to allow sub-pixel precision
         companion_loc_vec = pd.DataFrame({"y_pix_coord": loc_vec["y_pix_coord"],
@@ -521,20 +544,21 @@ class Detection:
             noise_frame = necklace_2d_array
         s2n = np.divide(signal,noise)
 
-        # append S/N info
+        # append S/N info if first iteration; if N>1 iteration,
+        # fill in the nans in the last rows which correspond to that companion
         injection_loc_dict["host_ampl"] = host_ampl
         injection_loc_dict["signal"] = signal
         injection_loc_dict["noise"] = noise
         injection_loc_dict["s2n"] = s2n
 
         # last step size for fake planet injection
-        injection_loc_dict["last_ampl_step_signed"] = np.nan
-        injection_loc_dict["inject_iteration"] = self.inject_iteration
-        injection_loc_dict["crossover_last_step"] = False
+        #injection_loc_dict["last_ampl_step_signed"] = np.nan
+        #injection_loc_dict["inject_iteration"] = self.inject_iteration
+        #injection_loc_dict["crossover_last_step"] = False
 
         print("-"*prog_bar_width)
         print("Host star amplitude:")
-        print(host_ampl)      
+        print(host_ampl)
         print("Signal:")
         print(signal)
         print("Noise:")
@@ -545,13 +569,42 @@ class Detection:
 
         # append to csv
         injection_loc_df = pd.DataFrame(injection_loc_dict)
+
         # check if csv file exists; if it does, don't repeat the header
         exists = os.path.isfile(self.csv_record_file_name)
-        injection_loc_df.to_csv(self.csv_record_file_name, sep = ",", mode = "a", header = (not exists))
-        print("Appended data to csv ")
+        if (injection_iteration == 0):
+            # simple append
+            injection_loc_df.to_csv(self.csv_record_file_name,
+                                    sep = ",",
+                                    mode = "a",
+                                    header = (not exists))
+            print("Appended data to csv ")
+        elif (injection_iteration > 0):
+            # fill in the nans
+            to_update_df = pd.read_csv(self.csv_record_file_name)
+            df_this_iteration = to_update_df.where(to_update_df["inject_iteration"] == injection_iteration)
+            # zero in on row of interest (make the other rows nans)
+            df_this_iteration_this_loc = df_this_iteration.where(
+                                            np.logical_and(
+                                                df_this_iteration["angle_deg"]==injection_loc_dict["angle_deg"][0],
+                                                df_this_iteration["rad_asec"]==injection_loc_dict["rad_asec"][0])
+                                            )
+            # get the index
+            df_this_iteration_this_loc_nonan = df_this_iteration_this_loc.dropna(subset=["angle_deg"])
+            # insert the new value
+            to_update_df.loc[df_this_iteration_this_loc_nonan.index,"signal"] = signal
+            to_update_df.loc[df_this_iteration_this_loc_nonan.index,"noise"] = noise
+            to_update_df.loc[df_this_iteration_this_loc_nonan.index,"s2n"] = s2n
+
+            # write out (overwrite old file)
+            to_update_df.to_csv(self.csv_record_file_name,
+                                    sep = ",",
+                                    mode = "w",
+                                    header = (not exists))
+            print("Filled in signal and noise data in csv")
+
         print(str(self.csv_record_file_name))
         print("-"*prog_bar_width)
-
         # write out frame as a check
         sn_check_cube = np.zeros((4,np.shape(smoothed_adi_frame)[0],np.shape(smoothed_adi_frame)[1]))
         sn_check_cube[0,:,:] = self.master_frame # the original ADI frame
@@ -582,7 +635,7 @@ def main(inject_iteration=None):
 
     ###########################################################
     ## ## IMAGES WITH FAKE PLANETS, TO DETERMINE SENSITIVITY
-    
+
     # make a list of the images in the ADI directory
     # N.b. fake planet parameters of all zero just indicate there is no fake planet
     hosts_removed_fake_psf_09a_directory = str(config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"])
@@ -600,15 +653,25 @@ def main(inject_iteration=None):
     degen_param_list = [i.split("adi_frame_")[1].split(".fits")[0] for i in hosts_removed_fake_psf_09a_name_array]
     param_list = list(frozenset(degen_param_list)) # remove repeats
 
-    # name of file which will record all S/N calculations, for each fake planet parameter
+    # name of file which will record S/N calculations for the INITIAL iteration, for each fake planet parameter
     csv_file_name = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
+    # name of file which will record S/N calculations for ALL iterations, for each fake planet parameter
+    csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
 
-    # check if csv file exists; I want to start with a new one
-    exists = os.path.isfile(csv_file_name)
-    if exists:
-        input("A fake planet detection CSV file already exists! Hit [Enter] to delete it and continue.")
-        os.remove(csv_file_name)
-        
+    if not inject_iteration:
+        print("PLACEHOLDER: NOTHING BEING INJECTED; I JUST WANT TO SEARCH FOR POSSIBLE SIGNAL")
+    if (inject_iteration == 0):
+        # check if csv file exists for the initial iteration; I want to start with a new one
+        exists = os.path.isfile(csv_file_name)
+        if exists:
+            input("A fake planet detection CSV file already exists! Hit [Enter] to delete it and continue.")
+            os.remove(csv_file_name)
+    if (inject_iteration > 0):
+        # read in the pre-existing file and fill in the NaNs in the rows
+        # corresponding to this iteration
+        pre_existing_data_df = pd.read_csv(csv_file_name_all_iters)
+        csv_file_name = csv_file_name_all_iters # reassign name
+
     # loop over all fake planet parameter combinations to retrieve ADI frames and look for signal
     for t in range(0,len(param_list)):
 
@@ -627,12 +690,13 @@ def main(inject_iteration=None):
         fake_angle_e_of_n_deg = np.divide(raw_angle,100.)
         fake_radius_asec = np.divide(raw_radius,100.)
         fake_contrast_rel = np.power(10.,-np.divide(raw_contrast,100.)) # scale is relative and linear
-    
+
         # specify parameters of fake companion
         fake_params_string = param_list[t]
 
         # initialize and detect
-        detection_blind_search = Detection(adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+        detection_blind_search = Detection(inject_iteration = inject_iteration,
+                                            adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                                    "adi_frame_"+fake_params_string+".fits",
                                                    csv_record_file_name = csv_file_name,
                                                    inject_iteration = inject_iteration)
@@ -647,10 +711,10 @@ def main(inject_iteration=None):
         # THE NOISE LEVEL IN EACH RING AROUND THE HOST STAR
         # substitute a fake parameter list above this for-loop
         '''
-    
+
     ###########################################################
     ## ## IMAGES WITHOUT FAKE PLANETS; I.E., ACTUAL SCIENCE
-        
+
     # MAKE LIST OF ADI FRAMES IN A DIRECTORY (MAY BE JUST 1)
 
     # DO CROSS-CORRELATION TO FIND MOST LIKELY SPOT WHERE A PLANET EXISTS

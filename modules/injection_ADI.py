@@ -1033,15 +1033,18 @@ def main(inject_iteration=None):
         # with pipeline upstream
         print("No fake planet being injected")
         cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-    elif (inject_iteration == 0):
+    elif (inject_iteration is not None):
+        # if we are injecting fake planets, get source images from previous iteration
         injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
         print("Fake planet injection iteration number " + injection_iteration_string)
-        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-    elif (inject_iteration >= 1):
-        injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
-        print("Fake planet injection iteration number " + injection_iteration_string)
-        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
-            injection_iteration_string
+        if (inject_iteration == 0):
+            # source directory is still just the original centered frames
+            cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+        elif (inject_iteration >= 1):
+            # source directory is now previous iteration
+            prev_iteration_string = "inj_iter_" + str(prev_iteration_string).zfill(4)
+            cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
+                                            prev_iteration_string
 
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 

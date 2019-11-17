@@ -424,7 +424,7 @@ def inject_remove_adi(this_param_combo):
 
 
     # injecting fake PSFs?
-    if (int(this_param_combo["rad_pix"]) == int(0)):
+    if (int(this_param_combo["rad_asec"]) == int(0)):
         # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
         print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.)")
@@ -1031,12 +1031,12 @@ def main(inject_iteration=None):
         injection_iteration_string = "no_fake_planet"
         # the string is not being appended to the path, to avoid breakage
         # with pipeline upstream
-        print("No fake planet being injected")
+        print("injection_ADI: No fake planet being injected")
         cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     elif (inject_iteration is not None):
         # if we are injecting fake planets, get source images from previous iteration
         injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
-        print("Fake planet injection iteration number " + injection_iteration_string)
+        print("injection_ADI: Fake planet injection iteration number " + injection_iteration_string)
         if (inject_iteration == 0):
             # source directory is still just the original centered frames
             cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])

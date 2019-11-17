@@ -131,7 +131,7 @@ class MedianCube:
         '''
 
         # string for making subdirectories to place ADI frames in
-        if self.injection_iteration not None:
+        if (self.injection_iteration is not None):
             injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
         else:
             injection_iteration_string = "no_fake_planet"

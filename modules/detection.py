@@ -661,7 +661,7 @@ def main(inject_iteration=None):
     # name of file which will record S/N calculations for ALL iterations, for each fake planet parameter
     csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
 
-    if not inject_iteration:
+    if (inject_iteration is not None):
         print("PLACEHOLDER: NOTHING BEING INJECTED; I JUST WANT TO SEARCH FOR POSSIBLE SIGNAL")
     if (inject_iteration == 0):
         # check if csv file exists for the initial iteration; I want to start with a new one

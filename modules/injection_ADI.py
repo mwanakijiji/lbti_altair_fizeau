@@ -705,6 +705,7 @@ class SyntheticFizeauInjectRemoveADI:
 
         time_start = time.time()
 
+        import ipdb; ipdb.set_trace()
         # injecting fake PSFs?
         if (int(this_param_combo["rad_pix"]) == int(0)):
             # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)

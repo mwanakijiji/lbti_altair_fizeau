@@ -636,10 +636,6 @@ def main(inject_iteration=None):
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/config.ini")
 
-    ###########################################################
-    ## ## IMAGES WITH FAKE PLANETS, TO DETERMINE SENSITIVITY
-
-%%%%%%%%%%%
     if (inject_iteration == None):
         injection_iteration_string = "no_fake_planet"
         # the string is not being appended to the path, to avoid breakage

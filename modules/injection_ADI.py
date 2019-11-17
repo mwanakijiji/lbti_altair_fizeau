@@ -716,7 +716,7 @@ class SyntheticFizeauInjectRemoveADI:
             frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
                                              test_PCA_vector_name = self.test_PCA_vector_name,
                                              write = True)
-
+            import ipdb; ipdb.set_trace()
             cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = self.cookies_centered_06_name_array,
                                                                               saved_cube_basename = self.cube_put_frames_into_it_simple_name)
 

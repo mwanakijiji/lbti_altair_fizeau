@@ -699,8 +699,13 @@ def main(inject_iteration=None):
         fake_params_string = param_list[t]
 
         # initialize and detect
+        if (inject_iteration is not None):
+            injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
+        else:
+            injection_iteration_string = ""
         detection_blind_search = Detection(injection_iteration = inject_iteration,
                                             adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
+                                                    "injection_iteration_string/"
                                                    "adi_frame_"+fake_params_string+".fits",
                                                    csv_record_file_name = csv_file_name,
                                                    inject_iteration = inject_iteration)

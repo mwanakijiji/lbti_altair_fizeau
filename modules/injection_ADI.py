@@ -1027,7 +1027,6 @@ def main(inject_iteration=None):
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
     # make a list of ALL the centered cookie cutout files
-    import ipdb; ipdb.set_trace()
     if (inject_iteration == None):
         injection_iteration_string = "no_fake_planet"
         # the string is not being appended to the path, to avoid breakage

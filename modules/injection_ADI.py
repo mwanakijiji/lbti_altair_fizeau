@@ -990,11 +990,11 @@ def main(inject_iteration=None):
         # filled in by detection module; note header
         if (inject_iteration == 1):
             #import ipdb; ipdb.set_trace()
-            exists = os.path.isfile(csv_file_name_all_iters)
-            if exists:
-                input("A fake planet detection CSV file (for all iterated info) "+\
-                    "already exists! Hit [Enter] to delete it and continue.")
-                os.remove(csv_file_name_all_iters)
+            #exists = os.path.isfile(csv_file_name_all_iters)
+            #if exists:
+            #    input("A fake planet detection CSV file (for all iterated info) "+\
+            #        "already exists! Hit [Enter] to delete it and continue.")
+            #    os.remove(csv_file_name_all_iters)
             noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "w", header=True)
         elif (inject_iteration > 1):
             # write out all the data to a pre-existing csv, and don't put in new headers

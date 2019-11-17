@@ -424,7 +424,7 @@ def inject_remove_adi(this_param_combo):
 
 
     # injecting fake PSFs?
-    if (int(this_param_combo["rad_asec"]) == int(0)):
+    if (int(1000*this_param_combo["rad_asec"]) == int(0)):
         # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
         print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.)")

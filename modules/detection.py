@@ -667,7 +667,8 @@ def main(inject_iteration=None):
         # check if csv file exists for the initial iteration; I want to start with a new one
         exists = os.path.isfile(csv_file_name)
         if exists:
-            input("A fake planet detection CSV file already exists! Hit [Enter] to delete it and continue.")
+            input("A fake planet detection CSV file already exists, and this is " + \
+                "injection iteration number 0! Hit [Enter] to delete CSV and continue.")
             os.remove(csv_file_name)
     if (inject_iteration > 0):
         # read in the pre-existing file and fill in the NaNs in the rows
@@ -705,7 +706,7 @@ def main(inject_iteration=None):
             injection_iteration_string = ""
         detection_blind_search = Detection(injection_iteration = inject_iteration,
                                             adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
-                                                    "injection_iteration_string/"
+                                                    injection_iteration_string + "/"
                                                    "adi_frame_"+fake_params_string+".fits",
                                                    csv_record_file_name = csv_file_name,
                                                    inject_iteration = inject_iteration)

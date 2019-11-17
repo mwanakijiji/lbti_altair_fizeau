@@ -69,6 +69,7 @@ class JustPutIntoCube:
         '''
 
         # read in one frame to get the shape
+        import ipdb; ipdb.set_trace()
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
         # initialize cube to hold the frames

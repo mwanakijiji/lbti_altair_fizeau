@@ -970,7 +970,8 @@ def main(inject_iteration=None):
             ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
             ## ## file to be deg E of N, and in asec
             ## ## IS RAD_PIX REALLY NECESSARY HERE?
-            new_companion_row["rad_pix"] = np.divide(new_companion_row["rad_asec"].values[0],np.float(config["instrum_params"]["LMIR_PS"]))
+            new_companion_row["rad_pix"] = np.divide(new_companion_row["rad_asec"].values[0],
+                                                    np.float(config["instrum_params"]["LMIR_PS"]))
             # append new row to larger dataframe
             noise_data = noise_data.append(new_companion_row, ignore_index=True, sort=True)
 

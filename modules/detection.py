@@ -579,7 +579,7 @@ class Detection:
                                     sep = ",",
                                     mode = "a",
                                     header = (not exists))
-            print("Appended data to csv ")
+            print("detection: Appended data to csv ")
         elif (self.injection_iteration > 0):
             # fill in the nans
             to_update_df = pd.read_csv(self.csv_record_file_name, index_col=0)

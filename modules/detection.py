@@ -252,6 +252,7 @@ class MedianCube:
         else:
             # if it is some other median we want to save, use the user-given name
             adi_file_name = adi_write_name
+        import ipdb; ipdb.set_trace()
 
         fits.writeto(filename = adi_file_name,
                      data = median_stack,

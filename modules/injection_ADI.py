@@ -1044,7 +1044,7 @@ def main(inject_iteration=None):
             cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
         elif (inject_iteration >= 1):
             # source directory is now previous iteration
-            prev_iteration_string = "inj_iter_" + str(prev_iteration_string).zfill(4)
+            prev_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
             cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
                                             prev_iteration_string
 

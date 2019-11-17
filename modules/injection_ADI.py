@@ -1027,7 +1027,7 @@ def main(inject_iteration=None):
     # make a list of ALL the centered cookie cutout files
     import ipdb; ipdb.set_trace()
     if inject_iteration is not None:
-        injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
+        injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
         print("Fake planet injection iteration number " + injection_iteration_string)
         cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
             injection_iteration_string

@@ -1025,6 +1025,7 @@ def main(inject_iteration=None):
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
     # make a list of ALL the centered cookie cutout files
+    import ipdb; ipdb.set_trace()
     if inject_iteration:
         injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
         cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \

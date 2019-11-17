@@ -317,7 +317,8 @@ class FakePlanetInjectorCube:
             # now calculate where in (y,x) space the fake planet should be injected in the
             # frame as projected in ALT-AZ mode, BEFORE it is de-rotated
             pos_info = polar_to_xy(pos_info = self.fake_params,
-                                   pa = header_sci["LBT_PARA"])
+                                   pa = header_sci["LBT_PARA"],
+                                   asec=True)
 
             #print('pa in header:')
             #print(header_sci["LBT_PARA"])

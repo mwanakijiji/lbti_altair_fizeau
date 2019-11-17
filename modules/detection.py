@@ -389,8 +389,8 @@ class Detection:
         print("Convolving ADI and median science frames with same kernel")
         print("-"*prog_bar_width)
         smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
-        #smoothed_adi_frame = convolve(self.master_frame, kernel)
-        smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
+        smoothed_adi_frame = convolve(self.master_frame, kernel)
+        #smoothed_adi_frame = self.master_frame ## ## NO SMOOTHING AT ALL
 
         # find amplitude of host star in SMOOTHED image
         center_sci_median_frame = [int(0.5*np.shape(sci_median_frame)[0]),

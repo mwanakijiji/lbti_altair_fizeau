@@ -227,7 +227,7 @@ class FakePlanetInjectorCube:
         print("injection_ADI: at __init__, read in PCA vector for fake planet \n" +
               self.abs_fake_planet_PCA_name)
         print("-"*prog_bar_width)
-
+        import ipdb; ipdb.set_trace()
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 

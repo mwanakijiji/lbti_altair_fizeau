@@ -639,27 +639,43 @@ def main(inject_iteration=None):
     ###########################################################
     ## ## IMAGES WITH FAKE PLANETS, TO DETERMINE SENSITIVITY
 
-    # make a list of the images in the ADI directory
-    # N.b. fake planet parameters of all zero just indicate there is no fake planet
-    hosts_removed_fake_psf_09a_directory = str(config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"])
+%%%%%%%%%%%
+    if (inject_iteration == None):
+        injection_iteration_string = "no_fake_planet"
+        # the string is not being appended to the path, to avoid breakage
+        # with pipeline upstream
+        print("detection: No fake planet being sought")
+        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+        print("PLACEHOLDER: NEED TO WRITE IN THE CORRECT READ DIRECTORY AT THIS STEP")
+        sys.exit()
+    elif (inject_iteration is not None):
+        # if we are injecting fake planets, get source images from current iteration
+        injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
+        print("detection: Detection of fake planet injection iteration number " + \
+            injection_iteration_string)
 
-    # find all combinations of available fake planet parameters using the file names
-    hosts_removed_fake_psf_09a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_09a_directory,
-                                                                        "*.fits"))) # list of all files
-    # list fake planet parameter patterns from adi_frame_AAAAA_BBBBB_CCCCC_lm_YYMMDD_NNNNNN.fits, where
-    # AAAAA is azimuth angle in deg
-    # BBBBB is radius in asec
-    # CCCCC is contrast
-    # examples: adi_frame_270.0_1.3_0.001.fits, adi_frame_270.0_1.1_1e-05.fits
-    print(hosts_removed_fake_psf_09a_name_array[0].split("adi_frame_"))
-    # the below list may have repeats
-    degen_param_list = [i.split("adi_frame_")[1].split(".fits")[0] for i in hosts_removed_fake_psf_09a_name_array]
-    param_list = list(frozenset(degen_param_list)) # remove repeats
+        # make a list of the images in the ADI directory
+        # N.b. fake planet parameters of all zero just indicate there is no fake planet
+        hosts_removed_fake_psf_09a_directory = str(config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"]) + \
+            injection_iteration_string
+        # find all combinations of available fake planet parameters using the file names
+        hosts_removed_fake_psf_09a_name_array = list(glob.glob(os.path.join(hosts_removed_fake_psf_09a_directory,
+                                                                                "*.fits"))) # list of all files
 
-    # name of file which will record S/N calculations for the INITIAL iteration, for each fake planet parameter
-    csv_file_name = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
-    # name of file which will record S/N calculations for ALL iterations, for each fake planet parameter
-    csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
+        # list fake planet parameter patterns from adi_frame_AAAAA_BBBBB_CCCCC_lm_YYMMDD_NNNNNN.fits, where
+        # AAAAA is azimuth angle in deg
+        # BBBBB is radius in asec
+        # CCCCC is contrast
+        # examples: adi_frame_270.0_1.3_0.001.fits, adi_frame_270.0_1.1_1e-05.fits
+        print(hosts_removed_fake_psf_09a_name_array[0].split("adi_frame_"))
+        # the below list may have repeats
+        degen_param_list = [i.split("adi_frame_")[1].split(".fits")[0] for i in hosts_removed_fake_psf_09a_name_array]
+        param_list = list(frozenset(degen_param_list)) # remove repeats
+
+        # name of file which will record S/N calculations for the INITIAL iteration, for each fake planet parameter
+        csv_file_name = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]
+        # name of file which will record S/N calculations for ALL iterations, for each fake planet parameter
+        csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
 
     if (inject_iteration is None):
         print("PLACEHOLDER: NOTHING BEING INJECTED; I JUST WANT TO SEARCH FOR POSSIBLE SIGNAL")
@@ -706,8 +722,8 @@ def main(inject_iteration=None):
             injection_iteration_string = ""
         detection_blind_search = Detection(injection_iteration = inject_iteration,
                                             adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
-                                                    injection_iteration_string + "/"
-                                                   "adi_frame_"+fake_params_string+".fits",
+                                                    injection_iteration_string + "/" + \
+                                                   "adi_frame_" + fake_params_string + ".fits",
                                                    csv_record_file_name = csv_file_name,
                                                    inject_iteration = inject_iteration)
         detection_blind_search(sci_median_file_name = config["data_dirs"]["DIR_OTHER_FITS"] + \

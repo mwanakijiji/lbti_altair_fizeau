@@ -849,7 +849,7 @@ def main(inject_iteration=None):
 
         # fake planet injection starting parameters
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.30,0.35,0.40],
+                               "rad_asec": [0.30],
                                "ampl_linear_norm": [1e-3]}
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate

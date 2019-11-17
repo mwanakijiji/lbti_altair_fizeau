@@ -451,10 +451,6 @@ class HostRemovalCube:
             if not os.path.exists(abs_path_name):
                 os.makedirs(abs_path_name)
                 print("Made directory " + abs_path_name)
-            file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
-                            injection_iteration_string + "/" + \
-                            "fake_planet_injected_cube_" + \
-
 
             # the cube of frames which are going to be PCA-reconstructed
             file_name_to_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \

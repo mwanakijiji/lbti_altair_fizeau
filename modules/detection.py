@@ -572,17 +572,19 @@ class Detection:
 
         # check if csv file exists; if it does, don't repeat the header
         exists = os.path.isfile(self.csv_record_file_name)
-        if (injection_iteration == 0):
+        if (self.injection_iteration == 0):
             # simple append
             injection_loc_df.to_csv(self.csv_record_file_name,
                                     sep = ",",
                                     mode = "a",
                                     header = (not exists))
             print("Appended data to csv ")
-        elif (injection_iteration > 0):
+        elif (self.injection_iteration > 0):
             # fill in the nans
-            to_update_df = pd.read_csv(self.csv_record_file_name)
-            df_this_iteration = to_update_df.where(to_update_df["inject_iteration"] == injection_iteration)
+            to_update_df = pd.read_csv(self.csv_record_file_name, index_col=0)
+            to_update_df.reset_index(inplace=True,drop=True)
+            #import ipdb; ipdb.set_trace()
+            df_this_iteration = to_update_df.where(to_update_df["inject_iteration"] == self.injection_iteration)
             # zero in on row of interest (make the other rows nans)
             df_this_iteration_this_loc = df_this_iteration.where(
                                             np.logical_and(
@@ -600,7 +602,7 @@ class Detection:
             to_update_df.to_csv(self.csv_record_file_name,
                                     sep = ",",
                                     mode = "w",
-                                    header = (not exists))
+                                    header = True)
             print("Filled in signal and noise data in csv")
 
         print(str(self.csv_record_file_name))
@@ -669,7 +671,8 @@ def main(inject_iteration=None):
     if (inject_iteration > 0):
         # read in the pre-existing file and fill in the NaNs in the rows
         # corresponding to this iteration
-        pre_existing_data_df = pd.read_csv(csv_file_name_all_iters)
+        pre_existing_data_df = pd.read_csv(csv_file_name_all_iters, index_col=0)
+        pre_existing_data_df.reset_index(inplace=True,drop=True)
         csv_file_name = csv_file_name_all_iters # reassign name
 
     # loop over all fake planet parameter combinations to retrieve ADI frames and look for signal
@@ -695,7 +698,7 @@ def main(inject_iteration=None):
         fake_params_string = param_list[t]
 
         # initialize and detect
-        detection_blind_search = Detection(inject_iteration = inject_iteration,
+        detection_blind_search = Detection(injection_iteration = inject_iteration,
                                             adi_frame_file_name = config["data_dirs"]["DIR_ADI_W_FAKE_PSFS"] + \
                                                    "adi_frame_"+fake_params_string+".fits",
                                                    csv_record_file_name = csv_file_name,

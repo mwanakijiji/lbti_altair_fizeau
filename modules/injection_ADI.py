@@ -857,12 +857,14 @@ def main(inject_iteration=None):
         # (does not make permutations of user-given parameters; this adjusts amplitudes individually)
 
         sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
-
+        #import ipdb; ipdb.set_trace()
         # csv to record ALL iteration info, but is not the initial file written
-        csv_file_name_all_iters = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV_ALL_ITER"]
+        csv_file_name_all_iters = str(config["data_dirs"]["DIR_S2N"] + \
+                                config["file_names"]["DETECTION_CSV_ALL_ITER"])
 
         # read in detection() csv file
         noise_data = pd.read_csv(csv_file_name_all_iters, index_col=0)
+        noise_data.reset_index(inplace=True,drop=True)
         # make non-redundant array of (radius,azimuth)
         ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
 
@@ -925,6 +927,7 @@ def main(inject_iteration=None):
                 # get the row corresponding to this companion, two iteration steps back
                 #idx_2 = np.where(old_companion_rows_all_iterations["inject_iteration"] == all_iteration_nums_sorted[-2])
                 #old_companion_row_minus_2 = old_companion_rows_all_iterations.iloc[idx_2]
+                #import ipdb; ipdb.set_trace()
 
                 if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
                     np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
@@ -935,10 +938,17 @@ def main(inject_iteration=None):
                       -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
                     # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
                     # take user-defined amplitude steps and remove the previous, larger steps
+                    #import ipdb; ipdb.set_trace()
                     indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step_unsigned"].iloc[0])
                     # take the maximum step value left over
-                    this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
-                    this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
+                    #import ipdb; ipdb.set_trace()
+                    if (len(indices_of_interest[0]) == 0):
+                        # if there is no more smaller amplitude change, go to
+                        # next item in the loop
+                        continue
+                    else:
+                        this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
+                        this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
 
                 # add the step to get a new absolute fake companion amplitude
                 new_companion_row["ampl_linear_norm"] = np.add(this_amp_step_signed,old_companion_row_minus_1["ampl_linear_norm"].iloc[0])
@@ -946,6 +956,7 @@ def main(inject_iteration=None):
                 # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
 
+            #import ipdb; ipdb.set_trace()
             # keep other relevant info, regardless of iteration number
             new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
             new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"].values[0]
@@ -972,17 +983,17 @@ def main(inject_iteration=None):
 
         # write to csv file (note it will overwrite), with NaNs which will get
         # filled in by detection module; note header
-        ## ## START HERE: WRITE IN HEADER IF ITER==1 ONLY
         if (inject_iteration == 1):
+            #import ipdb; ipdb.set_trace()
             exists = os.path.isfile(csv_file_name_all_iters)
             if exists:
-                input("A fake planet detection CSV file (for all iterated info) already "+\
-                    "exists! Hit [Enter] to delete it and continue.")
+                input("A fake planet detection CSV file (for all iterated info) "+\
+                    "already exists! Hit [Enter] to delete it and continue.")
                 os.remove(csv_file_name_all_iters)
-            noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "w")
+            noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "w", header=True)
         elif (inject_iteration > 1):
-            # write out to pre-existing csv, and don't put in new headers
-            noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "a", header=False)
+            # write out all the data to a pre-existing csv, and don't put in new headers
+            noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "w", header=True)
         print("Wrote data on iterated companion amplitudes to csv ")
         print(str(csv_file_name_all_iters))
         print("-"*prog_bar_width)
@@ -1013,7 +1024,15 @@ def main(inject_iteration=None):
     #inject_remove_adi(param_dict_list[0])
     ## END TEST
     # make a list of ALL the centered cookie cutout files
-    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+    if inject_iteration:
+        injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
+        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
+            injection_iteration_string
+    else:
+        injection_iteration_string = "no_fake_planet"
+        # the string is not being appended to the path, to avoid breakage
+        # with pipeline upstream
+        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
     # instantiate
@@ -1049,11 +1068,9 @@ def main(inject_iteration=None):
     '''
 
     ## ## BEGIN TEST
-    '''
     for param_num in range(0,len(param_dict_list)):
         print(":")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
-    '''
     ## ## END TEST
 
     # run

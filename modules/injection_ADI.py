@@ -232,8 +232,8 @@ class FakePlanetInjectorCube:
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
         # initialize cube to hold the frames
-        print("injection_ADI: Memory error, 0 " + str(len(abs_sci_name_array)))
-        print("injection_ADI: Memory error, shape " + str(np.shape(test_image)))
+        #print("injection_ADI: Memory error, 0 " + str(len(abs_sci_name_array)))
+        #print("injection_ADI: Memory error, shape " + str(np.shape(test_image)))
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))
@@ -1049,7 +1049,7 @@ def main(inject_iteration=None):
                                             prev_iteration_string
 
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
-
+    import ipdb; ipdb.set_trace()
     # instantiate
     synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,

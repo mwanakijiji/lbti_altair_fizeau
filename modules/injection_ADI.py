@@ -898,7 +898,7 @@ def main(inject_iteration=None):
             # retrieve the row corresponding to the most recent iteration corresponding to this (rad,az)
             old_companion_rows_all_iterations = noise_data[(noise_data["rad_asec"] == ang_rad_df.iloc[rad_az_num]["rad_asec"]) &
                                            (noise_data["angle_deg"] == ang_rad_df.iloc[rad_az_num]["angle_deg"])]
-            import ipdb; ipdb.set_trace()
+
             # ('minus_1': one step back in time)
             idx_1 = np.where(old_companion_rows_all_iterations["inject_iteration"] == old_companion_rows_all_iterations["inject_iteration"].max())
             old_companion_row_minus_1 = old_companion_rows_all_iterations.iloc[idx_1]
@@ -1044,7 +1044,7 @@ def main(inject_iteration=None):
             cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
         elif (inject_iteration >= 1):
             # source directory is now previous iteration
-            prev_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
+            prev_iteration_string = "inj_iter_" + str(inject_iteration-1).zfill(4)
             cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
                                             prev_iteration_string
 

@@ -921,6 +921,7 @@ def main(inject_iteration=None):
 
                 new_companion_row["ampl_linear_norm"] = old_companion_row_minus_1["ampl_linear_norm"].values[0] + this_amp_step_signed
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
+                new_companion_row["last_ampl_step_unsigned"] = np.abs(this_amp_step_signed)
 
             # Case of N>1 iteration, where comparison is made with previous step
             elif (inject_iteration > 1):
@@ -944,7 +945,7 @@ def main(inject_iteration=None):
                     indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step_unsigned"].iloc[0])
                     # take the maximum step value left over
                     #import ipdb; ipdb.set_trace()
-                    if ((len(indices_of_interest[0]) == 0) or (old_companion_row_minus_1["ampl_linear_norm"].iloc[0] == 0.0)):
+                    if ((len(indices_of_interest[0]) == 0) or (old_companion_row_minus_1["ampl_linear_norm"].iloc[0] <= 0.0)):
                         # If either
                         # 1. There is no more smaller amplitude change
                         # 2. The fake companion amplitude is zero (i.e., runaway)
@@ -959,6 +960,7 @@ def main(inject_iteration=None):
 
                 # the new amplitude change will be the 'last' one after feeding the ADI frame through the detection module
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
+                new_companion_row["last_ampl_step_unsigned"] = np.abs(this_amp_step_signed)
 
             #import ipdb; ipdb.set_trace()
             # keep other relevant info, regardless of iteration number

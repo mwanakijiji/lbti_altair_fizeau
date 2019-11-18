@@ -69,7 +69,6 @@ class JustPutIntoCube:
         '''
 
         # read in one frame to get the shape
-        import ipdb; ipdb.set_trace()
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
         # initialize cube to hold the frames
@@ -227,7 +226,7 @@ class FakePlanetInjectorCube:
         print("injection_ADI: at __init__, read in PCA vector for fake planet \n" +
               self.abs_fake_planet_PCA_name)
         print("-"*prog_bar_width)
-        import ipdb; ipdb.set_trace()
+
         # read in one frame to get the shape
         test_image = fits.getdata(abs_sci_name_array[0], 0, header=False)
 
@@ -717,7 +716,6 @@ class SyntheticFizeauInjectRemoveADI:
             frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
                                              test_PCA_vector_name = self.test_PCA_vector_name,
                                              write = True)
-            import ipdb; ipdb.set_trace()
             cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = self.cookies_centered_06_name_array,
                                                                               saved_cube_basename = self.cube_put_frames_into_it_simple_name)
 
@@ -1059,7 +1057,7 @@ def main(inject_iteration=None):
     '''
 
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
-    import ipdb; ipdb.set_trace()
+
     # instantiate
     synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,

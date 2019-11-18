@@ -44,6 +44,7 @@ while True:
     # companion-by-companion, change fake companion amplitude by del_X / del_Y / del_Z etc. with sign depending on starting S/N
     # re-inject and re-reduce ADI
     injection_ADI.main(inject_iteration=iter_num)
+    '''
     import ipdb; ipdb.set_trace()
 
     # re-check signal, amplitudes
@@ -53,6 +54,7 @@ while True:
     # condition for convergence: once crossover changes sign around desired S/N, or we reach iteration number X
 
     inject_iteration =+ 1
+    '''
 
 # interpolate amplitudes
 

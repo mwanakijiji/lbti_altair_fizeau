@@ -1025,10 +1025,19 @@ def main(inject_iteration=None):
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())
 
-    ## BEGIN THIS LINE IS A TEST ONLY
-    #inject_remove_adi(param_dict_list[0])
-    ## END TEST
-    # make a list of ALL the centered cookie cutout files
+    ## ## THE SOURCE DIRECTORY SHOULD ALWAYS BE DIR_CENTERED, RIGHT? NO
+    ## ## MATTER IF I AM INJECTING FAKE PLANETS OR NOT?
+    if (inject_iteration == None):
+        injection_iteration_string = "no_fake_planet"
+        # the string is not being appended to the path, to avoid breakage
+        # with pipeline upstream
+        print("injection_ADI: No fake planet being injected")
+    elif (inject_iteration is not None):
+        # if we are injecting fake planets, get source images from previous iteration
+        injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
+        print("injection_ADI: Fake planet injection iteration number " + injection_iteration_string)
+    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
+    '''
     if (inject_iteration == None):
         injection_iteration_string = "no_fake_planet"
         # the string is not being appended to the path, to avoid breakage
@@ -1047,6 +1056,7 @@ def main(inject_iteration=None):
             prev_iteration_string = "inj_iter_" + str(inject_iteration-1).zfill(4)
             cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
                                             prev_iteration_string
+    '''
 
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
     import ipdb; ipdb.set_trace()

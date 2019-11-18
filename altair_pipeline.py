@@ -50,7 +50,7 @@ while True:
 
     # condition for convergence: once crossover changes sign around desired S/N,
     # or we reach iteration number X
-    inject_iteration =+ 1
+    iter_num =+ 1
 
 # interpolate amplitudes
 

@@ -51,7 +51,7 @@ while True:
     # condition for convergence: once crossover changes sign around desired S/N,
     # or we reach iteration number X
     inject_iteration =+ 1
-    import ipdb; ipdb.set_trace()
+
 # interpolate amplitudes
 
 # median along azimuth

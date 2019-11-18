@@ -431,7 +431,7 @@ class Detection:
         comp_mask_inv = circ_mask(input_array = smoothed_adi_frame,
                       mask_center = [np.add(y_cen,companion_loc_vec["y_pix_coord"][pos_num]),
                                      np.add(x_cen,companion_loc_vec["x_pix_coord"][pos_num])],
-                      mask_radius = self.comp_rad,
+                      mask_radius = 2,
                       invert=True)
 
         ## one method of finding noise: get the medians of companion-sized patches in a necklace pattern

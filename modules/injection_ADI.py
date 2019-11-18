@@ -847,8 +847,8 @@ def main(inject_iteration=None):
 
         # fake planet injection starting parameters
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.30],
-                               "ampl_linear_norm": [1e-3]}
+                               "rad_asec": [0.20,0.25,0.30,0.35],
+                               "ampl_linear_norm": [1e-3,1e-4]}
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
@@ -944,9 +944,11 @@ def main(inject_iteration=None):
                     indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step_unsigned"].iloc[0])
                     # take the maximum step value left over
                     #import ipdb; ipdb.set_trace()
-                    if (len(indices_of_interest[0]) == 0):
-                        # if there is no more smaller amplitude change, go to
-                        # next item in the loop
+                    if (len(indices_of_interest[0]) == 0) or (old_companion_row_minus_1["ampl_linear_norm"].iloc[0] == 0.0)):
+                        # If either
+                        # 1. There is no more smaller amplitude change
+                        # 2. The fake companion amplitude is zero (i.e., runaway)
+                        # ... go to next item in the loop
                         continue
                     else:
                         this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])

@@ -556,7 +556,7 @@ class Detection:
         # if this is the first injection (iteration 0), keep record of the
         # starting amplitude to avoid mixing up convergence chains
         if (self.injection_iteration == 0):
-            injection_loc_df["ampl_linear_norm_0"] = ampl_linear_norm
+            injection_loc_dict["ampl_linear_norm_0"] = injection_loc["ampl_linear_norm"]
 
         # last step size for fake planet injection
         #injection_loc_dict["last_ampl_step_signed"] = np.nan

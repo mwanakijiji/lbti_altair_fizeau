@@ -952,8 +952,6 @@ def main(inject_iteration=None):
                         # amplitude of the injected planet has become negative,
                         # got to companion in the loop
                         continue
-                    elif
-                        # if we somehow ended up with negative planets
                     else:
                         this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                         this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned

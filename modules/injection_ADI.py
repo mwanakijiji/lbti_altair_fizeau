@@ -893,9 +893,11 @@ def main(inject_iteration=None):
             #                S/N threshold.)
             # 3. Repeat 2. to a cutoff criterion
 
-            # retrieve the row corresponding to the most recent iteration corresponding to this (rad,az)
+            # retrieve the row corresponding to the most recent iteration corresponding
+            # to this (rad,az,starting companion amplitude)
             old_companion_rows_all_iterations = noise_data[(noise_data["rad_asec"] == ang_rad_df.iloc[rad_az_num]["rad_asec"]) &
-                                           (noise_data["angle_deg"] == ang_rad_df.iloc[rad_az_num]["angle_deg"])]
+                                           (noise_data["angle_deg"] == ang_rad_df.iloc[rad_az_num]["angle_deg"]) &
+                                           (noise_data["ampl_linear_norm_0"] == ang_rad_df.iloc[rad_az_num]["ampl_linear_norm_0"])]
 
             # ('minus_1': one step back in time)
             idx_1 = np.where(old_companion_rows_all_iterations["inject_iteration"] == old_companion_rows_all_iterations["inject_iteration"].max())

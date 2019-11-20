@@ -866,8 +866,8 @@ def main(inject_iteration=None):
         # read in detection() csv file
         noise_data = pd.read_csv(csv_file_name_all_iters, index_col=0)
         noise_data.reset_index(inplace=True,drop=True)
-        # make non-redundant array of (radius,azimuth)
-        ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec"])
+        # make non-redundant array of (radius, azimuth, starting injected amplitude)
+        ang_rad_df = noise_data.drop_duplicates(subset=["angle_deg","rad_asec","ampl_linear_norm_0"])
 
         #if (inject_iteration == 1):
         # initialize list of fake companion parameters
@@ -934,23 +934,26 @@ def main(inject_iteration=None):
 
                 if (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
                     np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
-                    # Case 2A: S/N remained below/above the threshold, just take the same step again
+                    # Case 2A: S/N remained below/above the threshold, just take
+                    #          the same step again
                     this_amp_step_signed = old_companion_row_minus_1["last_ampl_step_signed"].iloc[0]
 
                 elif (np.sign(sn_thresh - old_companion_row_minus_1["s2n"].iloc[0]) ==
                       -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
-                    # Case 2B: There is a crossover relative to the threshold S/N; make the step smaller and go the opposite way
-                    # take user-defined amplitude steps and remove the previous, larger steps
-                    #import ipdb; ipdb.set_trace()
+                    # Case 2B: There is a crossover relative to the threshold S/N;
+                    #          make the step smaller and go the opposite way
+                    # take user-defined amplitude steps and remove the previous,
+                    # larger steps
                     indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step_unsigned"].iloc[0])
                     # take the maximum step value left over
                     #import ipdb; ipdb.set_trace()
                     if ((len(indices_of_interest[0]) == 0) or (old_companion_row_minus_1["ampl_linear_norm"].iloc[0] <= 0.0)):
-                        # If either
-                        # 1. There is no more smaller amplitude change
-                        # 2. The fake companion amplitude is zero (i.e., runaway)
-                        # ... go to next item in the loop
+                        # if there is no smaller amplitude change, or if the
+                        # amplitude of the injected planet has become negative,
+                        # got to companion in the loop
                         continue
+                    elif
+                        # if we somehow ended up with negative planets
                     else:
                         this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                         this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
@@ -1095,12 +1098,12 @@ def main(inject_iteration=None):
     '''
 
     ## ## BEGIN TEST
+    '''
     for param_num in range(0,len(param_dict_list)):
         print(":")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
+    '''
     ## ## END TEST
 
     # run
-    '''
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
-    '''

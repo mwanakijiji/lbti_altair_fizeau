@@ -3,6 +3,7 @@ Initialization
 '''
 
 import os
+import time
 import numpy as np
 import scipy
 from scipy import ndimage, sqrt, stats, misc, signal

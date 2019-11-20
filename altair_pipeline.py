@@ -15,6 +15,7 @@ from modules import (basic_red,
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
+start_time = time.time()
 
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
@@ -51,6 +52,12 @@ while True:
     # condition for convergence: once crossover changes sign around desired S/N,
     # or we reach iteration number X
     iter_num += 1
+
+    # time info
+    elapsed_time_iteration = np.subtract(time.time(),start_time)
+    print("Time since start:")
+    print(np.round(elapsed_time_iteration))
+    print("-"*prog_bar_width)
 
 # interpolate amplitudes
 

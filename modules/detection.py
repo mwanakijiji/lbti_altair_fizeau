@@ -553,6 +553,11 @@ class Detection:
         injection_loc_dict["s2n"] = s2n
         injection_loc_dict["inject_iteration"] = self.injection_iteration
 
+        # if this is the first injection (iteration 0), keep record of the
+        # starting amplitude to avoid mixing up convergence chains
+        if (self.injection_iteration == 0):
+            injection_loc_df["ampl_linear_norm_0"] = ampl_linear_norm
+
         # last step size for fake planet injection
         #injection_loc_dict["last_ampl_step_signed"] = np.nan
         #injection_loc_dict["inject_iteration"] = self.inject_iteration
@@ -569,7 +574,9 @@ class Detection:
         print(s2n)
         print("-"*prog_bar_width)
 
-        # append to csv
+        # append to csv, with a pseudorandom time delay to minimize conflicts
+        # if the same file is being read in/out by multiple cores
+        time.sleep(10.*np.random.rand())
         injection_loc_df = pd.DataFrame(injection_loc_dict)
 
         # check if csv file exists; if it does, don't repeat the header

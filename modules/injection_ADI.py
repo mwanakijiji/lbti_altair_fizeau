@@ -873,7 +873,7 @@ def main(inject_iteration=None):
         # initialize list of fake companion parameters
         experiments = []
 
-        # loop over each fake companion
+        # loop over each fake companion (i.e., combo of rad, azimuth, and starting amplitude)
         for rad_az_num in range(0,len(ang_rad_df)):
             # For each combination of (radius,azimuth), iterate injected fake companion.
             # Basic algorithm:
@@ -970,6 +970,7 @@ def main(inject_iteration=None):
             new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
             new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"].values[0]
             new_companion_row["host_ampl"] = old_companion_row_minus_1["host_ampl"].values[0]
+            new_companion_row["ampl_linear_norm_0"] = old_companion_row_minus_1["ampl_linear_norm_0"].values[0]
             new_companion_row["inject_iteration"] = inject_iteration
 
             # convert radii in asec to pixels

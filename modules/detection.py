@@ -217,6 +217,7 @@ class MedianCube:
         hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
         hdr["RADASEC"] = self.fake_params["rad_asec"]
         hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+        import ipdb; ipdb.set_trace()
         if (self.injection_iteration == 0):
             hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm"]
         else:

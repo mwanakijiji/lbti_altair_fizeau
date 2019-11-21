@@ -775,7 +775,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         print("injection_ADI: "+str(datetime.datetime.now())
               +": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
               +self.write_name_abs_derotated_sci_median)
@@ -1008,7 +1008,7 @@ def main(inject_iteration=None):
                                         "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
             experiments.append(fake_params_1_comp_dict)
         # end loop over every fake companion, for one amplitude iteration
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         # write to csv file (note it will overwrite), with NaNs which will get
         # filled in by detection module; note header
         if (inject_iteration == 1):
@@ -1033,7 +1033,7 @@ def main(inject_iteration=None):
 
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # clear
     del experiments
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
@@ -1048,7 +1048,7 @@ def main(inject_iteration=None):
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())
 
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     ## ## THE SOURCE DIRECTORY SHOULD ALWAYS BE DIR_CENTERED, RIGHT? NO
     ## ## MATTER IF I AM INJECTING FAKE PLANETS OR NOT?
     if (inject_iteration == None):

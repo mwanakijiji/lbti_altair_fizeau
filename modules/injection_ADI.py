@@ -1048,6 +1048,7 @@ def main(inject_iteration=None):
     for k in range(0,len(experiment_vector)):
         param_dict_list.append(experiment_vector.iloc[k].to_dict())
 
+    import ipdb; ipdb.set_trace()
     ## ## THE SOURCE DIRECTORY SHOULD ALWAYS BE DIR_CENTERED, RIGHT? NO
     ## ## MATTER IF I AM INJECTING FAKE PLANETS OR NOT?
     if (inject_iteration == None):

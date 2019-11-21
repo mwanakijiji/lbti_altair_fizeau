@@ -858,8 +858,8 @@ def main(inject_iteration=None):
                                "ampl_linear_norm": [1e-3,1e-4]}
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.25, 0.30],
-                               "ampl_linear_norm": [1e-3]}
+                               "rad_asec": [0.20, 0.25, 0.30, 0.35],
+                               "ampl_linear_norm": [1e-3, 1e-4]}
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
@@ -1117,12 +1117,12 @@ def main(inject_iteration=None):
     '''
 
     ## ## BEGIN TEST
+    '''
     for param_num in range(0,len(param_dict_list)):
         print(":")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
+    '''
     ## ## END TEST
 
     # run
-    '''
     pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
-    '''

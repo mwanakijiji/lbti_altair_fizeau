@@ -975,6 +975,7 @@ def main(inject_iteration=None):
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
                 new_companion_row["last_ampl_step_unsigned"] = np.abs(this_amp_step_signed)
 
+            import ipdb; ipdb.set_trace()
             # update iteration number
             new_companion_row["inject_iteration"] = inject_iteration
 

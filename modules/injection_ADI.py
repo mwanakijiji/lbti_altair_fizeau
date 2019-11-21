@@ -865,7 +865,7 @@ def main(inject_iteration=None):
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
         # add in the initial amplitudes after the permutations have been made
-
+        experiments = [dict(item, **{'ampl_linear_norm_0':item['ampl_linear_norm']}) for item in experiments]
 
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject

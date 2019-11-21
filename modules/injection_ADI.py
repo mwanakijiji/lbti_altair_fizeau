@@ -133,6 +133,7 @@ class JustPutIntoCube:
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+            hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
 
             file_name = str(saved_cube_basename)
             fits.writeto(filename = file_name,
@@ -357,6 +358,7 @@ class FakePlanetInjectorCube:
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+            hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
 
             # check if injection_iteration_string exists; if not, make the directory
             abs_path_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
@@ -369,12 +371,14 @@ class FakePlanetInjectorCube:
                 "fake_planet_injected_cube_" + \
                 str(self.fake_params["angle_deg_EofN"]) + "_" + \
                 str(self.fake_params["rad_asec"]) + \
-                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+                "_" + str(self.fake_params["ampl_linear_norm"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
             fits.writeto(filename = file_name,
                          data = cube_frames,
                          header = hdr,
                          overwrite = True)
-            print("injection_ADI: "+str(datetime.datetime.now())+"Wrote fake-planet-injected cube to disk as " + file_name)
+            print("injection_ADI: "+str(datetime.datetime.now())+\
+                "Wrote fake-planet-injected cube to disk as " + file_name)
             print("-"*prog_bar_width)
 
         #print("injection_ADI: Array of PA")
@@ -754,7 +758,8 @@ class SyntheticFizeauInjectRemoveADI:
         ## ## weak point here: this median name is hard-coded
 
         median_frame, header_median_frame = fits.getdata(self.pca_pre_decomposition_median_name, 0, header=True)
-        print("injection_ADI: "+str(datetime.datetime.now())+": Median frame being subtracted from the cube of science frames is read in as\n" +
+        print("injection_ADI: "+str(datetime.datetime.now())+\
+            ": Median frame being subtracted from the cube of science frames is read in as\n" +
               self.pca_pre_decomposition_median_name)
         print("-"*prog_bar_width)
         cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
@@ -846,9 +851,14 @@ def main(inject_iteration=None):
         # parameters, permutate values of fake planet parameters to get all possible combinations
 
         # fake planet injection starting parameters
+        '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.20,0.25,0.30,0.35],
                                "ampl_linear_norm": [1e-3,1e-4]}
+        '''
+        fake_params_pre_permute = {"angle_deg_EofN": [0.],
+                               "rad_asec": [0.25],
+                               "ampl_linear_norm": [1e-3]}
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
@@ -965,13 +975,14 @@ def main(inject_iteration=None):
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
                 new_companion_row["last_ampl_step_unsigned"] = np.abs(this_amp_step_signed)
 
-            #import ipdb; ipdb.set_trace()
+            # update iteration number
+            new_companion_row["inject_iteration"] = inject_iteration
+
             # keep other relevant info, regardless of iteration number
             new_companion_row["angle_deg"] = old_companion_row_minus_1["angle_deg"].values[0]
             new_companion_row["rad_asec"] = old_companion_row_minus_1["rad_asec"].values[0]
             new_companion_row["host_ampl"] = old_companion_row_minus_1["host_ampl"].values[0]
             new_companion_row["ampl_linear_norm_0"] = old_companion_row_minus_1["ampl_linear_norm_0"].values[0]
-            new_companion_row["inject_iteration"] = inject_iteration
 
             # convert radii in asec to pixels
             ## ## functionality of polar_to_xy will need to be checked, since I changed the convention in the init
@@ -988,6 +999,7 @@ def main(inject_iteration=None):
             fake_params_1_comp_dict = {"angle_deg_EofN": old_companion_row_minus_1["angle_deg"].values[0],
                                         "rad_asec": old_companion_row_minus_1["rad_asec"].values[0],
                                         "rad_pix": new_companion_row["rad_pix"].values[0],
+                                        "ampl_linear_norm_0": new_companion_row["ampl_linear_norm_0"].values[0],
                                         "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
             experiments.append(fake_params_1_comp_dict)
         # end loop over every fake companion, for one aplitude iteration

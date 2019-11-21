@@ -217,6 +217,7 @@ class MedianCube:
         hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
         hdr["RADASEC"] = self.fake_params["rad_asec"]
         hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+        hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
 
         # if writing cube of frames to disk for checking
         #OBSOLETE, SINCE WE ONLY USE THE FINAL ADI FRAMES ANYWAY
@@ -226,7 +227,8 @@ class MedianCube:
               "cube_just_before_median_ADI_" + \
               str(self.fake_params["angle_deg_EofN"]) + "_" + \
               str(self.fake_params["rad_asec"]) + "_" + \
-              str(self.fake_params["ampl_linear_norm"]) + ".fits"
+              str(self.fake_params["ampl_linear_norm"]) + "-" + \
+              str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
 
             fits.writeto(filename = cube_file_name,
                          data = cube_derotated_frames,
@@ -248,7 +250,8 @@ class MedianCube:
                 injection_iteration_string + "/" + \
               "adi_frame_" + str(self.fake_params["angle_deg_EofN"]) + "_" + \
               str(self.fake_params["rad_asec"]) + "_" + \
-              str(self.fake_params["ampl_linear_norm"]) + ".fits"
+              str(self.fake_params["ampl_linear_norm"]) + \
+              str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
         else:
             # if it is some other median we want to save, use the user-given name
             adi_file_name = adi_write_name

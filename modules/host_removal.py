@@ -458,7 +458,8 @@ class HostRemovalCube:
                 "cube_to_pca_recon_" + \
                 str(self.fake_params["angle_deg_EofN"]) + \
                 "_" + str(self.fake_params["rad_asec"]) + \
-                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+                "_" + str(self.fake_params["ampl_linear_norm"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
             fits.writeto(filename = file_name_to_recon,
                          data = self.cube_frames,
                          overwrite = True)
@@ -471,11 +472,13 @@ class HostRemovalCube:
                 "pca_recon_star_cube_" + \
                 str(self.fake_params["angle_deg_EofN"]) + \
                 "_" + str(self.fake_params["rad_asec"]) + \
-                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+                "_" + str(self.fake_params["ampl_linear_norm"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
             hdr1 = fits.Header()
             hdr1["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr1["RADASEC"] = self.fake_params["rad_asec"]
             hdr1["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+            hdr1["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
             fits.writeto(filename = file_name_recon,
                          data = recon_frames_cube_all_frames,
                          header = hdr1,
@@ -490,11 +493,13 @@ class HostRemovalCube:
                 "host_removed_cube_" + \
                 str(self.fake_params["angle_deg_EofN"]) + \
                 "_" + str(self.fake_params["rad_asec"]) + \
-                "_" + str(self.fake_params["ampl_linear_norm"]) + ".fits"
+                "_" + str(self.fake_params["ampl_linear_norm"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
             hdr = fits.Header()
             hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
             hdr["RADASEC"] = self.fake_params["rad_asec"]
             hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
+            hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
             fits.writeto(filename = file_name,
                          data = host_subt_cube_all_frames,
                          header = hdr,

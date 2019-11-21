@@ -710,11 +710,12 @@ def main(inject_iteration=None):
         raw_angle = int(float(param_list[t].split("_")[0]))
         raw_radius = int(float(param_list[t].split("_")[1]))
         raw_contrast = int(float(param_list[t].split("_")[2]))
-        print(raw_angle)
-        print(raw_radius)
-        print(raw_contrast)
-        print(param_list[t].split("_")[1])
-        print("-----")
+        raw_contrast_initial = int(float(param_list[t].split("_")[3]))
+        #print(raw_angle)
+        #print(raw_radius)
+        #print(raw_contrast)
+        #print(param_list[t].split("_")[1])
+        #print("-----")
 
         # get physical values
         fake_angle_e_of_n_deg = np.divide(raw_angle,100.)

@@ -1033,7 +1033,7 @@ def main(inject_iteration=None):
 
     # convert to dataframe
     experiment_vector = pd.DataFrame(experiments)
-
+    import ipdb; ipdb.set_trace()
     # clear
     del experiments
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters

@@ -775,6 +775,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
+        import ipdb; ipdb.set_trace()
         print("injection_ADI: "+str(datetime.datetime.now())
               +": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
               +self.write_name_abs_derotated_sci_median)
@@ -862,6 +863,9 @@ def main(inject_iteration=None):
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
+
+        # add in the initial amplitudes after the permutations have been made
+
 
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
@@ -975,7 +979,7 @@ def main(inject_iteration=None):
                 new_companion_row["last_ampl_step_signed"] = this_amp_step_signed
                 new_companion_row["last_ampl_step_unsigned"] = np.abs(this_amp_step_signed)
 
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # update iteration number
             new_companion_row["inject_iteration"] = inject_iteration
 

@@ -1007,8 +1007,8 @@ def main(inject_iteration=None):
                                         "ampl_linear_norm_0": new_companion_row["ampl_linear_norm_0"].values[0],
                                         "ampl_linear_norm": new_companion_row["ampl_linear_norm"].values[0]}
             experiments.append(fake_params_1_comp_dict)
-        # end loop over every fake companion, for one aplitude iteration
-
+        # end loop over every fake companion, for one amplitude iteration
+        import ipdb; ipdb.set_trace()
         # write to csv file (note it will overwrite), with NaNs which will get
         # filled in by detection module; note header
         if (inject_iteration == 1):

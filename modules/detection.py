@@ -217,7 +217,10 @@ class MedianCube:
         hdr["ANGEOFN"] = self.fake_params["angle_deg_EofN"]
         hdr["RADASEC"] = self.fake_params["rad_asec"]
         hdr["AMPLIN"] = self.fake_params["ampl_linear_norm"]
-        hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
+        if (self.injection_iteration == 0):
+            hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm"]
+        else:
+            hdr["AMPLIN0"] = self.fake_params["ampl_linear_norm_0"]
 
         # if writing cube of frames to disk for checking
         #OBSOLETE, SINCE WE ONLY USE THE FINAL ADI FRAMES ANYWAY

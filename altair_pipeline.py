@@ -37,7 +37,7 @@ injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI 
 
 ## ## DETECTION
 detection.main(inject_iteration=0)
-import ipdb; ipdb.set_trace()
+
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 1
 while True:

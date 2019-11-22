@@ -371,6 +371,7 @@ class Detection:
             # (note units are asec, and deg E of N)
             injection_loc_dict = {"angle_deg": [self.header["ANGEOFN"]],
                                   "rad_asec": [self.header["RADASEC"]],
+                                  "ampl_linear_norm_0": [self.header["AMPLIN0"]],
                                   "ampl_linear_norm": [self.header["AMPLIN"]]}
 
             print(injection_loc_dict)
@@ -588,7 +589,7 @@ class Detection:
         print(s2n)
         print("-"*prog_bar_width)
 
-        # append to csv, with a pseudorandom time delay to minimize conflicts
+        # write csv, with a pseudorandom time delay to minimize conflicts
         # if the same file is being read in/out by multiple cores
         time.sleep(10.*np.random.rand())
         injection_loc_df = pd.DataFrame(injection_loc_dict)
@@ -608,11 +609,13 @@ class Detection:
             to_update_df.reset_index(inplace=True,drop=True)
             #import ipdb; ipdb.set_trace()
             df_this_iteration = to_update_df.where(to_update_df["inject_iteration"] == self.injection_iteration)
-            # zero in on row of interest (make the other rows nans)
+            # zero in on row of interest, based on companion location and starting amplitude
+            # (make the other rows nans)
             df_this_iteration_this_loc = df_this_iteration.where(
-                                            np.logical_and(
+                                            np.logical_and(np.logical_and(
                                                 df_this_iteration["angle_deg"]==injection_loc_dict["angle_deg"][0],
-                                                df_this_iteration["rad_asec"]==injection_loc_dict["rad_asec"][0])
+                                                df_this_iteration["rad_asec"]==injection_loc_dict["rad_asec"][0]),
+                                                df_this_iteration["ampl_linear_norm_0"]==injection_loc_dict["ampl_linear_norm_0"][0])
                                             )
             # get the index
             df_this_iteration_this_loc_nonan = df_this_iteration_this_loc.dropna(subset=["angle_deg"])

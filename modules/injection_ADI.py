@@ -971,7 +971,7 @@ def main(inject_iteration=None):
                     else:
                         this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                         this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
-
+                import ipdb; ipdb.set_trace()
                 # add the step to get a new absolute fake companion amplitude
                 new_companion_row["ampl_linear_norm"] = np.add(this_amp_step_signed,old_companion_row_minus_1["ampl_linear_norm"].iloc[0])
 

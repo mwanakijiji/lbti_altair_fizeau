@@ -31,15 +31,15 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-
+'''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI frame
 
 ## ## DETECTION
 detection.main(inject_iteration=0)
-'''
+
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
-iter_num = 2
+iter_num = 1
 while True:
     # read in detection csv, check S/N (or FPF? maybe I should add that to csv) for each fake companion
     # companion-by-companion, change fake companion amplitude by del_X / del_Y / del_Z etc. with sign depending on starting S/N
@@ -49,15 +49,17 @@ while True:
     # re-check signal, amplitudes
     detection.main(inject_iteration=iter_num)
 
-    # condition for convergence: once crossover changes sign around desired S/N,
-    # or we reach iteration number X
-    iter_num += 1
-
     # time info
     elapsed_time_iteration = np.subtract(time.time(),start_time)
+    print("Done with iter_num:")
+    print(iter_num)
     print("Time since start:")
     print(np.round(elapsed_time_iteration))
     print("-"*prog_bar_width)
+
+    # condition for convergence: once crossover changes sign around desired S/N,
+    # or we reach iteration number X
+    iter_num += 1
 
 # interpolate amplitudes
 

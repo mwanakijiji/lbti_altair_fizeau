@@ -958,20 +958,21 @@ def main(inject_iteration=None):
                       -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])):
                     # Case 2B: There is a crossover relative to the threshold S/N;
                     #          make the step smaller and go the opposite way
-                    # take user-defined amplitude steps and remove the previous,
-                    # larger steps
                     indices_of_interest = np.where(np.array(del_amplitude_progression) < old_companion_row_minus_1["last_ampl_step_unsigned"].iloc[0])
                     # take the maximum step value left over
                     #import ipdb; ipdb.set_trace()
-                    if ((len(indices_of_interest[0]) == 0) or (old_companion_row_minus_1["ampl_linear_norm"].iloc[0] <= 0.0)):
-                        # if there is no smaller amplitude change, or if the
-                        # amplitude of the injected planet has become negative,
-                        # got to companion in the loop
+                    if (len(indices_of_interest[0]) == 0):
+                        # if there is no smaller amplitude change,
+                        # got to next companion in the loop
                         continue
                     else:
+                        # if smaller amplitude steps are still available, make
+                        # the step smaller and go the opposite way
                         this_amp_step_unsigned = np.nanmax(del_amplitude_progression[indices_of_interest])
                         this_amp_step_signed = -np.sign(old_companion_row_minus_1["last_ampl_step_signed"].iloc[0])*this_amp_step_unsigned
-                import ipdb; ipdb.set_trace()
+                        # in case code snipped is needed: case of amplitude of the injected planet being negative
+                        #elif (old_companion_row_minus_1["ampl_linear_norm"].iloc[0] <= 0.0):
+
                 # add the step to get a new absolute fake companion amplitude
                 new_companion_row["ampl_linear_norm"] = np.add(this_amp_step_signed,old_companion_row_minus_1["ampl_linear_norm"].iloc[0])
 

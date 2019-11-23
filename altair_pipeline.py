@@ -39,7 +39,7 @@ injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI 
 detection.main(inject_iteration=0)
 '''
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
-iter_num = 1
+iter_num = 2
 while True:
     # read in detection csv, check S/N (or FPF? maybe I should add that to csv) for each fake companion
     # companion-by-companion, change fake companion amplitude by del_X / del_Y / del_Z etc. with sign depending on starting S/N

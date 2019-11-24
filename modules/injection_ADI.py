@@ -852,14 +852,9 @@ def main(inject_iteration=None):
         # parameters, permutate values of fake planet parameters to get all possible combinations
 
         # fake planet injection starting parameters
-        '''
-        fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.20,0.25,0.30,0.35],
-                               "ampl_linear_norm": [1e-3,1e-4]}
-        '''
-        fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.20, 0.25, 0.30, 0.35],
-                               "ampl_linear_norm": [1e-3, 1e-4]}
+        fake_params_pre_permute = {"angle_deg_EofN": [0.,120.,240.],
+                               "rad_asec": [0.20,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.30,0.31,0.32,0.33,0.34,0.35],
+                               "ampl_linear_norm": [1e-3]}
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]

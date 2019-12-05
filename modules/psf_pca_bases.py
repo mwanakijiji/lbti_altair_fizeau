@@ -294,7 +294,7 @@ def main():
                                     n_PCA = 100,
                                     subtract_median = True)
     # for PCA basis set for reconstructing host star (subtraction of median from the training
-    # set may not make any difference, though)
+    # does not seem to make any difference when making a PCA basis set, though)
     pca_psf_maker_host_recon = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
                                     subtract_median = False)

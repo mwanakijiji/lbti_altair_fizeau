@@ -28,7 +28,7 @@ basic_red.main()
 
 ## ## CENTERING OF PSFS
 centering.main()
-
+'''
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 '''
@@ -41,9 +41,11 @@ detection.main(inject_iteration=0)
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 1
 while True:
-    # read in detection csv, check S/N (or FPF? maybe I should add that to csv) for each fake companion
-    # companion-by-companion, change fake companion amplitude by del_X / del_Y / del_Z etc. with sign depending on starting S/N
-    # re-inject and re-reduce ADI
+    # Read in detection csv, check S/N (or FPF? maybe I should add that to csv)
+    # for each fake companion.
+    # Companion-by-companion, change fake companion amplitude by del_X / del_Y /
+    # del_Z etc. with sign depending on starting S/N.
+    # Then re-inject and re-reduce ADI
     injection_ADI.main(inject_iteration=iter_num)
 
     # re-check signal, amplitudes
@@ -66,6 +68,6 @@ while True:
 # median along azimuth
 
 # incorporate
-'''
+
 sensitivity.main() # produces 1-D contrast curve from csv info
 '''

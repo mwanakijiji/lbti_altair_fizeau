@@ -243,7 +243,7 @@ def main():
     ## initialize dataframe
     # frame_num: the LMIR frame number
     # resd_avg: the average absolute value of residuals
-    # resd_med: the median " " " 
+    # resd_med: the median " " "
     # resd_int: the integrated (i.e., summed) " " "
     df = pd.DataFrame(columns=["frame_num",
                                "resd_avg",
@@ -294,12 +294,13 @@ def main():
                                     n_PCA = 100,
                                     subtract_median = True)
     # for PCA basis set for reconstructing host star (subtraction of median from the training
-    # set may not make any difference, though
+    # set may not make any difference, though)
     pca_psf_maker_host_recon = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
                                     subtract_median = False)
 
     # cube of fake data
+    '''
     pca_psf_maker_host_resids(start_frame_num = 0,
                    stop_frame_num = 10000,
                    resd_avg_limits = [0, 0],
@@ -322,33 +323,54 @@ def main():
                                                        'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
                     write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                 'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'))
-    
-    # cube A
     '''
+
+    # cube A (sat)
     pca_psf_maker(start_frame_num = 4259,
                    stop_frame_num = 5608,
                    resd_avg_limits = [50,62.5],
                    x_gauss_limits = [4,6],
-                   y_gauss_limits = [4,6])
+                   y_gauss_limits = [4,6],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                   'psf_PCA_training_cube_seqStart_04259_seqStop_05608_host_resids.fits'),
+                   write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'),
+                   write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'))
 
     # cube B (unsat)
     pca_psf_maker(start_frame_num = 6303,
                    stop_frame_num = 6921,
                    resd_avg_limits = [35.3,37.3],
                    x_gauss_limits = [3.9,6.7],
-                   y_gauss_limits = [3.9,6.7])
+                   y_gauss_limits = [3.9,6.7],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                   'psf_PCA_training_cube_seqStart_06303_seqStop_06921_host_resids.fits'),
+                   write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'median_frame_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits'),
+                   write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits'))
     # cube C (unsat)
     pca_psf_maker(start_frame_num = 7120,
                    stop_frame_num = 7734,
                    resd_avg_limits = [35.4,40.6],
                    x_gauss_limits = [3.9,4.5],
-                   y_gauss_limits = [3.9,4.5])
-    # cube D 
+                   y_gauss_limits = [3.9,4.5],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                   'psf_PCA_training_cube_seqStart_07120_seqStop_07734_host_resids.fits'),
+                   write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'median_frame_seqStart_07120_seqStop_07734_pcaNum_100_host_resids.fits'),
+                   write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'psf_PCA_vector_cookie_seqStart_07120_seqStop_07734_pcaNum_100_host_resids.fits'))
+    # cube D (sat)
     pca_psf_maker(start_frame_num = 7927,
                    stop_frame_num = 11408,
                    resd_avg_limits = [40.6,55],
                    x_gauss_limits = [4.15,5],
-                   y_gauss_limits = [4.1,4.44])
-    ''' 
-
-
+                   y_gauss_limits = [4.1,4.44],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                   'psf_PCA_training_cube_seqStart_07927_seqStop_11408_host_resids.fits'),
+                   write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'median_frame_seqStart_07927_seqStop_11408_pcaNum_100_host_resids.fits'),
+                   write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'psf_PCA_vector_cookie_seqStart_07927_seqStop_11408_pcaNum_100_host_resids.fits'))

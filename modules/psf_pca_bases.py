@@ -289,12 +289,14 @@ def main():
     ## generate PCA cubes for PSFs
     # (N.b. n_PCA needs to be smaller than the number of frames being used)
 
-    # for PCA basis set for subtracting host star residuals
+    # for PCA basis set for subtracting host star residuals (i.e., to reconstruct
+    # the residuals)
     pca_psf_maker_host_resids = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
                                     subtract_median = True)
-    # for PCA basis set for reconstructing host star (subtraction of median from the training
-    # does not seem to make any difference when making a PCA basis set, though)
+    # for PCA basis set for reconstructing host star (i.e., full PSF; non-subtraction
+    # of median from the training set does not seem to make any difference when
+    # making a PCA basis set, though)
     pca_psf_maker_host_recon = PSFPCACubeMaker(file_list = cookies_centered_06_name_array,
                                     n_PCA = 100,
                                     subtract_median = False)
@@ -326,7 +328,7 @@ def main():
     '''
 
     # cube A (sat)
-    pca_psf_maker(start_frame_num = 4259,
+    pca_psf_maker_host_resids(start_frame_num = 4259,
                    stop_frame_num = 5608,
                    resd_avg_limits = [50,62.5],
                    x_gauss_limits = [4,6],
@@ -339,7 +341,7 @@ def main():
                    'psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'))
 
     # cube B (unsat)
-    pca_psf_maker(start_frame_num = 6303,
+    pca_psf_maker_host_recon(start_frame_num = 6303,
                    stop_frame_num = 6921,
                    resd_avg_limits = [35.3,37.3],
                    x_gauss_limits = [3.9,6.7],
@@ -351,7 +353,7 @@ def main():
                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                    'psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits'))
     # cube C (unsat)
-    pca_psf_maker(start_frame_num = 7120,
+    pca_psf_maker_host_recon(start_frame_num = 7120,
                    stop_frame_num = 7734,
                    resd_avg_limits = [35.4,40.6],
                    x_gauss_limits = [3.9,4.5],
@@ -363,7 +365,7 @@ def main():
                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                    'psf_PCA_vector_cookie_seqStart_07120_seqStop_07734_pcaNum_100_host_resids.fits'))
     # cube D (sat)
-    pca_psf_maker(start_frame_num = 7927,
+    pca_psf_maker_host_resids(start_frame_num = 7927,
                    stop_frame_num = 11408,
                    resd_avg_limits = [40.6,55],
                    x_gauss_limits = [4.15,5],

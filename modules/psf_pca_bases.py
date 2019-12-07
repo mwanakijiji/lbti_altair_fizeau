@@ -328,7 +328,7 @@ def main():
     '''
 
     # cube A (sat)
-    pca_psf_maker_host_resids(start_frame_num = 4259,
+    pca_psf_maker_host_resids(start_frame_num = 4403,
                    stop_frame_num = 5608,
                    resd_avg_limits = [50,62.5],
                    x_gauss_limits = [4,6],
@@ -339,8 +339,7 @@ def main():
                    'median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'),
                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                    'psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'))
-
-    # cube B (unsat)
+    # cube B (unsats for A frames)
     pca_psf_maker_host_recon(start_frame_num = 6303,
                    stop_frame_num = 6921,
                    resd_avg_limits = [35.3,37.3],
@@ -352,7 +351,7 @@ def main():
                    'median_frame_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits'),
                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                    'psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits'))
-    # cube C (unsat)
+    # cube C (unsats for D frames)
     pca_psf_maker_host_recon(start_frame_num = 7120,
                    stop_frame_num = 7734,
                    resd_avg_limits = [35.4,40.6],

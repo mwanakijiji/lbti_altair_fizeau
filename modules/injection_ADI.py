@@ -163,7 +163,7 @@ class FakePlanetInjectorCube:
                 injection_iteration,
                  fake_params,
                  n_PCA,
-                 write_name_abs_host_star_PCA,
+                 read_name_abs_host_star_PCA,
                  read_name_abs_fake_planet_PCA,
                  read_name_raw_pca_median,
                  config_data = config,
@@ -174,7 +174,7 @@ class FakePlanetInjectorCube:
             (0: initial injection; >=1: successive injections)
         fake_params: parameters of the fake companion
         n_PCA: number of principal components to use
-        write_name_abs_host_star_PCA: absolute file name of the PCA cube to reconstruct the host star
+        read_name_abs_host_star_PCA: absolute file name of the PCA cube to reconstruct the host star
             for host star subtraction
         read_name_abs_fake_planet_PCA: absolute file name of the PCA cube to reconstruct the host star
             for making a fake planet (i.e., without saturation effects)
@@ -186,7 +186,7 @@ class FakePlanetInjectorCube:
 
         self.injection_iteration = injection_iteration
         self.n_PCA = n_PCA
-        self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
+        self.abs_host_star_PCA_name = read_name_abs_host_star_PCA
         self.abs_fake_planet_PCA_name = read_name_abs_fake_planet_PCA
         self.read_name_raw_pca_median = read_name_raw_pca_median
         self.config_data = config_data
@@ -651,19 +651,23 @@ def inject_remove_adi(this_param_combo):
 #######################
 
 class SyntheticFizeauInjectRemoveADI:
+    '''
+    This injects fake companion PSFs, removes host stars, and does the ADI
+    reduction.
+    '''
 
     def __init__(self,
                 injection_iteration,
                  file_name_list,
                  n_PCA_host_removal,
                  read_name_abs_test_PCA_vector,
+                 read_name_abs_pca_pre_decomposition_median,
+                 read_name_abs_fake_planet_PCA,
+                 read_name_abs_pca_tesselation_pattern,
                  write_name_abs_cube_put_frames_into_it_simple,
                  write_name_abs_cube_A_PCA_vector,
-                 read_name_abs_pca_pre_decomposition_median,
                  write_name_abs_derotated_sci_median,
-                 write_name_abs_host_star_PCA,
-                 read_name_abs_fake_planet_PCA,
-                 read_name_abs_pca_tesselation_pattern):
+                 write_name_abs_host_star_PCA):
         '''
         injection_iteration: number of the fake planet injection iteration
             (None if no planets are being injected)
@@ -671,19 +675,19 @@ class SyntheticFizeauInjectRemoveADI:
         n_PCA_host_removal: number of PCA modes to use for subtracting out the host star
         read_name_abs_test_PCA_vector: name of a test PCA vector cube file just to see if
             decomposition can be done at all
+        read_name_abs_pca_pre_decomposition_median: median of non-derotated science frames, to
+            subtract from frames before PCA decomposition
+        read_name_abs_fake_planet_PCA: name of PCA cube to use for host star decomposition
+            such that the full PSF is reconstructed (like to make fake planets)
+        read_name_abs_pca_tesselation_pattern: name of tesselation cube
         write_name_abs_cube_put_frames_into_it_simple: if no fakes are being injected,
             this file name contains the stack of all the frames
         write_name_abs_cube_A_PCA_vector: name of PCA vector
-        read_name_abs_pca_pre_decomposition_median: median of non-derotated science frames, to
-            subtract from frames before PCA decomposition
         write_name_abs_derotated_sci_median: name of median of derotated science frames, to find
             host star amplitude and to reconstruct PSFs (since PCA basis set only reconstructs
             residuals)
         write_name_abs_host_star_PCA: name of PCA cube to use for host star decomposition, for
             subtraction
-        read_name_abs_fake_planet_PCA: name of PCA cube to use for host star decomposition
-            such that the full PSF is reconstructed (like to make fake planets)
-        read_name_abs_pca_tesselation_pattern: name of tesselation cube
         '''
 
         self.injection_iteration = injection_iteration
@@ -1056,52 +1060,57 @@ def main(inject_iteration=None):
         # if we are injecting fake planets, get source images from previous iteration
         injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
         print("injection_ADI: Fake planet injection iteration number " + injection_iteration_string)
-    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-    '''
-    if (inject_iteration == None):
-        injection_iteration_string = "no_fake_planet"
-        # the string is not being appended to the path, to avoid breakage
-        # with pipeline upstream
-        print("injection_ADI: No fake planet being injected")
-        cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-    elif (inject_iteration is not None):
-        # if we are injecting fake planets, get source images from previous iteration
-        injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
-        print("injection_ADI: Fake planet injection iteration number " + injection_iteration_string)
-        if (inject_iteration == 0):
-            # source directory is still just the original centered frames
-            cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
-        elif (inject_iteration >= 1):
-            # source directory is now previous iteration
-            prev_iteration_string = "inj_iter_" + str(inject_iteration-1).zfill(4)
-            cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"]) + \
-                                            prev_iteration_string
-    '''
 
+    cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
-    # instantiate
-    synthetic_fizeau_inject_remove_adi = SyntheticFizeauInjectRemoveADI(
+    # instantiate reduction of A frames (frames 4259-5608 and 5826-6301)
+    # ref: block diagram from 2019 Apr 5
+    synthetic_fizeau_inject_remove_adi_A_frames = SyntheticFizeauInjectRemoveADI(
+        injection_iteration = inject_iteration,
+        file_name_list = cookies_centered_06_name_array,
+        n_PCA_host_removal = 100,
+        read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                            'psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'),
+        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                          + 'median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'),
+        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                            + "psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits"),
+        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                                                    "tesselation_10_psfs_in_each_region.fits"),
+        write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                            + "simple_synthetic_sci_frame_cube_A.fits"),
+        write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'"),
+        write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
+                                                  + config["file_names"]["MEDIAN_SCI_FRAME"]),
+        write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                           + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'")
+                                           )
+    ''''
+    # instantiate reduction of D frames (frames 7927-10722 and 10742-11408)
+    synthetic_fizeau_inject_remove_adi_D_frames = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,
         file_name_list = cookies_centered_06_name_array,
         n_PCA_host_removal = 100,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                             'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
+        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                          + 'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
+        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                            + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
+        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                                                    "tesselation_10_psfs_in_each_region.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                 + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits"),
-        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + 'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
         write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
                                                   + config["file_names"]["MEDIAN_SCI_FRAME"]),
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits"),
-        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                            + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "tesselation_10_psfs_in_each_region.fits")
-        )
+                                           + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits")
+                                           )
+    '''
     '''
     Note that tesselation region options are
     mask_100x100pix_whole_frame.fits

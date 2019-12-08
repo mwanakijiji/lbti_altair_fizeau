@@ -1037,10 +1037,10 @@ def main(inject_iteration=None):
     # clear
     del experiments
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
-    pool = multiprocessing.Pool(ncpu)
+    #pool = multiprocessing.Pool(ncpu)
 
     # TRYING IT OVER 8 CORES AS OPPOSED TO 16 TO SEE IF I AVOID TOO MUCH MEMORY LEAKAGE
-    #pool = multiprocessing.Pool(8)
+    pool = multiprocessing.Pool(8)
 
     # create list of dictionaries of fake planet parameters
     # (one dictionary is fed to each core at a time)

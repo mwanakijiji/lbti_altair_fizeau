@@ -1130,4 +1130,4 @@ def main(inject_iteration=None):
     ## ## END TEST
 
     # run
-    pool.map(synthetic_fizeau_inject_remove_adi, param_dict_list)
+    pool.map(synthetic_fizeau_inject_remove_adi_A_frames, param_dict_list)

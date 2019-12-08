@@ -1071,9 +1071,9 @@ def main(inject_iteration=None):
         file_name_list = cookies_centered_06_name_array,
         n_PCA_host_removal = 100,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                            'psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'),
+                                            "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + 'median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'),
+                                                          + "median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
@@ -1081,11 +1081,11 @@ def main(inject_iteration=None):
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'"),
+                                                + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
         write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
                                                   + config["file_names"]["MEDIAN_SCI_FRAME"]),
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits'")
+                                           + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits")
                                            )
     ''''
     # instantiate reduction of D frames (frames 7927-10722 and 10742-11408)

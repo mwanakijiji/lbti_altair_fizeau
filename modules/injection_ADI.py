@@ -163,7 +163,7 @@ class FakePlanetInjectorCube:
                 injection_iteration,
                  fake_params,
                  n_PCA,
-                 read_name_abs_host_star_PCA,
+                 write_name_abs_host_star_PCA,
                  read_name_abs_fake_planet_PCA,
                  read_name_raw_pca_median,
                  config_data = config,
@@ -186,7 +186,7 @@ class FakePlanetInjectorCube:
 
         self.injection_iteration = injection_iteration
         self.n_PCA = n_PCA
-        self.abs_host_star_PCA_name = read_name_abs_host_star_PCA
+        self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.abs_fake_planet_PCA_name = read_name_abs_fake_planet_PCA
         self.read_name_raw_pca_median = read_name_raw_pca_median
         self.config_data = config_data

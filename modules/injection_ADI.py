@@ -1122,12 +1122,10 @@ def main(inject_iteration=None):
     '''
 
     ## ## BEGIN TEST
-    '''
     for param_num in range(0,len(param_dict_list)):
         print(":")
         synthetic_fizeau_inject_remove_adi(param_dict_list[param_num]) # test on just one at a time
-    '''
     ## ## END TEST
 
     # run
-    pool.map(synthetic_fizeau_inject_remove_adi_A_frames, param_dict_list)
+    #pool.map(synthetic_fizeau_inject_remove_adi_A_frames, param_dict_list)

@@ -1037,10 +1037,10 @@ def main(inject_iteration=None):
     # clear
     del experiments
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
-    #pool = multiprocessing.Pool(ncpu)
+    pool = multiprocessing.Pool(ncpu)
 
     # TRYING IT OVER 8 CORES AS OPPOSED TO 16 TO SEE IF I AVOID TOO MUCH MEMORY LEAKAGE
-    pool = multiprocessing.Pool(8)
+    #pool = multiprocessing.Pool(8)
 
     # create list of dictionaries of fake planet parameters
     # (one dictionary is fed to each core at a time)
@@ -1064,11 +1064,18 @@ def main(inject_iteration=None):
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
+    # combination A: frames 4259-5608 & 5826-6301 (flux-saturated)
+    cookies_A_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[012]*.fits")))
+
     # instantiate reduction of A frames (frames 4259-5608 and 5826-6301)
     # ref: block diagram from 2019 Apr 5
     synthetic_fizeau_inject_remove_adi_A_frames = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,
-        file_name_list = cookies_centered_06_name_array,
+        file_name_list = cookies_A_only_centered_06_name_array,
         n_PCA_host_removal = 100,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                             "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),

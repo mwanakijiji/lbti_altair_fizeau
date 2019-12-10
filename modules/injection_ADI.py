@@ -1084,7 +1084,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "tesselation_10_psfs_in_each_region.fits"),
+                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
@@ -1107,7 +1107,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "tesselation_10_psfs_in_each_region.fits"),
+                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
@@ -1126,6 +1126,7 @@ def main(inject_iteration=None):
     mask_quad4_circ_ring.fits
     tesselation_10_psfs_in_each_region.fits
     mask_10x10_100squares.fits
+    mask_406x406_rings_4quad_fits_complete.fits
     '''
 
     ## ## BEGIN TEST

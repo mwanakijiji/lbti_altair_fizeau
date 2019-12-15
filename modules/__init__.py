@@ -42,9 +42,8 @@ del_amplitude_progression = np.array([0.5e-3,1e-4,5e-5,1e-5,5e-6,1e-6,5e-7,1e-7,
 
 '''
 def get_git_hash():
-    '''
-    Returns the hash for the current version of the code on Git
-    '''
+
+    # Returns the hash for the current version of the code on Git
 
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha

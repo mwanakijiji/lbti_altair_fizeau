@@ -7,7 +7,7 @@ import time
 import numpy as np
 import scipy
 from scipy import ndimage, sqrt, stats, misc, signal
-import git
+#import git
 import configparser
 import multiprocessing
 from astropy.io import fits
@@ -40,6 +40,7 @@ del_amplitude_progression = np.array([0.5e-3,1e-4,5e-5,1e-5,5e-6,1e-6,5e-7,1e-7,
 
 ## FUNCTIONS
 
+'''
 def get_git_hash():
     '''
     Returns the hash for the current version of the code on Git
@@ -50,6 +51,7 @@ def get_git_hash():
 
     ## ## HAVENT FINISHED THIS YET
     print(sha)
+'''
 
 
 def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):

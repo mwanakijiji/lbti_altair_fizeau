@@ -25,19 +25,19 @@ def convert_rad_xy(canvas_array, PS, rho_asec, theta_deg):
     rho: array of radii (in asec)
     theta_deg: array of angles E of N (in degrees)
     '''
-    
+
     # find the center of the dummy array; this will be the pivot point
     array_center = (int(0.5*np.shape(canvas_array)[0]),
                     int(0.5*np.shape(canvas_array)[1]))
-    
+
     # find x, y offsets from center in units of display pixels
     offset_from_center_x = -np.divide(rho_asec,PS)*np.sin(np.multiply(theta_deg,np.pi/180.))
     offset_from_center_y = np.divide(rho_asec,PS)*np.cos(np.multiply(theta_deg,np.pi/180.))
-    
+
     # find absolute coordinates
     y_absolute = np.add(array_center[0],offset_from_center_y)
     x_absolute = np.add(array_center[1],offset_from_center_x)
-    
+
     return y_absolute, x_absolute
 
 def blahblah():
@@ -77,7 +77,7 @@ class OneDimContrastCurve:
 
 
     def __call__(self,
-                 csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]):
+                 csv_file):
         '''
         Read in the csv with detection information and make a 1D contrast curve
 
@@ -89,15 +89,15 @@ class OneDimContrastCurve:
         # read in csv of detection info
         info_file = pd.read_csv(csv_file)
 
-        # For groups of rows defined by 
+        # For groups of rows defined by
         #      A.) a common value of rad_asec
         #      B.) a common value of ampl_linear_norm
         # 1. find median value of S/N for each group
         # 2. select lowest value of ampl_linear_norm which provides a minimum X S/N
 
         # group by radius and ampl_linear_norm
-        info_file_grouped_rad_ampl = info_file.groupby(["rad_asec", "ampl_linear_norm"], 
-                                            axis=0, 
+        info_file_grouped_rad_ampl = info_file.groupby(["rad_asec", "ampl_linear_norm"],
+                                            axis=0,
                                             as_index=False).median()
 
         # for each radius, find ampl_linear_norm with S/N > threshold_s2n
@@ -148,7 +148,7 @@ class OneDimContrastCurve:
                 print("-")
                 print(data_right_s2n_postsort)
                 '''
-                
+
             except:
                 print("No data point above min S/N at radius (asec) of " + str(unique_rad_vals[t]))
 
@@ -223,9 +223,9 @@ class TwoDimSensitivityMap:
             dummy_array_0 = np.nan*np.ones((1001,1001))
 
             # convert radial info into absolute (y,x)
-            y_scatter, x_scatter = convert_rad_xy(dummy_array_0, 
-                              PS=pseudo_ps_LMIR, 
-                              rho_asec=data_right_ampl["rad_asec"], 
+            y_scatter, x_scatter = convert_rad_xy(dummy_array_0,
+                              PS=pseudo_ps_LMIR,
+                              rho_asec=data_right_ampl["rad_asec"],
                               theta_deg=data_right_ampl["angle_deg"])
 
             ## make a simple scatter plot, where the 3rd dimension is in the marker color
@@ -260,25 +260,25 @@ class TwoDimSensitivityMap:
             #data_right_ampl["noise"] = 0.1*np.ones(len(data_right_ampl["signal"]))
             x_scatter = 1000*np.random.random(len(x_scatter))
             y_scatter = 1000*np.random.random(len(x_scatter))
-            grid_z0_signal = griddata(points=np.transpose([x_scatter,y_scatter]), 
-                   values=data_right_ampl["signal"].values, 
-                   xi=(xx, yy), 
+            grid_z0_signal = griddata(points=np.transpose([x_scatter,y_scatter]),
+                   values=data_right_ampl["signal"].values,
+                   xi=(xx, yy),
                    method='cubic')
-            grid_z0_noise = griddata(points=np.transpose([x_scatter,y_scatter]), 
-                   values=data_right_ampl["noise"].values, 
-                   xi=(xx, yy), 
+            grid_z0_noise = griddata(points=np.transpose([x_scatter,y_scatter]),
+                   values=data_right_ampl["noise"].values,
+                   xi=(xx, yy),
                    method='cubic')
             '''
             ## ## END TEST
             # N.b. In the interpolations, for linear and cubic options to work, x,y sampling
             # has to be heavy enough
-            grid_z0_signal = griddata(points=np.transpose([x_scatter,y_scatter]), 
-                   values=data_right_ampl["signal"].values, 
-                   xi=(xx, yy), 
+            grid_z0_signal = griddata(points=np.transpose([x_scatter,y_scatter]),
+                   values=data_right_ampl["signal"].values,
+                   xi=(xx, yy),
                    method='linear')
-            grid_z0_noise = griddata(points=np.transpose([x_scatter,y_scatter]), 
-                   values=data_right_ampl["noise"].values, 
-                   xi=(xx, yy), 
+            grid_z0_noise = griddata(points=np.transpose([x_scatter,y_scatter]),
+                   values=data_right_ampl["noise"].values,
+                   xi=(xx, yy),
                    method='linear')
             plt.clf()
             plt.figure(figsize=(10,5))
@@ -355,7 +355,7 @@ class TwoDimSensitivityMap:
                      header = None,
                      overwrite = True)
             print("-"*prog_bar_width)
-        
+
 
 
 def main():
@@ -369,7 +369,8 @@ def main():
     config.read("modules/config.ini")
 
     # make a 1D contrast curve
-    one_d_contrast = OneDimContrastCurve()
+    one_d_contrast = OneDimContrastCurve(csv_file = config["data_dirs"]["DIR_S2N"] + \
+        config["file_names"]["DETECTION_CSV"])
     one_d_contrast()
 
     '''

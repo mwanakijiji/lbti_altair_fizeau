@@ -22,8 +22,8 @@ matplotlib.use('agg') # avoids some crashes when multiprocessing
 import matplotlib.pyplot as plt
 
 # configuration data
-config = configparser.ConfigParser() # for parsing values in .init file
-config.read("config.ini")
+#config = configparser.ConfigParser() # for parsing values in .init file
+#config.read("config.ini")
 
 class DarkSubtSingle:
     '''
@@ -326,8 +326,7 @@ class BackgroundPCASubtSingle:
     def __init__(self,
                  inputArray,
                  config_data = config,
-                 simple_channel_file = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                           "background_PCA_vector_channel_vars_only.fits"),
+                 simple_channel_file,
                  simple_channel = False):
         '''
         INPUTS:
@@ -866,7 +865,9 @@ def main():
 
     # ALL science frames, using background subtraction involving just channel variations
     param_array = [-9999, -9999, 32, -9999]
-    do_pca_back_subt = BackgroundPCASubtSingle(param_array, config, simple_channel = True)
+    do_pca_back_subt = BackgroundPCASubtSingle(param_array, config, \
+        simple_channel_file = str(config["data_dirs"]["DIR_OTHER_FITS"] + \
+        "background_PCA_vector_channel_vars_only.fits", simple_channel = True)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array)
 
     '''

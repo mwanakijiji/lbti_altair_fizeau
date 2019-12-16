@@ -187,7 +187,7 @@ class TwoDimSensitivityMap:
 
 
     def __call__(self,
-                 csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"]):
+                 csv_file):
         '''
         Read in the csv with detection information and, for each fake planet amplitude, make a 2D signal map and noise map
 
@@ -375,6 +375,6 @@ def main():
 
     '''
     # make a 2D sensitivity map
-    two_d_sensitivity = TwoDimSensitivityMap()
+    two_d_sensitivity = TwoDimSensitivityMap(csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"])
     two_d_sensitivity()
     '''

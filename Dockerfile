@@ -1,17 +1,15 @@
-# our base image# our base image
+# get base image and right Python version
 FROM ubuntu:18.04
-#ARG PYTHON_VERSION=3.6.6
 FROM python:3.6.6
 
 # install python and pip
 #RUN apt-get install python-pip
 RUN apt-get update && apt-get install -y python-pip
 
-RUN python --version
+#RUN python --version
 
 # get dependencies
 ADD requirements.txt /
-#RUN curl https://bootstrap.pypa.io/get-pip.py | python 
 RUN pip install -r requirements.txt
 
 # copy files required for the app to run

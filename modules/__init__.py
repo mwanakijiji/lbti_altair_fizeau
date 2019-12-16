@@ -112,7 +112,7 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
     return pos_info
 
 
-def make_dirs(config):
+def make_dirs():
     '''
     Make directories for housing files/info if they don't already exist
     '''

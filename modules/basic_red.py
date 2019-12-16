@@ -325,8 +325,8 @@ class BackgroundPCASubtSingle:
 
     def __init__(self,
                  inputArray,
-                 config_data = config,
                  simple_channel_file,
+                 config_data = config,
                  simple_channel = False):
         '''
         INPUTS:
@@ -337,9 +337,9 @@ class BackgroundPCASubtSingle:
         -> [2]: n_PCA: number of PCA components to reconstruct the background with,
         --------> out of the total number of components in the cube
         -> [3]: background quadrant choice (2 or 3)
-        config_data: configuration data, as usual
         simple_channel_file: the name of a PCA background cube involving channel variations only;
             in which case, set simple_channel = True
+        config_data: configuration data, as usual
         simple_channel: flag for using a background cube that just consists of channel variations;
             note that this overrides the cube start and stop numbers, and the quadrant choice in the
             inputArray
@@ -865,9 +865,9 @@ def main():
 
     # ALL science frames, using background subtraction involving just channel variations
     param_array = [-9999, -9999, 32, -9999]
-    do_pca_back_subt = BackgroundPCASubtSingle(param_array, config, \
+    do_pca_back_subt = BackgroundPCASubtSingle(param_array, \
         simple_channel_file = str(config["data_dirs"]["DIR_OTHER_FITS"] + \
-        "background_PCA_vector_channel_vars_only.fits", simple_channel = True)
+        "background_PCA_vector_channel_vars_only.fits", config, simple_channel = True)
     pool.map(do_pca_back_subt, ramp_subted_03_name_array)
 
     '''

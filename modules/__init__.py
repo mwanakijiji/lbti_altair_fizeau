@@ -19,7 +19,7 @@ from sklearn.decomposition import PCA
 ncpu = multiprocessing.cpu_count()
 
 # configuration data
-global config
+#global config
 config = configparser.ConfigParser() # for parsing values in .init file
 config.read("modules/config.ini")
 
@@ -112,7 +112,7 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
     return pos_info
 
 
-def make_dirs():
+def make_dirs(config):
     '''
     Make directories for housing files/info if they don't already exist
     '''

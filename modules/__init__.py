@@ -19,6 +19,7 @@ from sklearn.decomposition import PCA
 ncpu = multiprocessing.cpu_count()
 
 # configuration data
+global config
 config = configparser.ConfigParser() # for parsing values in .init file
 config.read("modules/config.ini")
 

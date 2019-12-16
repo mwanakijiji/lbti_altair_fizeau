@@ -21,6 +21,9 @@ import matplotlib
 matplotlib.use('agg') # avoids some crashes when multiprocessing
 import matplotlib.pyplot as plt
 
+# configuration data
+config = configparser.ConfigParser() # for parsing values in .init file
+config.read("config.ini")
 
 class DarkSubtSingle:
     '''
@@ -280,7 +283,7 @@ class BackgroundPCACubeMaker:
             for slice_num in range(0,np.shape(training_cube_masked_weird)[0]):
 
                 # loop over each channel in that frame (assumes 32 channels across, each 64 pixels wide)
-                for ch_num in range(0,32): 
+                for ch_num in range(0,32):
                     training_cube_masked_weird[slice_num,:,ch_num*64:(ch_num+1)*64] = \
                       np.subtract(training_cube_masked_weird[slice_num,:,ch_num*64:(ch_num+1)*64],
                                   np.nanmedian(training_cube_masked_weird[slice_num,:,ch_num*64:(ch_num+1)*64]))
@@ -460,7 +463,7 @@ class BackgroundPCASubtSingle:
             pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
         sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
         sci_masked_1d_noNaN = sci_masked_1d[idx]
-        
+
         # the vector of component amplitudes
         soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:self.n_PCA,:].T, sci_masked_1d_noNaN)
 
@@ -481,11 +484,11 @@ class BackgroundPCASubtSingle:
         # background subtraction of channels only:
         # without PSF masking
         #sciImg_subtracted_channels_only_no_psf_masking = np.subtract(sciImg_psf_not_masked,recon_backgrnd_2d_channels_only)
-        
+
         # (I think the following lines are erroneous)
         #sciImg_subtracted_channels_only_psf_masked = np.subtract(sciImg_psf_masked,
         #                                                         np.multiply(recon_backgrnd_2d_channels_only_psf_masked,\
-        #                                                                     np.multiply(self.pca_cube,psf_mask))) 
+        #                                                                     np.multiply(self.pca_cube,psf_mask)))
 
 
         # add last reduction step to header
@@ -736,7 +739,7 @@ class CookieCutout:
 
             overflow_below_nosign_change = psf_loc_old[0]-radius_from_host
             overflow_above_nosign_change = psf_loc_old[0]+radius_from_host > sciImg_shape_old[0]
-            
+
             # pad the image in preparation for taking a cutout
             sciImg = np.pad(sciImg,
                             pad_width = radius_from_host,
@@ -749,7 +752,7 @@ class CookieCutout:
 
             # find the PSF again, in the coordinates of the padded image
             psf_loc = find_airy_psf(sciImg)
-            
+
 
         # cut out cookies
         cookie_cut_out = sciImg[psf_loc[0]-radius_from_host:psf_loc[0]+radius_from_host,
@@ -773,7 +776,7 @@ def pca_backg_maker_channels_only(abs_pca_cube_file_name):
     '''
     Generates a very simple PCA vector basis consisting of channel variations alone
     '''
-    
+
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("modules/config.ini")
@@ -787,8 +790,8 @@ def pca_backg_maker_channels_only(abs_pca_cube_file_name):
                      overwrite=True)
     print("Wrote out background PCA cube, consisting of channel variations only, as " + \
           str(abs_pca_cube_file_name))
-    
-        
+
+
 
 def main():
     '''
@@ -870,7 +873,7 @@ def main():
     # make a list of the PCA-background-subtracted files
     pcab_subted_04_directory = str(config["data_dirs"]["DIR_PCAB_SUBTED"])
     pcab_subted_04_names = list(glob.glob(os.path.join(pcab_subted_04_directory, "*.fits")))
-    
+
     # make cookie cutouts of the PSFs
     ## ## might add functionality to override the found 'center' of the PSF
     make_cookie_cuts = CookieCutout(quad_choice = -9999)

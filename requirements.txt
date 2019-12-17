@@ -35,7 +35,7 @@ matplotlib == 3.1.2
 # modules/sensitivity.py: 7
 # subtract_stray_y_illumination_gradient_parallel.py: 8
 # tests/write_fits_hdrs_fake_data.py: 6
-numpy == 1.13.3
+numpy == 1.17.4
 #numpy
 
 # modules/detection.py: 9

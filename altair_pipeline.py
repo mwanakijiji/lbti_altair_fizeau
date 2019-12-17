@@ -34,7 +34,7 @@ psf_pca_bases.main()
 '''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI frame
-
+'''
 ## ## DETECTION
 detection.main(inject_iteration=0)
 
@@ -68,6 +68,5 @@ while True:
 # median along azimuth
 
 # incorporate
-'''
 sensitivity.main() # produces 1-D contrast curve from csv info
 '''

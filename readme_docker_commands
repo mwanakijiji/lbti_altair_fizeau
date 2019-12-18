@@ -1,0 +1,3 @@
+YOUR_DOCKERHUB_USERNAME=mwanakijiji
+sudo docker build -t $YOUR_DOCKERHUB_USERNAME/fizeau_altair_pipeline .
+sudo docker run -v ${HOME}/lbti_altair_fizeau/modules:/modules -v /vol_c:/vol_c $YOUR_DOCKERHUB_USERNAME/fizeau_altair_pipeline

@@ -3,6 +3,7 @@
 
 # cmd:
 # pigar -p requirements.txt -P .
+# ... with numpy update to get around binary error
 
 # modules/basic_red.py: 15
 # modules/centering.py: 7

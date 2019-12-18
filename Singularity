@@ -1,2 +1,16 @@
 Bootstrap: docker
-From: ubuntu:18.04
+From: mwanakijiji/fizeau_altair_pipeline:latest
+
+%runscript
+
+%post
+
+	echo "Hello world!"
+
+%files
+
+%environment
+
+%labels
+
+AUTHOR mwanakijiji

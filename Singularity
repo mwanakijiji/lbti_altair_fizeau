@@ -9,9 +9,9 @@ mkdir -p /usr/src/app/modules
   requirements.txt /
   altair_pipeline.py /usr/src/app/
   # copy Python modules
-  modules/*py /usr/src/app/modules/
+  ##modules/*py /usr/src/app/modules/
   # copy config file
-  modules/*ini /usr/src/app/modules/
+  ##modules/*ini /usr/src/app/modules/
 
 %post
   # install pip

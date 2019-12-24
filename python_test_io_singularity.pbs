@@ -1,15 +1,15 @@
-###################################################
-## Script to run Altair Fizeau pipeline on Ocelote
-###################################################
+##########################################################################
+## Script to run a test Python I/O script with a Singularity container
+##########################################################################
 
 ### queue method
-#PBS -q standard
+#PBS -q debug
 
 ### resources
 #PBS -l select=1:ncpus=28:mem=168gb:pcmem=6gb
 
 ### project name
-#PBS -N altair_fizeau
+#PBS -N python_io_sing
 
 ### group name
 #PBS -W group_list=ktmorz
@@ -19,10 +19,10 @@
 
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
-#PBS -l cput=672:00:00
+#PBS -l cput=00:28:00
 
 ### walltime before job is cut off
-#PBS -l walltime=24:00:00
+#PBS -l walltime=00:01:00
 
 ### set up path
 DATADIR=/xdisk/spalding/
@@ -35,4 +35,4 @@ cd $DATADIR
 - AM I BINDING THESE VOLUMES CORRECTLY, GIVEN IT SHOULD BE RELATIVE TO XDISK?
 
 ### run Singularity container
-singularity exec --bind ${HOME}/lbti_altair_fizeau/modules:/modules --bind /vol_c:/vol_c [CONTAINER NAME].simg python altair_pipeline.py
+singularity exec --bind ${HOME}/lbti_altair_fizeau/modules:/modules --bind /vol_c:/vol_c [CONTAINER NAME].simg python python_io_test.py

@@ -1,0 +1,56 @@
+#!/bin/bash
+#PBS -N using_tmp
+#PBS -W group_list=
+#PBS -q standard
+#PBS -l select=1:ncpus=1:mem=6gb:pcmem=6gb
+#PBS -l walltime=00:10:00
+#PBS -l cput=00:10:00
+
+module load python
+
+# This line caclulates available space in /tmp in GB
+available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+
+# The if statement checks if /tmp has enough space for your job.
+# Here the value for the storage requirement is 10 GB,
+# although we are not going to use that much.
+
+echo $HOSTNAME
+echo "Check if /tmp has 10GB of storage available"
+if [ $available_space -gt 10 ]
+then
+   echo "There is enough storage"
+   echo $available_space GB
+   
+
+# Create an archive of the input files and the executable files
+cd ~/cookiecutter_project
+tar -czf input_files.tar -C ./src/visualization/ make_graphs.py -C ../../data/external/ surveys.csv
+
+# Make a directory in /tmp for your files. For a unique directory name we are using
+# your NetID. It is stored in the environment variable USER. So all we need to do
+# is to use the value of the environment variable USER.
+   rm -fr /tmp/$USER
+   mkdir /tmp/$USER
+
+# Copy tar archive with the input files to the directory you created in /tmp
+   cp input_files.tar /tmp/$USER
+   cd /tmp/$USER
+# Unpack the archive
+   tar -xzf input_files.tar
+
+# Run the executable. This would be where you run your calculation in the actual job.
+   python3 make_graphs.py
+
+# Create the archive named graphs.tar with the output graphs (all the graphs have extension .png) and copy it back to your home directory
+   tar -czf graphs.tar *.png
+   cp graphs.tar ~/cookiecutter_project/reports/figures/
+   
+# Delete your files from /tmp
+   rm -fr /tmp/$USER
+else
+
+# If there is not enough space on /tmp the job will not run and return these messages instead
+   echo "There is not enough storage"
+   echo $available_space GB
+fi

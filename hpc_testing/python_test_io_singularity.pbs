@@ -33,7 +33,7 @@ export start_dir=$PWD
 cp /xdisk/spalding/vol_c/altair_tar.tar.gz /tmp/$USER
 cd /tmp/$USER
 
-### unpack
+### unpack data
 tar -xzvf altair_tar.tar.gz
 
 ### move back to start directory
@@ -43,5 +43,11 @@ cd start_dir
 
 echo "Back in start directory"
 
+### run Singularity container
+### singularity exec --bind ${HOME}/lbti_altair_fizeau/modules:/modules --bind /vol_c:/vol_c [CONTAINER NAME].simg python python_io_test.py
+
 ### run placeholder executable
-###python3 python_io.py
+### python3 python_io.py
+
+### timestamp end
+date

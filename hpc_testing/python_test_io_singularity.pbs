@@ -21,33 +21,40 @@ module load python/3
 ### check if 500 Gb of storage are available in /tmp
 echo $HOSTNAME
 echo "Check if /tmp has 500GB of storage available"
+available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
 if [ $available_space -gt 500 ]
 then
    echo "There is enough storage"
    echo $available_space GB
 
-### get current directory
-export start_dir=$PWD
+   ### get current directory
+   export start_dir=$PWD
 
-### copy tarball into the /tmp/ directory on the same node
-cp /xdisk/spalding/vol_c/altair_tar.tar.gz /tmp/$USER
-cd /tmp/$USER
+   ### copy tarball into the /tmp/ directory on the same node
+   cp /xdisk/spalding/vol_c/altair_tar.tar.gz /tmp/$USER
+   cd /tmp/$USER
 
-### unpack data
-tar -xzvf altair_tar.tar.gz
+   ### unpack data
+   tar -xzvf altair_tar.tar.gz
 
-### move back to start directory
-### (decoupling the data and the script avoids requiring new
-### tarring each time the script is edited)
-cd start_dir
+   ### move back to start directory
+   ### (decoupling the data and the script avoids requiring new
+   ### tarring each time the script is edited)
+   cd start_dir
 
-echo "Back in start directory"
+   echo "Back in start directory"
 
-### run Singularity container
-### singularity exec --bind ${HOME}/lbti_altair_fizeau/modules:/modules --bind /vol_c:/vol_c [CONTAINER NAME].simg python python_io_test.py
+   ### run Singularity container
+   ### singularity exec --bind ${HOME}/lbti_altair_fizeau/modules:/modules --bind /vol_c:/vol_c [CONTAINER NAME].simg python python_io_test.py
 
-### run placeholder executable
-### python3 python_io.py
+   ### run placeholder executable
+   ### python3 python_io.py
 
-### timestamp end
-date
+   ### timestamp end
+   date
+
+else
+
+  echo "There is not enough storage"
+  echo $available_space GB
+fi

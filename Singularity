@@ -2,7 +2,7 @@ Bootstrap: docker
 From: python:3.6.6
 
 # copy files required for the app to run
-mkdir -p /usr/src/app/modules
+sudo mkdir -p /usr/src/app/modules
 
 %files
   requirements.txt /
@@ -14,7 +14,9 @@ mkdir -p /usr/src/app/modules
 
 %post
   # install pip
-  apt-get install -y python-pip
+  apt-get update
+  apt-get install -y python3-pip
+  pip install -U pip
   # get dependencies
   pip install -r requirements.txt
 

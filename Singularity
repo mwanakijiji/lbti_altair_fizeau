@@ -20,8 +20,8 @@ mkdir -p /usr/src/app/modules
   pip install -r requirements.txt
 
   # UA HPC specific: make directories for mount points
-  mkdir -p /extra
-  mkdir -p /xdisk
+  # mkdir -p /extra
+  # mkdir -p /xdisk
 
 # run the application
 #CMD python3 /usr/src/app/test_docker_script.py

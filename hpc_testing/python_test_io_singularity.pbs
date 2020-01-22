@@ -44,7 +44,7 @@ then
    mkdir /tmp/$USER
 
    ### copy tarball into the /tmp/ directory on the same node
-   cp /xdisk/spalding/vol_c/$DATA_TARBALL /tmp/$USER
+   cp /xdisk/spalding/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball directory"
    date
@@ -62,11 +62,7 @@ then
    echo "Back in start directory"
 
    ### run Singularity container (bind syntax is host:container)
-   ### singularity exec
-    --bind /tmp/$USER/modules:/modules
-    --bind /tmp/$USER/vol_c:/vol_c
-    /xdisk/$USER/$SING_FILE
-    python3 altair_pipeline.py
+   ### singularity exec --bind /tmp/$USER/modules:/modules --bind /tmp/$USER/vol_c:/vol_c /xdisk/$USER/$SING_FILE python3 altair_pipeline.py
 
    ### run placeholder executable
    ### python3 python_io.py

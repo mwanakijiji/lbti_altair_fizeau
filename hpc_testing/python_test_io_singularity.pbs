@@ -1,4 +1,4 @@
-### Your job will use 1 node, 1 cores, and 168gb of memory total.
+### Your job will use 1 node, 2 cores, and 168gb of memory total.
 #PBS -q standard
 #PBS -l select=1:ncpus=1:mem=168gb:pcmem=6gb
 ### Specify a name for the job
@@ -18,6 +18,10 @@
 ### start timestamp
 echo "Start time"
 date
+
+### set variables: the data tarball and Singularity container
+export DATA_TARBALL=altair_200121_10frames.tar.gz
+export SING_FILE=hpc_run_200121_run_1.simg
 
 ### load python 3.6.5
 module load python/3
@@ -40,13 +44,13 @@ then
    mkdir /tmp/$USER
 
    ### copy tarball into the /tmp/ directory on the same node
-   cp /xdisk/spalding/vol_c/altair_200120.tar.gz /tmp/$USER
+   cp /xdisk/spalding/vol_c/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball directory"
    date
 
    ### unpack data
-   tar -xzvf altair_tar.tar.gz
+   tar -xzvf $DATA_TARBALL
    echo "Tarball extracted"
    date
 
@@ -58,7 +62,11 @@ then
    echo "Back in start directory"
 
    ### run Singularity container (bind syntax is host:container)
-   ### singularity exec --bind /tmp/$USER/modules:/modules --bind /tmp/$USER/vol_c:/vol_c [CONTAINER NAME].simg python3 altair_pipeline.py
+   ### singularity exec
+    --bind /tmp/$USER/modules:/modules
+    --bind /tmp/$USER/vol_c:/vol_c
+    /xdisk/$USER/$SING_FILE
+    python3 altair_pipeline.py
 
    ### run placeholder executable
    ### python3 python_io.py

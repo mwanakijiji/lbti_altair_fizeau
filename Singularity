@@ -3,16 +3,16 @@ From: python:3.6.6
 
 # copy files required for the app to run
 %setup
-  mkdir -p ${SINGULARITY_ROOTFS}/usr/src/app/modules
-  mkdir -p ${SINGULARITY_ROOTFS}/usr/src/app/vol_c
+  mkdir -p ${SINGULARITY_ROOTFS}/modules
+  mkdir -p ${SINGULARITY_ROOTFS}/vol_c
 
 %files
   requirements.txt /
-  altair_pipeline.py ${SINGULARITY_ROOTFS}/usr/src/app/
+  altair_pipeline.py /
   # copy Python modules
-  modules/*py ${SINGULARITY_ROOTFS}/usr/src/app/modules/
+  modules/*py /modules/
   # copy config file
-  modules/*ini ${SINGULARITY_ROOTFS}/usr/src/app/modules/
+  modules/*ini /modules/
 
 %post
   # install pip

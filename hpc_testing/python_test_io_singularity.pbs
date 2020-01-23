@@ -21,10 +21,13 @@ date
 
 ### set variables: the data tarball and Singularity container
 export DATA_TARBALL=altair_200121_10frames.tar.gz
-export SING_FILE=hpc_run_200121_run_1.simg
+export SING_FILE=hpc_run_200122_run_1.simg
 
 ### load python 3.6.5
 module load python/3
+
+### load Singularity
+module load singularity
 
 ### check if 500 Gb of storage are available in /tmp
 echo $HOSTNAME
@@ -50,9 +53,12 @@ then
    date
 
    ### unpack data
-   tar -xzvf $DATA_TARBALL
+   tar -xvf $DATA_TARBALL
    echo "Tarball extracted"
    date
+
+   ### import the code
+   ### (should be inside Sing container)
 
    ### move back to start directory
    ### (decoupling the data and the script avoids requiring new
@@ -62,10 +68,15 @@ then
    echo "Back in start directory"
 
    ### run Singularity container (bind syntax is host:container)
-   ### singularity exec --bind /tmp/$USER/modules:/modules --bind /tmp/$USER/vol_c:/vol_c /xdisk/$USER/$SING_FILE python3 altair_pipeline.py
+   singularity exec \
+    --bind /tmp/$USER/modules:/usr/src/app/modules \
+    --bind /tmp/$USER/vol_c:/usr/src/app/vol_c \
+    /xdisk/$USER/$SING_FILE \
+    python3 /usr/src/app/altair_pipeline.py
 
    ### run placeholder executable
    ### python3 python_io.py
+   echo "Ran Singularity"
 
    ### timestamp end
    date

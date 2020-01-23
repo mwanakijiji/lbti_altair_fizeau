@@ -21,7 +21,7 @@ ncpu = multiprocessing.cpu_count()
 # configuration data
 #global config
 config = configparser.ConfigParser() # for parsing values in .init file
-config.read("modules/config.ini")
+config.read("./modules/config.ini")
 
 # status/progress/parse bar length
 prog_bar_width = 30

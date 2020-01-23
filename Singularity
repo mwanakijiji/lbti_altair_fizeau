@@ -4,6 +4,7 @@ From: python:3.6.6
 # copy files required for the app to run
 %setup
   mkdir -p ${SINGULARITY_ROOTFS}/usr/src/app/modules
+  mkdir -p ${SINGULARITY_ROOTFS}/usr/src/app/vol_c
 
 %files
   requirements.txt /

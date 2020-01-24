@@ -21,7 +21,7 @@ date
 
 ### set variables: the data tarball and Singularity container
 export DATA_TARBALL=altair_200121_10frames.tar.gz
-export SING_FILE=hpc_run_200124_run_1.simg
+export SING_FILE=hpc_run_200124_run_2.simg
 
 ### load python 3.6.5
 module load python/3
@@ -82,7 +82,7 @@ then
    singularity exec \
     --bind /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair \
     /xdisk/$USER/$SING_FILE \
-    python3 altair_pipeline.py
+    python3 /altair_pipeline.py
 
    echo "Ran Singularity"
 

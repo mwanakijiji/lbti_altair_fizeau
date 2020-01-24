@@ -67,12 +67,17 @@ then
 
    echo "Back in start directory"
 
+   ### BEGIN TEST
+   cd /tmp/$USER
+   echo "List of files in user dir:"
+   ls /tmp/$USER
+   ### END TEST
    ### run Singularity container (bind syntax is host:container)
    singularity exec \
-    --bind /tmp/$USER/modules:/usr/src/app/modules \
-    --bind /tmp/$USER/vol_c:/usr/src/app/vol_c \
+    --bind /tmp/$USER/modules:/modules \
+    --bind /tmp/$USER/vol_c:/vol_c \
     /xdisk/$USER/$SING_FILE \
-    python3 /usr/src/app/altair_pipeline.py
+    python3 altair_pipeline.py
 
    ### run placeholder executable
    ### python3 python_io.py

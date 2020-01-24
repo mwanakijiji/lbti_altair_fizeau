@@ -117,6 +117,12 @@ def make_dirs():
     Make directories for housing files/info if they don't already exist
     '''
 
+    ## begin # DEBUG:
+    print("make_dirs current working directory")
+    cwd = os.getcwd()
+    print(cwd)
+    ## end debug
+
     # loop over all directory paths we will need
     for vals in config["data_dirs"]:
         abs_path_name = str(config["data_dirs"][vals])

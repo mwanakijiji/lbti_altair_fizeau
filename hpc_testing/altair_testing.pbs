@@ -1,0 +1,96 @@
+### Your job will use 1 node, 2 cores, and 168gb of memory total.
+#PBS -q standard
+#PBS -l select=1:ncpus=1:mem=168gb:pcmem=6gb
+### Specify a name for the job
+#PBS -N test_python_io_debug
+### Specify the group name
+#PBS -W group_list=ktmorz
+### Used if job requires partial node only
+#PBS -l place=pack:shared
+### CPUtime required in hhh:mm:ss.
+### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
+#PBS -l cput=01:00:00
+### Walltime is how long your job will run
+#PBS -l walltime=01:00:00
+### send email when done
+#PBS -M spalding@email.arizona.edu
+
+### start timestamp
+echo "Start time"
+date
+
+### set variables: the data tarball and Singularity container
+export DATA_TARBALL=altair_200121_10frames.tar.gz
+export SING_FILE=hpc_run_200124_run_1.simg
+
+### load python 3.6.5
+module load python/3
+
+### load Singularity
+module load singularity
+
+### check if 500 Gb of storage are available in /tmp
+echo $HOSTNAME
+echo "Check if /tmp has 500GB of storage available"
+available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+if [ $available_space -gt 500 ]
+then
+   echo "There is enough storage"
+   echo $available_space GB
+   date
+
+   ### get current directory
+   export START_DIR=$PWD
+
+   ### make a new one
+   rm -fr /tmp/$USER
+   mkdir /tmp/$USER
+
+   ### copy tarball into the /tmp/ directory on the same node
+   ### (for 180507 Altair data, the top-level directory produced in the untarring
+   ### is /180507_fizeau_altair/ and NOT /vol_c/)
+   cp /xdisk/$USER/$DATA_TARBALL /tmp/$USER
+   cd /tmp/$USER
+   echo "Changed to tarball directory"
+   date
+
+   ### unpack data
+   tar -xvf $DATA_TARBALL
+   echo "Tarball extracted"
+   date
+
+   ### import the code
+   ### (should be inside Sing container)
+
+   ### move back to start directory
+   ### (decoupling the data and the script avoids requiring new
+   ### tarring each time the script is edited)
+   cd $START_DIR
+
+   echo "Back in start directory"
+
+   ### BEGIN TEST
+   cd /xdisk/$USER
+   echo "List of files in /xdisk/user/ dir:"
+   ls /xdisk/$USER
+   echo "List of files in /tmp/user/ dir:"
+   ls /tmp/$USER
+   ### END TEST
+   ### run Singularity container (bind syntax is host:container)
+   ### data files -> /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair
+   ### code files -> (is it necessary to bind this?) :/modules
+   singularity exec \
+    --bind /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair \
+    /xdisk/$USER/$SING_FILE \
+    python3 altair_pipeline.py
+
+   echo "Ran Singularity"
+
+   ### timestamp end
+   date
+
+else
+
+  echo "There is not enough storage"
+  echo $available_space GB
+fi

@@ -125,10 +125,10 @@ def make_dirs():
     print("files in current directory:")
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     print(files)
-    print("a test import, config2:")
-    config2 = configparser.ConfigParser() # for parsing values in .init file
-    config2.read("./modules/config.ini")
-    print(config2.items("data_dirs"))
+    #print("a test import, config2:")
+    #config2 = configparser.ConfigParser() # for parsing values in .init file
+    #config2.read("./modules/config.ini")
+    #print(config2.items("data_dirs"))
     print("a test import, config3:")
     config3 = configparser.ConfigParser() # for parsing values in .init file
     config3.read("/modules/config.ini")

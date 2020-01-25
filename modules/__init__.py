@@ -118,9 +118,18 @@ def make_dirs():
     '''
 
     ## begin # DEBUG:
-    print("make_dirs current working directory")
+    print("------------------")
+    print("make_dirs current working directory:")
     cwd = os.getcwd()
     print(cwd)
+    print("files in current directory:")
+    files = [f for f in os.listdir('.') if os.path.isfile(f)]
+    print(files)
+    print("a test import:")
+    config2 = configparser.ConfigParser() # for parsing values in .init file
+    config2.read("./modules/config.ini")
+    print(config2["data_dirs"])
+    print("------------------")
     ## end debug
 
     # loop over all directory paths we will need

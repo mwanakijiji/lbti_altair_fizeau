@@ -526,7 +526,7 @@ def main():
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)

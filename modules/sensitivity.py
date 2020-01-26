@@ -366,7 +366,7 @@ def main():
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     # make a 1D contrast curve
     one_d_contrast = OneDimContrastCurve(csv_file = config["data_dirs"]["DIR_S2N"] + \

@@ -312,7 +312,7 @@ def main():
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     # fake planet injection parameters
     fake_params_pre_permute = {"angle_deg_EofN": [270.],

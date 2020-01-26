@@ -840,7 +840,7 @@ def main(inject_iteration=None):
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     # name of file to which we will append all S/N calculations, for each fake planet parameter
     # (not used if inject_iteration==None):

@@ -21,7 +21,7 @@ ncpu = multiprocessing.cpu_count()
 # configuration data
 #global config
 config = configparser.ConfigParser() # for parsing values in .init file
-config.read("modules/config.ini")
+config.read("/modules/config.ini")
 
 # status/progress/parse bar length
 prog_bar_width = 30
@@ -116,25 +116,6 @@ def make_dirs():
     '''
     Make directories for housing files/info if they don't already exist
     '''
-
-    ## begin # DEBUG:
-    print("------------------")
-    print("make_dirs current working directory:")
-    cwd = os.getcwd()
-    print(cwd)
-    print("files in current directory:")
-    files = [f for f in os.listdir('.') if os.path.isfile(f)]
-    print(files)
-    #print("a test import, config2:")
-    #config2 = configparser.ConfigParser() # for parsing values in .init file
-    #config2.read("./modules/config.ini")
-    #print(config2.items("data_dirs"))
-    print("a test import, config3:")
-    config3 = configparser.ConfigParser() # for parsing values in .init file
-    config3.read("/modules/config.ini")
-    print(config3.items("data_dirs"))
-    print("------------------")
-    ## end debug
 
     # loop over all directory paths we will need
     for vals in config["data_dirs"]:

@@ -778,7 +778,7 @@ def pca_backg_maker_channels_only(abs_pca_cube_file_name):
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     pca_comp_cube = channels_PCA_cube()
 
@@ -799,7 +799,7 @@ def main():
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     # multiprocessing instance
     pool = multiprocessing.Pool(ncpu)

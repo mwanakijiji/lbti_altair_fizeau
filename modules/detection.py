@@ -659,7 +659,7 @@ def main(inject_iteration=None):
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("modules/config.ini")
+    config.read("/modules/config.ini")
 
     if (inject_iteration == None):
         injection_iteration_string = "no_fake_planet"

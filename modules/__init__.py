@@ -121,7 +121,7 @@ def make_dirs():
 
     print("a test import, config2:")
     config2 = configparser.ConfigParser() # for parsing values in .init file
-    config2.read("./modules/config.ini")
+    config2.read("/modules/config.ini")
     print(config2.items("data_dirs"))
     print("original import, config:")
     print(config.items("data_dirs"))

@@ -118,6 +118,14 @@ def make_dirs():
     '''
 
     # loop over all directory paths we will need
+
+    print("a test import, config2:")
+    config2 = configparser.ConfigParser() # for parsing values in .init file
+    config2.read("./modules/config.ini")
+    print(config2.items("data_dirs"))
+    print("original import, config:")
+    print(config.items("data_dirs"))
+
     for vals in config["data_dirs"]:
         abs_path_name = str(config["data_dirs"][vals])
         print("Directory exists: " + abs_path_name)

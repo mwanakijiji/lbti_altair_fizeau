@@ -21,6 +21,7 @@ date
 
 ### set variables: filenames of the data tarball and Singularity container
 export DATA_TARBALL=altair_200121_10frames.tar.gz
+export RESULTS_TARBALL=results.tar
 export SING_FILE=lbti_altair_fizeau_latest.sif
 
 ### load python 3.6.5
@@ -90,7 +91,16 @@ then
     python3 /altair_pipeline.py
 
    echo "Ran Singularity"
-   ### (add in tarring of results and making it available for transfer)
+
+   ### create tar archive of the results and copy it back to home directory
+   echo "Tarring outputs"
+   tar -czf $RESULTS_TARBALL --exclude='/tmp/$USER/180507_fizeau_altair/pipeline_0[0-6]*' /tmp/$USER/180507_fizeau_altair
+   echo "Done tarring output"
+   cp $RESULTS_TARBALL /xdisk/$USER
+   echo "Done copying output to /xdisk/"
+
+   ### delete the stuff remaining in /tmp/
+   rm -fr /tmp/$USER
 
    ### timestamp end
    date

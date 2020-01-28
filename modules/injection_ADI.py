@@ -849,11 +849,15 @@ def main(inject_iteration=None):
     if not inject_iteration:
         # if NOT injecting fake planets (and only doing host star removal and ADI), set rad_asec equal
         # to zero and the others to one element each
+
+        print("No injection iteration")
         fake_params_pre_permute = {"angle_deg_EofN": [0.], "rad_asec": [0.], "ampl_linear_norm": [0.]}
 
     if (inject_iteration == 0):
         # case of fake planet injection, first pass: inject them based on all permutations of user-given
         # parameters, permutate values of fake planet parameters to get all possible combinations
+
+        print("Injection iteration 0")
 
         # fake planet injection starting parameters
         '''
@@ -876,6 +880,7 @@ def main(inject_iteration=None):
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
         # (does not make permutations of user-given parameters; this adjusts amplitudes individually)
+        print("Injection iteration >0")
 
         sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
         #import ipdb; ipdb.set_trace()
@@ -1043,8 +1048,10 @@ def main(inject_iteration=None):
     #import ipdb; ipdb.set_trace()
     # clear
     del experiments
+    print("About to map inject_remove_adi() over all cores, over single combinations of fake planet parameters")
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)
+    print("Done with mapping")
 
     # TRYING IT OVER 8 CORES AS OPPOSED TO 16 TO SEE IF I AVOID TOO MUCH MEMORY LEAKAGE
     #pool = multiprocessing.Pool(8)
@@ -1070,6 +1077,9 @@ def main(inject_iteration=None):
 
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
+
+    print("contents of cookies_centered_06_name_array:")
+    print(cookies_centered_06_name_array)
 
     # combination A: frames 4259-5608 & 5826-6301 (flux-saturated)
     cookies_A_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))

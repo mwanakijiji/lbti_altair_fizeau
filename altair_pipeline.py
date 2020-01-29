@@ -35,16 +35,15 @@ psf_pca_bases.main()
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI frame
 
+print("TEST FYI only: between the injection_ADI and detection modules")
+
 ## ## DETECTION
 detection.main(inject_iteration=0)
 
-## TEST FOR UAHPC
-# TEST
 print("Total time:")
 elapsed_time_iteration = np.subtract(time.time(),start_time)
 print(np.round(elapsed_time_iteration))
 
-'''
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 1
 while True:
@@ -76,4 +75,3 @@ while True:
 
 # incorporate
 sensitivity.main() # produces 1-D contrast curve from csv info
-'''

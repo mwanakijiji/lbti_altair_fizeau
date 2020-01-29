@@ -9,7 +9,7 @@
 #PBS -l place=pack:shared
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
-#PBS -l cput=12:00:00
+#PBS -l cput=96:00:00
 ### Walltime is how long your job will run
 #PBS -l walltime=24:00:00
 ### send email when done
@@ -90,17 +90,21 @@ then
     /tmp/$USER/$SING_FILE \
     python3 /altair_pipeline.py
 
-   echo "Ran Singularity"
+   echo "Ran Singularity:"
+   date
 
    ### create tar archive of the results and copy it back to home directory
    echo "Tarring outputs"
    tar -czf $RESULTS_TARBALL --exclude='/tmp/$USER/180507_fizeau_altair/pipeline_0[0-6]*' /tmp/$USER/180507_fizeau_altair
-   echo "Done tarring output"
+   echo "Done tarring output:"
+   date
    cp $RESULTS_TARBALL /xdisk/$USER
-   echo "Done copying output to /xdisk/"
+   echo "Done copying output to /xdisk/:"
+   date
 
    ### delete the stuff remaining in /tmp/
    rm -fr /tmp/$USER
+   echo "Deleted stuff in the /tmp/ directory:"
 
    ### timestamp end
    date

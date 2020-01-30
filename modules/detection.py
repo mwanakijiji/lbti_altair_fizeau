@@ -245,7 +245,8 @@ class MedianCube:
                          data = cube_derotated_frames,
                          header = hdr,
                          overwrite = True)
-            print("detection: "+str(datetime.datetime.now())+": Wrote cube-just-before-median to disk as " + cube_file_name)
+            print("detection: "+str(datetime.datetime.now()) + \
+                ": Wrote cube-just-before-median to disk as " + cube_file_name)
 
         # take median and write
         median_stack = np.nanmedian(cube_derotated_frames, axis=0)
@@ -272,7 +273,8 @@ class MedianCube:
                      data = median_stack,
                      header = hdr,
                      overwrite = True)
-        print("detection: "+str(datetime.datetime.now())+": Wrote median of stack as " + adi_file_name)
+        print("detection: "+str(datetime.datetime.now()) + \
+            ": Wrote median of stack as " + adi_file_name)
         print("-"*prog_bar_width)
 
         # for memory's sake

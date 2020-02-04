@@ -13,6 +13,8 @@ From: python:3.6.6
   modules/*py /modules/
   # copy config file
   modules/*ini /modules/
+  # kludge: this file is used as an initial template in the pipeline
+  lm_180507_009030.fits /
 
 %post
   # install pip

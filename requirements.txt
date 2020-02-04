@@ -29,7 +29,7 @@ astropy == 3.2.3
 # modules/testing_optimization_detection.py: 14,16
 # subtract_stray_y_illumination_gradient_parallel.py: 9
 # tests/test_init_fcns.py: 1
-matplotlib == 3.1.2
+matplotlib == 3.0.3
 
 # modules/sensitivity.py: 7
 # subtract_stray_y_illumination_gradient_parallel.py: 8

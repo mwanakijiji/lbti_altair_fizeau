@@ -1,7 +1,7 @@
 #PBS -q standard
 #PBS -l select=1:ncpus=16:mem=96gb
 ### Specify a name for the job
-#PBS -N test_python_io
+#PBS -N fizeau_altair
 ### Specify the group name
 #PBS -W group_list=ktmorz
 ### Used if job requires partial node only
@@ -19,7 +19,7 @@ echo "Start time"
 date
 
 ### set variables: filenames of the data tarball and Singularity container
-export DATA_TARBALL=altair_200121_1000frames.tar.gz
+export DATA_TARBALL=altair_200121_10frames.tar.gz
 export RESULTS_TARBALL=results.tar
 export SING_FILE=lbti_altair_fizeau_latest.sif
 

@@ -19,7 +19,7 @@ echo "Start time"
 date
 
 ### set variables: filenames of the data tarball and Singularity container
-export DATA_TARBALL=altair_200121_10frames.tar.gz
+export DATA_TARBALL=altair_200204_10frames.tar.gz
 export RESULTS_TARBALL=results.tar
 export SING_FILE=lbti_altair_fizeau_latest.sif
 
@@ -39,8 +39,8 @@ then
    echo $available_space GB
    date
 
-   ### get current directory
-   export START_DIR=$PWD
+   ### get current (home) directory
+   export HOME_DIR=$PWD
 
    ### make a new one
    rm -fr /tmp/$USER
@@ -55,6 +55,8 @@ then
    date
 
    ### unpack data
+   echo "Unpacking data in directory"
+   pwd
    tar -xvf $DATA_TARBALL
    echo "Tarball extracted"
    date
@@ -65,7 +67,7 @@ then
    date
 
    ### BEGIN TEST
-   echo "List of files in directory simg was pulled to"
+   echo "List of files in directory Singularity file was pulled to"
    ls
    cd /xdisk/$USER
    echo "List of files in /xdisk/user/ dir:"
@@ -77,7 +79,7 @@ then
    ### move back to start directory
    ### (decoupling the data and the script avoids requiring new
    ### tarring each time the script is edited)
-   cd $START_DIR
+   cd $HOME_DIR
 
    echo "Back in start directory"
 
@@ -94,7 +96,9 @@ then
 
    ### create tar archive of the results and copy it back to home directory
    echo "Tarring outputs"
-   tar -czf $RESULTS_TARBALL --exclude='/tmp/$USER/180507_fizeau_altair/pipeline_0[0-6]*' /tmp/$USER/180507_fizeau_altair
+   tar -czf $RESULTS_TARBALL \
+    --exclude='/tmp/$USER/180507_fizeau_altair/pipeline_0[0-6]*' \
+    /tmp/$USER/180507_fizeau_altair
    echo "Done tarring output:"
    date
    cp $RESULTS_TARBALL /xdisk/$USER

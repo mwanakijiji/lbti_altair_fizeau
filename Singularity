@@ -17,9 +17,11 @@ From: python:3.6.6
   ## ## needs to change later!
   lm_180507_009030.fits /
 
-%post
+%environment
   # set environment variable to retrieve new image each time
-  echo 'export SINGULARITY_DISABLE_CACHE=True' >>$SINGULARITY_ENVIRONMENT
+  export SINGULARITY_DISABLE_CACHE=True
+
+%post
   # install pip
   apt-get update
   apt-get install -y python3-pip

@@ -42,46 +42,50 @@ then
    ### get current (home) directory
    export HOME_DIR=$PWD
 
-   ### make a new one
+   ### make a new /tmp/ directory on the compute node
    rm -fr /tmp/$USER
    mkdir /tmp/$USER
 
-   ### copy tarball into the /tmp/ directory on the same node
+   ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring
    ### is /180507_fizeau_altair/ and NOT /vol_c/)
    cp /xdisk/$USER/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball and Singularity file directory"
+   pwd
+   echo "---"
    date
 
    ### unpack data
    echo "Unpacking data in directory"
    pwd
+   echo "---"
    tar -xvf $DATA_TARBALL
    echo "Tarball extracted"
    date
+   echo "---"
 
    ### pull the Singularity file (which contains the code)
    singularity pull --name $SING_FILE shub://mwanakijiji/lbti_altair_fizeau:latest
-   echo "Singularity file pulled"
+   echo "Singularity file pulled in directory"
+   pwd
    date
+   echo "---"
 
    ### BEGIN TEST
    echo "List of files in directory Singularity file was pulled to"
    ls
-   cd /xdisk/$USER
+   echo "---"
    echo "List of files in /xdisk/user/ dir:"
    ls /xdisk/$USER
+   echo "---"
    echo "List of files in /tmp/user/ dir:"
    ls /tmp/$USER
+   echo "---"
    ### END TEST
 
-   ### move back to start directory
    ### (decoupling the data and the script avoids requiring new
    ### tarring each time the script is edited)
-   cd $HOME_DIR
-
-   echo "Back in start directory"
 
    ### run Singularity container (bind syntax is host:container)
    ### data files -> /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair
@@ -93,17 +97,21 @@ then
 
    echo "Ran Singularity:"
    date
+   echo "---"
 
-   ### create tar archive of the results and copy it back to home directory
+   ### create tar archive of the results in /tmp/, and leave it in /xdisk/
+   ### directory
    echo "Tarring outputs"
    tar -czf $RESULTS_TARBALL \
     --exclude='/tmp/$USER/180507_fizeau_altair/pipeline_0[0-6]*' \
     /tmp/$USER/180507_fizeau_altair
    echo "Done tarring output:"
    date
+   echo "---"
    cp $RESULTS_TARBALL /xdisk/$USER
    echo "Done copying output to /xdisk/:"
    date
+   echo "---"
 
    ### delete the stuff remaining in /tmp/
    rm -fr /tmp/$USER

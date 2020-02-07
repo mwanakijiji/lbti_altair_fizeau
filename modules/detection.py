@@ -341,7 +341,7 @@ class Detection:
         # read in a centered PSF model to use for companion search
         ## ## WILL NEED TO CHANGE THIS!
         print("Reading in centered PSF model to use for companion search:")
-        centered_psf_model_file_name = "lm_180507_009030.fits"
+        centered_psf_model_file_name = "/lm_180507_009030.fits" # slash needed for Singularity
         print(centered_psf_model_file_name)
         print("-"*prog_bar_width)
         centered_psf = fits.getdata(centered_psf_model_file_name)

@@ -14,9 +14,12 @@ From: python:3.6.6
   # copy config file
   modules/*ini /modules/
   # kludge: this file is used as an initial template in the pipeline
+  ## ## needs to change later!
   lm_180507_009030.fits /
 
 %post
+  # set environment variable to retrieve new image each time
+  echo 'export SINGULARITY_DISABLE_CACHE=True' >>$SINGULARITY_ENVIRONMENT
   # install pip
   apt-get update
   apt-get install -y python3-pip

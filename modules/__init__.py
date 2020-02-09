@@ -15,8 +15,13 @@ from sklearn.decomposition import PCA
 
 
 ## SOME VARIABLES
-# number of CPUs for parallelization
+# number of CPUs for parallelization on a fixed system where I can use all cores
+'''
 ncpu = multiprocessing.cpu_count()
+'''
+# stopgap in case job is running on HPC, when cores might be counted beyond those
+# allocated to the job
+ncpu = 16
 
 # configuration data
 #global config

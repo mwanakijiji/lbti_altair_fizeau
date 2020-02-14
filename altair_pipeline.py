@@ -28,7 +28,7 @@ basic_red.main()
 
 ## ## CENTERING OF PSFS
 centering.main()
-
+'''
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 '''
@@ -75,3 +75,4 @@ while True:
 
 # incorporate
 sensitivity.main() # produces 1-D contrast curve from csv info
+'''

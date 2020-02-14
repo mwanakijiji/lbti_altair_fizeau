@@ -301,6 +301,45 @@ def main():
                                     n_PCA = 100,
                                     subtract_median = False)
 
+    # in the below, I am attempting to make cubes that include as many frames as possible
+    # lists of files are separated based on filter combination (there are four: A, B, C, D)
+    # combination A: frames 4259-5608 & 5826-6301 (flux-saturated)
+    cookies_A_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
+    cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[012]*.fits")))
+    # combination B: frames 6303-6921 (flux-UNsaturated; use B as unsats for A)
+    cookies_B_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0063[123456789]*.fits")))
+    cookies_B_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[45678]*.fits")))
+    cookies_B_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0069[01]*.fits")))
+    # combination C: frames 7120-7734 (flux-UNsaturated; use C as unsats for D)
+    cookies_C_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0071[23456789]*.fits")))
+    cookies_C_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_007[23456]*.fits")))
+    cookies_C_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0077[012]*.fits")))
+    # combination D: frames 7927-11408 (flux-saturated)
+    cookies_D_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0079[3456789]*.fits")))
+    cookies_D_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
+    cookies_D_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_01[01]*.fits")))
+
+    # all the saturated frames: cubes A and D
+    cookies_sats_A_and_D_cube_frames_06_name_array = cookies_A_only_centered_06_name_array + cookies_D_only_centered_06_name_array
+
+    # all the unsaturated frames: cubes B and C
+    cookies_unsats_B_and_C_cube_frames_06_name_array = cookies_B_only_centered_06_name_array + cookies_C_only_centered_06_name_array
+
+    # for PCA basis set for subtracting host star residuals (i.e., to reconstruct
+    # the residuals)
+    pca_psf_maker_host_resids_all_A_and_D_frames = PSFPCACubeMaker(file_list = cookies_sats_A_and_D_cube_frames_06_name_array,
+                                    n_PCA = 100,
+                                    subtract_median = True)
+    # for PCA basis set for reconstructing host star (i.e., full PSF; non-subtraction
+    # of median from the training set does not seem to make any difference when
+    # making a PCA basis set, though)
+    pca_psf_maker_host_recon_all_B_and_C_frames = PSFPCACubeMaker(file_list = cookies_unsats_B_and_C_cube_frames_06_name_array,
+                                    n_PCA = 100,
+                                    subtract_median = False)
+
     # cube of fake data
     '''
     pca_psf_maker_host_resids(start_frame_num = 0,
@@ -327,6 +366,34 @@ def main():
                                 'psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'))
     '''
 
+    # cube of A and D frames (sat)
+    pca_psf_maker_host_resids_all_A_and_D_frames(start_frame_num = 4403,
+                   stop_frame_num = 11408,
+                   resd_avg_limits = [50,62.5],
+                   x_gauss_limits = [4,6],
+                   y_gauss_limits = [4,6],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                   'psf_PCA_training_cube_all_A_and_D_frames_host_resids.fits'),
+                   write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'median_frame_all_A_and_D_frames_pcaNum_100_host_resids.fits'),
+                   write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits'))
+
+    # cube of B and C frames (unsat)
+    pca_psf_maker_host_recon_all_B_and_C_frames(start_frame_num = 4403,
+                   stop_frame_num = 11408,
+                   resd_avg_limits = [35.4,40.6],
+                   x_gauss_limits = [4,6],
+                   y_gauss_limits = [4,6],
+                   write_training_cube_name = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                   'psf_PCA_training_cube_all_B_and_C_frames_host_resids.fits'),
+                   write_median_frame_file_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'median_frame_all_B_and_C_frames_pcaNum_100_host_resids.fits'),
+                   write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                   'psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits'))
+
+
+    '''
     # cube A (sat)
     pca_psf_maker_host_resids(start_frame_num = 4403,
                    stop_frame_num = 5608,
@@ -375,3 +442,4 @@ def main():
                    'median_frame_seqStart_07927_seqStop_11408_pcaNum_100_host_resids.fits'),
                    write_abs_pca_cube_name = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                    'psf_PCA_vector_cookie_seqStart_07927_seqStop_11408_pcaNum_100_host_resids.fits'))
+    '''

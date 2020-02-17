@@ -112,21 +112,6 @@ class PSFPCACubeMaker:
         # loop over frames to add them to training cube
         for frame_num in range(start_frame_num, stop_frame_num+1):
 
-            # kludge to remove individual bad frames that have persisted
-            if os.path.basename(write_training_cube_name) == "psf_PCA_training_cube_all_A_and_D_frames_host_resids.fits":
-                # remove slices 1688, 2119, 2024 (in Python numbering convention)
-                bad_slices = [1688,2119,2024]
-                if slice_counter in bad_slices:
-                    # skip frame by advancing counter by 1 and going to next item in for loop
-                    slice_counter += 1
-                    continue
-            elif os.path.basename(write_training_cube_name) == "psf_PCA_training_cube_all_B_and_C_frames_host_resids.fits":
-                # remove slices 1, 2, 129
-                bad_slices = [1,2,129]
-                if slice_counter in bad_slices:
-                    slice_counter += 1
-                    continue
-
             # get name of file that this number corresponds to
             abs_matching_file_array = [s for s in self.file_list if str("{:0>6d}".format(frame_num)) in s]
 
@@ -154,6 +139,24 @@ class PSFPCACubeMaker:
 
                     # add to cube
                     training_cube[slice_counter,:,:] = sci
+
+                    # kludge to identify to the user the individual bad frames that have persisted
+                    if os.path.basename(write_training_cube_name) == "psf_PCA_training_cube_all_A_and_D_frames_host_resids.fits":
+                        # remove slices 1688, 2119, 2024 (in Python numbering convention)
+                        bad_slices = [1688,2119,2024]
+                        if slice_counter in bad_slices:
+                            print("This frame is bad: " + str(os.path.basename(abs_matching_file)))
+                            # skip frame by advancing counter by 1 and going to next item in for loop
+                            #slice_counter += 1
+                            #continue
+                    elif os.path.basename(write_training_cube_name) == "psf_PCA_training_cube_all_B_and_C_frames_host_resids.fits":
+                        # remove slices 1, 2, 129
+                        bad_slices = [1,2,129]
+                        if slice_counter in bad_slices:
+                            print("This frame is bad: " + str(os.path.basename(abs_matching_file)))
+                            #slice_counter += 1
+                            #continue
+                    # end kludge
 
                     # advance counter
                     slice_counter += 1

@@ -388,7 +388,7 @@ def main():
                    'psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits'))
 
     # cube of B and C frames (unsat)
-    rint("Making cube of all B and C frames")
+    print("Making cube of all B and C frames")
     pca_psf_maker_host_recon_all_B_and_C_frames(start_frame_num = 4403,
                    stop_frame_num = 11408,
                    resd_avg_limits = [35.4,40.6],

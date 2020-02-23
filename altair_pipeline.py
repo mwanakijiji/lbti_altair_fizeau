@@ -28,7 +28,7 @@ basic_red.main()
 
 ## ## CENTERING OF PSFS
 centering.main()
-'''
+
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
 '''
@@ -68,7 +68,7 @@ while True:
     # condition for convergence: once crossover changes sign around desired S/N,
     # or we reach iteration number X
     iter_num += 1
-
+'''
 # interpolate amplitudes
 
 # median along azimuth

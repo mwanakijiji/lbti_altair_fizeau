@@ -140,7 +140,7 @@ class PSFPCACubeMaker:
                     # add to cube
                     training_cube[slice_counter,:,:] = sci
 
-                    # kludge to identify to the user the individual bad frames that have persisted
+                    # temporary kludge to identify to the user the individual bad frames that have persisted
                     if os.path.basename(write_training_cube_name) == "psf_PCA_training_cube_all_A_and_D_frames_host_resids.fits":
                         # remove slices 1688, 2119, 2024 (in Python numbering convention)
                         bad_slices = [1688,2119,2024]

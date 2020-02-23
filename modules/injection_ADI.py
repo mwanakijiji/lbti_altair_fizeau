@@ -439,24 +439,26 @@ def inject_remove_adi(this_param_combo):
                                                                     'psf_PCA_vector_cookie_seqStart_006303_seqStop_006921.fits'),
                                                                     write = True)
 
+        print("You have chosen to not inject fake planets. Specify in the pipeline what frames you want to include, please. Pipeline currently does nothing here.")
+
         # filter combo A
-        print('11A')
+        ## ##print('11A')
         '''
         cube_pre_removal_A, pas_array_A, frame_array_0_A = frames_in_cube(abs_sci_name_array = cookies_A_only_centered_06_name_array,
                                                                           saved_cube_basename = "simple_sci_frame_cube_A.fits")
-        '''
+
         # filter combo B
-        print('22A')
+        ## ##print('22A')
         cube_pre_removal_B, pas_array_B, frame_array_0_B = frames_in_cube(abs_sci_name_array = cookies_B_only_centered_06_name_array,
                                                                           saved_cube_basename = "simple_sci_frame_cube_B.fits")
-        '''
+
         # filter combo C
-        print('33A')
+        ## ##print('33A')
         cube_pre_removal_C, pas_array_C, frame_array_0_C = frames_in_cube(abs_sci_name_array = cookies_C_only_centered_06_name_array,
                                                                           saved_cube_basename = "simple_sci_frame_cube_C.fits")
 
         # filter combo D
-        print('44A')
+        ## ##print('44A')
         cube_pre_removal_D, pas_array_D, frame_array_0_D = frames_in_cube(abs_sci_name_array = cookies_D_only_centered_06_name_array,
                                                                           saved_cube_basename = "simple_sci_frame_cube_D.fits")
         '''
@@ -860,12 +862,17 @@ def main(inject_iteration=None):
         print("Injection iteration 0")
 
         # fake planet injection starting parameters
+
+        # note for 4.05 um and 8.25-m apertures, 1.22*lambda/D = 0.1235 asec
+
+        ### OPTION 1: PERMUTATE VALUES
+        ### (BE SURE TO COMMENT OUT OPTION 2!)
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.80],
                                "ampl_linear_norm": [1e-3]}
         '''
-
+        '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.20,0.50,0.80,1.10,1.40,1.70],
                                "ampl_linear_norm": [1e-3]}
@@ -876,6 +883,37 @@ def main(inject_iteration=None):
 
         # add in the initial amplitudes after the permutations have been made
         experiments = [dict(item, **{'ampl_linear_norm_0':item['ampl_linear_norm']}) for item in experiments]
+        '''
+
+        ### OPTION 2: MANUALLY SET ALL VALUES
+        ### (BE SURE TO COMMENT OUT OPTION 1!)
+        experiments = [{'angle_deg_EofN': 0.0, 'rad_asec': 0.12, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
+                        {'angle_deg_EofN': 180.0, 'rad_asec': 0.12, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 0.2, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 0.2, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 0.2, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 0.3, 'ampl_linear_norm': 0.003, 'ampl_linear_norm_0': 0.003},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 0.3, 'ampl_linear_norm': 0.003, 'ampl_linear_norm_0': 0.003},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 0.3, 'ampl_linear_norm': 0.003, 'ampl_linear_norm_0': 0.003},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 0.4, 'ampl_linear_norm': 0.002, 'ampl_linear_norm_0': 0.002},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 0.4, 'ampl_linear_norm': 0.002, 'ampl_linear_norm_0': 0.002},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 0.4, 'ampl_linear_norm': 0.002, 'ampl_linear_norm_0': 0.002},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 0.5, 'ampl_linear_norm': 0.001, 'ampl_linear_norm_0': 0.001},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 0.5, 'ampl_linear_norm': 0.001, 'ampl_linear_norm_0': 0.001},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 0.5, 'ampl_linear_norm': 0.001, 'ampl_linear_norm_0': 0.001},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 0.7, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 0.7, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 0.7, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 1.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 1.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 1.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 1.6, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 1.6, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 1.6, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 0.0, 'rad_asec': 2.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 120.0, 'rad_asec': 2.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
+                        {'angle_deg_EofN': 240.0, 'rad_asec': 2.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005}]
+
 
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
@@ -1078,18 +1116,62 @@ def main(inject_iteration=None):
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))
 
-    print("contents of cookies_centered_06_name_array:")
-    print(cookies_centered_06_name_array)
+    #print("contents of cookies_centered_06_name_array:")
+    #print(cookies_centered_06_name_array)
 
+    # in the below, I am attempting to make cubes that include as many frames as possible
+    # lists of files are separated based on filter combination (there are four: A, B, C, D)
     # combination A: frames 4259-5608 & 5826-6301 (flux-saturated)
     cookies_A_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_004*.fits")))
     cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_005[012345]*.fits")))
     cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0058[3456789]*.fits")))
     cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0059*.fits")))
     cookies_A_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[012]*.fits")))
+    # combination B: frames 6303-6921 (flux-UNsaturated; use B as unsats for A)
+    cookies_B_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0063[123456789]*.fits")))
+    cookies_B_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_006[45678]*.fits")))
+    cookies_B_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0069[01]*.fits")))
+    # combination C: frames 7120-7734 (flux-UNsaturated; use C as unsats for D)
+    cookies_C_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0071[23456789]*.fits")))
+    cookies_C_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_007[23456]*.fits")))
+    cookies_C_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_0077[012]*.fits")))
+    # combination D: frames 7927-11408 (flux-saturated)
+    cookies_D_only_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*_0079[3456789]*.fits")))
+    cookies_D_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_00[89]*.fits")))
+    cookies_D_only_centered_06_name_array.extend(glob.glob(os.path.join(cookies_centered_06_directory, "*_01[01]*.fits")))
 
-    # instantiate reduction of A frames (frames 4259-5608 and 5826-6301)
+    # all the saturated frames: cubes A and D
+    cookies_sats_A_and_D_cube_frames_06_name_array = cookies_A_only_centered_06_name_array + cookies_D_only_centered_06_name_array
+
+    # all the unsaturated frames: cubes B and C
+    cookies_unsats_B_and_C_cube_frames_06_name_array = cookies_B_only_centered_06_name_array + cookies_C_only_centered_06_name_array
+
     # ref: block diagram from 2019 Apr 5
+
+    synthetic_fizeau_inject_remove_adi_A_and_D_frames = SyntheticFizeauInjectRemoveADI(
+        injection_iteration = inject_iteration,
+        file_name_list = cookies_sats_A_and_D_cube_frames_06_name_array,
+        n_PCA_host_removal = 100,
+        read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
+                                            "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits"),
+        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                          + "median_frame_all_A_and_D_frames_pcaNum_100_host_resids.fits"),
+        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                            + "psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits"),
+        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
+                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
+        write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                            + "simple_synthetic_sci_frame_cube_A_and_D.fits"),
+        write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                                + "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits"),
+        write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
+                                                  + config["file_names"]["MEDIAN_SCI_FRAME"]),
+        write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
+                                           + "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits")
+                                           )
+
+    '''
+    # instantiate reduction of A frames (frames 4259-5608 and 5826-6301)
     synthetic_fizeau_inject_remove_adi_A_frames = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,
         file_name_list = cookies_A_only_centered_06_name_array,
@@ -1111,7 +1193,7 @@ def main(inject_iteration=None):
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                            + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits")
                                            )
-    ''''
+
     # instantiate reduction of D frames (frames 7927-10722 and 10742-11408)
     synthetic_fizeau_inject_remove_adi_D_frames = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,
@@ -1155,4 +1237,4 @@ def main(inject_iteration=None):
     ## ## END TEST
 
     # run in parallel
-    pool.map(synthetic_fizeau_inject_remove_adi_A_frames, param_dict_list)
+    pool.map(synthetic_fizeau_inject_remove_adi_A_and_D_frames, param_dict_list)

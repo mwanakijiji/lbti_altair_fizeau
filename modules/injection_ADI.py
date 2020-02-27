@@ -8,6 +8,8 @@ import pickle
 import math
 import datetime
 import os
+import string
+import random
 from astropy.io import fits
 from astropy.convolution import convolve, Gaussian1DKernel, interpolate_replace_nans
 from astropy.modeling import models, fitting
@@ -718,11 +720,15 @@ class SyntheticFizeauInjectRemoveADI:
 
         time_start = time.time()
 
+        # generate random string to match timestamps with cores
+        res = ''.join(random.choices(string.ascii_uppercase +string.digits, k = N_string))
+
         #import ipdb; ipdb.set_trace()
         # injecting fake PSFs?
         if (int(1000*this_param_combo["rad_asec"]) == int(0)):
             # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
-            print("injection_ADI: "+str(datetime.datetime.now())+" No fake planets being injected. (Input radius of fake planets is set to zero.)")
+            print("injection_ADI: "+str(datetime.datetime.now())+\
+                " No fake planets being injected. (Input radius of fake planets is set to zero.), string "+res)
 
             # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
             frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
@@ -733,7 +739,8 @@ class SyntheticFizeauInjectRemoveADI:
 
         else:
             # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
-            print("injection_ADI: "+str(datetime.datetime.now())+" Injecting fake planet corresponding to parameter")
+            print("injection_ADI: "+str(datetime.datetime.now())+\
+                " Injecting fake planet corresponding to below parameter, string "+res)
             print(this_param_combo)
 
             # instantiate fake planet injection
@@ -768,7 +775,7 @@ class SyntheticFizeauInjectRemoveADI:
         median_frame, header_median_frame = fits.getdata(self.pca_pre_decomposition_median_name, 0, header=True)
         print("injection_ADI: "+str(datetime.datetime.now())+\
             ": Median frame being subtracted from the cube of science frames is read in as\n" +
-              self.pca_pre_decomposition_median_name)
+              self.pca_pre_decomposition_median_name + ", string "+res)
         print("-"*prog_bar_width)
         cube_pre_removal_A_post_pca_median_removal = np.subtract(cube_pre_removal_A, median_frame)
 
@@ -786,7 +793,7 @@ class SyntheticFizeauInjectRemoveADI:
         #import ipdb; ipdb.set_trace()
         print("injection_ADI: "+str(datetime.datetime.now())
               +": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
-              +self.write_name_abs_derotated_sci_median)
+              +self.write_name_abs_derotated_sci_median +", string "+res)
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
@@ -806,7 +813,8 @@ class SyntheticFizeauInjectRemoveADI:
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)
         removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
-        print("injection_ADI: "+str(datetime.datetime.now())+" Done with host removal from cube of science frames.")
+        print("injection_ADI: "+str(datetime.datetime.now())+\
+            " Done with host removal from cube of science frames, string "+res)
         print("-"*prog_bar_width)
         # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames
         median_instance_A = detection.MedianCube(injection_iteration = self.injection_iteration,
@@ -822,7 +830,8 @@ class SyntheticFizeauInjectRemoveADI:
 
         elapsed_time = np.subtract(time.time(), time_start)
 
-        print("injection_ADI: "+str(datetime.datetime.now())+" Completed one fake planet parameter configuration")
+        print("injection_ADI: "+str(datetime.datetime.now())+\
+            " Completed one fake planet parameter configuration, string "+res)
         print("injection_ADI: Elapsed time (sec): ")
         print(str(int(elapsed_time)))
         print("-"*prog_bar_width)

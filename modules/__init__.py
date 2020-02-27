@@ -9,7 +9,10 @@ import scipy
 from scipy import ndimage, sqrt, stats, misc, signal
 #import git
 import configparser
+import datetime
 import multiprocessing
+import string
+import random
 from astropy.io import fits
 from sklearn.decomposition import PCA
 
@@ -22,6 +25,9 @@ ncpu = multiprocessing.cpu_count()
 # stopgap in case job is running on HPC, when cores might be counted beyond those
 # allocated to the job
 ncpu = 16
+
+# set length of random strings to match timesstamps across different cores
+N_string=7
 
 # configuration data
 #global config
@@ -333,6 +339,10 @@ def fit_pca_star(pca_cube, sciImg, raw_pca_training_median, mask_weird, n_PCA, s
     recon_2d_masked: same as recon_2d, but with the 'weird_mask'
     '''
 
+    # generate random string
+    res = ''.join(random.choices(string.ascii_uppercase +string.digits, k = N_string))
+    print("__init__: "+str(datetime.datetime.now())+" Starting PCA fit, string "+res)
+
     # apply mask over weird regions to PCA cube
     try:
         pca_cube_masked = np.multiply(pca_cube,mask_weird)
@@ -353,6 +363,7 @@ def fit_pca_star(pca_cube, sciImg, raw_pca_training_median, mask_weird, n_PCA, s
     pca_not_masked_1ds = np.reshape(pca_cube,(np.shape(pca_cube)[0],np.shape(pca_cube)[1]*np.shape(pca_cube)[2]))
     sci_masked_1d = np.reshape(sciImg_psf_masked,(np.shape(sciImg_psf_masked)[0]*np.shape(sciImg_psf_masked)[1]))
     pca_masked_1ds = np.reshape(pca_cube_masked,(np.shape(pca_cube_masked)[0],np.shape(pca_cube_masked)[1]*np.shape(pca_cube_masked)[2]))
+    print("__init__: "+str(datetime.datetime.now())+" Arrays flattened for PCA, string "+res)
 
     ## remove nans from the linear algebra
 
@@ -365,13 +376,16 @@ def fit_pca_star(pca_cube, sciImg, raw_pca_training_median, mask_weird, n_PCA, s
         pca_masked_1ds_noNaN[t,:] = pca_masked_1ds[t,idx]
     sci_masked_1d_noNaN = np.array(1,np.sum(idx)) # science frame
     sci_masked_1d_noNaN = sci_masked_1d[idx]
+    print("__init__: "+str(datetime.datetime.now())+" PCA finite elements grouped together, string "+res)
 
     # the vector of component amplitudes
     soln_vector = np.linalg.lstsq(pca_masked_1ds_noNaN[0:n_PCA,:].T, sci_masked_1d_noNaN)
+    print("__init__: "+str(datetime.datetime.now())+" PCA done, string "+res)
     # reconstruct the background based on that vector
     # note that the PCA components WITHOUT masking of the PSF location is being
     # used to reconstruct the background
     recon_2d = np.dot(pca_cube[0:n_PCA,:,:].T, soln_vector[0]).T
+    print("__init__: "+str(datetime.datetime.now())+" PCA reconstruction done, string "+res)
 
     if subt_median:
         # add the offset frame back in

@@ -81,8 +81,10 @@ class JustPutIntoCube:
 
         # loop over frames
         for frame_num in range(0,len(abs_sci_name_array)):
-            print("injection_ADI: Adding relative frame num " + str(frame_num) + " out of " + str(len(abs_sci_name_array)))
-            print("injection_ADI: Corresponding to file base name " + str(os.path.basename(abs_sci_name_array[frame_num])))
+            print("injection_ADI: "+str(datetime.datetime.now())+\
+                " Adding relative frame num " + str(frame_num) + " out of " + str(len(abs_sci_name_array)))
+            print("injection_ADI: "+str(datetime.datetime.now())+\
+                " Corresponding to file base name " + str(os.path.basename(abs_sci_name_array[frame_num])))
 
             # read in the cutout science frames
             sci, header_sci = fits.getdata(abs_sci_name_array[frame_num], 0, header=True)
@@ -222,9 +224,9 @@ class FakePlanetInjectorCube:
             injection_iteration_string = "inj_iter_" + str(self.injection_iteration).zfill(4)
         else:
             injection_iteration_string = "no_fake_planet"
-        print("injection_ADI: at __init__, read in PCA vector for host star \n" +
+        print("injection_ADI: "+str(datetime.datetime.now())+" at __init__, read in PCA vector for host star \n" +
               self.abs_host_star_PCA_name)
-        print("injection_ADI: at __init__, read in PCA vector for fake planet \n" +
+        print("injection_ADI: "+str(datetime.datetime.now())+" at __init__, read in PCA vector for fake planet \n" +
               self.abs_fake_planet_PCA_name)
         print("-"*prog_bar_width)
 
@@ -243,7 +245,7 @@ class FakePlanetInjectorCube:
 
         # loop over frames to inject fake planets in each of them
         for frame_num in range(0,len(abs_sci_name_array)):
-            print("injection_ADI: Injecting a fake planet into cube slice " + str(frame_num))
+            print("injection_ADI: "+str(datetime.datetime.now())+" Injecting a fake planet into cube slice " + str(frame_num))
             print(" which corresponds to file \n" + abs_sci_name_array[frame_num])
 
             # read in the cutout science frames
@@ -275,14 +277,14 @@ class FakePlanetInjectorCube:
             # do the PCA fit of masked host star
             # returns dict: 'pca_vector': the PCA best-fit vector; and 'recon_2d': the 2D reconstructed PSF
             # N.b. PCA reconstruction will be to get an UN-sat PSF; note PCA basis cube involves unsat PSFs
-            print("injection_ADI: Applying this PCA basis for the host star: \n" +
+            print("injection_ADI: "+str(datetime.datetime.now())+" Applying this PCA basis for the host star: \n" +
                   str(self.abs_host_star_PCA_name))
             fit_host_star = fit_pca_star(pca_cube = self.pca_basis_cube_host_star,
                                          sciImg = sci,
                                          raw_pca_training_median = self.raw_pca_basis_median,
                                          mask_weird = no_mask,
                                          n_PCA=100)
-            print("injection_ADI: Applying this PCA basis for the fake planet: \n" +
+            print("injection_ADI: "+str(datetime.datetime.now())+" Applying this PCA basis for the fake planet: \n" +
                   str(self.abs_fake_planet_PCA_name))
             print("-"*prog_bar_width)
             fit_fake_planet = fit_pca_star(pca_cube = self.pca_basis_cube_fake_planet,
@@ -431,7 +433,7 @@ def inject_remove_adi(this_param_combo):
     if (int(1000*this_param_combo["rad_asec"]) == int(0)):
         # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
 
-        print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.)")
+        print("injection_ADI: "+str(datetime.datetime.now())+" No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
         # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
         frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
@@ -466,7 +468,7 @@ def inject_remove_adi(this_param_combo):
         # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
 
         print("-------------------------------------------------")
-        print("injection_ADI: Injecting fake planet corresponding to parameter")
+        print("injection_ADI: "+str(datetime.datetime.now())+" Injecting fake planet corresponding to parameter")
         print(this_param_combo)
 
         # instantiate fake planet injection
@@ -645,7 +647,7 @@ def inject_remove_adi(this_param_combo):
     elapsed_time = np.subtract(time.time(), time_start)
 
     print("----------------------------------------------------------------")
-    print("injection_ADI: Completed one fake planet parameter configuration")
+    print("injection_ADI: "+str(datetime.datetime.now())+" Completed one fake planet parameter configuration")
     print("injection_ADI: Elapsed time (sec): ")
     print(str(int(elapsed_time)))
 
@@ -720,7 +722,7 @@ class SyntheticFizeauInjectRemoveADI:
         # injecting fake PSFs?
         if (int(1000*this_param_combo["rad_asec"]) == int(0)):
             # no fake PSF injection; just put frames into a cube (host star subtraction and ADI is done downstream)
-            print("injection_ADI: No fake planets being injected. (Input radius of fake planets is set to zero.)")
+            print("injection_ADI: "+str(datetime.datetime.now())+" No fake planets being injected. (Input radius of fake planets is set to zero.)")
 
             # instantiate FakePlanetInjectorCube to put science frames into a cube, but no fakes are injected into the frames
             frames_in_cube = JustPutIntoCube(fake_params = this_param_combo,
@@ -731,7 +733,7 @@ class SyntheticFizeauInjectRemoveADI:
 
         else:
             # inject a fake psf in each science frame, return a cube of non-derotated, non-host-star-subtracted frames
-            print("injection_ADI: Injecting fake planet corresponding to parameter")
+            print("injection_ADI: "+str(datetime.datetime.now())+" Injecting fake planet corresponding to parameter")
             print(this_param_combo)
 
             # instantiate fake planet injection
@@ -804,7 +806,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                     subtract_median_PCA_training_frame = True,
                                                     write = True)
         removed_hosts_cube_A, frame_array_1_A = remove_hosts_A()
-        print("injection_ADI: Done with host removal from cube of science frames.")
+        print("injection_ADI: "+str(datetime.datetime.now())+" Done with host removal from cube of science frames.")
         print("-"*prog_bar_width)
         # instantiate derotation, ADI, sensitivity determination of host-star-subtracted frames
         median_instance_A = detection.MedianCube(injection_iteration = self.injection_iteration,
@@ -820,7 +822,7 @@ class SyntheticFizeauInjectRemoveADI:
 
         elapsed_time = np.subtract(time.time(), time_start)
 
-        print("injection_ADI: Completed one fake planet parameter configuration")
+        print("injection_ADI: "+str(datetime.datetime.now())+" Completed one fake planet parameter configuration")
         print("injection_ADI: Elapsed time (sec): ")
         print(str(int(elapsed_time)))
         print("-"*prog_bar_width)
@@ -859,7 +861,7 @@ def main(inject_iteration=None):
         # case of fake planet injection, first pass: inject them based on all permutations of user-given
         # parameters, permutate values of fake planet parameters to get all possible combinations
 
-        print("Injection iteration 0")
+        print("injection_ADI: "+str(datetime.datetime.now())+" Starting injection iteration 0")
 
         # fake planet injection starting parameters
 
@@ -918,7 +920,8 @@ def main(inject_iteration=None):
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject
         # (does not make permutations of user-given parameters; this adjusts amplitudes individually)
-        print("Injection iteration >0")
+        print("injection_ADI: "+str(datetime.datetime.now())+\
+            " Starting injection iteration " + str(int(inject_iteration)))
 
         sn_thresh = float(config["reduc_params"]["SN_THRESHOLD"])
         #import ipdb; ipdb.set_trace()
@@ -1072,7 +1075,7 @@ def main(inject_iteration=None):
         elif (inject_iteration > 1):
             # write out all the data to a pre-existing csv, and don't put in new headers
             noise_data.to_csv(csv_file_name_all_iters, sep = ",", mode = "w", header=True)
-        print("Wrote data on iterated companion amplitudes to csv ")
+        print("injection_ADI: "+str(datetime.datetime.now())+" Wrote data on iterated companion amplitudes to csv ")
         print(str(csv_file_name_all_iters))
         print("-"*prog_bar_width)
 
@@ -1086,10 +1089,10 @@ def main(inject_iteration=None):
     #import ipdb; ipdb.set_trace()
     # clear
     del experiments
-    print("About to map inject_remove_adi() over all cores, over single combinations of fake planet parameters")
+    print("injection_ADI: "+str(datetime.datetime.now())+" About to map inject_remove_adi() over all cores, over single combinations of fake planet parameters")
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)
-    print("Done with mapping")
+    print("injection_ADI: "+str(datetime.datetime.now())+" Done with mapping")
 
     # TRYING IT OVER 8 CORES AS OPPOSED TO 16 TO SEE IF I AVOID TOO MUCH MEMORY LEAKAGE
     #pool = multiprocessing.Pool(8)
@@ -1107,11 +1110,11 @@ def main(inject_iteration=None):
         injection_iteration_string = "no_fake_planet"
         # the string is not being appended to the path, to avoid breakage
         # with pipeline upstream
-        print("injection_ADI: No fake planet being injected")
+        print("injection_ADI: "+str(datetime.datetime.now())+" No fake planet being injected")
     elif (inject_iteration is not None):
         # if we are injecting fake planets, get source images from previous iteration
         injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
-        print("injection_ADI: Fake planet injection iteration number " + injection_iteration_string)
+        print("injection_ADI: "+str(datetime.datetime.now())+" Fake planet injection iteration number " + injection_iteration_string)
 
     cookies_centered_06_directory = str(config["data_dirs"]["DIR_CENTERED"])
     cookies_centered_06_name_array = list(glob.glob(os.path.join(cookies_centered_06_directory, "*.fits")))

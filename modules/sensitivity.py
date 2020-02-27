@@ -4,6 +4,7 @@ import glob
 import time
 import pickle
 import math
+import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -155,7 +156,7 @@ class OneDimContrastCurve:
         # write out to csv
         file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CSV"]
         contrast_curve_pd.to_csv(file_name_cc, sep = ",", columns = ["rad_asec","ampl_linear_norm"])
-        print("Wrote out contrast curve CSV to " + file_name_cc)
+        print("sensitivity: "+str(datetime.datetime.now())+" Wrote out contrast curve CSV to " + file_name_cc)
 
         # make plot
         print(contrast_curve_pd)
@@ -165,7 +166,7 @@ class OneDimContrastCurve:
         plt.ylabel("Min. companion amplitude with S/N > threshhold")
         plt.savefig(file_name_cc_plot)
         plt.clf()
-        print("Wrote out contast curve plot to " + file_name_cc_plot)
+        print("sensitivity: "+str(datetime.datetime.now())+" Wrote out contast curve plot to " + file_name_cc_plot)
 
 
 class TwoDimSensitivityMap:

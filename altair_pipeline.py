@@ -3,6 +3,7 @@
 # and a hash text is written when a module is complete
 # In the meantime, FYI plots/tables are written out
 
+import datetime
 from modules import *
 from modules import (basic_red,
                      fits_hdr,
@@ -34,11 +35,13 @@ psf_pca_bases.main()
 '''
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI frame
-
-print("TEST FYI only: between the injection_ADI and detection modules")
+print("altair_pipeline: "+str(datetime.datetime.now())+\
+    " Finished injection_ADI.main() iteration 0")
 
 ## ## DETECTION
 detection.main(inject_iteration=0)
+print("altair_pipeline: "+str(datetime.datetime.now())+\
+    " Finished detection.main() iteration 0")
 
 print("Total time:")
 elapsed_time_iteration = np.subtract(time.time(),start_time)
@@ -54,15 +57,19 @@ while True:
     # Then re-inject and re-reduce ADI
     injection_ADI.main(inject_iteration=iter_num)
 
+    # time info
+    print("altair_pipeline: "+str(datetime.datetime.now())+\
+        " Finished injection_ADI.main() iteration "+str(int(iter_num))+" at "+\
+        str(np.round(elapsed_time_iteration))+" walltime since start.")
+
     # re-check signal, amplitudes
     detection.main(inject_iteration=iter_num)
 
     # time info
     elapsed_time_iteration = np.subtract(time.time(),start_time)
-    print("Done with iter_num:")
-    print(iter_num)
-    print("Time since start:")
-    print(np.round(elapsed_time_iteration))
+    print("altair_pipeline: "+str(datetime.datetime.now())+\
+        " Finished detection.main() iteration "+str(int(iter_num))+" at "+\
+        str(np.round(elapsed_time_iteration))+" walltime since start.")
     print("-"*prog_bar_width)
 
     # condition for convergence: once crossover changes sign around desired S/N,

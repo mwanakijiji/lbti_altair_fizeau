@@ -175,13 +175,15 @@ class MedianCube:
                 # mask for nod down: same, but also top-right corner (340:,375:), and bottom 100 pixels
                 # convention: 0: bad pixels we will mask; 1: pixels to pass
                 if (nod_position == "nod_up"):
-                    print("detection: Applying mask to frame after derotation, nod up")
+                    print("detection: "+str(datetime.datetime.now())+\
+                        " Applying mask to frame after derotation, nod up")
                     mask_nan_regions[:10,:] = 0
                     mask_nan_regions[-10:,:] = 0
                     mask_nan_regions[:,:10] = 0
                     mask_nan_regions[:,-10:] = 0
                 elif (nod_position == "nod_down"):
-                    print("detection: Applying mask to frame after derotation, nod down")
+                    print("detection: "+str(datetime.datetime.now())+\
+                        " Applying mask to frame after derotation, nod down")
                     mask_nan_regions[:10,:] = 0
                     mask_nan_regions[-10:,:] = 0
                     mask_nan_regions[:,:10] = 0
@@ -340,7 +342,8 @@ class Detection:
 
         # read in a centered PSF model to use for companion search
         ## ## WILL NEED TO CHANGE THIS!
-        print("Reading in centered PSF model to use for companion search:")
+        print("detection: "+str(datetime.datetime.now())+\
+            " Reading in centered PSF model to use for companion search:")
         centered_psf_model_file_name = "/lm_180507_009030.fits" # slash needed for Singularity
         print(centered_psf_model_file_name)
         print("-"*prog_bar_width)
@@ -397,13 +400,13 @@ class Detection:
         y_cen = 0.5*np.shape(self.master_frame)[1]-0.5
 
         # read in median science frame for determining host star amplitude
-        print("Reading in median science frame for determining host star amplitude from")
+        print("detection: "+str(datetime.datetime.now())+" Reading in median science frame for determining host star amplitude from")
         print(sci_median_file_name)
         print("-"*prog_bar_width)
         sci_median_frame = fits.getdata(sci_median_file_name, 0, header=False)
         pos_num = 0 ## ## stand-in for now; NEED TO CHANGE LATER
         kernel = Gaussian2DKernel(x_stddev=0.5*fwhm_4um_lbt_airy_pix)
-        print("Convolving ADI and median science frames with same kernel")
+        print("detection: "+str(datetime.datetime.now())+" Convolving ADI and median science frames with same kernel")
         print("-"*prog_bar_width)
         smoothed_sci_median_frame = convolve(sci_median_frame, kernel) # smooth sci frame with same kernel
         smoothed_adi_frame = convolve(self.master_frame, kernel)
@@ -414,7 +417,7 @@ class Detection:
                                    int(0.5*np.shape(sci_median_frame)[1])]
         host_ampl = np.nanmax(smoothed_sci_median_frame[center_sci_median_frame[0]-10:center_sci_median_frame[0]+10,
                                                center_sci_median_frame[1]-10:center_sci_median_frame[1]+10])
-        print("host_ampl")
+        print("detection: "+str(datetime.datetime.now())+" host_ampl")
         print(host_ampl)
         # calculate outer noise annulus radius
         print("comp loc vec from center")
@@ -581,13 +584,13 @@ class Detection:
         #injection_loc_dict["crossover_last_step"] = False
 
         print("-"*prog_bar_width)
-        print("Host star amplitude:")
+        print("detection: "+str(datetime.datetime.now())+" Host star amplitude:")
         print(host_ampl)
-        print("Signal:")
+        print("detection: "+str(datetime.datetime.now())+" Signal:")
         print(signal)
-        print("Noise:")
+        print("detection: "+str(datetime.datetime.now())+" Noise:")
         print(noise)
-        print("S/N:")
+        print("detection: "+str(datetime.datetime.now())+" S/N:")
         print(s2n)
         print("-"*prog_bar_width)
 
@@ -604,7 +607,7 @@ class Detection:
                                     sep = ",",
                                     mode = "a",
                                     header = (not exists))
-            print("detection: Appended data to csv ")
+            print("detection: "+str(datetime.datetime.now())+" Appended data to csv ")
         elif (self.injection_iteration > 0):
             # fill in the nans
             to_update_df = pd.read_csv(self.csv_record_file_name, index_col=0)
@@ -631,7 +634,7 @@ class Detection:
                                     sep = ",",
                                     mode = "w",
                                     header = True)
-            print("Filled in signal and noise data in csv")
+            print("detection: "+str(datetime.datetime.now())+" Filled in signal and noise data in csv")
 
         print(str(self.csv_record_file_name))
         print("-"*prog_bar_width)
@@ -674,7 +677,7 @@ def main(inject_iteration=None):
     elif (inject_iteration is not None):
         # if we are injecting fake planets, get source images from current iteration
         injection_iteration_string = "inj_iter_" + str(inject_iteration).zfill(4)
-        print("detection: Detection of fake planet injection iteration number " + \
+        print("detection: "+str(datetime.datetime.now())+" Detection of fake planet injection iteration number " + \
             injection_iteration_string)
 
         # make a list of the images in the ADI directory

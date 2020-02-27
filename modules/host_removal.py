@@ -70,11 +70,11 @@ class HostRemoval:
         abs_sci_name: the absolute path of the science frame into which we want to inject a planet
         '''
 
-        print("Read in PCA training median \n" + self.abs_PCA_training_median_name)
+        print("host_removal: "+str(datetime.datetime.now())+" Read in PCA training median \n" + self.abs_PCA_training_median_name)
         print("-"*prog_bar_width)
-        print("Read in PCA basis cube \n" + self.abs_PCA_name)
+        print("host_removal: "+str(datetime.datetime.now())+" Read in PCA basis cube \n" + self.abs_PCA_name)
         print("-"*prog_bar_width)
-        print("Reading in science frame \n" + abs_sci_name)
+        print("host_removal: "+str(datetime.datetime.now())+" Reading in science frame \n" + abs_sci_name)
         print("-"*prog_bar_width)
 
         # read in the cutout science frame
@@ -138,7 +138,7 @@ class HostRemoval:
                      data = image_host_removed,
                      header = header_sci,
                      overwrite = True)
-        print("Writing out host_removed frame \n"
+        print("host_removal: "+str(datetime.datetime.now())+" Writing out host_removed frame \n"
               + abs_image_host_removed_name)
         print("-"*prog_bar_width)
 
@@ -230,11 +230,11 @@ class HostRemovalCube:
         OUTPUTS:
         host_subt_cube: a cube of non-derotated frames
         '''
-        print("Read in PCA basis for host star \n" + self.abs_host_star_PCA_name)
+        print("host_removal: "+str(datetime.datetime.now())+" Read in PCA basis for host star \n" + self.abs_host_star_PCA_name)
         print("-"*prog_bar_width)
-        print("Read in PCA basis for fake planet \n" + self.abs_fake_planet_PCA_name)
+        print("host_removal: "+str(datetime.datetime.now())+" Read in PCA basis for fake planet \n" + self.abs_fake_planet_PCA_name)
         print("-"*prog_bar_width)
-        print("Read in PCA tesselation file \n" + self.abs_region_mask_name)
+        print("host_removal: "+str(datetime.datetime.now())+" Read in PCA tesselation file \n" + self.abs_region_mask_name)
         print("-"*prog_bar_width)
 
         # string for making subdirectories to place ADI frames in
@@ -269,8 +269,9 @@ class HostRemovalCube:
                 # ... and also an FYI cube to hold regions of the original image
                 cube_original_image_1_frame = np.copy(cube_PCA_recon_regions_1_frame)
 
-                print("Removing host star from relative slice " + str(slice_num) +
-                      " of " + str(len(self.cube_frames)))
+                print("host_removal: "+str(datetime.datetime.now())+\
+                    " Removing host star from relative slice " + str(slice_num) +\
+                    " of " + str(len(self.cube_frames)))
                 print("-"*prog_bar_width)
 
                 # select the slice from the cube
@@ -347,7 +348,7 @@ class HostRemovalCube:
                                                  subt_median = False)
 
                     except:
-                        print("PCA fit to slice number " + str(slice_num) + " failed; skipping.")
+                        print("host_removal: "+str(datetime.datetime.now())+" PCA fit to slice number " + str(slice_num) + " failed; skipping.")
                         continue
                     #import ipdb; ipdb.set_trace()
                     # subtract the PCA-reconstructed host star (within the region corresponding to this mask slice)
@@ -450,7 +451,7 @@ class HostRemovalCube:
                                         injection_iteration_string + "/"
             if not os.path.exists(abs_path_name):
                 os.makedirs(abs_path_name)
-                print("Made directory " + abs_path_name)
+                print("host_removal: "+str(datetime.datetime.now())+" Made directory " + abs_path_name)
 
             # the cube of frames which are going to be PCA-reconstructed
             file_name_to_recon = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
@@ -511,7 +512,7 @@ class HostRemovalCube:
         # for memory's sake
         del self.cube_frames
 
-        print("Returning cube of host-removed frames ")
+        print("host_removal: "+str(datetime.datetime.now())+" Returning cube of host-removed frames ")
 
         # return
         # host_subt_cube_all_frames: cube of non-derotated, host-star-subtracted frames

@@ -38,7 +38,7 @@ class JustPutIntoCube:
                  fake_params,
                  test_PCA_vector_name,
                  config_data = config,
-                 write = False):
+                 write = True):
         '''
         INPUTS:
         fake_params: parameters of a fake planet (just zeros if none)
@@ -96,7 +96,7 @@ class JustPutIntoCube:
             mask_weird = np.ones(np.shape(sci))
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
             #mask_weird[sci > 55000] = np.nan # mask saturating region (~55000 for empirical PSFs)
-            mask_weird[sci > 4.4e9] = np.nan ## this value just for fake data
+            mask_weird[sci > 4.4e19] = np.nan ## this value just for fake data
 
             # check if PCA can be done at all; if not, skip this science frame
             # (N.b. We don't need a PCA reconstruction quite yet, but this is just a check.)
@@ -878,11 +878,9 @@ def main(inject_iteration=None):
 
         ### OPTION 1: PERMUTATE VALUES
         ### (BE SURE TO COMMENT OUT OPTION 2!)
-        '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
-                               "rad_asec": [0.80],
-                               "ampl_linear_norm": [1e-3]}
-        '''
+                               "rad_asec": [0.10],
+                               "ampl_linear_norm": [1e-10]}
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.20,0.50,0.80,1.10,1.40,1.70],
@@ -898,6 +896,7 @@ def main(inject_iteration=None):
 
         ### OPTION 2: MANUALLY SET ALL VALUES
         ### (BE SURE TO COMMENT OUT OPTION 1!)
+        '''
         experiments = [{'angle_deg_EofN': 0.0, 'rad_asec': 0.12, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
                         {'angle_deg_EofN': 180.0, 'rad_asec': 0.12, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
                         {'angle_deg_EofN': 0.0, 'rad_asec': 0.2, 'ampl_linear_norm': 0.008, 'ampl_linear_norm_0': 0.008},
@@ -924,7 +923,7 @@ def main(inject_iteration=None):
                         {'angle_deg_EofN': 0.0, 'rad_asec': 2.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
                         {'angle_deg_EofN': 120.0, 'rad_asec': 2.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005},
                         {'angle_deg_EofN': 240.0, 'rad_asec': 2.0, 'ampl_linear_norm': 0.0005, 'ampl_linear_norm_0': 0.0005}]
-
+        '''
 
     if (inject_iteration > 0):
         # case of fake planet injection, N>1 pass: use adjusted amplitudes, companion-by-companion, and re-inject

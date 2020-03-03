@@ -364,21 +364,28 @@ class HostRemovalCube:
                     # put the region of the original image into its cube
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
+                    # save the PCA info as a text file (FYI only)
+                    csv_file_name = str(self.config_data["data_dirs"]["DIR_FYI_INFO"]) + \
+                        "pca_spectrum_science_cube_frame_" + \
+                        str(slice_num).zfill(6)+"_mask_slice_" + \
+                        str(mask_slice_num).zfill(4) + ".csv"
+                    fit_host_star.to_csv(csv_file_name, sep = ",")
+
                     # accumulate-plot the PCA vectors (FYI only)
-                    '''
-                    plt.plot(fit_host_star["pca_vector"], label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
+                    plt.plot(fit_host_star["pca_vector"],
+                        label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
                     plt.xlabel("PCA mode")
                     plt.ylabel("Amplitude")
                     # if we're at the last region to plot the PCA vector of
                     if mask_slice_num == len(self.abs_region_mask)-1:
                         plot_file_name = str(self.config_data["data_dirs"]["DIR_FYI_INFO"]) + \
                           "pca_spectrum_science_cube_frame_" + \
-                          str(slice_num).zfill(6)+"_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf"
+                          str(slice_num).zfill(6) + \
+                          "_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf"
                         plt.legend(loc="upper right")
                         plt.savefig(plot_file_name)
                         plt.clf()
                         print("host_removal: Wrote PCA vectors to \n" + plot_file_name)
-                    '''
 
                     ## BEGIN TEST
                     '''

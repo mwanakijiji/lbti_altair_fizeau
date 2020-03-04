@@ -885,14 +885,14 @@ def main(inject_iteration=None):
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.20,0.50,0.80,1.10,1.40,1.70],
                                "ampl_linear_norm": [1e-3]}
-
+        '''
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
         # add in the initial amplitudes after the permutations have been made
         experiments = [dict(item, **{'ampl_linear_norm_0':item['ampl_linear_norm']}) for item in experiments]
-        '''
+
 
         ### OPTION 2: MANUALLY SET ALL VALUES
         ### (BE SURE TO COMMENT OUT OPTION 1!)

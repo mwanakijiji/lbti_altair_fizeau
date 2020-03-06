@@ -366,16 +366,43 @@ class HostRemovalCube:
 
                     # save the PCA info as a text file (FYI only)
                     csv_file_name = str(self.config_data["data_dirs"]["DIR_FYI_INFO"]) + \
-                        "pca_spectrum_science_cube_frame_" + \
-                        str(slice_num).zfill(6)+"_mask_slice_" + \
-                        str(mask_slice_num).zfill(4) + ".csv"
-                    fit_host_star.to_csv(csv_file_name, sep = ",")
+                        "pcaspectrumsciencecubeframe_" + str(slice_num).zfill(6) + \
+                        "_maskslice_" + str(mask_slice_num).zfill(4) + \
+                        "_fakeangledegEofN_" + str(self.fake_params["angle_deg_EofN"]) + \
+                        "_fakeradasec_" + str(self.fake_params["rad_asec"]) + \
+                        "_fakeampllinearnorm_" + str(self.fake_params["ampl_linear_norm"]) + \
+                        "_fakeampllinearnorm0_" + str(self.fake_params["ampl_linear_norm"]) + \
+                        ".csv"
+                    pca_vec_write = pd.DataFrame(data=soln_vector[0],columns=["amplitude"])
+                    pca_vec_write.to_csv(csv_file_name, sep = ",")
+                    # add some meta-data to the bottom of the file
+                    # (I have not found an easy way to insert it at the top)
+                    file_object = open(csv_file_name, 'a')
+                    file_object.write('-------------------\n')
+                    file_object.write('self.injection_iteration: ' + \
+                        str(self.injection_iteration) + '\n')
+                    file_object.write('cube slice_num: ' + \
+                        str(slice_num).zfill(6) + '\n')
+                    file_object.write('self.fake_params: ' + \
+                        str(self.fake_params) + '\n')
+                    file_object.write('self.n_PCA: ' + \
+                        str(self.n_PCA) + '\n')
+                    file_object.write('self.outdir: ' + \
+                        str(self.outdir) + '\n')
+                    file_object.write('self.abs_host_star_PCA_name: ' + \
+                        str(self.abs_host_star_PCA_name) + '\n')
+                    file_object.write('self.abs_fake_planet_PCA_name: ' + \
+                        str(self.abs_fake_planet_PCA_name) + '\n')
+                    file_object.write('self.abs_region_mask_name: ' + \
+                        str(self.abs_region_mask_name) + '\n')
+                    file_object.write('mask slice num: ' + \
+                        str(mask_slice_num).zfill(4))
+                    file_object.close()
+                    print("host_removal: Wrote PCA spectrum file " + csv_file_name)
 
                     # accumulate-plot the PCA vectors (FYI only)
                     plt.plot(fit_host_star["pca_vector"],
                         label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
-                    plt.xlabel("PCA mode")
-                    plt.ylabel("Amplitude")
                     # if we're at the last region to plot the PCA vector of
                     if mask_slice_num == len(self.abs_region_mask)-1:
                         plot_file_name = str(self.config_data["data_dirs"]["DIR_FYI_INFO"]) + \
@@ -383,9 +410,11 @@ class HostRemovalCube:
                           str(slice_num).zfill(6) + \
                           "_mask_slice_"+str(mask_slice_num).zfill(4) + ".pdf"
                         plt.legend(loc="upper right")
+                        plt.xlabel("PCA mode")
+                        plt.ylabel("Amplitude")
                         plt.savefig(plot_file_name)
                         plt.clf()
-                        print("host_removal: Wrote PCA vectors to \n" + plot_file_name)
+                        print("host_removal: Plotted PCA vectors in \n" + plot_file_name)
 
                     ## BEGIN TEST
                     '''

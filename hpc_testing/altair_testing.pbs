@@ -19,7 +19,7 @@ echo "Start time"
 date
 
 ### set variables: filenames of the data tarball and Singularity container
-export DATA_TARBALL=altair_20200221_take01_allframes.tar.gz
+export DATA_TARBALL=altair_20200304_take01_allframes.tar.gz
 export RESULTS_TARBALL=results.tar
 export SING_FILE=lbti_altair_fizeau_latest.sif
 

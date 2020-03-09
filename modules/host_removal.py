@@ -374,7 +374,7 @@ class HostRemovalCube:
                         "_fakeampllinearnorm_" + str(self.fake_params["ampl_linear_norm"]) + \
                         "_fakeampllinearnorm0_" + str(self.fake_params["ampl_linear_norm"]) + \
                         ".csv"
-                    pca_vec_write = pd.DataFrame(data=soln_vector[0],columns=["amplitude"])
+                    pca_vec_write = pd.DataFrame(data=fit_host_star["pca_vector"],columns=["amplitude"])
                     pca_vec_write.to_csv(csv_file_name, sep = ",")
                     # add some meta-data to the bottom of the file
                     # (I have not found an easy way to insert it at the top)

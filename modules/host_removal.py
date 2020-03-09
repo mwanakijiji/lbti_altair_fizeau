@@ -6,6 +6,7 @@ import pickle
 import math
 import datetime
 import matplotlib.pyplot as plt
+import pandas as pd
 from astropy.io import fits
 from modules import *
 

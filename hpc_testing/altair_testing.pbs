@@ -1,5 +1,5 @@
 #PBS -q standard
-#PBS -l select=1:ncpus=1:mem=6gb
+#PBS -l select=1:ncpus=6:mem=36gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
@@ -8,9 +8,9 @@
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
-#PBS -l cput=24:00:00
+#PBS -l cput=288:00:00
 ### Walltime is how long your job will run
-#PBS -l walltime=24:00:00
+#PBS -l walltime=48:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 
@@ -49,7 +49,7 @@ then
    ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring
    ### is /180507_fizeau_altair/ and NOT /vol_c/)
-   cp /xdisk/$USER/$DATA_TARBALL /tmp/$USER
+   cp /extra/$USER/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball and Singularity file directory"
    pwd
@@ -76,8 +76,8 @@ then
    echo "List of files in directory Singularity file was pulled to"
    ls
    echo "---"
-   echo "List of files in /xdisk/user/ dir:"
-   ls /xdisk/$USER
+   echo "List of files in /extra/user/ dir:"
+   ls /extra/$USER
    echo "---"
    echo "List of files in /tmp/user/ dir:"
    ls /tmp/$USER
@@ -99,7 +99,7 @@ then
    date
    echo "---"
 
-   ### create tar archive of the results in /tmp/, and leave it in /xdisk/
+   ### create tar archive of the results in /tmp/, and leave it in /extra/
    ### directory
    echo "Tarring outputs"
    tar -czf $RESULTS_TARBALL \
@@ -108,8 +108,8 @@ then
    echo "Done tarring output:"
    date
    echo "---"
-   cp $RESULTS_TARBALL /xdisk/$USER
-   echo "Done copying output to /xdisk/:"
+   cp $RESULTS_TARBALL /extra/$USER
+   echo "Done copying output to /extra/:"
    date
    echo "---"
 

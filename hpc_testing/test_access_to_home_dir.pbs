@@ -1,0 +1,84 @@
+#PBS -q debug
+#PBS -l select=1:ncpus=1:mem=6gb
+### Specify a name for the job
+#PBS -N test_access
+### Specify the group name
+#PBS -W group_list=ktmorz
+### Sharing settings
+#PBS -l place=free
+### CPUtime required in hhh:mm:ss.
+### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
+#PBS -l cput=00:10:00
+### Walltime is how long your job will run
+#PBS -l walltime=00:10:00
+### send email when done
+#PBS -M spalding@email.arizona.edu
+
+### start timestamp
+echo "Start time"
+date
+
+### set variables: filenames of the data tarball and Singularity container
+export DATA_TARBALL=altair_20200304_take01_allframes.tar.gz
+export RESULTS_TARBALL=results.tar
+export SING_FILE=lbti_altair_fizeau_latest.sif
+
+### load python 3.6.5
+module load python/3
+
+### load Singularity
+module load singularity
+
+### check if 500 Gb of storage are available in /tmp
+echo $HOSTNAME
+echo "Check if /tmp has 500GB of storage available"
+available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+if [ $available_space -gt 500 ]
+then
+   echo "There is enough storage"
+   echo $available_space GB
+   date
+
+   ### get current (home) directory
+   export HOME_DIR=$PWD
+
+   ### check available space
+   available_space_home=$(df -h /home | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+   echo "Available space in /home:"
+   echo $available_space_home GB
+
+   ### make a new /tmp/ directory on the compute node
+   rm -fr /tmp/$USER
+   mkdir /tmp/$USER
+
+   ### copy tarball into the /tmp/ directory
+   ### (for 180507 Altair data, the top-level directory produced in the untarring
+   ### is /180507_fizeau_altair/ and NOT /vol_c/)
+   cp /home/$DATA_TARBALL /tmp/$USER
+   cd /tmp/$USER
+   echo "Changed to tarball and Singularity file directory"
+   pwd
+   echo "---"
+   date
+
+   ### unpack data
+   echo "Unpacking data in directory"
+   pwd
+   echo "---"
+   tar -xvf $DATA_TARBALL
+   echo "Tarball extracted"
+   date
+   echo "---"
+
+   ### delete the stuff remaining in /tmp/
+   rm -fr /tmp/$USER
+   echo "Deleted stuff in the /tmp/ directory:"
+
+   ### timestamp end
+   date
+
+else
+
+  echo "There is not enough storage"
+  echo $available_space GB
+fi

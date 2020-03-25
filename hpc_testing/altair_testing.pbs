@@ -1,5 +1,5 @@
 #PBS -q standard
-#PBS -l select=1:ncpus=6:mem=36gb
+#PBS -l select=1:ncpus=8:mem=48gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
@@ -42,6 +42,11 @@ then
    ### get current (home) directory
    export HOME_DIR=$PWD
 
+   ### check available space in home
+   available_space_home=$(df -h /home/u6/spalding | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+   echo "Available space in /home/u6/spalding:"
+   echo $available_space_home GB
+
    ### make a new /tmp/ directory on the compute node
    rm -fr /tmp/$USER
    mkdir /tmp/$USER
@@ -49,7 +54,7 @@ then
    ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring
    ### is /180507_fizeau_altair/ and NOT /vol_c/)
-   cp /extra/$USER/$DATA_TARBALL /tmp/$USER
+   cp /home/u6/spalding/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball and Singularity file directory"
    pwd
@@ -76,16 +81,13 @@ then
    echo "List of files in directory Singularity file was pulled to"
    ls
    echo "---"
-   echo "List of files in /extra/user/ dir:"
-   ls /extra/$USER
+   echo "List of files in /home/u6/spalding/ dir:"
+   ls /home/u6/spalding/
    echo "---"
    echo "List of files in /tmp/user/ dir:"
    ls /tmp/$USER
    echo "---"
    ### END TEST
-
-   ### (decoupling the data and the script avoids requiring new
-   ### tarring each time the script is edited)
 
    ### run Singularity container (bind syntax is host:container)
    ### data files -> /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair
@@ -99,7 +101,12 @@ then
    date
    echo "---"
 
-   ### create tar archive of the results in /tmp/, and leave it in /extra/
+   ### copy the output text file separately to /home/u6/spalding/
+   ### just in case the whole tarball is too large
+   export CSV_FILE=/tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/test_csv_file_all_iterations.csv
+   cp $CSV_FILE /home/u6/spalding/
+
+   ### create tar archive of the results in /tmp/, and leave it in /home/u6/spalding/
    ### directory
    echo "Tarring outputs"
    tar -czf $RESULTS_TARBALL \
@@ -108,8 +115,8 @@ then
    echo "Done tarring output:"
    date
    echo "---"
-   cp $RESULTS_TARBALL /extra/$USER
-   echo "Done copying output to /extra/:"
+   cp $RESULTS_TARBALL /home/u6/spalding/
+   echo "Done copying output to /home/u6/spalding/:"
    date
    echo "---"
 

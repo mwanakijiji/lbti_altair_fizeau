@@ -43,8 +43,8 @@ then
    export HOME_DIR=$PWD
 
    ### check available space
-   available_space_home=$(df -h /home | tail -n +2 | awk '{print $4}' | sed 's/.$//')
-   echo "Available space in /home:"
+   available_space_home=$(df -h /home/u6/spalding | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+   echo "Available space in /home/u6/spalding:"
    echo $available_space_home GB
 
    ### make a new /tmp/ directory on the compute node
@@ -54,7 +54,7 @@ then
    ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring
    ### is /180507_fizeau_altair/ and NOT /vol_c/)
-   cp /home/$DATA_TARBALL /tmp/$USER
+   cp /home/u6/spalding/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball and Singularity file directory"
    pwd

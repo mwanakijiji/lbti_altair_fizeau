@@ -20,11 +20,14 @@ from sklearn.decomposition import PCA
 ## SOME VARIABLES
 # number of CPUs for parallelization on a fixed system where I can use all cores
 # subtract a few to avoid killed job due to spillover
-ncpu_all = multiprocessing.cpu_count()
+'''
+ncpu_all = multiprocessing.cpu_count() # this actually counts all cores on a node!
 if (ncpu_all > 4):
     ncpu = np.subtract(ncpu_all,3)
 else:
     ncpu = ncpu_all
+'''
+ncpu = 8
 
 # below istopgap in case job is running on HPC, when cores might be counted beyond those
 # allocated to the job

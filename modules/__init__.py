@@ -28,13 +28,13 @@ if (ncpu_all > 4):
 else:
     ncpu = ncpu_all
 '''
-ncpu = 8
+ncpu = 6
 
 # below istopgap in case job is running on HPC, when cores might be counted beyond those
 # allocated to the job
 #ncpu = 16
 
-# set length of random strings to match timesstamps across different cores
+# set length of random strings to match timestamps across different cores
 N_string=7
 
 # configuration data

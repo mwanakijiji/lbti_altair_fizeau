@@ -1,4 +1,5 @@
 #PBS -q standard
+### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
 #PBS -l select=1:ncpus=8:mem=48gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
@@ -19,7 +20,7 @@ echo "Start time"
 date
 
 ### set variables: filenames of the data tarball and Singularity container
-export DATA_TARBALL=altair_20200304_take01_allframes.tar.gz
+export DATA_TARBALL=altair_20200326_allgoodframes.tar.gz
 export RESULTS_TARBALL=results.tar
 export SING_FILE=lbti_altair_fizeau_latest.sif
 
@@ -50,6 +51,11 @@ then
    ### make a new /tmp/ directory on the compute node
    rm -fr /tmp/$USER
    mkdir /tmp/$USER
+
+   ### check available space in new /tmp directory
+   available_space_tmp=$(df -h /tmp/$USER | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+   echo "Available space in /tmp/spalding:"
+   echo $available_space_tmp GB
 
    ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring

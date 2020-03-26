@@ -60,7 +60,7 @@ then
    ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring
    ### is /180507_fizeau_altair/ and NOT /vol_c/)
-   cp /home/u6/spalding/$DATA_TARBALL /tmp/$USER
+   cp /home/u6/$USER/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball and Singularity file directory"
    pwd
@@ -76,7 +76,7 @@ then
    date
    echo "---"
 
-   ### pull the Singularity file (which contains the code)
+   ### pull the Singularity file (which contains the code + environment)
    singularity pull --name $SING_FILE shub://mwanakijiji/lbti_altair_fizeau:latest
    echo "Singularity file pulled in directory"
    pwd
@@ -88,7 +88,7 @@ then
    ls
    echo "---"
    echo "List of files in /home/u6/spalding/ dir:"
-   ls /home/u6/spalding/
+   ls /home/u6/$USER/
    echo "---"
    echo "List of files in /tmp/user/ dir:"
    ls /tmp/$USER
@@ -110,7 +110,7 @@ then
    ### copy the output text file separately to /home/u6/spalding/
    ### just in case the whole tarball is too large
    export CSV_FILE=/tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/test_csv_file_all_iterations.csv
-   cp $CSV_FILE /home/u6/spalding/
+   cp $CSV_FILE /home/u6/$USER/
 
    ### create tar archive of the results in /tmp/, and leave it in /home/u6/spalding/
    ### directory
@@ -121,7 +121,7 @@ then
    echo "Done tarring output:"
    date
    echo "---"
-   cp $RESULTS_TARBALL /home/u6/spalding/
+   cp $RESULTS_TARBALL /home/u6/$USER/
    echo "Done copying output to /home/u6/spalding/:"
    date
    echo "---"

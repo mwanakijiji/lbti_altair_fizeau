@@ -1106,7 +1106,7 @@ def main(inject_iteration=None):
     print("injection_ADI: "+str(datetime.datetime.now())+\
         " About to map inject_remove_adi() over "+str(ncpu)+\
         " out of "+str(ncpu_all)+\
-        " cores, over single combinations of fake planet parameters")
+        " cores in the node, over single combinations of fake planet parameters")
     # map inject_remove_adi() over all cores, over single combinations of fake planet parameters
     pool = multiprocessing.Pool(ncpu)
     print("injection_ADI: "+str(datetime.datetime.now())+" Done with mapping")

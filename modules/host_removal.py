@@ -366,6 +366,7 @@ class HostRemovalCube:
                     cube_original_image_1_frame[mask_slice_num,:,:] = np.multiply(sci,self.abs_region_mask[mask_slice_num,:,:])
 
                     # save the PCA info as a text file (FYI only)
+                    ''' COMMENTED OUT TO REDUCE OVERHEADS (2020 03 30, E.S.)
                     csv_file_name = str(self.config_data["data_dirs"]["DIR_FYI_INFO"]) + \
                         "pcaspectrumsciencecubeframe_" + str(slice_num).zfill(6) + \
                         "_maskslice_" + str(mask_slice_num).zfill(4) + \
@@ -400,8 +401,10 @@ class HostRemovalCube:
                         str(mask_slice_num).zfill(4))
                     file_object.close()
                     print("host_removal: Wrote PCA spectrum file " + csv_file_name)
+                    '''
 
                     # accumulate-plot the PCA vectors (FYI only)
+                    ''' COMMENTED OUT TO REDUCE OVERHEADS (2020 03 30, E.S.)
                     plt.plot(fit_host_star["pca_vector"],
                         label="tess. reg. "+str(mask_slice_num)) # this will be overplotted
                     # if we're at the last region to plot the PCA vector of
@@ -416,6 +419,7 @@ class HostRemovalCube:
                         plt.savefig(plot_file_name)
                         plt.clf()
                         print("host_removal: Plotted PCA vectors in \n" + plot_file_name)
+                    '''
 
                     ## BEGIN TEST
                     '''

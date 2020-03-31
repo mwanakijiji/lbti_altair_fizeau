@@ -790,7 +790,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                host_subt_cube = cube_pre_removal_A,
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
-                                               write_cube = True)
+                                               write_cube = False)
         #import ipdb; ipdb.set_trace()
         print("injection_ADI: "+str(datetime.datetime.now())
               +": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
@@ -823,7 +823,7 @@ class SyntheticFizeauInjectRemoveADI:
                                                host_subt_cube = removed_hosts_cube_A,
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_1_A,
-                                               write_cube = True)
+                                               write_cube = False)
         # call derotation, ADI, sensitivity determination
         make_median_A = median_instance_A(apply_mask_after_derot = True,
                                       fake_planet = True)

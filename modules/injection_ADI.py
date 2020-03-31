@@ -884,14 +884,19 @@ def main(inject_iteration=None):
         #A = np.arange(2,21) # FWHM numbers from center to edge of frame (FULL THING)
         A = np.arange(16,21) # FWHM numbers from center to edge of frame (SUBSET)
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
+        '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.,120.,240.],
                                "rad_asec": list(B),
                                "ampl_linear_norm": [1e-3]}
+        '''
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.20,0.50,0.80,1.10,1.40,1.70],
                                "ampl_linear_norm": [1e-3]}
         '''
+        fake_params_pre_permute = {"angle_deg_EofN": [0.],
+                                "rad_asec": [0.10],
+                                "ampl_linear_norm": [1e-20]}
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]

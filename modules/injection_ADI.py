@@ -882,21 +882,22 @@ def main(inject_iteration=None):
         fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
         ps_asec_per_pix = np.float(config["instrum_params"]["LMIR_PS"]) # plate scale
         #A = np.arange(2,21) # FWHM numbers from center to edge of frame (FULL THING)
-        A = np.arange(16,21) # FWHM numbers from center to edge of frame (SUBSET)
+        #A = np.arange(16,21) # FWHM numbers from center to edge of frame (SUBSET)
+        A = np.array([2,3,4,5,7,9,12,15,19]) # more sparse as R increases
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
-        '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.,120.,240.],
                                "rad_asec": list(B),
                                "ampl_linear_norm": [1e-3]}
-        '''
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                "rad_asec": [0.20,0.50,0.80,1.10,1.40,1.70],
                                "ampl_linear_norm": [1e-3]}
         '''
+        '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
                                 "rad_asec": [0.10],
                                 "ampl_linear_norm": [1e-20]}
+        '''
 
         keys, values = zip(*fake_params_pre_permute.items()) # permutate
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
@@ -1184,7 +1185,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
+                                                    "mask_406x406_rings_4quad_fits_truncated.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A_and_D.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
@@ -1251,6 +1252,7 @@ def main(inject_iteration=None):
     tesselation_10_psfs_in_each_region.fits
     mask_10x10_100squares.fits
     mask_406x406_rings_4quad_fits_complete.fits
+    mask_406x406_rings_4quad_fits_truncated.fits
     '''
 
     ## ## BEGIN SERIAL TEST

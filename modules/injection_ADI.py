@@ -1253,6 +1253,7 @@ def main(inject_iteration=None):
     mask_10x10_100squares.fits
     mask_406x406_rings_4quad_fits_complete.fits
     mask_406x406_rings_4quad_fits_truncated.fits
+    mask_406x406_rings_4quad_fits_coarse_20200404.fits
     '''
 
     ## ## BEGIN SERIAL TEST

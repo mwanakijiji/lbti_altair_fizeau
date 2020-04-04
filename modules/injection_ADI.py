@@ -1177,7 +1177,7 @@ def main(inject_iteration=None):
     synthetic_fizeau_inject_remove_adi_A_and_D_frames = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,
         file_name_list = cookies_sats_A_and_D_cube_frames_06_name_array,
-        n_PCA_host_removal = 100,
+        n_PCA_host_removal = 50,
         read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
                                             "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
@@ -1185,7 +1185,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_truncated.fits"),
+                                                    "mask_406x406_rings_4quad_fits_coarse_20200404.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A_and_D.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]

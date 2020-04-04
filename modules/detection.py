@@ -759,7 +759,7 @@ def main(inject_iteration=None):
                                                    inject_iteration = inject_iteration)
         detection_blind_search(sci_median_file_name = config["data_dirs"]["DIR_OTHER_FITS"] + \
                                                    config["file_names"]["MEDIAN_SCI_FRAME"],
-                                                   noise_option = "full_ring",
+                                                   noise_option = "necklace",
                                                    noise_annulus_half_width_pix = 0.5,
                                                    blind_search = False)
 

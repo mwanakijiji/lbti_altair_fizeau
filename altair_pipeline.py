@@ -46,7 +46,7 @@ print("altair_pipeline: "+str(datetime.datetime.now())+\
 print("Total time:")
 elapsed_time_iteration = np.subtract(time.time(),start_time)
 print(np.round(elapsed_time_iteration))
-'''
+
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 1
 while True:
@@ -75,7 +75,7 @@ while True:
     # condition for convergence: once crossover changes sign around desired S/N,
     # or we reach iteration number X
     iter_num += 1
-'''
+
 # interpolate amplitudes
 
 # median along azimuth

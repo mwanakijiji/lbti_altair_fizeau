@@ -5,6 +5,7 @@ import time
 import pickle
 import math
 import datetime
+import gc
 import matplotlib.pyplot as plt
 import pandas as pd
 from astropy.io import fits
@@ -413,9 +414,15 @@ class HostRemovalCube:
                         plt.legend(loc="upper right")
                         plt.xlabel("PCA mode")
                         plt.ylabel("Amplitude")
-                        plt.savefig(plot_file_name)
+                        # 'try' because sometimes saving plot leads to unpredictable errors when multi-threading
+                        try:
+                            plt.savefig(plot_file_name)
+                            print("host_removal: Plotted PCA vectors as \n" + plot_file_name)
+                        except:
+                            print("host_removal: Failed to save plot of PCA vectors as \n" + plot_file_name)
                         plt.clf()
-                        print("host_removal: Plotted PCA vectors in \n" + plot_file_name)
+                        plt.close()
+                        gc.collect() # attempt to save on memory leakage
 
                     ## BEGIN TEST
                     '''

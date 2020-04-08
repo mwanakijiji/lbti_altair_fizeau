@@ -494,12 +494,14 @@ class Detection:
             necklace_2d_array = np.nansum( np.dstack((necklace_2d_array,noise_smoothed_patch)),2 )
 
         # BEGIN TEST
+        '''
         if (len(other_angles) > 1): # at small radii, there is not enough room for a necklace of patches
             print("patch num")
             print(patch_num)
             plt.imshow(necklace_2d_array, origin="lower")
             plt.colorbar()
             plt.savefig("junk_necklace.png")
+        '''
         # END TEST
 
         # at this point, the array of median values of necklaced patches has been made
@@ -522,10 +524,12 @@ class Detection:
                       invert=False)
 
         # BEGIN TEST
+        '''
         plt.clf()
         plt.imshow(comp_mask, origin="lower")
         plt.colorbar()
         plt.savefig("junk_comp_mask.png")
+        '''
         # END TEST
 
         # mask involving the noise ring without the companion
@@ -596,7 +600,7 @@ class Detection:
 
         # write csv, with a pseudorandom time delay to minimize conflicts
         # if the same file is being read in/out by multiple cores
-        time.sleep(10.*np.random.rand())
+        time.sleep(600.*np.random.rand()) # some fraction of 10 mins
         injection_loc_df = pd.DataFrame(injection_loc_dict)
 
         # check if csv file exists; if it does, don't repeat the header
@@ -610,6 +614,7 @@ class Detection:
             print("detection: "+str(datetime.datetime.now())+" Appended data to csv ")
         elif (self.injection_iteration > 0):
             # fill in the nans
+            print("detection: "+str(datetime.datetime.now())+" Reading in csv")
             to_update_df = pd.read_csv(self.csv_record_file_name, index_col=0)
             to_update_df.reset_index(inplace=True,drop=True)
             #import ipdb; ipdb.set_trace()
@@ -634,7 +639,11 @@ class Detection:
                                     sep = ",",
                                     mode = "w",
                                     header = True)
-            print("detection: "+str(datetime.datetime.now())+" Filled in signal and noise data in csv")
+            print("detection: "+str(datetime.datetime.now())+" Filled in signal and noise data in csv; signal="+str(signal)+", noise="+str(noise))
+            print("detection: csv, pre-update, signal: ")
+            print(to_update_df["signal"])
+            print("detection: csv, pre-update, noise: ")
+            print(to_update_df["noise"])
 
         print(str(self.csv_record_file_name))
         print("-"*prog_bar_width)

@@ -95,8 +95,8 @@ class JustPutIntoCube:
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
-            #mask_weird[sci > 55000] = np.nan # mask saturating region (~55000 for empirical PSFs)
-            mask_weird[sci > 4.4e19] = np.nan ## this value just for fake data
+            mask_weird[sci > 55000] = np.nan # mask saturating region (~55000 for empirical PSFs)
+            #mask_weird[sci > 4.4e19] = np.nan ## this value just for fake data
 
             # check if PCA can be done at all; if not, skip this science frame
             # (N.b. We don't need a PCA reconstruction quite yet, but this is just a check.)

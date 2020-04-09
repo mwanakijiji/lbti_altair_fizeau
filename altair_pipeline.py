@@ -42,11 +42,11 @@ print("altair_pipeline: "+str(datetime.datetime.now())+\
 detection.main(inject_iteration=0)
 print("altair_pipeline: "+str(datetime.datetime.now())+\
     " Finished detection.main() iteration 0")
-
+'''
 print("Total time:")
 elapsed_time_iteration = np.subtract(time.time(),start_time)
 print(np.round(elapsed_time_iteration))
-'''
+
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 2
 while True:

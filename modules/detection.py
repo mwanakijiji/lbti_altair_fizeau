@@ -600,7 +600,7 @@ class Detection:
 
         # write csv, with a pseudorandom time delay to minimize conflicts
         # if the same file is being read in/out by multiple cores
-        time.sleep(600.*np.random.rand()) # some fraction of 10 mins
+        time.sleep(60.*np.random.rand()) # some fraction of 1 min
         injection_loc_df = pd.DataFrame(injection_loc_dict)
 
         # check if csv file exists; if it does, don't repeat the header
@@ -649,11 +649,10 @@ class Detection:
             # zero in on row of interest, based on companion location and starting amplitude
             # (make the other rows nans)
             df_this_iteration_this_loc = df_this_iteration.where(
-                                            np.logical_and(np.logical_and(
-                                                df_this_iteration["angle_deg"]==injection_loc_dict["angle_deg"][0],
-                                                df_this_iteration["rad_pix"]==injection_loc_dict["rad_pix"][0],
-                                                df_this_iteration["ampl_linear_norm_0"]==injection_loc_dict["ampl_linear_norm_0"][0])
-                                            )
+                                                np.logical_and(np.logical_and(
+                                                np.round(df_this_iteration["angle_deg"],decimals=4)==np.round(injection_loc_dict["angle_deg"][0],decimals=4),
+                                                np.round(df_this_iteration["rad_asec"],decimals=4)==np.round(injection_loc_dict["rad_asec"][0],decimals=4),
+                                                np.round(df_this_iteration["ampl_linear_norm_0"],decimals=8)==np.round(injection_loc_dict["ampl_linear_norm_0"][0],decimals=8))))
             print("detection: csv, pre-update df_this_iteration_this_loc, signal: ")
             print(df_this_iteration_this_loc["signal"])
             print("detection: csv, pre-update df_this_iteration_this_loc, noise: ")

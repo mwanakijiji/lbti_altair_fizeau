@@ -82,4 +82,6 @@ while True:
 '''
 # incorporate
 sensitivity.main() # produces 1-D contrast curve from csv info
+
+convert_contrast_limits_to_masses.main()
 '''

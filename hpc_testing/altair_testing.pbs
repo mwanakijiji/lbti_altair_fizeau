@@ -1,17 +1,17 @@
 #PBS -q standard
 ### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
-#PBS -l select=1:ncpus=28:mem=168gb
+#PBS -l select=1:ncpus=14:mem=84gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
-#PBS -W group_list=ktmorz
+#PBS -W group_list=phinz
 ### Sharing settings
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
-#PBS -l cput=168:00:00
+#PBS -l cput=3080:00:00
 ### Walltime is how long your job will run
-#PBS -l walltime=6:00:00
+#PBS -l walltime=110:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 
@@ -21,11 +21,11 @@ date
 
 ### set variables: filenames of the data tarball and Singularity container
 ### input files
-export DATA_TARBALL=altair_20200404_allgoodframes.tar.gz
+export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=results3.tar
-export OUTPUT_CSV_FILE_BASENAME=csv_output_3.csv
+export RESULTS_TARBALL=results_fwhm15_120degEofN.tar
+export OUTPUT_CSV_FILE_BASENAME=csv_output_results_fwhm15_120degEofN.csv
 
 ### load python 3.6.5
 module load python/3
@@ -111,16 +111,13 @@ then
    echo "---"
 
    ### copy the output text file separately to /home/u6/spalding/
-   ### just in case the whole tarball is too large
    export CSV_FILE=/tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/test_csv_file_all_iterations.csv
    cp $CSV_FILE /home/u6/$USER/$OUTPUT_CSV_FILE_BASENAME
 
    ### create tar archive of the results in /tmp/, and leave it in /xdisk/spalding/
    ### directory
    echo "Tarring outputs"
-   tar -czf $RESULTS_TARBALL \
-    --exclude='/tmp/$USER/180507_fizeau_altair/pipeline_0[0-6]*' \
-    /tmp/$USER/180507_fizeau_altair
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
    echo "Done tarring output:"
    date
    echo "---"

@@ -617,32 +617,86 @@ class Detection:
             print("detection: "+str(datetime.datetime.now())+" Reading in csv")
             to_update_df = pd.read_csv(self.csv_record_file_name, index_col=0)
             to_update_df.reset_index(inplace=True,drop=True)
+            print("detection: whole csv, pre-update, signal: ")
+            print(to_update_df["signal"])
+            print("detection: whole csv, pre-update, noise: ")
+            print(to_update_df["noise"])
+            print("detection: whole csv, pre-update, rad_asec: ")
+            print(to_update_df["rad_asec"])
+            print("detection: whole csv, pre-update, rad_pix: ")
+            print(to_update_df["rad_pix"])
+            print("detection: whole csv, pre-update, angle_deg: ")
+            print(to_update_df["angle_deg"])
+            print("detection: whole csv, pre-update, inject_iteration: ")
+            print(to_update_df["inject_iteration"])
+
+            # attempt to avoid writing problems
+            time.sleep(5.*np.random.rand()) # some fraction of 5 sec
             #import ipdb; ipdb.set_trace()
             df_this_iteration = to_update_df.where(to_update_df["inject_iteration"] == self.injection_iteration)
+            print("detection: csv, pre-update this iteration, signal: ")
+            print(df_this_iteration["signal"])
+            print("detection: csv, pre-update this iteration, noise: ")
+            print(df_this_iteration["noise"])
+            print("detection: csv, pre-update this iteration, rad_asec: ")
+            print(df_this_iteration["rad_asec"])
+            print("detection: csv, pre-update this iteration, rad_pix: ")
+            print(df_this_iteration["rad_pix"])
+            print("detection: csv, pre-update this iteration, angle_deg: ")
+            print(df_this_iteration["angle_deg"])
+            print("detection: csv, pre-update this iteration, inject_iteration: ")
+            print(df_this_iteration["inject_iteration"])
             # zero in on row of interest, based on companion location and starting amplitude
             # (make the other rows nans)
             df_this_iteration_this_loc = df_this_iteration.where(
                                             np.logical_and(np.logical_and(
                                                 df_this_iteration["angle_deg"]==injection_loc_dict["angle_deg"][0],
-                                                df_this_iteration["rad_asec"]==injection_loc_dict["rad_asec"][0]),
+                                                df_this_iteration["rad_pix"]==injection_loc_dict["rad_pix"][0],
                                                 df_this_iteration["ampl_linear_norm_0"]==injection_loc_dict["ampl_linear_norm_0"][0])
                                             )
+            print("detection: csv, pre-update df_this_iteration_this_loc, signal: ")
+            print(df_this_iteration_this_loc["signal"])
+            print("detection: csv, pre-update df_this_iteration_this_loc, noise: ")
+            print(df_this_iteration_this_loc["noise"])
+            print("detection: csv, pre-update df_this_iteration_this_loc, rad_asec: ")
+            print(df_this_iteration_this_loc["rad_asec"])
+            print("detection: csv, pre-update df_this_iteration_this_loc, rad_pix: ")
+            print(df_this_iteration_this_loc["rad_pix"])
+            print("detection: csv, pre-update df_this_iteration_this_loc, angle_deg: ")
+            print(df_this_iteration_this_loc["angle_deg"])
+            print("detection: csv, pre-update df_this_iteration_this_loc, inject_iteration: ")
+            print(df_this_iteration_this_loc["inject_iteration"])
             # get the index
             df_this_iteration_this_loc_nonan = df_this_iteration_this_loc.dropna(subset=["angle_deg"])
+
+            print("detection: csv, pre-update df_this_iteration_this_loc_nonan, signal: ")
+            print(df_this_iteration_this_loc_nonan["signal"])
+            print("detection: csv, pre-update df_this_iteration_this_loc_nonan, noise: ")
+            print(df_this_iteration_this_loc_nonan["noise"])
+            print("detection: csv, pre-update df_this_iteration_this_loc_nonan, rad_asec: ")
+            print(df_this_iteration_this_loc_nonan["rad_asec"])
+            print("detection: csv, pre-update df_this_iteration_this_loc_nonan, rad_pix: ")
+            print(df_this_iteration_this_loc_nonan["rad_pix"])
+            print("detection: csv, pre-update df_this_iteration_this_loc_nonan, angle_deg: ")
+            print(df_this_iteration_this_loc_nonan["angle_deg"])
+            print("detection: csv, pre-update df_this_iteration_this_loc_nonan, inject_iteration: ")
+            print(df_this_iteration_this_loc_nonan["inject_iteration"])
             # insert the new value
             to_update_df.loc[df_this_iteration_this_loc_nonan.index,"signal"] = signal
             to_update_df.loc[df_this_iteration_this_loc_nonan.index,"noise"] = noise
             to_update_df.loc[df_this_iteration_this_loc_nonan.index,"s2n"] = s2n
 
+            print("Updated df:")
+            print(to_update_df)
             # write out (overwrite old file)
             to_update_df.to_csv(self.csv_record_file_name,
                                     sep = ",",
                                     mode = "w",
                                     header = True)
             print("detection: "+str(datetime.datetime.now())+" Filled in signal and noise data in csv; signal="+str(signal)+", noise="+str(noise))
-            print("detection: csv, pre-update, signal: ")
+            print("detection: csv, post-update, signal: ")
             print(to_update_df["signal"])
-            print("detection: csv, pre-update, noise: ")
+            print("detection: csv, post-update, noise: ")
             print(to_update_df["noise"])
 
         print(str(self.csv_record_file_name))

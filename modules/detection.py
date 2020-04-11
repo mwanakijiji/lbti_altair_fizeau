@@ -651,8 +651,10 @@ class Detection:
             df_this_iteration_this_loc = df_this_iteration.where(
                                                 np.logical_and(np.logical_and(
                                                 np.round(df_this_iteration["angle_deg"],decimals=4)==np.round(injection_loc_dict["angle_deg"][0],decimals=4),
-                                                np.round(df_this_iteration["rad_asec"],decimals=4)==np.round(injection_loc_dict["rad_asec"][0],decimals=4),
-                                                np.round(df_this_iteration["ampl_linear_norm_0"],decimals=8)==np.round(injection_loc_dict["ampl_linear_norm_0"][0],decimals=8))))
+                                                np.round(df_this_iteration["rad_asec"],decimals=4)==np.round(injection_loc_dict["rad_asec"][0],decimals=4)),
+                                                np.round(df_this_iteration["ampl_linear_norm_0"],decimals=8)==np.round(injection_loc_dict["ampl_linear_norm_0"][0],decimals=8)))
+            print("df_this_iteration_this_loc: ")
+            print(df_this_iteration_this_loc)
             print("detection: csv, pre-update df_this_iteration_this_loc, signal: ")
             print(df_this_iteration_this_loc["signal"])
             print("detection: csv, pre-update df_this_iteration_this_loc, noise: ")

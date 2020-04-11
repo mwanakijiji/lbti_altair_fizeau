@@ -708,11 +708,15 @@ class Detection:
         sn_check_cube[1,:,:] = smoothed_adi_frame # smoothed frame
         sn_check_cube[2,:,:] = noise_frame # the noise ring (for full_ring mode); or the noise patches (for necklace mode),  note this is blank if there is no room for necklace
         sn_check_cube[3,:,:] = comp_ampl # the area around the companion (be it fake or possibly real)
-        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + "sn_check_cube_" + os.path.basename(self.adi_frame_file_name),
+        fits.writeto(filename = config["data_dirs"]["DIR_S2N_CUBES"] + \
+                                "sn_check_cube_iter_" + str(int(self.injection_iteration)) + \
+                                "_" + os.path.basename(self.adi_frame_file_name),
                      data = sn_check_cube,
                      overwrite = True)
-        print("detection: "+str(datetime.datetime.now())+": Wrote out S/N check cube as \n" + str(config["data_dirs"]["DIR_S2N_CUBES"]) +
-              "sn_check_cube_" + os.path.basename(self.adi_frame_file_name))
+        print("detection: "+str(datetime.datetime.now())+": Wrote out S/N check cube as \n" + \
+                    str(config["data_dirs"]["DIR_S2N_CUBES"]) + \
+                    "sn_check_cube_iter_" + str(int(self.injection_iteration)) + \
+                    "_" + os.path.basename(self.adi_frame_file_name))
 
 
 def main(inject_iteration=None):

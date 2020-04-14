@@ -81,6 +81,9 @@ while True:
 # median along azimuth
 '''
 # incorporate
+find_abs_mag_altair
+
+# incorporate
 sensitivity.main() # produces 1-D contrast curve from csv info
 
 convert_contrast_limits_to_masses.main()

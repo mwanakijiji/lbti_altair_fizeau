@@ -1,51 +1,14 @@
-#import multiprocessing
-#import configparser
-#import glob
-#import time
-#import pickle
-#import math
-#import datetime
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-#from astropy.io import fits
-#from scipy.interpolate import griddata
-#from mpl_toolkits.axes_grid1 import make_axes_locatable
 from modules import *
-
-############
-PASTED IN
-
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-# This reads in a contrast curve and converts the contrast to masses
-
-# Created 2020 Feb. 13 by E.S.
-
-
-# In[15]:
-
-
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Transform
 from matplotlib.ticker import (
     AutoLocator, AutoMinorLocator, FuncFormatter)
 from scipy import interpolate
 
-get_ipython().run_line_magic('matplotlib', 'qt')
 
-
-# In[2]:
-
-
-# define some basic functions
-
+# MOVE THIS TO INIT
 def asec_to_AU(input_asec):
 
     # convert asec to AU
@@ -63,30 +26,18 @@ def AU_to_asec(input_AU):
 
     return output_asec
 
-
-# In[3]:
-
-
 # absolute magnitude of host star in NB205 filter
-
 ## ## PLACEHOLDER VALUE HERE; CURRENT VALUE FROM NOTEBOOK
 ## ## determine_abs_mag_altair.ipynb; NOT DOUBLE-CHECKED;
 ## ## REPLACE LATER (NOTE ALSO THAT ALTAIR IS A VARIABLE SOURCE!)
-
 abs_mag_altair_nb405 = 1.87
 
-
-# In[4]:
-
-
 # Obtain input data
-
 # pipeline will output a fake companion amplitude which is normalized, linearly, to the host star (amplitude of 1)
-
 # make/read in a contrast curve, where contrast is defined as the flux ratio F_planet/F_star where detection
 # has 5-sigma significance
 ## contrast_df = pd.read_csv("data/fake_contrast_curve.csv")
-contrast_df = pd.read_csv("data/classical_curve_20200316.csv")
+contrast_df = pd.read_csv("./notebooks_for_development/data/classical_curve_20200316.csv")
 
 
 # In[5]:

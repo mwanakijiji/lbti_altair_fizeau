@@ -11,16 +11,17 @@ from modules import (basic_red,
                      psf_pca_bases,
                      injection_ADI,
                      detection,
-                     sensitivity)
+                     sensitivity,
+                     convert_contrast_limits_to_masses)
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
 start_time = time.time()
-
+'''
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
-'''
+
 ## ## FITS HEADER METADATA EXTRACTION
 fits_meta_data = fits_hdr.main()
 
@@ -32,7 +33,7 @@ centering.main()
 
 ## ## PSF PCA BASIS GENERATION
 psf_pca_bases.main()
-'''
+
 ## ## FAKE PLANET INJECTION, ADI, DETECTION
 injection_ADI.main(inject_iteration=0) # finishes by writing out the median ADI frame
 print("altair_pipeline: "+str(datetime.datetime.now())+\
@@ -79,9 +80,8 @@ while True:
 # interpolate amplitudes
 
 # median along azimuth
-'''
-# incorporate
-sensitivity.main() # produces 1-D contrast curve from csv info
 
-convert_contrast_limits_to_masses.main()
+# incorporate
+sensitivity.main(small_angle_correction=True) # produces 1-D contrast curve from csv info
 '''
+convert_contrast_limits_to_masses.main()

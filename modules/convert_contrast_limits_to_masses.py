@@ -1,51 +1,14 @@
-#import multiprocessing
-#import configparser
-#import glob
-#import time
-#import pickle
-#import math
-#import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-#from astropy.io import fits
-#from scipy.interpolate import griddata
-#from mpl_toolkits.axes_grid1 import make_axes_locatable
 from modules import *
-
-############
-PASTED IN
-
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-# This reads in a contrast curve and converts the contrast to masses
-
-# Created 2020 Feb. 13 by E.S.
-
-
-# In[15]:
-
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.transforms import Transform
 from matplotlib.ticker import (
     AutoLocator, AutoMinorLocator, FuncFormatter)
 from scipy import interpolate
 
-get_ipython().run_line_magic('matplotlib', 'qt')
-
-
-# In[2]:
-
-
+## ## THESE SHOULD BE IN INIT
 # define some basic functions
-
 def asec_to_AU(input_asec):
 
     # convert asec to AU
@@ -63,86 +26,63 @@ def AU_to_asec(input_AU):
 
     return output_asec
 
-
-# In[3]:
-
-
 # absolute magnitude of host star in NB205 filter
 
 ## ## PLACEHOLDER VALUE HERE; CURRENT VALUE FROM NOTEBOOK
 ## ## determine_abs_mag_altair.ipynb; NOT DOUBLE-CHECKED;
 ## ## REPLACE LATER (NOTE ALSO THAT ALTAIR IS A VARIABLE SOURCE!)
+def calculate_abs_mag():
 
-abs_mag_altair_nb405 = 1.87
+    abs_mag_altair_nb405 = 1.87
 
+    return abs_mag_altair_nb405
 
-# In[4]:
+def linear_2_mass(df_pass):
+    '''
+    Takes linear contrast and
+    1. converts it to magnitude difference
+    2. finds abs magnitude equivalent to the sensitivity threshold
+    3. converts abs magnitude to masses for a given model
 
+    INPUTS:
+    df_pass: dataframe containing "asec" and "lin_contrast" (after any small
+    angle correction, if applicable)
+    '''
 
-# Obtain input data
+    # convert linear empirical contrast to del_mag
+    contrast_df["del_mag_LMIR"] = -2.5*np.log10(contrast_df["contrast_lim"])
 
-# pipeline will output a fake companion amplitude which is normalized, linearly, to the host star (amplitude of 1)
+    # convert del_mag (between planet and host star) to abs. mag (of planet)
+    contrast_df["abs_mag_LMIR"] = np.add(contrast_df["del_mag_LMIR"],abs_mag_altair_nb405)
 
-# make/read in a contrast curve, where contrast is defined as the flux ratio F_planet/F_star where detection
-# has 5-sigma significance
-## contrast_df = pd.read_csv("data/fake_contrast_curve.csv")
-contrast_df = pd.read_csv("data/classical_curve_20200316.csv")
+    # convert asec to AU
+    dist_altair = 5.130 # pc
+    contrast_df["AU"] = np.multiply(dist_altair,contrast_df["asec"])
 
+    # read in models
 
-# In[5]:
+    # these are from
+    # AMES-Cond: https://phoenix.ens-lyon.fr/Grids/AMES-Cond/ISOCHRONES/model.AMES-Cond-2000.M-0.0.NaCo.Vega
 
+    # Br-alpha filter is model_data["NB4.05"], in Vega magnitudes
 
-# convert linear empirical contrast to del_mag
-contrast_df["del_mag_LMIR"] = -2.5*np.log10(contrast_df["contrast_lim"])
+    model_data = pd.read_csv("data/1gr_data.txt", delim_whitespace=True)
 
-# convert del_mag (between planet and host star) to abs. mag (of planet)
-contrast_df["abs_mag_LMIR"] = np.add(contrast_df["del_mag_LMIR"],abs_mag_altair_nb405)
+    # read in NACO transmission curve for comparison
+    naco_trans = pd.read_csv("data/Paranal_NACO.NB405.dat.txt", names = ["angstrom", "transm"], delim_whitespace=True)
+    lmir_bralpha_trans = pd.read_csv("data/br-alpha_NDC.txt", delim_whitespace=True)
+    lmir_bralpha_trans["Wavelength_angstr"] = np.multiply(10000.,lmir_bralpha_trans["Wavelength"])
 
-# convert asec to AU
-dist_altair = 5.130 # pc
-contrast_df["AU"] = np.multiply(dist_altair,contrast_df["asec"])
-
-
-# In[6]:
-
-
-# read in models
-
-# these are from
-# AMES-Cond: https://phoenix.ens-lyon.fr/Grids/AMES-Cond/ISOCHRONES/model.AMES-Cond-2000.M-0.0.NaCo.Vega
-
-# Br-alpha filter is model_data["NB4.05"], in Vega magnitudes
-
-model_data = pd.read_csv("data/1gr_data.txt", delim_whitespace=True)
-
-
-# In[7]:
-
-
-# read in NACO transmission curve for comparison
-
-naco_trans = pd.read_csv("data/Paranal_NACO.NB405.dat.txt", names = ["angstrom", "transm"], delim_whitespace=True)
-lmir_bralpha_trans = pd.read_csv("data/br-alpha_NDC.txt", delim_whitespace=True)
-lmir_bralpha_trans["Wavelength_angstr"] = np.multiply(10000.,lmir_bralpha_trans["Wavelength"])
-
-
-# In[7]:
-
-
-# plot filter curves
-
-plt.clf()
-plt.plot(naco_trans["angstrom"], naco_trans["transm"], label = "NACO NB4.05")
-plt.plot(lmir_bralpha_trans["Wavelength_angstr"], lmir_bralpha_trans["Trans_77"],
+    # plot filter curves
+    plt.clf()
+    plt.plot(naco_trans["angstrom"], naco_trans["transm"], label = "NACO NB4.05")
+    plt.plot(lmir_bralpha_trans["Wavelength_angstr"], lmir_bralpha_trans["Trans_77"],
          label = "LMIR Br-"+r"$\alpha$ (T = 77 K)")
-plt.xlim([39750,41550])
-plt.xlabel("Wavelength ("+r"$\AA$"+")")
-plt.ylabel("Transmission")
-plt.legend()
-plt.show()
-
-
-# In[17]:
+    plt.xlim([39750,41550])
+    plt.xlabel("Wavelength ("+r"$\AA$"+")")
+    plt.ylabel("Transmission")
+    plt.legend()
+    plt.show()
 
 
 model_data
@@ -242,63 +182,6 @@ contrast_df.keys()
 # In[ ]:
 
 
-# sources of error:
-# 1. uncertainty of distance from parallax
-# 2. wavelength dependency of atmospheric transmission -> absolute magnitude of planet
-# 3. small differences in filter bandpass between LMIR, NB4.05
-
-
-
-END PASTED IN
-##############
-
-def blahblah():
-    '''
-    Make a circular mask somewhere in the input image
-    returns 1=good, nan=bad/masked
-
-    INPUTS:
-    input_array: the array to mask
-    mask_center: the center of the mask, in (y,x) input_array coords
-    mask_radius: radius of the mask, in pixels
-    invert: if False, area INSIDE mask region is masked; if True, area OUTSIDE
-
-    OUTPUTS:
-    mask_array: boolean array (1 and nan) of the same size as the input image
-    '''
-
-    return
-
-
-class OneDimContrastCurve:
-    '''
-    Produces a 1D contrast curve (for regime of large radii)
-    '''
-
-    def __init__(self,
-                 config_data = config):
-        '''
-        INPUTS:
-        config_data: configuration data, as usual
-        '''
-
-        self.config_data = config_data
-
-
-        ##########
-
-
-    def __call__(self,
-                 csv_file):
-        '''
-        Read in the csv with detection information and make a 1D contrast curve
-
-        INPUTS:
-
-        csv_file: absolute name of the file which contains the detection information for all fake planet parameters
-        '''
-
-        # CODE HERE
 
 
 
@@ -312,13 +195,16 @@ def main():
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("/modules/config.ini")
 
-    # make a 1D contrast curve (PLACEHOLDER)
-    one_d_contrast = OneDimContrastCurve(csv_file = config["data_dirs"]["DIR_S2N"] + \
-        config["file_names"]["DETECTION_CSV"])
-    one_d_contrast()
+    # get abs magnitude of Altair
+    calculate_abs_mag()
 
-    '''
-    # make a 2D sensitivity map
-    two_d_sensitivity = TwoDimSensitivityMap(csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"])
-    two_d_sensitivity()
-    '''
+    # make/read in a contrast curve, where contrast is defined as the flux ratio
+    # F_planet/F_star where detection has 5-sigma significance
+    contrast_df = pd.read_csv("data/classical_curve_20200316.csv")
+
+    print(contrast_df)
+
+    # sources of error:
+    # 1. uncertainty of distance from parallax
+    # 2. wavelength dependency of atmospheric transmission -> absolute magnitude of planet
+    # 3. small differences in filter bandpass between LMIR, NB4.05

@@ -73,11 +73,14 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     # AMES-Cond: https://phoenix.ens-lyon.fr/Grids/AMES-Cond/ISOCHRONES/model.AMES-Cond-2000.M-0.0.NaCo.Vega
     # Br-alpha filter is model_data["NB4.05"], in Vega magnitudes
 
-    model_data = pd.read_csv("./notebooks_for_development/data/1gr_data.txt", delim_whitespace=True)
-    print(model_data)
+    model_data = pd.read_csv("./notebooks_for_development/data/1gr_data.txt",
+        delim_whitespace=True)
+    #print(model_data)
     # read in NACO transmission curve for comparison
-    naco_trans = pd.read_csv("./notebooks_for_development/data/Paranal_NACO.NB405.dat.txt", names = ["angstrom", "transm"], delim_whitespace=True)
-    lmir_bralpha_trans = pd.read_csv("./notebooks_for_development/data/br-alpha_NDC.txt", delim_whitespace=True)
+    naco_trans = pd.read_csv("./notebooks_for_development/data/Paranal_NACO.NB405.dat.txt",
+        names = ["angstrom", "transm"], delim_whitespace=True)
+    lmir_bralpha_trans = pd.read_csv("./notebooks_for_development/data/br-alpha_NDC.txt",
+        delim_whitespace=True)
     lmir_bralpha_trans["Wavelength_angstr"] = np.multiply(10000.,lmir_bralpha_trans["Wavelength"])
 
     # plot filter curves
@@ -90,37 +93,34 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     plt.xlabel("Wavelength ("+r"$\AA$"+")")
     plt.ylabel("Transmission")
     plt.legend()
-    plt.show()
+    plt.savefig("junk.pdf")
     '''
-
 
     # ### Interpolate the models to map absolute mag to mass
     # make function to interpolate models
-    f_abs_mag_2_mass = interpolate.interp1d(model_data["NB4.05"],model_data["M/Ms"])
+    f_abs_mag_2_mass = interpolate.interp1d(model_data["NB4.05"],model_data["M/Ms"],kind="linear")
     # ... and its inverse
-    f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"])
-    print(model_data)
+    f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"],kind="linear")
+
+    # return masses (M/M_solar) corresponding to our contrast curve
+    df_new["masses_LMIR"] = f_abs_mag_2_mass(df_new["del_mag_widthFWHM"])
+
+    print(df_new["masses_LMIR"])
 
     # plot model data and interpolation
     plt.clf()
     plt.plot(model_data["NB4.05"], model_data["M/Ms"], color="blue", label="model points", marker="o")
     plt.scatter(df_new["abs_mag_LMIR"], df_new["masses_LMIR"], color="orange",
             label="contrast curve interpolation")
+    plt.xlim([0,20])
     plt.xlabel("abs_mag LMIR")
     plt.ylabel("M/M_solar")
     plt.legend()
-    plt.show()
-
-
-    # return masses (M/M_solar) corresponding to our contrast curve
-
-    contrast_df["masses_LMIR"] = f_abs_mag_2_mass(contrast_df["del_mag_widthFWHM"])
-
+    plt.savefig("junk.pdf")
 
     # return more masses corresponding to interpolations at intervals
-
     mass_intervals = [0.5,0.6,0.7,0.8,0.9,1.0]
-    annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","1.0 Ms","1.0 Ms"]
+    annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","0.9 Ms","1.0 Ms"]
     abs_mag_intervals = f_mass_2_abs_mag(mass_intervals)
 
     # ### Make plot
@@ -131,6 +131,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
     #f = lambda q: q
     #finv = lambda x: np.log10(2+x)+np.cos(x)
+    '''
     fig, ax = plt.subplots()
     fig.suptitle("Contrast curve\n(based on M_altair = 1.8; NOT QUADRUPLE-CHECKED")
     ax2 = ax.twinx()
@@ -157,6 +158,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         ax2.set_ylabel('Masses (M/Ms)')
         plt.gca().invert_yaxis()
         plt.show()
+    '''
 
 
 def main():

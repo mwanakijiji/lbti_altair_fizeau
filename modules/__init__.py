@@ -58,6 +58,10 @@ fwhm_4um_lbt_airy_pix = 1.028*lambda_over_D_pix # fwhm of a 4 um Airy PSF with t
 #del_amplitude_progression = np.array([0.5e-3,1e-4,5e-5,1e-5,5e-6,1e-6,5e-7,1e-7,5e-8,1e-8])
 del_amplitude_progression = np.array([1e-4,5e-5,1e-5,5e-6,1e-6]) # truncated 2020 Apr. 2 and 9
 
+# Altair distance
+dist_altair_pc = 5.13
+err_dist_altair_pc = 0.015
+
 ## FUNCTIONS
 
 '''

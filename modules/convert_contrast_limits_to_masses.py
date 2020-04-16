@@ -63,10 +63,8 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     # convert del_mag (between planet and host star) to abs. mag (of planet)
     df_new["abs_mag_LMIR"] = np.add(df_new["del_mag_LMIR"],star_abs_mag_pass)
 
-    ## ## SHOULD BE IN __INIT__
     # convert asec to AU
-    dist_altair = 5.130 # pc
-    df_new["AU"] = np.multiply(dist_altair,df_new["asec"])
+    df_new["AU"] = np.multiply(dist_altair_pc,df_new["asec"])
 
     # read in models
 
@@ -75,7 +73,6 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
     model_data = pd.read_csv("./notebooks_for_development/data/1gr_data.txt",
         delim_whitespace=True)
-    #print(model_data)
     # read in NACO transmission curve for comparison
     naco_trans = pd.read_csv("./notebooks_for_development/data/Paranal_NACO.NB405.dat.txt",
         names = ["angstrom", "transm"], delim_whitespace=True)
@@ -103,25 +100,37 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"],kind="linear")
 
     # return masses (M/M_solar) corresponding to our contrast curve
-    df_new["masses_LMIR"] = f_abs_mag_2_mass(df_new["del_mag_widthFWHM"])
+    df_new["masses_LMIR"] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"])
 
     print(df_new["masses_LMIR"])
 
-    # plot model data and interpolation
+    # FYI plot of model data and interpolation
+    '''
     plt.clf()
     plt.plot(model_data["NB4.05"], model_data["M/Ms"], color="blue", label="model points", marker="o")
     plt.scatter(df_new["abs_mag_LMIR"], df_new["masses_LMIR"], color="orange",
             label="contrast curve interpolation")
+    #plt.axvline(x=)
     plt.xlim([0,20])
     plt.xlabel("abs_mag LMIR")
     plt.ylabel("M/M_solar")
     plt.legend()
     plt.savefig("junk.pdf")
+    '''
 
     # return more masses corresponding to interpolations at intervals
-    mass_intervals = [0.5,0.6,0.7,0.8,0.9,1.0]
-    annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","0.9 Ms","1.0 Ms"]
-    abs_mag_intervals = f_mass_2_abs_mag(mass_intervals)
+    mass_intervals = pd.DataFrame(
+        [["0.5 Ms",0.5],
+        ["0.6 Ms",0.6],
+        ["0.7 Ms",0.7],
+        ["0.8 Ms",0.8],
+        ["0.9 Ms",0.9],
+        ["1.0 Ms",1.0]],columns=["annotation","M_Ms"])
+    #physical_mass_intervals = [0.5,0.6,0.7,0.8,0.9,1.0]
+    #annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","0.9 Ms","1.0 Ms"]
+    print(mass_intervals["M_Ms"])
+    abs_mag_intervals = f_mass_2_abs_mag(mass_intervals["M_Ms"])
+    print("mass intervals")
 
     # ### Make plot
     # #### left y-axis: abs mag
@@ -131,7 +140,6 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
     #f = lambda q: q
     #finv = lambda x: np.log10(2+x)+np.cos(x)
-    '''
     fig, ax = plt.subplots()
     fig.suptitle("Contrast curve\n(based on M_altair = 1.8; NOT QUADRUPLE-CHECKED")
     ax2 = ax.twinx()
@@ -141,24 +149,24 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     ax.set_ylabel('Abs mag (LMIR)')
     ax.set_xlabel('Angle (asec)')
 
-    ax.plot(contrast_df["asec"], contrast_df["abs_mag_LMIR"])
+    ax.plot(df_new["asec"], df_new["abs_mag_LMIR"])
 
     # secondary x axis on top
     secax_x = ax.secondary_xaxis('top', functions=(asec_to_AU, AU_to_asec))
     secax_x.set_xlabel('Distance (AU)')
 
     # draw horizontal lines corresponding to certain masses
-    for t in range(0,len(mass_intervals)):
+    for t in range(0,len(mass_intervals["M_Ms"])):
         ax.axhline(y=abs_mag_intervals[t], linestyle="--", color="k")
-        ax.annotate(annotate_mass_intervals[t],
+        ax.annotate(mass_intervals["annotation"][t],
                 xy=(0.4,abs_mag_intervals[t]),
                 xytext=(0,0), textcoords="offset points")
 
         ax2.yaxis.set_major_formatter(FuncFormatter(lambda t,pos: f"{f_abs_mag_2_mass(t):.2f}"))
         ax2.set_ylabel('Masses (M/Ms)')
-        plt.gca().invert_yaxis()
-        plt.show()
-    '''
+    plt.gca().invert_yaxis()
+    plt.savefig("junk.pdf")
+
 
 
 def main():

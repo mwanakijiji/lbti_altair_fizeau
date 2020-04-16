@@ -1,6 +1,6 @@
 #PBS -q standard
 ### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
-#PBS -l select=1:ncpus=28:mem=168gb
+#PBS -l select=1:ncpus=14:mem=168gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
@@ -9,9 +9,9 @@
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
-#PBS -l cput=3080:00:00
+#PBS -l cput=2800:00:00
 ### Walltime is how long your job will run
-#PBS -l walltime=110:00:00
+#PBS -l walltime=200:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 

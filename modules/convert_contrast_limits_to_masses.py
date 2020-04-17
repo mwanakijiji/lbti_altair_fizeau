@@ -86,102 +86,142 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     # model_BT-NextGen_M-0_0_NaCo_Vega_1gyr.txt
     # model_NextGen_M-0_0_NaCo_Vega_700myr.txt
     # model_NextGen_M-0_0_NaCo_Vega_1gyr.txt
-    model_data = pd.read_csv("./notebooks_for_development/data/model_NextGen_M-0_0_NaCo_Vega_700myr.txt",
-        delim_whitespace=True)
-    # read in NACO transmission curve for comparison
+
     '''
-    naco_trans = pd.read_csv("./notebooks_for_development/data/Paranal_NACO.NB405.dat.txt",
-        names = ["angstrom", "transm"], delim_whitespace=True)
-    lmir_bralpha_trans = pd.read_csv("./notebooks_for_development/data/br-alpha_NDC.txt",
-        delim_whitespace=True)
-    lmir_bralpha_trans["Wavelength_angstr"] = np.multiply(10000.,lmir_bralpha_trans["Wavelength"])
+    model_file_names_df = pd.DataFrame(
+        [["AMES-Cond, 0.7 Gyr","model_AMES-Cond-2000_M-0_0_NaCo_Vega_700myr.txt"],
+        ["AMES-Cond, 1.0 Gyr","model_AMES-Cond-2000_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["AMES-Dusty, 0.7 Gyr","model_AMES-dusty_M-0_0_NaCo_Vega_700myr.txt"],
+        ["AMES-Dusty, 1.0 Gyr","model_AMES-dusty_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-Cond, 0.7 Gyr","model_BT-Cond_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-Cond, 1.0 Gyr","model_BT-Cond_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-Settl, 0.7 Gyr","model_BT-Settl_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-Settl, 1.0 Gyr","model_BT-Settl_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-Dusty, 0.7 Gyr","model_BT-Dusty_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-Dusty, 1.0 Gyr","model_BT-Dusty_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-NextGen, 0.7 Gyr","model_BT-NextGen_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-NextGen, 1.0 Gyr","model_BT-NextGen_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["NextGen, 0.7 Gyr","model_NextGen_M-0_0_NaCo_Vega_700myr.txt"],
+        ["NextGen, 1.0 Gyr","model_NextGen_M-0_0_NaCo_Vega_1gyr.txt"]],columns=["annotation","file_name"])
     '''
 
-    # plot filter curves
-    '''
-    plt.clf()
-    plt.plot(naco_trans["angstrom"], naco_trans["transm"], label = "NACO NB4.05")
-    plt.plot(lmir_bralpha_trans["Wavelength_angstr"], lmir_bralpha_trans["Trans_77"],
+    model_file_names_df = pd.DataFrame(
+        [["AMES-Cond, 0.7 Gyr","ames_cond_700myr","model_AMES-Cond-2000_M-0_0_NaCo_Vega_700myr.txt"],
+        ["AMES-Cond, 1.0 Gyr","ames_cond_1gyr","model_AMES-Cond-2000_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-Cond, 0.7 Gyr","bt_cond_700myr","model_BT-Cond_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-Cond, 1.0 Gyr","bt_cond_1gyr","model_BT-Cond_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-Settl, 0.7 Gyr","bt_settl_700myr","model_BT-Settl_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-Settl, 1.0 Gyr","bt_settl_1gyr","model_BT-Settl_M-0_0_NaCo_Vega_1gyr.txt"],
+        ["BT-Dusty, 0.7 Gyr","bt_dusty_700myr","model_BT-Dusty_M-0_0_NaCo_Vega_700myr.txt"],
+        ["BT-Dusty, 1.0 Gyr","bt_dusty_1gyr","model_BT-Dusty_M-0_0_NaCo_Vega_1gyr.txt"]],
+        columns=["annotation","string_ref","file_name"])
+
+    for model_num in range(0,len(model_file_names_df)):
+
+        model_data = pd.read_csv("./notebooks_for_development/data/"+model_file_names_df["file_name"][model_num],
+            delim_whitespace=True)
+        print(model_file_names_df["file_name"][model_num])
+        # read in NACO transmission curve for comparison
+        '''
+        naco_trans = pd.read_csv("./notebooks_for_development/data/Paranal_NACO.NB405.dat.txt",
+            names = ["angstrom", "transm"], delim_whitespace=True)
+        lmir_bralpha_trans = pd.read_csv("./notebooks_for_development/data/br-alpha_NDC.txt",
+            delim_whitespace=True)
+        lmir_bralpha_trans["Wavelength_angstr"] = np.multiply(10000.,lmir_bralpha_trans["Wavelength"])
+        '''
+
+        # plot filter curves
+        '''
+        plt.clf()
+        plt.plot(naco_trans["angstrom"], naco_trans["transm"], label = "NACO NB4.05")
+        plt.plot(lmir_bralpha_trans["Wavelength_angstr"], lmir_bralpha_trans["Trans_77"],
          label = "LMIR Br-"+r"$\alpha$ (T = 77 K)")
-    plt.xlim([39750,41550])
-    plt.xlabel("Wavelength ("+r"$\AA$"+")")
-    plt.ylabel("Transmission")
-    plt.legend()
-    plt.savefig("junk.pdf")
-    '''
+        plt.xlim([39750,41550])
+        plt.xlabel("Wavelength ("+r"$\AA$"+")")
+        plt.ylabel("Transmission")
+        plt.legend()
+        plt.savefig("junk.pdf")
+        '''
 
-    # ### Interpolate the models to map absolute mag to mass
-    # make function to interpolate models
-    f_abs_mag_2_mass = interpolate.interp1d(model_data["NB4.05"],model_data["M/Ms"],kind="linear")
-    # ... and its inverse
-    f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"],kind="linear")
+        # ### Interpolate the models to map absolute mag to mass
+        # make function to interpolate models
+        f_abs_mag_2_mass = interpolate.interp1d(model_data["NB4.05"],model_data["M/Ms"],kind="linear")
+        # ... and its inverse
+        f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"],kind="linear")
 
-    # return masses (M/M_solar) corresponding to our contrast curve
-    df_new["masses_LMIR"] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"])
-    print("masses")
-    print(df_new["masses_LMIR"])
+        # return masses (M/M_solar) corresponding to our contrast curve
+        key_masses_this_model = model_file_names_df["string_ref"][model_num]
+        df_new[key_masses_this_model] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"]) ####
+        print("masses")
+        print(df_new[key_masses_this_model])
 
-    # FYI plot of model data and interpolation
-    '''
-    plt.clf()
-    plt.plot(model_data["NB4.05"], model_data["M/Ms"], color="blue", label="model points", marker="o")
-    plt.scatter(df_new["abs_mag_LMIR"], df_new["masses_LMIR"], color="orange",
+        # FYI plot of model data and interpolation
+        '''
+        plt.clf()
+        plt.plot(model_data["NB4.05"], model_data["M/Ms"], color="blue", label="model points", marker="o")
+        plt.scatter(df_new["abs_mag_LMIR"], df_new["masses_LMIR"], color="orange",
             label="contrast curve interpolation")
-    #plt.axvline(x=)
-    plt.xlim([0,20])
-    plt.xlabel("abs_mag LMIR")
-    plt.ylabel("M/M_solar")
-    plt.legend()
-    plt.savefig("junk.pdf")
-    '''
+        #plt.axvline(x=)
+        plt.xlim([0,20])
+        plt.xlabel("abs_mag LMIR")
+        plt.ylabel("M/M_solar")
+        plt.legend()
+        plt.savefig("junk.pdf")
+        '''
 
-    # return more masses corresponding to interpolations at intervals
-    mass_intervals = pd.DataFrame(
-        [["0.5 Ms",0.5],
-        ["0.6 Ms",0.6],
-        ["0.7 Ms",0.7],
-        ["0.8 Ms",0.8],
-        ["0.9 Ms",0.9],
-        ["1.0 Ms",1.0]],columns=["annotation","M_Ms"])
-    #physical_mass_intervals = [0.5,0.6,0.7,0.8,0.9,1.0]
-    #annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","0.9 Ms","1.0 Ms"]
-    abs_mag_intervals = f_mass_2_abs_mag(mass_intervals["M_Ms"])
-    print("mass intervals")
+        # return more masses corresponding to interpolations at intervals
+        '''
+        mass_intervals = pd.DataFrame(
+            [["0.5 Ms",0.5],
+            ["0.6 Ms",0.6],
+            ["0.7 Ms",0.7],
+            ["0.8 Ms",0.8],
+            ["0.9 Ms",0.9],
+            ["1.0 Ms",1.0]],columns=["annotation","M_Ms"])
+        #physical_mass_intervals = [0.5,0.6,0.7,0.8,0.9,1.0]
+        #annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","0.9 Ms","1.0 Ms"]
+        abs_mag_intervals = f_mass_2_abs_mag(mass_intervals["M_Ms"])
+        print("mass intervals")
+        '''
 
-    # ### Plot the contrast curve
-    # #### left y-axis: abs mag
-    # #### bottom x-axis: asec
-    # #### right y-axis: M/Ms
-    # #### top x-axis: AU
-    fig, ax = plt.subplots()
-    fig.suptitle("Contrast curve\n(based on M_altair = 1.8; NOT QUADRUPLE-CHECKED")
-    ax2 = ax.twinx()
-    ax.set_xlim([0,2.2]) # 0 to 2.2 asec
-    ax.get_shared_y_axes().join(ax,ax2)
+        # ### Plot the contrast curve
+        # #### left y-axis: abs mag
+        # #### bottom x-axis: asec
+        # #### right y-axis: M/Ms
+        # #### top x-axis: AU
+        if (model_num == 0):
+            plt.clf()
+            fig, ax = plt.subplots()
+            fig.suptitle("Contrast curve\n(based on M_altair = 1.8; NOT QUADRUPLE-CHECKED")
+            #ax2 = ax.twinx()
+            ax.set_xlim([0,2.2]) # 0 to 2.2 asec
+            #ax.get_shared_y_axes().join(ax,ax2)
+            ax.set_ylabel('Mass (M/Ms)')
+            ax.set_xlabel('Angle (asec)')
+            # secondary x axis on top
+            secax_x = ax.secondary_xaxis('top', functions=(asec_to_AU, AU_to_asec))
+            secax_x.set_xlabel('Distance (AU)')
 
-    ax.set_ylabel('Abs mag (LMIR)')
-    ax.set_xlabel('Angle (asec)')
+            # draw horizontal lines corresponding to certain masses
+            '''
+            for t in range(0,len(mass_intervals["M_Ms"])):
+                ax.axhline(y=abs_mag_intervals[t], linestyle="--", color="k")
+                ax.annotate(mass_intervals["annotation"][t],
+                    xy=(0.4,abs_mag_intervals[t]),
+                    xytext=(0,0), textcoords="offset points")
+                ax2.yaxis.set_major_formatter(FuncFormatter(lambda t,pos: f"{f_abs_mag_2_mass(t):.2f}"))
+                ax2.set_ylabel('Masses (M/Ms)')
+            '''
 
-    ax.plot(df_new["asec"], df_new["abs_mag_LMIR"])
+        ax.plot(df_new["asec"], df_new[key_masses_this_model],
+            label=model_file_names_df["annotation"][model_num])
 
-    # secondary x axis on top
-    secax_x = ax.secondary_xaxis('top', functions=(asec_to_AU, AU_to_asec))
-    secax_x.set_xlabel('Distance (AU)')
-
-    # draw horizontal lines corresponding to certain masses
-    for t in range(0,len(mass_intervals["M_Ms"])):
-        ax.axhline(y=abs_mag_intervals[t], linestyle="--", color="k")
-        ax.annotate(mass_intervals["annotation"][t],
-                xy=(0.4,abs_mag_intervals[t]),
-                xytext=(0,0), textcoords="offset points")
-
-        ax2.yaxis.set_major_formatter(FuncFormatter(lambda t,pos: f"{f_abs_mag_2_mass(t):.2f}"))
-        ax2.set_ylabel('Masses (M/Ms)')
-    plt.gca().invert_yaxis()
+    ax.legend()
+    for hline_num in range(5,10):
+        ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
+    #plt.gca().invert_yaxis()
     plt.savefig("junk.pdf")
     plt.close()
-    ## end contrast curve plot
-
 
 
 def main():

@@ -71,14 +71,31 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     # AMES-Cond: https://phoenix.ens-lyon.fr/Grids/AMES-Cond/ISOCHRONES/model.AMES-Cond-2000.M-0.0.NaCo.Vega
     # Br-alpha filter is model_data["NB4.05"], in Vega magnitudes
 
-    model_data = pd.read_csv("./notebooks_for_development/data/1gr_data.txt",
+    # models to select:
+    # model_AMES-Cond-2000_M-0_0_NaCo_Vega_700myr.txt
+    # model_AMES-Cond-2000_M-0_0_NaCo_Vega_1gyr.txt
+    # model_AMES-dusty_M-0_0_NaCo_Vega_700myr.txt
+    # model_AMES-dusty_M-0_0_NaCo_Vega_1gyr.txt
+    # model_BT-Cond_M-0_0_NaCo_Vega_700myr.txt
+    # model_BT-Cond_M-0_0_NaCo_Vega_1gyr.txt
+    # model_BT-Settl_M-0_0_NaCo_Vega_700myr.txt
+    # model_BT-Settl_M-0_0_NaCo_Vega_1gyr.txt
+    # model_BT-Dusty_M-0_0_NaCo_Vega_700myr.txt
+    # model_BT-Dusty_M-0_0_NaCo_Vega_1gyr.txt
+    # model_BT-NextGen_M-0_0_NaCo_Vega_700myr.txt
+    # model_BT-NextGen_M-0_0_NaCo_Vega_1gyr.txt
+    # model_NextGen_M-0_0_NaCo_Vega_700myr.txt
+    # model_NextGen_M-0_0_NaCo_Vega_1gyr.txt
+    model_data = pd.read_csv("./notebooks_for_development/data/model_NextGen_M-0_0_NaCo_Vega_700myr.txt",
         delim_whitespace=True)
     # read in NACO transmission curve for comparison
+    '''
     naco_trans = pd.read_csv("./notebooks_for_development/data/Paranal_NACO.NB405.dat.txt",
         names = ["angstrom", "transm"], delim_whitespace=True)
     lmir_bralpha_trans = pd.read_csv("./notebooks_for_development/data/br-alpha_NDC.txt",
         delim_whitespace=True)
     lmir_bralpha_trans["Wavelength_angstr"] = np.multiply(10000.,lmir_bralpha_trans["Wavelength"])
+    '''
 
     # plot filter curves
     '''
@@ -101,7 +118,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
     # return masses (M/M_solar) corresponding to our contrast curve
     df_new["masses_LMIR"] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"])
-
+    print("masses")
     print(df_new["masses_LMIR"])
 
     # FYI plot of model data and interpolation
@@ -128,18 +145,14 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         ["1.0 Ms",1.0]],columns=["annotation","M_Ms"])
     #physical_mass_intervals = [0.5,0.6,0.7,0.8,0.9,1.0]
     #annotate_mass_intervals = ["0.5 Ms","0.6 Ms","0.7 Ms","0.8 Ms","0.9 Ms","1.0 Ms"]
-    print(mass_intervals["M_Ms"])
     abs_mag_intervals = f_mass_2_abs_mag(mass_intervals["M_Ms"])
     print("mass intervals")
 
-    # ### Make plot
+    # ### Plot the contrast curve
     # #### left y-axis: abs mag
     # #### bottom x-axis: asec
     # #### right y-axis: M/Ms
     # #### top x-axis: AU
-
-    #f = lambda q: q
-    #finv = lambda x: np.log10(2+x)+np.cos(x)
     fig, ax = plt.subplots()
     fig.suptitle("Contrast curve\n(based on M_altair = 1.8; NOT QUADRUPLE-CHECKED")
     ax2 = ax.twinx()
@@ -166,6 +179,8 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         ax2.set_ylabel('Masses (M/Ms)')
     plt.gca().invert_yaxis()
     plt.savefig("junk.pdf")
+    plt.close()
+    ## end contrast curve plot
 
 
 
@@ -187,7 +202,6 @@ def main():
     contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
 
     df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag)
-    print(star_abs_mag)
 
     # sources of error:
     # 1. uncertainty of distance from parallax

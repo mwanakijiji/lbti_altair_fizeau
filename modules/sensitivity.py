@@ -85,6 +85,20 @@ class OneDimContrastCurve:
         INPUTS:
 
         csv_file: absolute name of the file which contains the detection information for all fake planet parameters
+            - it is expected this file will have keys
+            ampl_linear_norm: linear amplitude of the planet (normalized to star)
+            ampl_linear_norm_0: the starting point linear amplitude (does not change)
+            angle_deg: degrees E of N where planet is injected
+            host_ampl: host star amplitude in counts
+            inject_iteration: iteration of the injection (0 is start)
+            last_ampl_step_unsigned: last change in amplitude taken (from vector in __init__; unsigned)
+            last_ampl_step_signed: same as last_ampl_step_signed, but with sign
+            noise: noise as calculated either from ring or necklace of points
+                at planet's radius (but with area around planet itself excluded)
+            signal: max counts in area around injected planet
+            rad_asec: radius from host star of injected planet (asec)
+            rad_pix: same as rad_asec, in pixels
+            s2n: signal/noise
         '''
 
         # read in csv of detection info
@@ -96,63 +110,44 @@ class OneDimContrastCurve:
         # 1. find median value of S/N for each group
         # 2. select lowest value of ampl_linear_norm which provides a minimum X S/N
 
-        # group by radius and ampl_linear_norm
-        info_file_grouped_rad_ampl = info_file.groupby(["rad_asec", "ampl_linear_norm"],
-                                            axis=0,
-                                            as_index=False).median()
+        # from contrast_curve_1d.ipynb
+        # 1. Consider only the rows corresponding to the most recent injection iteration
+        #     for each combination of (radius, azimuth, starting amplitude).
+        # 2. For each radius, find median value of amplitude across all azimuth and
+        #     starting amplitude.
 
-        # for each radius, find ampl_linear_norm with S/N > threshold_s2n
-        ## ## STAND-IN THRESHOLD S/N
-        threshold_s2n = 0.5
+        ### BEGIN PASTED
+        # find unique combinations of (radius, azimuth, starting amplitude)
+        info_file_grouped_rad_ampl_ampl0 = info_file.drop_duplicates(subset=["rad_asec",
+                                                                     "angle_deg",
+                                                                     "ampl_linear_norm_0"])
+        # initialize a dataframe for containing the most recent injections
+        df_recent = pd.DataFrame(columns=list(info_file_grouped_rad_ampl_ampl0.keys()))
 
-        # unique radius values
-        unique_rad_vals = info_file_grouped_rad_ampl["rad_asec"].unique()
-        print(unique_rad_vals)
+        for combo_num in range(0,len(info_file_grouped_rad_ampl_ampl0)):
+            # loop over each combination of (radius, azimuth, starting amplitude)
+            info_file_unique_combo = info_file.where(
+                np.logical_and(
+                    np.logical_and(
+                        info_file["rad_asec"] == info_file_grouped_rad_ampl_ampl0["rad_asec"].iloc[combo_num],
+                        info_file["angle_deg"] == info_file_grouped_rad_ampl_ampl0["angle_deg"].iloc[combo_num]),
+                        info_file["ampl_linear_norm_0"] == info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].iloc[combo_num])
+                        ).dropna(how="all")
 
-        # initialize array for contrast curve
-        contrast_curve = {"rad_asec": np.nan*np.ones(len(unique_rad_vals)),
-                  "ampl_linear_norm": np.nan*np.ones(len(unique_rad_vals))}
-        contrast_curve_pd = pd.DataFrame(contrast_curve)
+            for starting_ampl_num in range(0,len(info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique())):
+                # loop over all starting amplitudes
+                this_ampl = info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique()[starting_ampl_num]
+                info_file_unique_combo_ampl0 = info_file_unique_combo.where(info_file_unique_combo["ampl_linear_norm_0"] ==
+                                                                    this_ampl)
 
-        # loop over unique radius values
-        for t in range(0,len(unique_rad_vals)):
-            # subset of data with the right radius from the host star
-            data_right_rad = info_file_grouped_rad_ampl.where(\
-                                                          info_file_grouped_rad_ampl["rad_asec"] == unique_rad_vals[t]\
-                                                          )
-            # sub-subset of data with at least the minimum S/N
-            data_right_s2n_presort = data_right_rad.where(\
-                                                      data_right_rad["s2n"] >= threshold_s2n\
-                                                      ).dropna()
+                # take the row corresponding to the last injection iteration, for THIS starting amplitude
+                info_file_unique_combo_ampl0_recent = info_file_unique_combo_ampl0.where(info_file_unique_combo_ampl0["inject_iteration"] ==
+                                                                                 np.nanmax(info_file_unique_combo_ampl0["inject_iteration"])).dropna(how="all")
 
-            try:
-                # the row of data with the minimum S/N above the minimum threshold (if it exists)
-                data_right_s2n_postsort = data_right_s2n_presort.where(\
-                                                               data_right_s2n_presort["s2n"] == data_right_s2n_presort["s2n"].min()\
-                                                               ).dropna()
-                '''
-                print(data_right_s2n_postsort)
-                print(data_right_s2n_postsort["rad_asec"].values[0])
-                print(data_right_s2n_postsort["ampl_linear_norm"].values[0])
-                '''
+                # paste this row into the 'new' dataframe
+                df_recent = df_recent.append(info_file_unique_combo_ampl0_recent, sort=True)
 
-                # append companion radius and amplitude values
-                print(data_right_s2n_postsort)
-                contrast_curve_pd.at[t,"rad_asec"] = data_right_s2n_postsort["rad_asec"].values[0]
-                contrast_curve_pd.at[t,"ampl_linear_norm"] = data_right_s2n_postsort["ampl_linear_norm"].values[0]
-
-                '''
-                print("------------")
-                print(data_right_rad)
-                print("-")
-                print(data_right_s2n_presort)
-                print("-")
-                print(data_right_s2n_postsort)
-                '''
-
-            except:
-                print("No data point above min S/N at radius (asec) of " + str(unique_rad_vals[t]))
-
+        ### END PASTED
         # write out to csv
         file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CSV"]
         contrast_curve_pd.to_csv(file_name_cc, sep = ",", columns = ["rad_asec","ampl_linear_norm"])
@@ -359,7 +354,7 @@ class TwoDimSensitivityMap:
 
 
 
-def main():
+def main(small_angle_correction):
     '''
     Detect companions (either fake or in a blind search within science data)
     and calculate S/N.
@@ -376,6 +371,7 @@ def main():
 
     '''
     # make a 2D sensitivity map
-    two_d_sensitivity = TwoDimSensitivityMap(csv_file = config["data_dirs"]["DIR_S2N"] + config["file_names"]["DETECTION_CSV"])
+    two_d_sensitivity = TwoDimSensitivityMap(csv_file = config["data_dirs"]["DIR_S2N"] + \
+        config["file_names"]["DETECTION_CSV"])
     two_d_sensitivity()
     '''

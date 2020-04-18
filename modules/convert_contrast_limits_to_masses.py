@@ -35,6 +35,8 @@ def calculate_abs_mag():
 
     abs_mag_altair_nb405 = 1.87
 
+    # SEE determine_abs_mag_altair.ipynb
+
     return abs_mag_altair_nb405
 
 
@@ -238,7 +240,7 @@ def main():
 
     # make/read in a contrast curve, where contrast is defined as the flux ratio
     # F_planet/F_star where detection has 5-sigma significance
-    # names: "contrast_lin" and "asec"
+    # keys: "contrast_lin" and "asec"
     contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
 
     df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag)

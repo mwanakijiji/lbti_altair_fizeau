@@ -41,7 +41,7 @@ def convert_rad_xy(canvas_array, PS, rho_asec, theta_deg):
 
     return y_absolute, x_absolute
 
-def blahblah():
+def small_angle_correction():
     '''
     Make a circular mask somewhere in the input image
     returns 1=good, nan=bad/masked
@@ -78,84 +78,97 @@ class OneDimContrastCurve:
 
 
     def __call__(self,
-                 csv_file):
+                 csv_files_dir):
         '''
         Read in the csv with detection information and make a 1D contrast curve
 
         INPUTS:
 
-        csv_file: absolute name of the file which contains the detection information for all fake planet parameters
-            - it is expected this file will have keys
-            ampl_linear_norm: linear amplitude of the planet (normalized to star)
-            ampl_linear_norm_0: the starting point linear amplitude (does not change)
-            angle_deg: degrees E of N where planet is injected
-            host_ampl: host star amplitude in counts
-            inject_iteration: iteration of the injection (0 is start)
-            last_ampl_step_unsigned: last change in amplitude taken (from vector in __init__; unsigned)
-            last_ampl_step_signed: same as last_ampl_step_signed, but with sign
-            noise: noise as calculated either from ring or necklace of points
+        csv_files_dir: directory containing csv files in which it is expected
+            to have the keys
+            -ampl_linear_norm: linear amplitude of the planet (normalized to star)
+            -ampl_linear_norm_0: the starting point linear amplitude (does not change)
+            -angle_deg: degrees E of N where planet is injected
+            -host_ampl: host star amplitude in counts
+            -inject_iteration: iteration of the injection (0 is start)
+            -last_ampl_step_unsigned: last change in amplitude taken (from vector in __init__; unsigned)
+            -last_ampl_step_signed: same as last_ampl_step_signed, but with sign
+            -noise: noise as calculated either from ring or necklace of points
                 at planet's radius (but with area around planet itself excluded)
-            signal: max counts in area around injected planet
-            rad_asec: radius from host star of injected planet (asec)
-            rad_pix: same as rad_asec, in pixels
-            s2n: signal/noise
+            -signal: max counts in area around injected planet
+            -rad_asec: radius from host star of injected planet (asec)
+            -rad_pix: same as rad_asec, in pixels
+            -s2n: signal/noise
         '''
 
         # read in csv of detection info
-        info_file = pd.read_csv(csv_file)
+        # check for all csvs in the directory
+        csv_file_names_array = list(glob.glob(str(csv_files_dir + "/*.csv")))
+        print("List of csv files which will be assembled into a contrast curve:")
+        print(csv_file_names_array)
+        for file_num in range(0,len(csv_file_names_array)):
+            # loop over each file and generate the contrast curve data points
+            # (these will all be overlapped as the loop finishes)
+            info_file = pd.read_csv(csv_file_names_array[file_num])
 
-        # For groups of rows defined by
-        #      A.) a common value of rad_asec
-        #      B.) a common value of ampl_linear_norm
-        # 1. find median value of S/N for each group
-        # 2. select lowest value of ampl_linear_norm which provides a minimum X S/N
+            # For groups of rows defined by
+            #      A.) a common value of rad_asec
+            #      B.) a common value of ampl_linear_norm
+            # 1. find median value of S/N for each group
+            # 2. select lowest value of ampl_linear_norm which provides a minimum X S/N
 
-        # from contrast_curve_1d.ipynb
-        # 1. Consider only the rows corresponding to the most recent injection iteration
-        #     for each combination of (radius, azimuth, starting amplitude).
-        # 2. For each radius, find median value of amplitude across all azimuth and
-        #     starting amplitude.
+            # from contrast_curve_1d.ipynb
+            # 1. Consider only the rows corresponding to the most recent injection iteration
+            #     for each combination of (radius, azimuth, starting amplitude).
+            # 2. For each radius, find median value of amplitude across all azimuth and
+            #     starting amplitude.
 
-        ### BEGIN PASTED
-        # find unique combinations of (radius, azimuth, starting amplitude)
-        info_file_grouped_rad_ampl_ampl0 = info_file.drop_duplicates(subset=["rad_asec",
+            ### BEGIN PASTED
+            # find unique combinations of (radius, azimuth, starting amplitude)
+            info_file_grouped_rad_ampl_ampl0 = info_file.drop_duplicates(subset=["rad_asec",
                                                                      "angle_deg",
                                                                      "ampl_linear_norm_0"])
-        # initialize a dataframe for containing the most recent injections
-        df_recent = pd.DataFrame(columns=list(info_file_grouped_rad_ampl_ampl0.keys()))
+            # initialize a dataframe for containing the most recent injections
+            df_recent = pd.DataFrame(columns=list(info_file_grouped_rad_ampl_ampl0.keys()))
 
-        for combo_num in range(0,len(info_file_grouped_rad_ampl_ampl0)):
-            # loop over each combination of (radius, azimuth, starting amplitude)
-            info_file_unique_combo = info_file.where(
-                np.logical_and(
+            for combo_num in range(0,len(info_file_grouped_rad_ampl_ampl0)):
+                # loop over each combination of (radius, azimuth, starting amplitude)
+                info_file_unique_combo = info_file.where(
                     np.logical_and(
-                        info_file["rad_asec"] == info_file_grouped_rad_ampl_ampl0["rad_asec"].iloc[combo_num],
-                        info_file["angle_deg"] == info_file_grouped_rad_ampl_ampl0["angle_deg"].iloc[combo_num]),
-                        info_file["ampl_linear_norm_0"] == info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].iloc[combo_num])
-                        ).dropna(how="all")
+                        np.logical_and(
+                            info_file["rad_asec"] == info_file_grouped_rad_ampl_ampl0["rad_asec"].iloc[combo_num],
+                            info_file["angle_deg"] == info_file_grouped_rad_ampl_ampl0["angle_deg"].iloc[combo_num]),
+                            info_file["ampl_linear_norm_0"] == info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].iloc[combo_num])
+                            ).dropna(how="all")
 
-            for starting_ampl_num in range(0,len(info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique())):
-                # loop over all starting amplitudes
-                this_ampl = info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique()[starting_ampl_num]
-                info_file_unique_combo_ampl0 = info_file_unique_combo.where(info_file_unique_combo["ampl_linear_norm_0"] ==
+                for starting_ampl_num in range(0,len(info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique())):
+                    # loop over all starting amplitudes
+                    this_ampl = info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique()[starting_ampl_num]
+                    info_file_unique_combo_ampl0 = info_file_unique_combo.where(info_file_unique_combo["ampl_linear_norm_0"] ==
                                                                     this_ampl)
 
-                # take the row corresponding to the last injection iteration, for THIS starting amplitude
-                info_file_unique_combo_ampl0_recent = info_file_unique_combo_ampl0.where(info_file_unique_combo_ampl0["inject_iteration"] ==
+                    # take the row corresponding to the last injection iteration, for THIS starting amplitude
+                    info_file_unique_combo_ampl0_recent = info_file_unique_combo_ampl0.where(info_file_unique_combo_ampl0["inject_iteration"] ==
                                                                                  np.nanmax(info_file_unique_combo_ampl0["inject_iteration"])).dropna(how="all")
 
-                # paste this row into the 'new' dataframe
-                df_recent = df_recent.append(info_file_unique_combo_ampl0_recent, sort=True)
+                    # paste this row into the 'new' dataframe
+                    df_recent = df_recent.append(info_file_unique_combo_ampl0_recent, sort=True)
 
         ### END PASTED
+
+        # combine all curves into one
+
+        # apply small angle correction
+        contrast_corrected = small_angle_correction()
+
         # write out to csv
-        file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CSV"]
+        file_name_cc = self.config_data["data_dirs"]["DIR_S2N"] + self.config_data["file_names"]["CONTCURV_CSV"]
         contrast_curve_pd.to_csv(file_name_cc, sep = ",", columns = ["rad_asec","ampl_linear_norm"])
         print("sensitivity: "+str(datetime.datetime.now())+" Wrote out contrast curve CSV to " + file_name_cc)
 
         # make plot
         print(contrast_curve_pd)
-        file_name_cc_plot = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["CONTCURV_PLOT"]
+        file_name_cc_plot = self.config_data["data_dirs"]["DIR_FYI_INFO"] + self.config_data["file_names"]["CONTCURV_PLOT"]
         plt.plot(contrast_curve_pd["rad_asec"],contrast_curve_pd["ampl_linear_norm"])
         plt.xlabel("Radius from host star (asec)")
         plt.ylabel("Min. companion amplitude with S/N > threshhold")
@@ -183,7 +196,7 @@ class TwoDimSensitivityMap:
 
 
     def __call__(self,
-                 csv_file):
+                 csv_files_dir):
         '''
         Read in the csv with detection information and, for each fake planet amplitude, make a 2D signal map and noise map
 
@@ -363,11 +376,12 @@ def main(small_angle_correction):
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("/modules/config.ini")
+    print(config.items("data_dirs"))
 
     # make a 1D contrast curve
-    one_d_contrast = OneDimContrastCurve(csv_file = config["data_dirs"]["DIR_S2N"] + \
-        config["file_names"]["DETECTION_CSV"])
-    one_d_contrast()
+    #one_d_contrast = OneDimContrastCurve(csv_files_dir = config["data_dirs"]["DIR_S2N"]) ## ## this is what needs to be configed
+    one_d_contrast = OneDimContrastCurve()
+    one_d_contrast(csv_files_dir = "./notebooks_for_development/data/placeholder_csvs/") # placeholder directory
 
     '''
     # make a 2D sensitivity map

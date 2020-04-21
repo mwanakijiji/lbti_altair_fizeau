@@ -883,12 +883,12 @@ def main(inject_iteration=None):
         ps_asec_per_pix = np.float(config["instrum_params"]["LMIR_PS"]) # plate scale
         #A = np.arange(2,21) # FWHM numbers from center to edge of frame (FULL THING)
         #A = np.array([2,3,4,5,7,9,12,15,19]) # more sparse design as R increases (FULL THING)
-        A = np.array([5,12]) # (SUBSET)
+        A = np.array([4]) # (SUBSET)
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
 
-        fake_params_pre_permute = {"angle_deg_EofN": [240.],
+        fake_params_pre_permute = {"angle_deg_EofN": [39.68],
                                "rad_asec": list(B),
-                               "ampl_linear_norm": [0.00014]}
+                               "ampl_linear_norm": [0.0003]}
 
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
@@ -1186,7 +1186,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_coarse_20200409.fits"),
+                                                    "mask_406x406_center_strip_lamb_over_B.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A_and_D.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]

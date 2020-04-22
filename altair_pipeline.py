@@ -46,7 +46,7 @@ print("altair_pipeline: "+str(datetime.datetime.now())+\
 print("Total time:")
 elapsed_time_iteration = np.subtract(time.time(),start_time)
 print(np.round(elapsed_time_iteration))
-
+'''
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 1
 while True:
@@ -79,7 +79,7 @@ while True:
 # interpolate amplitudes
 
 # median along azimuth
-'''
+
 # incorporate
 find_abs_mag_altair
 

@@ -42,199 +42,210 @@ def convert_rad_xy(canvas_array, PS, rho_asec, theta_deg):
 
     return y_absolute, x_absolute
 
-class OneDimModernContrastCurve():
+def one_d_modern_contrast():
     '''
     Produces a 1D contrast curve (for regime of lambda/D)
+    corrected for small angles and FPF, TPF constraints
+
+    INPUTS:
+    sbar_and_r_asec_pass: pandas dataframe with
+        ["contrast_lin"]: linear empirical contrast, or the 's-bar' (implied TPF=0.5 but says nothing else)
+        ["rad_asec"]: radius from host star in arcsec
+    TPF_pass: the fixed true positive fraction (default 0.95)
+
+    OUTPUTS:
+    correction_factor: the factor by which to multiply the input 1-sigma contrast curve
+    corrected_curve: the actual corrected '5-sigma' curve, found by using the correction factor
     '''
 
-    def __init__(self,
-                 config_data = config):
+    # read in the empirical 5-sigma linearly-scaled contrast, without correction
+    # the input curve, as is, represents the relative amplitude at which TPF=0.5, and nothing else
+
+
+    ## ## PLACEHOLDER DATA
+    original_contrast_curve = pd.read_csv("./notebooks_for_development/data/fake_contrast_curve.csv")
+    ## ## FOR THE REAL THING, UNCOMMENT THE BELOW
+    #sbar_and_r_asec_pass = original_contrast_curve
+
+    # Set some initial constants
+
+    # Note that radii are all in units of FWHM unless explicity
+    # stated otherwise
+    N_FP_tot = 0.01 # limit on total number of false positives in the entire dataset
+    R_max = 20 # maximum radius of the dataset (in floor rounded number of FWHM)
+    TPF_this_r = 0.95 # minimum TPF
+
+    # Then at each radius we have a constant number of false positives
+    N_FP_r = np.divide(N_FP_tot,R_max)
+    print("N_FP_r:")
+    print(N_FP_r)
+
+    # Example pythonic CDF inversion:
+    '''
+    # generate a t-distribution with 10 DOFs
+    df = 10
+    mean, var, skew, kurt = t.stats(df, moments='mvsk')
+
+    # print the tau/s-bar where the FPF=0.5 (should be zero!)
+    print("PPF where FPF=0.5:")
+    print(t.ppf(0.5, df))
+
+    # print the tau/s-bar where the FPF=0.1 (should be negative!)
+    # and check it with the cdf
+    print("PPF where FPF=0.1:")
+    tau_0pt1 = t.ppf(0.1, df)
+    print(tau_0pt1)
+    print("Check with CDF (should be 0.1):")
+    print(t.cdf(tau_0pt1, df))
+    '''
+
+    # make a copy of the input dataframe which we will update
+    df_corrxn = original_contrast_curve.copy(deep=True)
+    # companion amplitude that fits all criteria; i.e., THE CONTRAST CURVE
+    df_corrxn["mu_c_r"] = np.nan
+    # multiplicative correction factor to 'classical' curve
+    df_corrxn["corrxn_factor"] = np.nan
+    # max value of FPF (for calculating tau)
+    df_corrxn["FPF_r_max"] = np.nan
+    # min value of TPF, no radial dependency (for calculating tau)
+    df_corrxn["TPF_r_min"] = np.nan
+    # some info in the style of Table 1 in Mawet+ 2014 ApJ 792
+    df_corrxn["mu_c_minus_tau"] = np.nan
+    df_corrxn["tau_calc"] = np.nan
+    df_corrxn["tau_5_sigma"] = np.nan
+    df_corrxn["tau_3_sigma"] = np.nan
+
+    # find the radii in units of decimal lambda/D FWHM
+    # (note FWHM=1.028*lambda/D
+    #           =(1.028)*(9.463pix)
+    #           =0.10409 asec
+    #
+    df_corrxn["rad_fwhm"] = np.divide(np.divide(df_corrxn["rad_asec"],0.0107),9.728)
+    #print(df_corrxn)
+
+    # for each radius, generate a noise parent population and calculate tau
+    for rad_num in range(0,len(df_corrxn["rad_fwhm"])):
+
+        # generate a t-distribution at that radius with DOF_r=rad_fwhm_r-2 because the
+        # point where the fake planet is located is removed, and 1 is subtracted from
+        # those which remain
+
+        # number of whole-number FWHM that can fit in an annulus at that radius
+        # (it needs to be the whole-number floor because of how the Altair
+        # pipeline samples the noise)
+        N_FWHM_fit = math.floor(np.multiply(2*np.pi,df_corrxn["rad_fwhm"][rad_num]))
+        # maximum FPF at that radius
+        FPF_this_r = np.divide(N_FP_r,N_FWHM_fit)
+        # sample size of noise 'necklace beads'
+        n_2 = N_FWHM_fit-1
+        # degrees of freedom
+        dof = N_FWHM_fit-2
+        print("dof:")
+        print(dof)
+
+        # generate a t-distribution for that radius
+        mean, var, skew, kurt = t.stats(dof, moments='mvsk')
+
+        # calculate the first and second Cst^-1 terms in the square brackets
+        ppf_1st = t.ppf(1-FPF_this_r, dof)
+        ppf_2nd = t.ppf(TPF_this_r, dof)
+
+        # tau
+        #tau_calc = (ppf_1st+ppf_2nd) # this is what we want
+        tau_calc = ppf_1st # FOR DEBUGGING
+        # s2: the empirical noise
+        s_2 = np.divide(df_corrxn["contrast_lin"].iloc[rad_num],5.)
+        # find the correction factor ('alpha')
+        corrxn_factor = s_2*np.sqrt(1+(1./n_2))
+        # find the mu_c_r_5sig (the CONTRAST)
+        mu_c_r = tau_calc*s_2*np.sqrt(1+(1./n_2))
+        print("tau:")
+        print(tau_calc)
+        print("corrxn_factor:")
+        print(corrxn_factor)
+
+        # recalculate the TPF and FPF with the final value of tau
+        # we use the symmetry of the t-distribution to find
+        # FPF = int_tau^inf P(t) dt
+        # by using the CDF of the t-distribution, with the integration limits flipped:
+        # FPF = int_tau^inf P(t) dt = CDF_t(-tau)
+        TPF_final = t.cdf(tau_calc, dof)
+        FPF_final = 1.-t.cdf(tau_calc, dof)
+        print("TPF_final:")
+        print(TPF_final)
+        print("FPF_final:")
+        print(FPF_final)
+
+        # update dataframe with new stuff
+        df_corrxn.at[rad_num,"mu_c_r"] = mu_c_r
+        df_corrxn.at[rad_num,"tau_calc"] = tau_calc
+        df_corrxn.at[rad_num,"corrxn_factor"] = corrxn_factor
+        df_corrxn.at[rad_num,"FPF_r_max"] = FPF_this_r
+        df_corrxn.at[rad_num,"TPF_r_min"] = TPF_this_r # should be fixed
+        df_corrxn.at[rad_num,"FPF_r_final"] = FPF_final
+        df_corrxn.at[rad_num,"TPF_final"] = TPF_final
+
+        # and multiply everything with 5*s-bar to get a corrected '5-sigma' curve
+        # (note the input contrast_lin is being divided by 5 since the input is '5-sigma')
+        #print(df_corrxn.keys())
         '''
-        INPUTS:
-        config_data: configuration data, as usual
+        mu_c_r_5sig = 5.*np.multiply(n,corrxn_factor)
+        df_corrxn.at[rad_num,"mu_c_r_5sig"] = mu_c_r_5sig
+        df_corrxn.at[rad_num,"corrxn_factor"] = corrxn_factor
+        df_corrxn.at[rad_num,"FPF_r"] = FPF_this_r
+        #df_corrxn["mu_c_r_5sig"][rad_num] = mu_c_r_5sig
+        #df_corrxn["corrxn_factor"][rad_num] = corrxn_factor
         '''
 
-        self.config_data = config_data
+    # just to make things clearer
+    df_corrxn = df_corrxn.rename(columns={"contrast_lin": "original_contrast_lin"})
 
+    # test with some plots
+    # (note the input contrast curve has to be divided by 5 first)
+    '''
+    test_df = mu_c_5sig(sbar_and_r_asec_pass=original_contrast_curve,
+                        TPF_pass=0.95)
+    '''
 
-        ##########
+    print("df_corrxn:")
+    print(df_corrxn)
+    print("----------")
+    print("THIS JUST USES FPF (AND NOT TPF) SO AS TO CROSS-CHECK WITH MAWET!!!")
 
+    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(12,18))
 
-    def __call__(self):
-        '''
-        Read in the csv with detection information and make a 1D contrast curve
+    plt.grid(True, which="both")
+    ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["original_contrast_lin"],'r-', lw=5, alpha=0.6, label="Original contrast curve")
+    ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["mu_c_r"],'b-', lw=5, alpha=0.6, label="Corrected contrast curve")
+    ax[0].set_xlabel("Radius (FWHM)")
+    ax[0].set_ylabel("Contrast curves")
+    ax[0].set_xlim([0,15])
+    ax[0].set_yscale("log")
+    ax[0].legend()
 
-        INPUTS:
+    ax[1].plot(df_corrxn["rad_fwhm"], df_corrxn["corrxn_factor"],'g-', lw=5, alpha=0.6, label="Correction factor")
+    ax[1].set_ylabel("Correction factor")
+    ax[1].set_xlabel("Radius (FWHM)")
+    ax[1].set_xlim([0,15])
+    ax[1].set_yscale("log")
+    ax[1].legend()
 
-        csv_files_dir: directory contain
-        '''
+    ax[2].plot(df_corrxn["rad_fwhm"], df_corrxn["TPF_final"],'b-', lw=5, alpha=0.6, label="TPF_final")
+    ax[2].plot(df_corrxn["rad_fwhm"], np.subtract(1.,df_corrxn["FPF_r_final"]),'r-', lw=5, alpha=0.6, label="1-FPF_final")
+    ax[2].set_ylabel("Final TPF or (1-FPF)")
+    ax[2].set_xlabel("Radius (FWHM)")
+    ax[2].set_xlim([0,15])
+    ax[2].set_yscale("log")
+    ax[2].legend()
 
-        # read in the empirical 5-sigma linearly-scaled contrast, without correction
-        # the input curve, as is, represents the relative amplitude at which TPF=0.5, and nothing else
+    ax[3].plot(df_corrxn["rad_fwhm"], df_corrxn["FPF_r_final"],'b-', lw=5, alpha=0.6, label="FPF_final")
+    ax[3].set_ylabel("Final FPF")
+    ax[3].set_xlabel("Radius (FWHM)")
+    ax[3].set_xlim([0,15])
+    ax[3].set_yscale("log")
+    ax[3].legend()
 
-        ## ## PLACEHOLDER DATA
-        original_contrast_curve = pd.read_csv("data/fake_contrast_curve.csv")
-
-        # Set some initial constants
-
-        # Note that radii are all in units of FWHM unless explicity
-        # stated otherwise
-        N_FP_tot = 0.01
-        R_max = 20
-
-        # Then at each radius we have a constant number of false positives
-        N_FP_r = np.divide(N_FP_tot,R_max)
-        print("N_FP_r:")
-        print(N_FP_r)
-
-        # And thus the FPF is a function of radius:
-        # $FPF(r)=\frac{N_{FP,r}}{2\pi r}$
-        def FPF_r(N_FP_r_pass,N_fwhm_pass):
-            '''
-            INPUTS:
-            N_FP_r_pass: number of false positives at each radius
-            #r_fwhm: radius in units of FWHM
-            N_fwhm_pass: number of FWHM that can fit in an annulus at that radius
-
-            RETURNS:
-            FPF at that radius
-            '''
-            return np.divide(N_FP_r_pass,N_fwhm_pass)
-
-        # Under the hypothesis H0, the FPF(r) is
-        # $FPF(r)=\int_{\tau}^{\infty}p_{t}(x,n_{2}-1)dx |_{r}$
-
-        # This means that tau is where the CDF is 1-FPF:
-        # $CDF(\tau)=1-FPF(r)$ (DOFs implied)
-
-        # To find tau, invert the CDF:
-        ### ## WHY IS THIS TAU/SBAR, AND NOT JUST TAU?
-        # $\frac{\tau(r)}{\bar{s}(r)}=C_{st}^{-1}(1-FPF(r)|n-1)$
-
-        # Example CDF inversion:
-        '''
-        # generate a t-distribution with 10 DOFs
-        df = 10
-        mean, var, skew, kurt = t.stats(df, moments='mvsk')
-
-        # print the tau/s-bar where the FPF=0.5 (should be zero!)
-        print("PPF where FPF=0.5:")
-        print(t.ppf(0.5, df))
-
-        # print the tau/s-bar where the FPF=0.1 (should be negative!)
-        # and check it with the cdf
-        print("PPF where FPF=0.1:")
-        tau_0pt1 = t.ppf(0.1, df)
-        print(tau_0pt1)
-        print("Check with CDF (should be 0.1):")
-        print(t.cdf(tau_0pt1, df))
-        '''
-        # Now, under the hypothesis H1, consider a fixed TPF.
-        # $TPF(r) = \int_{\mu_{c}-\tau}^{\infty}p_{t}(x,n_{2}-1)dx |_{r}$
-
-        # Inverting, rearranging, and substituting in the expression for the inverted CDF, we have
-        # $\frac{\mu_{c}(r)}{\bar{s}(r)} = C_{st}^{-1}(1-FPF(r)|n-1) + C_{st}^{-1}(TPF|n-1)$
-
-        # The fake injected planets are of amplitude N*sbar,
-        # so just divide those amplitudes by N (which is probably 5).
-
-        # The contrast level 'corrected' for small angles is then
-        # $\mu_{c}(r) = \bar{s}(r)\left[C_{st}^{-1}(1-FPF(r)|n-1) + C_{st}^{-1}(TPF|n-1)\right]$
-
-        # Make a function out of this (notation mu_c_5sig from Mawet+ 2014)
-        def mu_c_5sig(sbar_and_r_asec_pass,TPF_pass=0.95):
-            '''
-            INPUTS:
-            sbar_and_r_asec_pass: pandas dataframe with
-                ["contrast_lin"]: linear empirical contrast, or the 's-bar' (implied TPF=0.5 but says nothing else)
-                ["rad_asec"]: radius from host star in arcsec
-            TPF_pass: the fixed true positive fraction (default 0.95)
-
-            OUTPUTS:
-            correction_factor: the factor by which to multiply the input 1-sigma contrast curve
-            corrected_curve: the actual corrected '5-sigma' curve, found by using the correction factor
-            '''
-
-            # initialize a dataframe
-            df_corrxn = sbar_and_r_asec_pass.copy(deep=True)
-            df_corrxn["mu_c_r_5sig"] = np.nan
-            df_corrxn["corrxn_factor"] = np.nan
-            df_corrxn["FPF_r"] = np.nan
-            # some info in the style of Table 1 in Mawet+ 2014 ApJ 792
-            df_corrxn["mu_c_minus_tau"] = np.nan
-            df_corrxn["tau_5_sigma"] = np.nan
-            df_corrxn["tau_3_sigma"] = np.nan
-
-            # find the radii in units of lambda/D FWHM
-            # (note FWHM=1.028*lambda/D=(1.028)*(9.463pix)=9.728 pix)
-            df_corrxn["rad_fwhm"] = np.divide(np.divide(df_corrxn["rad_asec"],0.0107),9.728)
-            print(df_corrxn)
-
-            # for each radius, regenerate a noise parent population
-            for rad_num in range(0,len(df_corrxn["rad_fwhm"])):
-
-                # generate a t-distribution at that radius with DOF_r=rad_fwhm_r-2 because the
-                # point where the fake planet is located is removed, and 1 is subtracted from
-                # those which remain
-
-                # number of whole-number FWHM that can fit in an annulus at that radius
-                # (it needs to be the whole-number floor because of how the Altair
-                # pipeline samples the noise)
-                N_FWHM_fit = math.floor(np.multiply(2*np.pi,df_corrxn["rad_fwhm"][rad_num]))
-                dof = N_FWHM_fit-2 # degrees of freedom
-
-                # generate a t-distribution for that radius
-                mean, var, skew, kurt = t.stats(dof, moments='mvsk')
-
-                # calculate the FPF at that radius
-                FPF_this_r = FPF_r(N_FP_r_pass=N_FP_r,
-                                   N_fwhm_pass=N_FWHM_fit)
-
-                # calculate the first and second Cst^-1 terms in the square brackets
-                ppf_1st = t.ppf(1-FPF_this_r, dof)
-                ppf_2nd = t.ppf(TPF_pass, dof)
-
-                # find the correction factor
-                corrxn_factor = (ppf_1st+ppf_2nd)
-
-                # and multiply everything with 5*s-bar to get a corrected '5-sigma' curve
-                # (note the input contrast_lin is being divided by 5 since the input is '5-sigma')
-                print(df_corrxn.keys())
-                mu_c_r_5sig = 5.*np.multiply(np.divide(df_corrxn["contrast_lin"].iloc[rad_num],5.),corrxn_factor)
-                df_corrxn.at[rad_num,"mu_c_r_5sig"] = mu_c_r_5sig
-                df_corrxn.at[rad_num,"corrxn_factor"] = corrxn_factor
-                df_corrxn.at[rad_num,"FPF_r"] = FPF_this_r
-                #df_corrxn["mu_c_r_5sig"][rad_num] = mu_c_r_5sig
-                #df_corrxn["corrxn_factor"][rad_num] = corrxn_factor
-
-            # just to make things clearer
-            df_corrxn = df_corrxn.rename(columns={"contrast_lin": "original_contrast_lim"})
-
-            # return the completed dataframe
-            return df_corrxn
-
-
-        # test with some plots
-        # (note the input contrast curve has to be divided by 5 first)
-        test_df = mu_c_5sig(sbar_and_r_asec_pass=original_contrast_curve,
-                            TPF_pass=0.95)
-
-        print("test_df:")
-        print(test_df)
-
-        fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12,12))
-
-        ax[0].plot(test_df["rad_asec"], test_df["original_contrast_lim"],'r-', lw=5, alpha=0.6, label="Original contrast curve")
-        ax[0].plot(test_df["rad_asec"], test_df["mu_c_r_5sig"],'b-', lw=5, alpha=0.6, label="Corrected contrast curve")
-        ax[1].set_ylabel("Contrast curves")
-        ax[0].legend()
-
-        ax[1].plot(test_df["rad_asec"], test_df["corrxn_factor"],'g-', lw=5, alpha=0.6, label="Correction factor")
-        ax[1].set_ylabel("Correction factor")
-        ax[1].set_xlabel("Radius (asec)")
-        ax[1].legend()
-
-        fig.savefig("junk.pdf")
+    fig.savefig("junk.pdf")
 
 
 class OneDimClassicalContrastCurve:
@@ -553,16 +564,21 @@ def main(small_angle_correction):
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("/modules/config.ini")
+    config.read("./modules/config.ini")
     print(config.items("data_dirs"))
 
     # make a 1D contrast curve (implied TPF=0.5) from assemblage of pipeline csv outputs
     # (N.b. this does NOT calculate small angle corrections, FPFs, etc.; it
     # only consolidates the converged S/N=5 fake planet amplitudes)
+    '''
     one_d_classical_contrast = OneDimContrastCurve()
     one_d_classical_contrast(csv_files_dir = "./notebooks_for_development/data/placeholder_csvs/") # placeholder directory
+    '''
 
-    one_d_modern_contrast
+    # now make FPF, TPF, small-angle corrections to make a more modern curve
+    #one_d_modern_contrast = OneDimModernContrastCurve()
+    one_d_modern_contrast()
+
     '''
     # make a 2D sensitivity map
     two_d_sensitivity = TwoDimSensitivityMap(csv_file = config["data_dirs"]["DIR_S2N"] + \

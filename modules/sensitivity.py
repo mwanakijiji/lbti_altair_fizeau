@@ -73,7 +73,7 @@ def one_d_modern_contrast():
     # stated otherwise
     N_FP_tot = 0.01 # limit on total number of false positives in the entire dataset
     R_max = 20 # maximum radius of the dataset (in floor rounded number of FWHM)
-    TPF_this_r = 0.95 # minimum TPF
+    TPF = 0.95 # true positive fraction
 
     # Then at each radius we have a constant number of false positives
     N_FP_r = np.divide(N_FP_tot,R_max)
@@ -102,18 +102,24 @@ def one_d_modern_contrast():
     # make a copy of the input dataframe which we will update
     df_corrxn = original_contrast_curve.copy(deep=True)
     # companion amplitude that fits all criteria; i.e., THE CONTRAST CURVE
-    df_corrxn["mu_c_r"] = np.nan
+    df_corrxn["mu_c"] = np.nan
+    df_corrxn["mu_c_minus_tau"] = np.nan
     # multiplicative correction factor to 'classical' curve
     df_corrxn["corrxn_factor"] = np.nan
     # max value of FPF (for calculating tau)
-    df_corrxn["FPF_r_max"] = np.nan
+    df_corrxn["FPF_tau"] = np.nan
     # min value of TPF, no radial dependency (for calculating tau)
-    df_corrxn["TPF_r_min"] = np.nan
+    df_corrxn["TPF"] = np.nan
     # some info in the style of Table 1 in Mawet+ 2014 ApJ 792
     df_corrxn["mu_c_minus_tau"] = np.nan
-    df_corrxn["tau_calc"] = np.nan
-    df_corrxn["tau_5_sigma"] = np.nan
-    df_corrxn["tau_3_sigma"] = np.nan
+    df_corrxn["tau"] = np.nan
+    df_corrxn["mu_c"] = np.nan
+    #df_corrxn["tau_5_sigma"] = np.nan
+    #df_corrxn["tau_3_sigma"] = np.nan
+    df_corrxn["ppf_1st"] = np.nan
+    df_corrxn["ppf_2nd"] = np.nan
+    df_corrxn["N_FWHM_fit"] = np.nan
+    df_corrxn["F"] = np.nan
 
     # find the radii in units of decimal lambda/D FWHM
     # (note FWHM=1.028*lambda/D
@@ -134,11 +140,11 @@ def one_d_modern_contrast():
         # (it needs to be the whole-number floor because of how the Altair
         # pipeline samples the noise)
         N_FWHM_fit = math.floor(np.multiply(2*np.pi,df_corrxn["rad_fwhm"][rad_num]))
-        # maximum FPF at that radius
-        FPF_this_r = np.divide(N_FP_r,N_FWHM_fit)
+        # maximum FPF at that radius; i.e., the FPF(r) for the tau we will calculate
+        FPF_tau = np.divide(N_FP_r,N_FWHM_fit)
         # sample size of noise 'necklace beads'
         n_2 = N_FWHM_fit-1
-        # degrees of freedom
+        # degrees of freedom of the noise sample
         dof = N_FWHM_fit-2
         print("dof:")
         print(dof)
@@ -146,77 +152,61 @@ def one_d_modern_contrast():
         # generate a t-distribution for that radius
         mean, var, skew, kurt = t.stats(dof, moments='mvsk')
 
-        # calculate the first and second Cst^-1 terms in the square brackets
-        ppf_1st = t.ppf(1-FPF_this_r, dof)
-        ppf_2nd = t.ppf(TPF_this_r, dof)
+        # calculate the first and second inverse-CDF terms in the square brackets
+        ppf_1st = t.ppf(1-FPF_tau, dof)
+        ppf_2nd = t.ppf(TPF, dof)
 
         # tau
-        #tau_calc = (ppf_1st+ppf_2nd) # this is what we want
-        tau_calc = ppf_1st # FOR DEBUGGING
+        tau_calc = ppf_1st
+        # mu_c-tau
+        mu_c_minus_tau = ppf_2nd
+        # mu_c alone
+        mu_c = np.add(ppf_1st,ppf_2nd)
         # s2: the empirical noise
+        # (found by taking companion amplitudes for S/N=5 and dividing by 5)
         s_2 = np.divide(df_corrxn["contrast_lin"].iloc[rad_num],5.)
-        # find the correction factor ('alpha')
-        corrxn_factor = s_2*np.sqrt(1+(1./n_2))
-        # find the mu_c_r_5sig (the CONTRAST)
-        mu_c_r = tau_calc*s_2*np.sqrt(1+(1./n_2))
-        print("tau:")
-        print(tau_calc)
-        print("corrxn_factor:")
-        print(corrxn_factor)
 
-        # recalculate the TPF and FPF with the final value of tau
-        # we use the symmetry of the t-distribution to find
-        # FPF = int_tau^inf P(t) dt
-        # by using the CDF of the t-distribution, with the integration limits flipped:
-        # FPF = int_tau^inf P(t) dt = CDF_t(-tau)
-        TPF_final = t.cdf(tau_calc, dof)
-        FPF_final = 1.-t.cdf(tau_calc, dof)
-        print("TPF_final:")
-        print(TPF_final)
-        print("FPF_final:")
-        print(FPF_final)
+        # map the mu_c from t-space to amplitude F (F IS THE CONTRAST CURVE)
+        F = mu_c*s_2*np.sqrt(1.+(1./n_2))
+        # find the correction factor between the original and new contrast curves: alpha = F/A_5
+        # N.b. A_5 a.k.a. original_contrast_lin
+        corrxn_factor = np.divide(F,df_corrxn["contrast_lin"].iloc[rad_num])
+
+        # now the FPF is smaller due to the offset mu_c-tau; calculate the
+        # FPF(t=mu_c) with the final value of tau
+        TPF_mu_c_minus_tau = t.cdf(mu_c_minus_tau, dof) # should still be 0.95
+        FPF_mu_c = 1.-t.cdf(mu_c, dof)
+        print(df_corrxn.keys())
 
         # update dataframe with new stuff
-        df_corrxn.at[rad_num,"mu_c_r"] = mu_c_r
-        df_corrxn.at[rad_num,"tau_calc"] = tau_calc
+        df_corrxn.at[rad_num,"mu_c"] = mu_c
+        df_corrxn.at[rad_num,"mu_c_minus_tau"] = mu_c_minus_tau
+        df_corrxn.at[rad_num,"tau"] = tau_calc
         df_corrxn.at[rad_num,"corrxn_factor"] = corrxn_factor
-        df_corrxn.at[rad_num,"FPF_r_max"] = FPF_this_r
-        df_corrxn.at[rad_num,"TPF_r_min"] = TPF_this_r # should be fixed
-        df_corrxn.at[rad_num,"FPF_r_final"] = FPF_final
-        df_corrxn.at[rad_num,"TPF_final"] = TPF_final
-
-        # and multiply everything with 5*s-bar to get a corrected '5-sigma' curve
-        # (note the input contrast_lin is being divided by 5 since the input is '5-sigma')
-        #print(df_corrxn.keys())
-        '''
-        mu_c_r_5sig = 5.*np.multiply(n,corrxn_factor)
-        df_corrxn.at[rad_num,"mu_c_r_5sig"] = mu_c_r_5sig
-        df_corrxn.at[rad_num,"corrxn_factor"] = corrxn_factor
-        df_corrxn.at[rad_num,"FPF_r"] = FPF_this_r
-        #df_corrxn["mu_c_r_5sig"][rad_num] = mu_c_r_5sig
-        #df_corrxn["corrxn_factor"][rad_num] = corrxn_factor
-        '''
+        df_corrxn.at[rad_num,"FPF_tau"] = FPF_tau
+        df_corrxn.at[rad_num,"TPF"] = TPF # should be fixed
+        df_corrxn.at[rad_num,"FPF_mu_c"] = FPF_mu_c
+        df_corrxn.at[rad_num,"TPF_mu_c_minus_tau"] = TPF_mu_c_minus_tau
+        df_corrxn.at[rad_num,"ppf_1st"] = ppf_1st
+        df_corrxn.at[rad_num,"ppf_2nd"] = ppf_2nd
+        df_corrxn.at[rad_num,"N_FWHM_fit"] = N_FWHM_fit
+        df_corrxn.at[rad_num,"F"] = F
 
     # just to make things clearer
     df_corrxn = df_corrxn.rename(columns={"contrast_lin": "original_contrast_lin"})
 
     # test with some plots
     # (note the input contrast curve has to be divided by 5 first)
-    '''
-    test_df = mu_c_5sig(sbar_and_r_asec_pass=original_contrast_curve,
-                        TPF_pass=0.95)
-    '''
-
     print("df_corrxn:")
     print(df_corrxn)
-    print("----------")
-    print("THIS JUST USES FPF (AND NOT TPF) SO AS TO CROSS-CHECK WITH MAWET!!!")
+    print("df_corrxn.keys():")
+    print(df_corrxn.keys())
 
     fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(12,18))
 
     plt.grid(True, which="both")
     ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["original_contrast_lin"],'r-', lw=5, alpha=0.6, label="Original contrast curve")
-    ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["mu_c_r"],'b-', lw=5, alpha=0.6, label="Corrected contrast curve")
+    ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["F"],'b-', lw=5, alpha=0.6, label="Corrected contrast curve")
     ax[0].set_xlabel("Radius (FWHM)")
     ax[0].set_ylabel("Contrast curves")
     ax[0].set_xlim([0,15])
@@ -224,22 +214,24 @@ def one_d_modern_contrast():
     ax[0].legend()
 
     ax[1].plot(df_corrxn["rad_fwhm"], df_corrxn["corrxn_factor"],'g-', lw=5, alpha=0.6, label="Correction factor")
-    ax[1].set_ylabel("Correction factor")
+    ax[1].plot(df_corrxn["rad_fwhm"], df_corrxn["mu_c_minus_tau"],'r-', lw=5, alpha=0.6, label="$\mu_{c}-tau$")
+    ax[1].set_ylabel("Scaling factors")
     ax[1].set_xlabel("Radius (FWHM)")
     ax[1].set_xlim([0,15])
     ax[1].set_yscale("log")
     ax[1].legend()
 
-    ax[2].plot(df_corrxn["rad_fwhm"], df_corrxn["TPF_final"],'b-', lw=5, alpha=0.6, label="TPF_final")
-    ax[2].plot(df_corrxn["rad_fwhm"], np.subtract(1.,df_corrxn["FPF_r_final"]),'r-', lw=5, alpha=0.6, label="1-FPF_final")
-    ax[2].set_ylabel("Final TPF or (1-FPF)")
+    ax[2].plot(df_corrxn["rad_fwhm"], df_corrxn["FPF_tau"],'b-', lw=5, alpha=0.6, label="FPF_tau")
+    ax[2].plot(df_corrxn["rad_fwhm"], df_corrxn["FPF_mu_c"],'r-', lw=5, alpha=0.6, label="FPF_mu_c")
+    ax[2].set_ylabel("FPF")
     ax[2].set_xlabel("Radius (FWHM)")
     ax[2].set_xlim([0,15])
     ax[2].set_yscale("log")
     ax[2].legend()
 
-    ax[3].plot(df_corrxn["rad_fwhm"], df_corrxn["FPF_r_final"],'b-', lw=5, alpha=0.6, label="FPF_final")
-    ax[3].set_ylabel("Final FPF")
+    ax[3].plot(df_corrxn["rad_fwhm"], df_corrxn["TPF"],'b-', lw=5, alpha=0.6, label="TPF (input)")
+    ax[3].plot(df_corrxn["rad_fwhm"], df_corrxn["TPF_mu_c_minus_tau"],'r-', lw=5, alpha=0.6, label="TPF_mu_c_minus_tau")
+    ax[3].set_ylabel("TPF")
     ax[3].set_xlabel("Radius (FWHM)")
     ax[3].set_xlim([0,15])
     ax[3].set_yscale("log")

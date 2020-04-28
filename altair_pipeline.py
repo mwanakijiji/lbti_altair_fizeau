@@ -75,7 +75,7 @@ while True:
     # condition for convergence: once crossover changes sign around desired S/N,
     # or we reach iteration number X
     iter_num += 1
-'''
+
 # interpolate amplitudes
 
 # median along azimuth

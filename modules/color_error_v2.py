@@ -64,7 +64,11 @@ m_per_solar_radius = 6.95508e8 # units meters
 au_per_pc = np.divide(360*60*60,2*np.pi) # units AU/pc
 
 # distance of Altair in Altair radii (this should be about 1.4e8 altair radii)
-d_altair_altair_radii = d_altair_pc*au_per_pc*np.divide(1.,m_per_solar_radius)*m_per_au*np.divide(1.,solar_radii_per_altair_radii)
+d_altair_altair_radii = d_altair_pc*\
+                        au_per_pc*\
+                        np.divide(1.,m_per_solar_radius)*\
+                        m_per_au*\
+                        np.divide(1.,solar_radii_per_altair_radii)
 
 # zero point on the Vega scale, specific to Paranal-NACO NB405 filter, from SVO filter service
 # http://svo2.cab.inta-csic.es/theory/fps/index.php?id=Paranal/NACO.NB405&&mode=browse&gname=Paranal&gname2=NACO#filter
@@ -72,13 +76,8 @@ zp_vega = 3.885e-12 # units erg /cm2 /sec /angstrom
 
 
 # Naco NB405 filter
-
 nb405_transmission = pd.read_csv("data/Paranal_NACO.NB405.dat.txt",
                                  names=["wavel_angs", "transmission"], delim_whitespace=True)
-
-
-# In[5]:
-
 
 # plot filter
 '''
@@ -96,6 +95,7 @@ plt.close()
 # Read in blackbodies in the general range of relevant temperatures of planets
 # (note these are BB emissions at their surfaces)
 # Ref: research journal, 2020 Mar. 4
+# flux is in units of erg/cm2/s/A
 bb_00200K = pd.read_csv("data/bb00200.dat.txt",
                                  names=["wavel_angs", "flux"], skiprows=6, delim_whitespace=True)
 bb_00400K = pd.read_csv("data/bb00400.dat.txt",
@@ -117,7 +117,7 @@ plt.plot(bb_00650K["wavel_angs"],np.divide(bb_00650K["flux"],np.max(bb_00650K["f
 plt.plot(bb_02800K["wavel_angs"],np.divide(bb_02800K["flux"],np.max(bb_02800K["flux"])),
          label="BB, T=2800K")
 plt.scatter(nb405_transmission["wavel_angs"],nb405_transmission["transmission"],s=2,
-            label="55000*NB405 trans.")
+            label="NB405 trans.")
 plt.title("Filter profile and planet BBs")
 plt.xlabel("Wavelength (angstr)")
 plt.ylabel("Normalized emission or filter transmission")
@@ -126,7 +126,6 @@ plt.legend()
 plt.savefig("junk.pdf")
 plt.close()
 '''
-
 
 # ### Obtain model spectra of host star (and of Vega, though we don't seem to need it)
 
@@ -310,7 +309,8 @@ integrand_scaled_R_times_T_times_flux_vega = np.multiply(atm_transmission_filter
 # plot R*f integrands
 '''
 plt.clf()
-plt.plot(nb405_transmission["wavel_angs"],nb405_transmission["transmission"], label="Straight transmission")
+plt.plot(nb405_transmission["wavel_angs"],nb405_transmission["transmission"],
+        label="Straight transmission")
 plt.plot(nb405_transmission["wavel_angs"],np.divide(integrand_unscaled_R_times_f_00200K,np.max(integrand_unscaled_R_times_f_00200K)),
          label="Normalized Transmission * BB(200K)")
 plt.plot(nb405_transmission["wavel_angs"],np.divide(integrand_unscaled_R_times_f_00400K,np.max(integrand_unscaled_R_times_f_00400K)),
@@ -325,14 +325,15 @@ plt.plot(nb405_transmission["wavel_angs"],np.divide(integrand_scaled_R_times_flu
          label="Normalized Transmission * Vega")
 plt.xlabel("Wavel (angstr)")
 plt.legend()
-plt.savefig("junk.pdf")
+plt.savefig("junk1.pdf")
 plt.close()
 '''
 
 # plot R*T*f integrands
 '''
 plt.clf()
-plt.plot(nb405_transmission["wavel_angs"],nb405_transmission["transmission"], label="Straight transmission")
+plt.plot(nb405_transmission["wavel_angs"],nb405_transmission["transmission"], label="Straight filter transmission")
+plt.plot(nb405_transmission["wavel_angs"],atm_transmission_filter, label="Atmospheric transmission")
 plt.plot(nb405_transmission["wavel_angs"],np.divide(integrand_unscaled_R_times_T_times_f_00200K,np.max(integrand_unscaled_R_times_T_times_f_00200K)),
          label="Normalized R*T*BB(200K)")
 plt.plot(nb405_transmission["wavel_angs"],np.divide(integrand_unscaled_R_times_T_times_f_00400K,np.max(integrand_unscaled_R_times_T_times_f_00400K)),
@@ -347,7 +348,25 @@ plt.plot(nb405_transmission["wavel_angs"],np.divide(integrand_scaled_R_times_T_t
          label="Normalized R*T*Vega")
 plt.xlabel("Wavel (angstr)")
 plt.legend()
-plt.savefig("junk.pdf")
+plt.savefig("junk2.pdf")
+plt.close()
+'''
+
+# plot a couple by themselves without normalization, so that it's checkable
+'''
+plt.clf()
+plt.plot(nb405_transmission["wavel_angs"],integrand_unscaled_R_times_T_times_f_altair,
+         label="R*T*Altair")
+plt.xlabel("Wavel (angstr)")
+plt.legend()
+plt.savefig("junk3.pdf")
+plt.close()
+plt.clf()
+plt.plot(nb405_transmission["wavel_angs"],integrand_unscaled_R_times_f_02800K,
+         label="R*f_2800K")
+plt.xlabel("Wavel (angstr)")
+plt.legend()
+plt.savefig("junk4.pdf")
 plt.close()
 '''
 
@@ -367,7 +386,6 @@ piece_4_unscaled_altair = np.trapz(integrand_unscaled_R_times_T_times_f_altair,x
 
 piece_3_scaled_vega = np.trapz(integrand_scaled_R_times_flux_vega,x=nb405_transmission["wavel_angs"])
 piece_4_scaled_vega = np.trapz(integrand_scaled_R_times_T_times_flux_vega,x=nb405_transmission["wavel_angs"])
-
 
 # # Put pieces together
 

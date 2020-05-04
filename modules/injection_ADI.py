@@ -888,7 +888,7 @@ def main(inject_iteration=None):
 
         fake_params_pre_permute = {"angle_deg_EofN": [129.68],
                                "rad_asec": list(B),
-                               "ampl_linear_norm": [0.,0.01,0.1]}
+                               "ampl_linear_norm": [0.01,0.1]}
 
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],

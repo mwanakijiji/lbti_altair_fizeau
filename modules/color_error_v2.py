@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
+from scipy import signal
 import os
 import pysynphot as S
 
@@ -241,9 +242,11 @@ vega_earth_flux_filter = np.interp(nb405_transmission["wavel_angs"].values,
                                              S.Vega.wave,
                                              S.Vega.flux)
 
+# make smoothed version of the atmospheric transmission before interpolating
+smoothed_atm_trans = scipy.signal.medfilt(trans_df["transmission"],kernel_size=401)
 atm_transmission_filter = np.interp(nb405_transmission["wavel_angs"].values,
                                     trans_df["wavel_angs"],
-                                    trans_df["transmission"])
+                                    smoothed_atm_trans)
 
 # plot an example interpolation
 '''
@@ -419,6 +422,23 @@ piece_4_scaled_vega = np.trapz(integrand_scaled_R_times_T_times_flux_vega,x=nb40
 # 	}
 # 	\right\}$
 
+# a plot of many things for the Altair paper integrand
+#print(np.max())
+'''
+plt.clf()
+#color = 'tab:red'
+plt.xlabel('Wavelength ($\AA$)')
+plt.ylabel('Transmission')
+plt.plot(nb405_transmission["wavel_angs"],nb405_transmission["transmission"],
+         label="NACO NB4.05 filter ($R_{\lambda}$)")
+plt.plot(trans_df["wavel_angs"],trans_df["transmission"],
+         label="Atmosphere (high-res)")
+plt.plot(nb405_transmission["wavel_angs"].values, atm_transmission_filter,
+         label="Atmosphere ($T_{\lambda}$)")
+plt.xlim([39800,41300])
+plt.legend(loc="upper right")
+plt.show()
+'''
 
 # FINAL ANSWERS
 M_diff_00200K = 2.5*np.log10(np.divide(piece_1_unscaled_00200K,piece_2_unscaled_00200K)*

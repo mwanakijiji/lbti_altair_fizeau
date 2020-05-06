@@ -282,7 +282,7 @@ def one_d_classical_contrast(csv_files_dir):
         if (file_num == 0):
             # initialize a dataframe for containing the most recent (i.e., converged) injections
             df_recent = pd.DataFrame(columns=list(info_file.keys()))
-            #import ipdb; ipdb.set_trace()
+
         # For groups of rows defined by
         #      A.) a common value of rad_asec
         #      B.) a common value of ampl_linear_norm
@@ -299,10 +299,11 @@ def one_d_classical_contrast(csv_files_dir):
         info_file_grouped_rad_ampl_ampl0 = info_file.drop_duplicates(
                                                 subset=["rad_asec","angle_deg","ampl_linear_norm_0"]
                                                 )
-        #import ipdb; ipdb.set_trace()
+
         for combo_num in range(0,len(info_file_grouped_rad_ampl_ampl0)):
             # loop over each combination of (radius, azimuth, starting amplitude)
-            # (i.e., get all the info together corresponding to one fake injected planet)
+            # (i.e., in one iteration get all the info together corresponding to
+            # one fake injected planet)
             info_file_unique_combo = info_file.where(
                 np.logical_and(
                     np.logical_and(
@@ -310,7 +311,6 @@ def one_d_classical_contrast(csv_files_dir):
                         info_file["angle_deg"] == info_file_grouped_rad_ampl_ampl0["angle_deg"].iloc[combo_num]),
                         info_file["ampl_linear_norm_0"] == info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].iloc[combo_num])
                         ).dropna(how="all")
-            #import ipdb; ipdb.set_trace()
 
             for starting_ampl_num in range(0,len(info_file_grouped_rad_ampl_ampl0["ampl_linear_norm_0"].unique())):
                 # loop over all starting amplitudes of this planet (this is redundant
@@ -599,7 +599,7 @@ class TwoDimSensitivityMap:
 
 
 
-def main(small_angle_correction):
+def main(small_angle_correction=True):
     '''
     Detect companions (either fake or in a blind search within science data)
     and calculate S/N.

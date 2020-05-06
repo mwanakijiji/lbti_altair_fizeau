@@ -349,20 +349,20 @@ def one_d_classical_contrast(csv_files_dir):
     print(contrast_curve)
 
     # FYI: plot all the points and the final line
-    plt.scatter(df_recent["rad_asec"],df_recent["ampl_linear_norm"])
-    plt.plot(contrast_curve["rad_asec"],contrast_curve["ampl_linear_norm"])
-    plt.savefig("junk.pdf")
+    #plt.scatter(df_recent["rad_asec"],df_recent["ampl_linear_norm"])
+    #plt.plot(contrast_curve["rad_asec"],contrast_curve["ampl_linear_norm"])
+    #plt.savefig("junk.pdf")
 
     # write out to csv
-    #file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CLASSICAL_CSV"]
-    file_name_cc = "contrast_curve_classical.csv"
+    file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CLASSICAL_CSV"]
     contrast_curve.to_csv(file_name_cc, sep = ",", columns = ["rad_asec","ampl_linear_norm"])
     print("sensitivity: "+str(datetime.datetime.now())+" Wrote out contrast curve CSV to " + file_name_cc)
 
     # make classical contrast curve plot
-    #file_name_cc_plot = self.config_data["data_dirs"]["DIR_FYI_INFO"] + self.config_data["file_names"]["CONTCURV_CLASSICAL_PLOT"]
-    file_name_cc_plot = "classical_curve.pdf"
-    plt.plot(contrast_curve["rad_asec"],contrast_curve["ampl_linear_norm"])
+    file_name_cc_plot = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["CONTCURV_CLASSICAL_PLOT"]
+    plt.scatter(df_recent["rad_asec"],df_recent["ampl_linear_norm"])
+    plt.plot(contrast_curve["rad_asec"],contrast_curve["ampl_linear_norm"], color="orange")
+    plt.ylim([0,0.001])
     plt.xlabel("Radius from host star (asec)")
     plt.ylabel("Linear contrast")
     plt.title("Classical contrast curve")
@@ -370,7 +370,8 @@ def one_d_classical_contrast(csv_files_dir):
     plt.clf()
     print("sensitivity: "+str(datetime.datetime.now())+" Wrote out contast curve plot to " + file_name_cc_plot)
 
-    # plot locations of fake planets involved in making the 1D curve
+    ###
+    # plot 2D locations of fake planets involved in making the 1D curve
     oversample_factor = 10 # oversample by this much
     # effective plate scale on the display area
     pseudo_ps_LMIR = np.divide(0.0107,oversample_factor)
@@ -402,9 +403,10 @@ def one_d_classical_contrast(csv_files_dir):
     plt.colorbar()
     # make square
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.savefig("junk_2d_fake_planets.pdf")
+    plt.savefig(config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["SN_2D_FAKE_PLANETSPLOT"])
     #plt.show()
     print("Wrote out scatter signal map")
+    ###
 
 
 class TwoDimSensitivityMap:

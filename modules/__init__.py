@@ -144,13 +144,13 @@ def make_dirs():
 
     print("a test import, config2:")
     config2 = configparser.ConfigParser() # for parsing values in .init file
-    config2.read("/modules/config.ini")
+    config2.read("./modules/config.ini")
     print(config2.items("data_dirs"))
     print("original import, config:")
-    print(config.items("data_dirs"))
+    print(config2.items("data_dirs"))
 
-    for vals in config["data_dirs"]:
-        abs_path_name = str(config["data_dirs"][vals])
+    for vals in config2["data_dirs"]:
+        abs_path_name = str(config2["data_dirs"][vals])
         print("Directory exists: " + abs_path_name)
 
         # if directory does not exist, create it

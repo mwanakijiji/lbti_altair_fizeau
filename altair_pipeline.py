@@ -18,10 +18,10 @@ from modules import (basic_red,
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
 
 start_time = time.time()
-'''
+
 ## ## MAKE NEEDED DIRECTORIES
 make_dirs()
-
+'''
 ## ## FITS HEADER METADATA EXTRACTION
 fits_meta_data = fits_hdr.main()
 

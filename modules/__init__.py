@@ -30,6 +30,7 @@ else:
 '''
 ncpu = 1
 
+#
 # below istopgap in case job is running on HPC, when cores might be counted beyond those
 # allocated to the job
 #ncpu = 16

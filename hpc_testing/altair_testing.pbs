@@ -24,8 +24,8 @@ date
 export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=results_fwhm4_240degEofN_031.tar
-export OUTPUT_CSV_FILE_BASENAME=csv_output_results_fwhm4_240degEofN_031.csv
+export RESULTS_TARBALL=results_just_check_cubes_lambdaOverD_033.tar
+export OUTPUT_CSV_FILE_BASENAME=csv_output_results_just_check_cubes_lambdaOverD_033.csv
 
 ### load python 3.6.5
 module load python/3
@@ -117,7 +117,8 @@ then
    ### create tar archive of the results in /tmp/, and leave it in /xdisk/phinz/mig2020/xdisk/spalding/
    ### directory
    echo "Tarring outputs"
-   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/
+   ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
    echo "Done tarring output:"
    date
    echo "---"

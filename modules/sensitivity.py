@@ -50,7 +50,7 @@ def one_d_modern_contrast():
 
     INPUTS:
     sbar_and_r_asec_pass: pandas dataframe with
-        ["contrast_lin"]: classical, linear empirical contrast, or the 's-bar'
+        ["ampl_linear_norm"]: classical, linear empirical contrast, or the 's-bar'
                             (implied TPF=0.5 but the curve says nothing else)
         ["rad_asec"]: radius from host star in arcsec
     TPF_pass: the fixed true positive fraction (default 0.95)
@@ -60,12 +60,15 @@ def one_d_modern_contrast():
     corrected_curve: the actual corrected '5-sigma' curve, found by using the correction factor
     '''
 
+    # read in config info
+    config = configparser.ConfigParser() # for parsing values in .init file
+    config.read("./modules/config.ini")
+
     # read in the empirical 5-sigma linearly-scaled contrast, without correction
     # the input curve, as is, represents the relative amplitude at which TPF=0.5, and nothing else
-
-
-    ## ## PLACEHOLDER DATA
-    original_contrast_curve = pd.read_csv("./notebooks_for_development/data/fake_contrast_curve.csv")
+    file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_CLASSICAL_CSV"]
+    original_contrast_curve = pd.read_csv(file_name_cc)
+    print("Read in classical contrast curve in file " + file_name_cc)
     ## ## FOR THE REAL THING, UNCOMMENT THE BELOW
     #sbar_and_r_asec_pass = original_contrast_curve
 
@@ -79,8 +82,8 @@ def one_d_modern_contrast():
 
     # Then at each radius we have a constant number of false positives
     N_FP_r = np.divide(N_FP_tot,R_max)
-    print("N_FP_r:")
-    print(N_FP_r)
+    #print("N_FP_r:")
+    #print(N_FP_r)
 
     # Example pythonic CDF inversion:
     '''
@@ -148,8 +151,8 @@ def one_d_modern_contrast():
         n_2 = N_FWHM_fit-1
         # degrees of freedom of the noise sample
         dof = N_FWHM_fit-2
-        print("dof:")
-        print(dof)
+        #print("dof:")
+        #print(dof)
 
         # generate a t-distribution for that radius
         mean, var, skew, kurt = t.stats(dof, moments='mvsk')
@@ -166,19 +169,18 @@ def one_d_modern_contrast():
         mu_c = np.add(ppf_1st,ppf_2nd)
         # s2: the empirical noise
         # (found by taking companion amplitudes for S/N=5 and dividing by 5)
-        s_2 = np.divide(df_corrxn["contrast_lin"].iloc[rad_num],5.)
+        s_2 = np.divide(df_corrxn["ampl_linear_norm"].iloc[rad_num],5.)
 
         # map the mu_c from t-space to amplitude F (F IS THE CONTRAST CURVE)
         F = mu_c*s_2*np.sqrt(1.+(1./n_2))
         # find the correction factor between the original and new contrast curves: alpha = F/A_5
-        # N.b. A_5 a.k.a. original_contrast_lin
-        corrxn_factor = np.divide(F,df_corrxn["contrast_lin"].iloc[rad_num])
+        # N.b. A_5 a.k.a. original_ampl_linear_norm
+        corrxn_factor = np.divide(F,df_corrxn["ampl_linear_norm"].iloc[rad_num])
 
         # now the FPF is smaller due to the offset mu_c-tau; calculate the
         # FPF(t=mu_c) with the final value of tau
         TPF_mu_c_minus_tau = t.cdf(mu_c_minus_tau, dof) # should still be 0.95
         FPF_mu_c = 1.-t.cdf(mu_c, dof)
-        print(df_corrxn.keys())
 
         # update dataframe with new stuff
         df_corrxn.at[rad_num,"mu_c"] = mu_c
@@ -195,26 +197,53 @@ def one_d_modern_contrast():
         df_corrxn.at[rad_num,"F"] = F
 
     # just to make things clearer
-    df_corrxn = df_corrxn.rename(columns={"contrast_lin": "original_contrast_lin"})
+    df_corrxn = df_corrxn.rename(columns={"ampl_linear_norm": "original_ampl_linear_norm"})
 
-    # test with some plots
-    # (note the input contrast curve has to be divided by 5 first)
-    print("df_corrxn:")
-    print(df_corrxn)
-    print("df_corrxn.keys():")
-    print(df_corrxn.keys())
+    # include del_m version of the linear contrast: m_planet - m_star
+    df_corrxn["del_m_classical"] = -2.5*np.log10(df_corrxn["original_ampl_linear_norm"])
+    df_corrxn["del_m_modern"] = -2.5*np.log10(df_corrxn["F"])
 
-    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(12,18))
+    # write out to csv
+    file_name_cc = config["data_dirs"]["DIR_S2N"] + \
+                    config["file_names"]["CONTCURV_MODERN_CSV"]
+    df_corrxn.to_csv(file_name_cc, sep = ",")
+    print("sensitivity: "+str(datetime.datetime.now()) + \
+            " Wrote out modern contrast curve CSV to " + file_name_cc)
 
+    # make plot for publication
+    contrast_curves_publication_file_name = config["data_dirs"]["DIR_S2N"] + \
+                                            config["file_names"]["CONTCURV_MODERN_PLOT_PUBLICATION"]
+    plt.clf()
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,9))
     plt.grid(True, which="both")
-    ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["original_contrast_lin"],'r-', lw=5, alpha=0.6, label="Original contrast curve")
+    ax.plot(df_corrxn["rad_fwhm"], df_corrxn["del_m_classical"],
+                'r-', linestyle=":", lw=5, alpha=0.6, label="Classical contrast curve")
+    ax.plot(df_corrxn["rad_fwhm"], df_corrxn["del_m_modern"],
+                'b-', lw=5, alpha=1, label="Modern contrast curve")
+    ax.set_xlabel("Radius (FWHM)")
+    ax.set_ylabel("$\Delta$m")
+    ax.set_xlim([0,20])
+    ax.legend()
+    plt.gca().invert_yaxis()
+    plt.savefig(contrast_curves_publication_file_name)
+    print("Saved publication plot of modern contrast curve as " + str(contrast_curves_publication_file_name))
+    plt.close()
+
+
+    # test with some FYI plots
+    # (note the input contrast curve has to be divided by 5 first)
+    contrast_curves_fyi_file_name = config["data_dirs"]["DIR_S2N"] + \
+                                    config["file_names"]["CONTCURV_MODERN_PLOT_FYI"]
+    plt.clf()
+    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(12,18))
+    plt.grid(True, which="both")
+    ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["original_ampl_linear_norm"],'r-', lw=5, alpha=0.6, label="Original contrast curve")
     ax[0].plot(df_corrxn["rad_fwhm"], df_corrxn["F"],'b-', lw=5, alpha=0.6, label="Corrected contrast curve")
     ax[0].set_xlabel("Radius (FWHM)")
     ax[0].set_ylabel("Contrast curves")
     ax[0].set_xlim([0,15])
     ax[0].set_yscale("log")
     ax[0].legend()
-
     ax[1].plot(df_corrxn["rad_fwhm"], df_corrxn["corrxn_factor"],'g-', lw=5, alpha=0.6, label="Correction factor")
     ax[1].plot(df_corrxn["rad_fwhm"], df_corrxn["mu_c_minus_tau"],'r-', lw=5, alpha=0.6, label="$\mu_{c}-tau$")
     ax[1].set_ylabel("Scaling factors")
@@ -222,7 +251,6 @@ def one_d_modern_contrast():
     ax[1].set_xlim([0,15])
     ax[1].set_yscale("log")
     ax[1].legend()
-
     ax[2].plot(df_corrxn["rad_fwhm"], df_corrxn["FPF_tau"],'b-', lw=5, alpha=0.6, label="FPF_tau")
     ax[2].plot(df_corrxn["rad_fwhm"], df_corrxn["FPF_mu_c"],'r-', lw=5, alpha=0.6, label="FPF_mu_c")
     ax[2].set_ylabel("FPF")
@@ -230,7 +258,6 @@ def one_d_modern_contrast():
     ax[2].set_xlim([0,15])
     ax[2].set_yscale("log")
     ax[2].legend()
-
     ax[3].plot(df_corrxn["rad_fwhm"], df_corrxn["TPF"],'b-', lw=5, alpha=0.6, label="TPF (input)")
     ax[3].plot(df_corrxn["rad_fwhm"], df_corrxn["TPF_mu_c_minus_tau"],'r-', lw=5, alpha=0.6, label="TPF_mu_c_minus_tau")
     ax[3].set_ylabel("TPF")
@@ -238,8 +265,9 @@ def one_d_modern_contrast():
     ax[3].set_xlim([0,15])
     ax[3].set_yscale("log")
     ax[3].legend()
+    fig.savefig(contrast_curves_fyi_file_name)
 
-    fig.savefig("junk.pdf")
+    print("Saved FYI plot of modern contrast curve as " + str(contrast_curves_fyi_file_name))
 
 
 def one_d_classical_contrast(csv_files_dir):
@@ -267,7 +295,6 @@ def one_d_classical_contrast(csv_files_dir):
     # read in config info
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
-    print(config.items("data_dirs"))
 
     # read in csv of detection info
     # check for all csvs in the directory
@@ -358,7 +385,7 @@ def one_d_classical_contrast(csv_files_dir):
     contrast_curve.to_csv(file_name_cc, sep = ",", columns = ["rad_asec","ampl_linear_norm"])
     print("sensitivity: "+str(datetime.datetime.now())+" Wrote out contrast curve CSV to " + file_name_cc)
 
-    # make classical contrast curve plot
+    # make classical contrast curve plot with other points (just FYI)
     file_name_cc_plot = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["CONTCURV_CLASSICAL_PLOT"]
     plt.scatter(df_recent["rad_asec"],df_recent["ampl_linear_norm"])
     plt.plot(contrast_curve["rad_asec"],contrast_curve["ampl_linear_norm"], color="orange")
@@ -386,6 +413,7 @@ def one_d_classical_contrast(csv_files_dir):
                                 )
     ## make a simple scatter plot, where the 3rd dimension is in the marker color
     plt.clf()
+    scatter_signal_map_file_name = config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["SN_2D_FAKE_PLANETSPLOT"]
     for t_indx in range(0,len(x_scatter)):
         plt.annotate("r="+np.round(df_recent["rad_asec"].iloc[int(t_indx)],2).astype("str")+", rho="+np.round(df_recent["angle_deg"].iloc[int(t_indx)],2).astype("str"),
                     xy=(x_scatter[int(t_indx)],y_scatter[int(t_indx)]),
@@ -403,9 +431,9 @@ def one_d_classical_contrast(csv_files_dir):
     plt.colorbar()
     # make square
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.savefig(config["data_dirs"]["DIR_FYI_INFO"] + config["file_names"]["SN_2D_FAKE_PLANETSPLOT"])
+    plt.savefig(scatter_signal_map_file_name)
     #plt.show()
-    print("Wrote out scatter signal map")
+    print("sensitivity: "+str(datetime.datetime.now())+" Wrote out scatter signal map as " + str(scatter_signal_map_file_name))
     ###
 
 
@@ -616,10 +644,10 @@ def main(small_angle_correction=True):
     one_d_classical_contrast(csv_files_dir = "./csv_outputs/") # placeholder directory
 
     # now make FPF, TPF, small-angle corrections to make a more modern curve
-    #one_d_modern_contrast = OneDimModernContrastCurve()
-    '''
-    one_d_modern_contrast()
+    #dern_contrast = OneDimModernContrastCurve()
 
+    one_d_modern_contrast()
+    '''
     # make a 2D sensitivity map
     two_d_sensitivity = TwoDimSensitivityMap(csv_file = config["data_dirs"]["DIR_S2N"] + \
         config["file_names"]["DETECTION_CSV"])

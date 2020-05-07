@@ -56,6 +56,10 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     df_w_masses: dataframe same as the input, but with a column for masses
     '''
 
+    # configuration data
+    config = configparser.ConfigParser() # for parsing values in .init file
+    config.read("./modules/config.ini")
+
     # make a copy of the input dataframe
     df_new = df_pass.copy(deep=True)
 
@@ -194,7 +198,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         if (model_num == 0):
             plt.clf()
             fig, ax = plt.subplots()
-            fig.suptitle("Contrast curve\n(based on M_altair = 1.8; NOT QUADRUPLE-CHECKED")
+            fig.suptitle("Contrast curve\n(based on M_altair = 1.8)")
             #ax2 = ax.twinx()
             ax.set_xlim([0,2.2]) # 0 to 2.2 asec
             #ax.get_shared_y_axes().join(ax,ax2)
@@ -217,13 +221,18 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
         ax.plot(df_new["asec"], df_new[key_masses_this_model],
             label=model_file_names_df["annotation"][model_num])
-
     ax.legend()
     for hline_num in range(5,10):
         ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
-    #plt.gca().invert_yaxis()
-    plt.savefig("junk.pdf")
+    ax.set_ylim([0.5,0.75])
+    plt.tight_layout()
+    file_name_cc_masses_plot_name = config["data_dirs"]["DIR_S2N"] + \
+                                    config["file_names"]["CONTCURV_MODERN_PLOT_PUBLICATION_MASSES"]
+    plt.savefig(file_name_cc_masses_plot_name)
     plt.close()
+    print("convert_contrast_limits_to_masses: Saved contrast curve plot as " + \
+        file_name_cc_masses_plot_name)
+
 
 
 def main():
@@ -233,15 +242,21 @@ def main():
 
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
-    config.read("/modules/config.ini")
+    config.read("./modules/config.ini")
 
     # get abs magnitude of Altair
     star_abs_mag = calculate_abs_mag()
+    print("M of Altair: " + str(star_abs_mag))
 
     # make/read in a contrast curve, where contrast is defined as the flux ratio
     # F_planet/F_star where detection has 5-sigma significance
     # keys: "contrast_lin" and "asec"
-    contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
+    #contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
+    file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_MODERN_CSV"]
+    contrast_df = pd.read_csv(file_name_cc, sep = ",")
+    # put in some col names that are recognized downstream
+    contrast_df["contrast_lin"] = contrast_df["F"]
+    contrast_df["asec"] = contrast_df["rad_asec"]
 
     df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag)
 

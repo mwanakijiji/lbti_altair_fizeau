@@ -21,7 +21,7 @@ date
 
 ### set variables: filenames of the data tarball and Singularity container
 ### input files
-export DATA_TARBALL=altair_20200406_good_frames_list_A_stripe_0_of_4.tar.gz
+export DATA_TARBALL=altair_20200427_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
 export RESULTS_TARBALL=test_results_fwhmpt1pt2pt3pt4pt6and1and2and3and4and5_129pt68degEofN_036.tar
@@ -63,7 +63,7 @@ then
    ### copy tarball into the /tmp/ directory
    ### (for 180507 Altair data, the top-level directory produced in the untarring
    ### is /180507_fizeau_altair/ and NOT /vol_c/)
-   cp /xdisk/$USER/$DATA_TARBALL /tmp/$USER
+   cp /xdisk/phinz/mig2020/xdisk/$USER/$DATA_TARBALL /tmp/$USER
    cd /tmp/$USER
    echo "Changed to tarball and Singularity file directory"
    pwd
@@ -90,8 +90,8 @@ then
    echo "List of files in directory Singularity file was pulled to"
    ls
    echo "---"
-   echo "List of files in /xdisk/spalding/ dir:"
-   ls /xdisk/$USER/
+   echo "List of files in /xdisk/phinz/mig2020/xdisk/spalding/ dir:"
+   ls /xdisk/phinz/mig2020/xdisk/$USER/
    echo "---"
    echo "List of files in /tmp/user/ dir:"
    ls /tmp/$USER
@@ -114,7 +114,7 @@ then
    export CSV_FILE=/tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/test_csv_file_all_iterations.csv
    cp $CSV_FILE /home/u6/$USER/$OUTPUT_CSV_FILE_BASENAME
 
-   ### create tar archive of the results in /tmp/, and leave it in /xdisk/spalding/
+   ### create tar archive of the results in /tmp/, and leave it in /xdisk/phinz/mig2020/xdisk/spalding/
    ### directory
    echo "Tarring outputs"
    ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
@@ -122,8 +122,8 @@ then
    echo "Done tarring output:"
    date
    echo "---"
-   cp $RESULTS_TARBALL /xdisk/$USER/
-   echo "Done copying output to /xdisk/spalding/:"
+   cp $RESULTS_TARBALL /xdisk/phinz/mig2020/xdisk/$USER/
+   echo "Done copying output to /xdisk/phinz/mig2020/xdisk/spalding/:"
    date
    echo "---"
 

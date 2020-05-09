@@ -1186,7 +1186,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_coarse_20200409.fits"),
+                                                    "mask_406x406_center_strip_width_2_FWHM_lamb_over_B.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A_and_D.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
@@ -1257,6 +1257,8 @@ def main(inject_iteration=None):
     mask_406x406_rings_4quad_fits_coarse_20200404.fits
     mask_406x406_rings_4quad_fits_coarse_20200409.fits
     mask_406x406_center_strip_lamb_over_B.fits
+    mask_406x406_center_strip_width_1_FWHM_lamb_over_B.fits
+    mask_406x406_center_strip_width_2_FWHM_lamb_over_B.fits
     '''
 
     ## ## BEGIN SERIAL TEST

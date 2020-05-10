@@ -3,4 +3,4 @@
 **/py354
 
 # the config file
-modules/config.ini
+#.modules/config.ini

@@ -80,8 +80,8 @@ while True:
 # interpolate amplitudes
 
 # median along azimuth
-'''
+
 # incorporate
 sensitivity.main(small_angle_correction=True) # produces 1-D contrast curve from csv info
-
+'''
 convert_contrast_limits_to_masses.main()

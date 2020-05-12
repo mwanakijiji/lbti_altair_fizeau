@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from modules import *
+from modules import determine_abs_mag_altair
 from matplotlib.transforms import Transform
 from matplotlib.ticker import (
     AutoLocator, AutoMinorLocator, FuncFormatter)
@@ -25,19 +26,6 @@ def AU_to_asec(input_AU):
     output_asec = np.divide(input_AU,dist_altair)
 
     return output_asec
-
-# absolute magnitude of host star in NB205 filter
-
-## ## PLACEHOLDER VALUE HERE; CURRENT VALUE FROM NOTEBOOK
-## ## determine_abs_mag_altair.ipynb; NOT DOUBLE-CHECKED;
-## ## REPLACE LATER (NOTE ALSO THAT ALTAIR IS A VARIABLE SOURCE!)
-def calculate_abs_mag():
-
-    abs_mag_altair_nb405 = 1.87
-
-    # SEE determine_abs_mag_altair.ipynb
-
-    return abs_mag_altair_nb405
 
 
 def linear_2_mass(df_pass, star_abs_mag_pass):
@@ -244,8 +232,8 @@ def main():
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
 
-    # get abs magnitude of Altair
-    star_abs_mag = calculate_abs_mag()
+    # get abs magnitude of Altair in NB205 filter
+    star_abs_mag = determine_abs_mag_altair.altair_abs_mag()
     print("M of Altair: " + str(star_abs_mag))
 
     # make/read in a contrast curve, where contrast is defined as the flux ratio

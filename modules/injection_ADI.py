@@ -172,6 +172,7 @@ class FakePlanetInjectorCube:
                  read_name_abs_fake_planet_PCA,
                  read_name_raw_pca_median,
                  config_data = config,
+                 recenter = False,
                  write = False):
         '''
         INPUTS:
@@ -186,6 +187,9 @@ class FakePlanetInjectorCube:
         read_name_raw_pca_median: absolute file name of the raw PCA training set median (i.e., the
             offset not preserved by the PCA decomposition)
         config_data: configuration data, as usual
+        recenter: option to re-center the image after injection of fake planet
+            (this checks for systematics introduced by centering real images first, and then
+            injecting fake planets)
         write: flag as to whether data product should be written to disk (for checking)
         '''
 
@@ -195,6 +199,7 @@ class FakePlanetInjectorCube:
         self.abs_fake_planet_PCA_name = read_name_abs_fake_planet_PCA
         self.read_name_raw_pca_median = read_name_raw_pca_median
         self.config_data = config_data
+        self.recenter = recenter
         self.write = write
 
         # read in the PCA vector cubes for this series of frames
@@ -258,7 +263,7 @@ class FakePlanetInjectorCube:
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
-            ## COMMENTED THIS OUT SO THAT I CAN TEST FAKE DATA
+
             mask_weird[sci > 55000] = np.nan # mask saturating region
             ## THE BELOW FOR FAKE DATA
             #mask_weird[sci > 4.5e9] = np.nan
@@ -346,6 +351,10 @@ class FakePlanetInjectorCube:
 
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
+
+            # option to re-center the frame
+            if self.recenter:
+                image_w_fake_planet = simple_center(image_w_fake_planet)
 
             # add image to cube, add PA to array, and add frame number to array
             cube_frames[frame_num] = image_w_fake_planet
@@ -674,7 +683,8 @@ class SyntheticFizeauInjectRemoveADI:
                  write_name_abs_cube_put_frames_into_it_simple,
                  write_name_abs_cube_A_PCA_vector,
                  write_name_abs_derotated_sci_median,
-                 write_name_abs_host_star_PCA):
+                 write_name_abs_host_star_PCA,
+                 recenter_option):
         '''
         injection_iteration: number of the fake planet injection iteration
             (None if no planets are being injected)
@@ -708,6 +718,7 @@ class SyntheticFizeauInjectRemoveADI:
         self.abs_host_star_PCA_name = write_name_abs_host_star_PCA
         self.read_name_abs_fake_planet_PCA = read_name_abs_fake_planet_PCA
         self.read_name_abs_pca_tesselation_pattern = read_name_abs_pca_tesselation_pattern
+        self.recenter_option = recenter_option
 
     def __call__(self, this_param_combo):
         '''
@@ -752,6 +763,7 @@ class SyntheticFizeauInjectRemoveADI:
                                           write_name_abs_host_star_PCA = self.write_name_abs_cube_A_PCA_vector,
                                           read_name_abs_fake_planet_PCA = self.write_name_abs_cube_A_PCA_vector,
                                           read_name_raw_pca_median = self.pca_pre_decomposition_median_name,
+                                          recenter = self.recenter_option,
                                           write = False)
 
             # call fake planet injection
@@ -888,7 +900,7 @@ def main(inject_iteration=None):
 
         fake_params_pre_permute = {"angle_deg_EofN": [129.68],
                                "rad_asec": list(B),
-                               "ampl_linear_norm": [0.0]}
+                               "ampl_linear_norm": [0.01,0.1]}
 
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
@@ -1194,56 +1206,9 @@ def main(inject_iteration=None):
         write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
                                                   + config["file_names"]["MEDIAN_SCI_FRAME"]),
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits")
-                                           )
+                                           + "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits"),
+        recenter_option=True)
 
-    '''
-    # instantiate reduction of A frames (frames 4259-5608 and 5826-6301)
-    synthetic_fizeau_inject_remove_adi_A_frames = SyntheticFizeauInjectRemoveADI(
-        injection_iteration = inject_iteration,
-        file_name_list = cookies_A_only_centered_06_name_array,
-        n_PCA_host_removal = 100,
-        read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                            "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
-        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + "median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
-        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                            + "psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
-        write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                            + "simple_synthetic_sci_frame_cube_A.fits"),
-        write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
-        write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
-                                                  + config["file_names"]["MEDIAN_SCI_FRAME"]),
-        write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits")
-                                           )
-
-    # instantiate reduction of D frames (frames 7927-10722 and 10742-11408)
-    synthetic_fizeau_inject_remove_adi_D_frames = SyntheticFizeauInjectRemoveADI(
-        injection_iteration = inject_iteration,
-        file_name_list = cookies_centered_06_name_array,
-        n_PCA_host_removal = 100,
-        read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                            'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
-        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + 'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
-        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                            + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
-        write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                            + "simple_synthetic_sci_frame_cube_A.fits"),
-        write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits"),
-        write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
-                                                  + config["file_names"]["MEDIAN_SCI_FRAME"]),
-        write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits")
-                                           )
-    '''
     '''
     Note that tesselation region options are
     mask_100x100pix_whole_frame.fits

@@ -29,7 +29,7 @@ if (ncpu_all > 4):
 else:
     ncpu = ncpu_all
 '''
-ncpu = 1
+ncpu = 2
 
 #
 # below istopgap in case job is running on HPC, when cores might be counted beyond those
@@ -203,6 +203,9 @@ def simple_center(sci):
     # or at coordinate (50.5,50.5) in DS9 convention
     y_true_center = 0.5*np.shape(sci)[0]-0.5
     x_true_center = 0.5*np.shape(sci)[1]-0.5
+
+    print("Re-shifting frame by del_y=" + str(y_true_center-y_mean) + \
+        ", del_x=" + str(x_true_center-x_mean))
 
     # shift in [+y,+x] convention
     sci_shifted = scipy.ndimage.interpolation.shift(sci,

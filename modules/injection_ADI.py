@@ -1207,7 +1207,7 @@ def main(inject_iteration=None):
                                                   + config["file_names"]["MEDIAN_SCI_FRAME"]),
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                            + "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits"),
-        recenter_option=True)
+        recenter_option=False)
 
     '''
     Note that tesselation region options are

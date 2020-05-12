@@ -14,6 +14,7 @@ import multiprocessing
 import string
 import random
 from astropy.io import fits
+from astropy.modeling import models, fitting
 from sklearn.decomposition import PCA
 
 
@@ -160,6 +161,57 @@ def simple_save_fits(image, file_name):
     Handy function to save a FITS image locally for bug-checking
     '''
     fits.writeto(filename = file_name,data = image,overwrite = True)
+
+def simple_center(sci):
+    '''
+    Function to make a simple re-centering of an image with a PSF. This is
+    a slight simplification of the machinery in centering.py
+
+    INPUTS:
+    sci: a 2d image
+
+    OUTPUTS:
+    sci_shifted: a re-centered version of the input image
+    '''
+
+    # get coordinate grid info
+    y, x = np.mgrid[0:np.shape(sci)[0],0:np.shape(sci)[1]]
+    z = np.copy(sci)
+
+    # make an initial Gaussian guess
+    p_init = models.Gaussian2D(amplitude=2000000000.,
+                               x_mean=np.float(0.5*np.shape(sci)[1]),
+                               y_mean=np.float(0.5*np.shape(sci)[0]),
+                               x_stddev=6.,
+                               y_stddev=6.)
+    fit_p = fitting.LevMarLSQFitter()
+
+    # fit the data
+    try:
+        p = fit_p(p_init, x, y, z)
+        ampl, x_mean, y_mean, x_stdev, y_stdev, theat = p._parameters
+
+    except:
+        return
+
+    # get the residual frame
+    resids = z - p(x, y)
+
+    # center the frame
+    # N.b. for a 100x100 image, the physical center is at Python coordinate (49.5,49.5)
+    # i.e., in between pixels 49 and 50 in both dimensions (Python convention),
+    # or at coordinate (50.5,50.5) in DS9 convention
+    y_true_center = 0.5*np.shape(sci)[0]-0.5
+    x_true_center = 0.5*np.shape(sci)[1]-0.5
+
+    # shift in [+y,+x] convention
+    sci_shifted = scipy.ndimage.interpolation.shift(sci,
+                                                    shift = [y_true_center-y_mean, x_true_center-x_mean],
+                                                    mode = "constant",
+                                                    cval = 0.0)
+
+    return sci_shifted
+
 
 
 def make_first_pass_mask(image, quadChoice):

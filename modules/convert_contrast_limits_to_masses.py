@@ -100,14 +100,12 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     '''
 
     model_file_names_df = pd.DataFrame(
-        [["AMES-Cond, 0.7 Gyr","ames_cond_700myr","model_AMES-Cond-2000_M-0_0_NaCo_Vega_700myr.txt"],
+        [
         ["AMES-Cond, 1.0 Gyr","ames_cond_1gyr","model_AMES-Cond-2000_M-0_0_NaCo_Vega_1gyr.txt"],
-        ["BT-Cond, 0.7 Gyr","bt_cond_700myr","model_BT-Cond_M-0_0_NaCo_Vega_700myr.txt"],
         ["BT-Cond, 1.0 Gyr","bt_cond_1gyr","model_BT-Cond_M-0_0_NaCo_Vega_1gyr.txt"],
-        ["BT-Settl, 0.7 Gyr","bt_settl_700myr","model_BT-Settl_M-0_0_NaCo_Vega_700myr.txt"],
         ["BT-Settl, 1.0 Gyr","bt_settl_1gyr","model_BT-Settl_M-0_0_NaCo_Vega_1gyr.txt"],
-        ["BT-Dusty, 0.7 Gyr","bt_dusty_700myr","model_BT-Dusty_M-0_0_NaCo_Vega_700myr.txt"],
-        ["BT-Dusty, 1.0 Gyr","bt_dusty_1gyr","model_BT-Dusty_M-0_0_NaCo_Vega_1gyr.txt"]],
+        ["BT-Dusty, 1.0 Gyr","bt_dusty_1gyr","model_BT-Dusty_M-0_0_NaCo_Vega_1gyr.txt"]
+        ],
         columns=["annotation","string_ref","file_name"])
 
     for model_num in range(0,len(model_file_names_df)):
@@ -186,7 +184,8 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         if (model_num == 0):
             plt.clf()
             fig, ax = plt.subplots()
-            fig.suptitle("Contrast curve\n(based on M_altair = 1.8)")
+            fig.suptitle("Contrast curve\n(based on M_altair = " + \
+                str(np.round(star_abs_mag_pass,1))+")")
             #ax2 = ax.twinx()
             ax.set_xlim([0,2.2]) # 0 to 2.2 asec
             #ax.get_shared_y_axes().join(ax,ax2)

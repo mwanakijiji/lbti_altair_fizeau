@@ -887,7 +887,9 @@ def main(inject_iteration=None):
 
         # fake planet injection starting parameters
 
-        # note for 4.05 um and 8.25-m apertures, 1.22*lambda/D = 0.1235 asec
+        # note for 4.05 um and 8.25-m apertures,
+        # 1.22*lambda/D = 0.1235 asec
+        # FWHM = 1.028*lambda/D = 0.1041 asec
 
         ### OPTION 1: PERMUTATE VALUES
         ### (BE SURE TO COMMENT OUT OPTION 2!)
@@ -901,6 +903,13 @@ def main(inject_iteration=None):
         fake_params_pre_permute = {"angle_deg_EofN": [129.68],
                                "rad_asec": list(B),
                                "ampl_linear_norm": [0.01,0.1]}
+
+        # average angles along long baseline deg E of N for lambda/B strips
+        # Block A, strip 0 of 4: 129.68 (-39.68 along short baseline)
+        # Block D, strip 1 of 4: 109.218 (-19.218 along short baseline)
+        # Block D, strip 2 of 4: 103.43 (-13.43 along short baseline)
+        # Block D, strip 3 of 4: 96.63 (-6.63 along short baseline)
+        # Block D, strip 4 of 4: 89.96 (+0.04 along short baseline)
 
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],

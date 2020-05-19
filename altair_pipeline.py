@@ -12,7 +12,8 @@ from modules import (basic_red,
                      injection_ADI,
                      detection,
                      sensitivity,
-                     convert_contrast_limits_to_masses)
+                     convert_contrast_limits_to_masses,
+                     lambda_over_B_cross_sections_pipeline_code)
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
@@ -80,8 +81,13 @@ while True:
 # interpolate amplitudes
 
 # median along azimuth
-
-# incorporate
-sensitivity.main(small_angle_correction=True) # produces 1-D contrast curve from csv info
 '''
+# lambda/D 1-D contrast curve from csv info
+sensitivity.main(small_angle_correction=True)
+
+# lambda/D mass limits
 convert_contrast_limits_to_masses.main()
+'''
+# lambda/B cross-sections
+lambda_over_B_cross_sections_pipeline_code.main()
+'''

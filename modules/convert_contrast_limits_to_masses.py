@@ -212,6 +212,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     for hline_num in range(5,10):
         ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
     ax.set_ylim([0.5,0.75])
+    ax.axvline(x=1, linewidth=4, linestyle=":", color="k", alpha=0.5)
     plt.tight_layout()
     file_name_cc_masses_plot_name = config["data_dirs"]["DIR_S2N"] + \
                                     config["file_names"]["CONTCURV_MODERN_PLOT_PUBLICATION_MASSES"]

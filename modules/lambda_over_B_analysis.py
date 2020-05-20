@@ -90,21 +90,13 @@ def do_KS(empirical_sample_1,empirical_sample_2):
     return D, val_crit, p_val
 
 
-def main():
+def main(stripe_w_planet):
     '''
     Read in arrays, process them, find residuals, and calculate KS test
+
+    INPUTS:
+    stripe_w_planet: integer which sets the strip with planets injected along the median angle
     '''
-
-    ############################
-    # BEGIN USER INPUTS
-    ############################
-
-    # specify which stripe had the planets injected along the median angle
-    stripe_w_planet == 0
-
-    ############################
-    # END USER INPUTS
-    ############################
 
     # retrieve ALL file names
 
@@ -138,16 +130,21 @@ def main():
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
-                "strip_w_planets_rel_to_strip_0",
-                "strip_w_planets_rel_to_strip_1",
-                "strip_w_planets_rel_to_strip_2",
-                "strip_w_planets_rel_to_strip_3",
-                "strip_w_planets_rel_to_strip_4"]
+                "D_strip_w_planets_rel_to_strip_0",
+                "D_strip_w_planets_rel_to_strip_1",
+                "D_strip_w_planets_rel_to_strip_2",
+                "D_strip_w_planets_rel_to_strip_3",
+                "D_strip_w_planets_rel_to_strip_4",
+                "val_crit_strip_w_planets_rel_to_strip_0",
+                "val_crit_strip_w_planets_rel_to_strip_1",
+                "val_crit_strip_w_planets_rel_to_strip_2",
+                "val_crit_strip_w_planets_rel_to_strip_3",
+                "val_crit_strip_w_planets_rel_to_strip_4"]
     ks_info_df = pd.DataFrame(columns = col_names)
 
     # loop over each combination of injected companion amplitude and radial distance
     comp_ampl_array = np.array([0.01,0.1])
-    dist_fwhm_array = np.array([0.1,0.2,0.3,0.4,0.5,0.6,1.,2.,3.,4.,5.])
+    dist_fwhm_array = np.array([0.1,0.2,0.3,0.4,0.6,1.,2.,3.,4.,5.])
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
     dist_asec_array = np.multiply(dist_pix_array,0.0107)
@@ -161,6 +158,7 @@ def main():
             new_filename = "lambda_over_B_comp_ampl_" + str(comp_ampl) + \
                                 "_dist_asec_" + str(dist_asec) + ".png"
 
+            print("---------------------------------------------------")
             print("Doing KS test for comp_ampl " + str(comp_ampl) + \
                                 " dist_asec " + str(dist_asec))
 
@@ -240,18 +238,47 @@ def main():
             else:
                 print("No strip with planet specified!")
 
-            ### CONTINUE HERE
-            ####################
-            # add info to the dataframe
-            my_dic = {"dist_asec":2,
-                    "comp_ampl":4,
-                    "strip_w_planets_rel_to_strip_0":5,
-                    "strip_w_planets_rel_to_strip_1":5,
-                    "strip_w_planets_rel_to_strip_2":5,
-                    "strip_w_planets_rel_to_strip_3":5,
-                    "strip_w_planets_rel_to_strip_4":5}
+            # calculate relevant quantities, put them into dataframe
+            strip_0_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0"])
+            strip_1_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_1"])
+            strip_2_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_2"])
+            strip_3_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_3"])
+            strip_4_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_4"])
+            strip_0_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_0"])
+            strip_1_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_1"])
+            strip_2_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_2"])
+            strip_3_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_3"])
+            strip_4_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_4"])
+
+            print(strip_0_ks_cross_sec[0])
+            my_dic = {"dist_asec": dist_asec,
+                    "comp_ampl": comp_ampl,
+                    "D_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[0],
+                    "D_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[0],
+                    "D_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[0],
+                    "D_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[0],
+                    "D_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[0],
+                    "val_crit_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[1],
+                    "val_crit_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[1],
+                    "val_crit_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[1],
+                    "val_crit_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[1],
+                    "val_crit_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[1],}
             ks_info_df.loc[len(ks_info_df)] = my_dic
 
+            '''
+            print("dist_asec: " + str(np.round(dist_asec,3)))
+            print("comp_ampl: " + str(np.round(comp_ampl,2)))
+            print("strip_w_planets_rel_to_strip_0, cross-sec: " + str(strip_0_ks_cross_sec))
+            print("strip_w_planets_rel_to_strip_0, marginalization: " + str(strip_0_ks_marg))
+            print("strip_w_planets_rel_to_strip_1, cross-sec: " + str(strip_1_ks_cross_sec))
+            print("strip_w_planets_rel_to_strip_1, marginalization: " + str(strip_1_ks_marg))
+            print("strip_w_planets_rel_to_strip_2, cross-sec: " + str(strip_2_ks_cross_sec))
+            print("strip_w_planets_rel_to_strip_2, marginalization: " + str(strip_2_ks_marg))
+            print("strip_w_planets_rel_to_strip_3, cross-sec: " + str(strip_3_ks_cross_sec))
+            print("strip_w_planets_rel_to_strip_3, marginalization: " + str(strip_3_ks_marg))
+            print("strip_w_planets_rel_to_strip_4, cross-sec: " + str(strip_4_ks_cross_sec))
+            print("strip_w_planets_rel_to_strip_4, marginalization: " + str(strip_4_ks_marg))
+            '''
             planet_loc_pix = np.divide(dist_asec,0.0107)
 
             ## giant block of code to make a plot
@@ -270,51 +297,57 @@ def main():
             # plot cross-sections and their differences between different strips
             ax2.plot(cross_sec_dict["strip_0"], label="cross sec")
             ax2.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0"]), label="diff")
-            ax2.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_0_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0"])
+            ax2.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
+
             ax2.legend()
             ax2.set_title("Cross-sec rel. to strip 0\nD = "
                           + str(np.round(strip_0_ks_cross_sec[0],4))
-                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec[1],4)) + ",\np_val = " + str(np.round(strip_0_ks_cross_sec[2],4)))
+                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec[1],4))
+                          + ",\np_val = " + str(np.round(strip_0_ks_cross_sec[2],4)))
 
             ax3.plot(cross_sec_dict["strip_1"], label="cross sec")
             ax3.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1"]), label="diff")
-            ax3.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_1_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_1"])
+            ax3.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax3.legend()
             ax3.set_title("Cross-sec rel. to strip 1\nD = "
                           + str(np.round(strip_1_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_1_ks_cross_sec[1],4)) + ",\np_val = " + str(np.round(strip_1_ks_cross_sec[2],4)))
+                          + str(np.round(strip_1_ks_cross_sec[1],4)) + ",\np_val = "
+                          + str(np.round(strip_1_ks_cross_sec[2],4)))
 
 
             ax4.plot(cross_sec_dict["strip_2"], label="cross sec")
             ax4.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_2"]), label="diff")
-            ax4.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_2_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_2"])
+            ax4.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax4.legend()
             ax4.set_title("Cross-sec rel. to strip 2\nD = "
                           + str(np.round(strip_2_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_2_ks_cross_sec[1],4)) + ",\np_val = " + str(np.round(strip_2_ks_cross_sec[2],4)))
+                          + str(np.round(strip_2_ks_cross_sec[1],4)) + ",\np_val = "
+                          + str(np.round(strip_2_ks_cross_sec[2],4)))
 
 
             ax5.plot(cross_sec_dict["strip_3"], label="cross sec")
             ax5.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_3"]), label="diff")
-            ax5.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_3_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_3"])
+            ax5.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax5.legend()
             ax5.set_title("Cross-sec rel. to strip 3\nD = "
                           + str(np.round(strip_3_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_3_ks_cross_sec[1],4)) + ",\np_val = " + str(np.round(strip_3_ks_cross_sec[2],4)))
+                          + str(np.round(strip_3_ks_cross_sec[1],4)) + ",\np_val = "
+                          + str(np.round(strip_3_ks_cross_sec[2],4)))
 
 
             ax6.plot(cross_sec_dict["strip_4"], label="cross sec")
             ax6.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_4"]), label="diff")
-            ax6.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_4_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_4"])
+            ax6.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax6.legend()
             ax6.set_title("Cross-sec rel. to strip 4\nD = "
                           + str(np.round(strip_4_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_4_ks_cross_sec[1],4)) + ",\np_val = " + str(np.round(strip_4_ks_cross_sec[2],4)))
+                          + str(np.round(strip_4_ks_cross_sec[1],4)) + ",\np_val = "
+                          + str(np.round(strip_4_ks_cross_sec[2],4)))
 
 
             # bottom-left (ax7): blank
@@ -322,48 +355,52 @@ def main():
             # plot cross-sections and their differences between different strips
             ax8.plot(marginalization_dict["strip_0"], label="marginalization")
             ax8.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_0"]), label="diff")
-            ax8.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_0_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_0"])
+            ax8.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax8.legend()
             ax8.set_title("Marg rel. to strip 0\nD = "
                           + str(np.round(strip_0_ks_marg[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_0_ks_marg[1],4)) + ",\np_val = " + str(np.round(strip_0_ks_marg[2],4)))
+                          + str(np.round(strip_0_ks_marg[1],4)) + ",\np_val = "
+                          + str(np.round(strip_0_ks_marg[2],4)))
 
             ax9.plot(marginalization_dict["strip_1"], label="marginalization")
             ax9.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_1"]), label="diff")
-            ax9.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_1_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_1"])
+            ax9.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax9.legend()
             ax9.set_title("Marg rel. to strip 1\nD = "
                           + str(np.round(strip_1_ks_marg[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_1_ks_marg[1],4)) + ",\np_val = " + str(np.round(strip_1_ks_marg[2],4)))
+                          + str(np.round(strip_1_ks_marg[1],4)) + ",\np_val = "
+                          + str(np.round(strip_1_ks_marg[2],4)))
 
             ax10.plot(cross_sec_dict["strip_2"], label="marginalization")
             ax10.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_2"]), label="diff")
-            ax10.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_2_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_2"])
+            ax10.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax10.legend()
             ax10.set_title("Marg rel. to strip 2\nD = "
                            + str(np.round(strip_2_ks_marg[0],4)) + ",\nval_crit = "
-                           + str(np.round(strip_2_ks_marg[1],4)) + ",\np_val = " + str(np.round(strip_2_ks_marg[2],4)))
-
+                           + str(np.round(strip_2_ks_marg[1],4)) + ",\np_val = "
+                           + str(np.round(strip_2_ks_marg[2],4)))
             ax11.plot(cross_sec_dict["strip_3"], label="marginalization")
             ax11.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_3"]), label="diff")
-            ax11.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_3_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_3"])
+            ax11.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax11.legend()
             ax11.set_title("Marg rel. to strip 3\nD = "
                            + str(np.round(strip_3_ks_marg[0],4)) + ",\nval_crit = "
-                           + str(np.round(strip_3_ks_marg[1],4)) + ",\np_val = " + str(np.round(strip_3_ks_marg[2],4)))
+                           + str(np.round(strip_3_ks_marg[1],4)) + ",\np_val = "
+                           + str(np.round(strip_3_ks_marg[2],4)))
 
             ax12.plot(cross_sec_dict["strip_4"], label="marginalization")
             ax12.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_4"]), label="diff")
-            ax12.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix, linestyle=":", color="k", linewidth=4, alpha=0.4)
-            strip_4_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_4"])
+            ax12.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
+                linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax12.legend()
             ax12.set_title("Marg rel. to strip 4\nD = "
                            + str(np.round(strip_4_ks_marg[0],4)) + ",\nval_crit = "
-                           + str(np.round(strip_4_ks_marg[1],4)) + ",\np_val = " + str(np.round(strip_4_ks_marg[2],4)))
+                           + str(np.round(strip_4_ks_marg[1],4)) + ",\np_val = "
+                           + str(np.round(strip_4_ks_marg[2],4)))
 
             #ax6.set_ylim([-400,700]) # for 0.01 companions
             #ax3.set_ylim([-3000,6000]) # for 0.1 companions
@@ -375,3 +412,5 @@ def main():
             #plt.show()
 
             print("Saved " + new_filename)
+
+    import ipdb; ipdb.set_trace()

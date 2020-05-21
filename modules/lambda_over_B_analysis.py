@@ -8,7 +8,7 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 
 
-stem = "/Users/nyumbani/Downloads/"
+stem = "/Users/nyumbani/Documents/git.repos/lbti_altair_fizeau/"
 
 
 def shave_and_rotate(img, angle):
@@ -103,43 +103,42 @@ def main(stripe_w_planet):
     # glob of file names of ADI frames of A block strip 0 of 4
     # (planets are in this strip)
     file_names_strip_0_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3203135/*.fits"))
-
     # glob of file names of ADI frames of D block strip 1 of 4
-    # (planets present in strip 0 of 4)
     file_names_strip_1_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216450/*.fits"))
-
     # glob of file names of ADI frames of D block strip 2 of 4
-    # (planets present in strip 0 of 4)
     file_names_strip_2_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216451/*.fits"))
-
     # glob of file names of ADI frames of D block strip 3 of 4
-    # (planets present in strip 0 of 4)
     file_names_strip_3_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216452/*.fits"))
-
     # glob of file names of ADI frames of D block strip 4 of 4
-    # (planets present in strip 0 of 4)
     file_names_strip_4_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216453/*.fits"))
 
-    # choose the arrays
-    file_names_strip_0_of_4 = file_names_strip_0_of_4_planetsInStrip0
-    file_names_strip_1_of_4 = file_names_strip_1_of_4_planetsInStrip0
-    file_names_strip_2_of_4 = file_names_strip_2_of_4_planetsInStrip0
-    file_names_strip_3_of_4 = file_names_strip_3_of_4_planetsInStrip0
-    file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip0
+    # choose the arrays to use in the analysis
+    if (stripe_w_planet == 0):
+        file_names_strip_0_of_4 = file_names_strip_0_of_4_planetsInStrip0
+        file_names_strip_1_of_4 = file_names_strip_1_of_4_planetsInStrip0
+        file_names_strip_2_of_4 = file_names_strip_2_of_4_planetsInStrip0
+        file_names_strip_3_of_4 = file_names_strip_3_of_4_planetsInStrip0
+        file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip0
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_0_"
+        # name of the plot for the publication outside the for-loop below
+        lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
+    else:
+        print("Don't know which lists of file names to use in the analysis!")
 
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
-                "D_strip_w_planets_rel_to_strip_0",
-                "D_strip_w_planets_rel_to_strip_1",
-                "D_strip_w_planets_rel_to_strip_2",
-                "D_strip_w_planets_rel_to_strip_3",
-                "D_strip_w_planets_rel_to_strip_4",
-                "val_crit_strip_w_planets_rel_to_strip_0",
-                "val_crit_strip_w_planets_rel_to_strip_1",
-                "val_crit_strip_w_planets_rel_to_strip_2",
-                "val_crit_strip_w_planets_rel_to_strip_3",
-                "val_crit_strip_w_planets_rel_to_strip_4"]
+                "D_xsec_strip_w_planets_rel_to_strip_0",
+                "D_xsec_strip_w_planets_rel_to_strip_1",
+                "D_xsec_strip_w_planets_rel_to_strip_2",
+                "D_xsec_strip_w_planets_rel_to_strip_3",
+                "D_xsec_strip_w_planets_rel_to_strip_4",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_0",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_1",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_2",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_3",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_4"]
     ks_info_df = pd.DataFrame(columns = col_names)
 
     # loop over each combination of injected companion amplitude and radial distance
@@ -155,12 +154,14 @@ def main(stripe_w_planet):
             comp_ampl = comp_ampl_array[comp_ampl_num]
             dist_asec = dist_asec_array[dist_asec_num]
 
-            new_filename = "lambda_over_B_comp_ampl_" + str(comp_ampl) + \
-                                "_dist_asec_" + str(dist_asec) + ".png"
+            # name of the FYI plot
+            new_filename = plot_string + \
+                            "lambda_over_B_comp_ampl_" + str(comp_ampl) + \
+                            "_dist_asec_" + str(dist_asec) + ".png"
 
             print("---------------------------------------------------")
             print("Doing KS test for comp_ampl " + str(comp_ampl) + \
-                                " dist_asec " + str(dist_asec))
+                                " and dist_asec " + str(dist_asec))
 
             # pluck out the interesting file names
             file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4,
@@ -180,7 +181,6 @@ def main(stripe_w_planet):
                                                                 dist_asec_pass=dist_asec)
 
             # read in and process the images
-            # (note we still don't define which strip has the planets)
 
             image_stripe_0 = fits.getdata(file_name_strip_0_of_4,0,header=False)
             img_processed_stripe_0 = shave_and_rotate(image_stripe_0,angle=39.68)
@@ -196,7 +196,6 @@ def main(stripe_w_planet):
 
             image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
             img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=-0.04)
-
 
             # find the cross-sections and marginalizations
 
@@ -250,19 +249,18 @@ def main(stripe_w_planet):
             strip_3_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_3"])
             strip_4_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_4"])
 
-            print(strip_0_ks_cross_sec[0])
             my_dic = {"dist_asec": dist_asec,
                     "comp_ampl": comp_ampl,
-                    "D_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[0],
-                    "D_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[0],
-                    "D_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[0],
-                    "D_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[0],
-                    "D_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[0],
-                    "val_crit_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[1],
-                    "val_crit_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[1],
-                    "val_crit_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[1],
-                    "val_crit_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[1],
-                    "val_crit_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[1],}
+                    "D_xsec_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[0],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[1],}
             ks_info_df.loc[len(ks_info_df)] = my_dic
 
             '''
@@ -413,4 +411,34 @@ def main(stripe_w_planet):
 
             print("Saved " + new_filename)
 
-    import ipdb; ipdb.set_trace()
+    # taking all the data together, make a plot for the publication
+
+    # loop over each companion amplitude
+    for comp_ampl_num in range(0,len(comp_ampl_array)):
+
+        # select one companion amplitude
+        ks_info_df_this_ampl = ks_info_df.where(
+                                                np.round(ks_info_df["comp_ampl"],3) == np.round(comp_ampl_array[comp_ampl_num],3)
+                                                )
+        plt.clf()
+        plt.plot(ks_info_df_this_ampl["dist_asec"], ks_info_df_this_ampl["D_xsec_strip_w_planets_rel_to_strip_0"],
+            marker="o", label="Rel to strip 0")
+        plt.plot(ks_info_df_this_ampl["dist_asec"], ks_info_df_this_ampl["D_xsec_strip_w_planets_rel_to_strip_1"],
+            marker="o", label="Rel to strip 1")
+        plt.plot(ks_info_df_this_ampl["dist_asec"], ks_info_df_this_ampl["D_xsec_strip_w_planets_rel_to_strip_2"],
+            marker="o", label="Rel to strip 2")
+        plt.plot(ks_info_df_this_ampl["dist_asec"], ks_info_df_this_ampl["D_xsec_strip_w_planets_rel_to_strip_3"],
+            marker="o", label="Rel to strip 3")
+        plt.plot(ks_info_df_this_ampl["dist_asec"], ks_info_df_this_ampl["D_xsec_strip_w_planets_rel_to_strip_4"],
+            marker="o", label="Rel to strip 4")
+        plt.xlabel("asec")
+        plt.ylabel("KS D statistic")
+        plt.axhline(y=np.nanmedian(ks_info_df_this_ampl["val_xsec_crit_strip_w_planets_rel_to_strip_0"]), linestyle=":", color="k")
+        plt.legend()
+        plt.title("KS test on cross-sections\ninjected companion amplitude: " +
+                    str(np.round(comp_ampl_array[comp_ampl_num],3)))
+        file_name_this = "ampl_" + str(np.round(comp_ampl_array[comp_ampl_num],3)) +
+                            "_" + lambda_over_B_pub_plot_filename_suffix
+        plt.savefig(file_name_this)
+        plt.close()
+        print("Saved lambda-over-B plot as " + file_name_this)

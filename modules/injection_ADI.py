@@ -897,12 +897,12 @@ def main(inject_iteration=None):
         ps_asec_per_pix = np.float(config["instrum_params"]["LMIR_PS"]) # plate scale
         #A = np.arange(2,21) # FWHM numbers from center to edge of frame (FULL THING)
         #A = np.array([2,3,4,5,7,9,12,15,19]) # more sparse design as R increases (FULL THING)
-        A = np.array([0.1,0.2,0.3,0.4,0.5,0.6,1.,2.,3.,4.,5.]) # (SUBSET)
+        A = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.]) # (SUBSET)
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
 
         fake_params_pre_permute = {"angle_deg_EofN": [129.68],
                                "rad_asec": list(B),
-                               "ampl_linear_norm": [0.01,0.1]}
+                               "ampl_linear_norm": [0.01,0.02]}
 
         # average angles along long baseline deg E of N for lambda/B strips
         # Block A, strip 0 of 4: 129.68 (-39.68 along short baseline)

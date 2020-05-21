@@ -20,12 +20,17 @@ echo "Start time"
 date
 
 ### set variables: filenames of the data tarball and Singularity container
-### input files
-export DATA_TARBALL=altair_20200508_good_frames_list_D_stripe_1_of_4.tar.gz
+### input files: for lambda/B regime, probably want to choose data tarball from
+### altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
+### altair_20200508_good_frames_list_D_stripe_1_of_4.tar.gz
+### altair_20200508_good_frames_list_D_stripe_2_of_4.tar.gz
+### altair_20200508_good_frames_list_D_stripe_3_of_4.tar.gz
+### altair_20200508_good_frames_list_D_stripe_4_of_4.tar.gz
+export DATA_TARBALL=altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_test_results_severalFWHM_129pt68degEofN_list_D_stripe_1_of_4_047.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_129pt68degEofN_list_D_stripe_1_of_4_047.csv
+export RESULTS_TARBALL=recenter_test_results_severalFWHM_129pt68degEofN_list_A_stripe_0_of_4_048.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_129pt68degEofN_list_A_stripe_0_of_4_048.csv
 
 ### load python 3.6.5
 module load python/3
@@ -118,7 +123,7 @@ then
    ### directory
    echo "Tarring outputs"
    ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
-   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/
    echo "Done tarring output:"
    date
    echo "---"

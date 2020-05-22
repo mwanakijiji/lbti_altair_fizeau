@@ -14,11 +14,13 @@ import matplotlib.cm as cmx
 #%matplotlib qt
 
 # read in a pre-existing mask and remove slices to make a truncated mask
+# be sure to comment/uncomment the plot commands with the 'extent' arguments
 
 # lambda/D
-test_data_frame, hdr = fits.getdata("data/mask_406x406_rings_4quad_fits_coarse_20200409.fits", 0, header=True)
+#test_data_frame, hdr = fits.getdata("data/mask_406x406_rings_4quad_fits_coarse_20200409.fits", 0, header=True)
 
 # lambda/B
+test_data_frame, hdr = fits.getdata("data/mask_406x406_center_strip_width_2_FWHM_lamb_over_B.fits", 0, header=True)
 
 this_cube = np.copy(test_data_frame)
 fig, ax = plt.subplots(1, 1)

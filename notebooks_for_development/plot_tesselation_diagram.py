@@ -17,34 +17,44 @@ import matplotlib.cm as cmx
 # be sure to comment/uncomment the plot commands with the 'extent' arguments
 
 # lambda/D
-#test_data_frame, hdr = fits.getdata("data/mask_406x406_rings_4quad_fits_coarse_20200409.fits", 0, header=True)
+'''
+test_data_frame, hdr = fits.getdata("data/mask_406x406_rings_4quad_fits_coarse_20200409.fits", 0, header=True)
+lower_lim_x = -2.1721
+upper_lim_x = 2.1721
+lower_lim_y = -2.1721
+upper_lim_y = 2.1721
+'''
 
 # lambda/B
 test_data_frame, hdr = fits.getdata("data/mask_406x406_center_strip_width_2_FWHM_lamb_over_B.fits", 0, header=True)
+test_data_frame = test_data_frame[:,156:250,:]
+lower_lim_x = -2.1721
+upper_lim_x = 2.1721
+lower_lim_y = -0.5
+upper_lim_y = 0.5
 
 this_cube = np.copy(test_data_frame)
 fig, ax = plt.subplots(1, 1)
-lower_lim = -2.1721
-upper_lim = 2.1721
+
 
 # plot the grey (not considered) regions
 
 median_img = np.nanmedian(this_cube,axis=0)
 plt.imshow(median_img, cmap="gray", vmin=-1, vmax=0.2,
-           extent=[lower_lim,upper_lim,lower_lim,upper_lim], origin="lower")
+           extent=[lower_lim_x,upper_lim_x,lower_lim_y,upper_lim_y], origin="lower")
 
 # plot the white (considered) regions
 for plot_num in range(0,len(this_cube)):
     this_plot = this_cube[plot_num,:,:].astype('float')
     this_plot[this_plot == 0] = np.nan # this to a
     plt.imshow(this_plot, cmap="gray", vmin=-3, vmax=1,
-               extent=[lower_lim,upper_lim,lower_lim,upper_lim], origin="lower")
-    plt.contour(this_plot, levels=[1], colors="k", extent=[lower_lim,upper_lim,lower_lim,upper_lim], origin="lower")
+               extent=[lower_lim_x,upper_lim_x,lower_lim_y,upper_lim_y], origin="lower")
+    plt.contour(this_plot, levels=[1], colors="k", extent=[lower_lim_x,upper_lim_x,lower_lim_y,upper_lim_y], origin="lower")
 
 # plot the contours
 for plot_num in range(0,len(this_cube)):
     this_plot = this_cube[plot_num,:,:].astype('float')
-    plt.contour(this_plot, levels=[1], colors="k", extent=[lower_lim,upper_lim,lower_lim,upper_lim], origin="lower")
+    plt.contour(this_plot, levels=[1], colors="k", extent=[lower_lim_x,upper_lim_x,lower_lim_y,upper_lim_y], origin="lower")
 
 ax.set_aspect('equal', 'box')
 #plt.title("mask_406x406_rings_4quad_fits_coarse_20200409.fits")

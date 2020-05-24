@@ -29,8 +29,8 @@ date
 export DATA_TARBALL=altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_test_results_severalFWHM_109pt218degEofN_ampl_0pt05to0pt08_list_A_stripe_0_of_4_073.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_109pt218degEofN_ampl_0pt05to0pt08_list_A_stripe_0_of_4_073.csv
+export RESULTS_TARBALL=recenter_test_results_severalFWHM_109pt218degEofN_ampl_0pt09to0pt3_list_A_stripe_0_of_4_078.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_109pt218degEofN_ampl_0pt09to0pt3_list_A_stripe_0_of_4_078.csv
 
 ### load python 3.6.5
 module load python/3
@@ -38,11 +38,11 @@ module load python/3
 ### load Singularity
 module load singularity
 
-### check if 500 Gb of storage are available in /tmp
+### check if 450 Gb of storage are available in /tmp
 echo $HOSTNAME
 echo "Check if /tmp has 500GB of storage available"
 available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
-if [ $available_space -gt 500 ]
+if [ $available_space -gt 450 ]
 then
    echo "There is enough storage"
    echo $available_space GB

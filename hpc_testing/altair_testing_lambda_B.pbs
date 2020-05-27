@@ -11,11 +11,11 @@
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
 ### (1820 for 6 sets of amplitude at a time)
 ### (1204 for 4 sets of amplitude at a time)
-#PBS -l cput=1204:00:00
+#PBS -l cput=1820:00:00
 ### Walltime is how long your job will run
 ### (65 for 6 sets of amplitude at a time)
 ### (43 for 4 sets of amplitude at a time)
-#PBS -l walltime=43:00:00
+#PBS -l walltime=65:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 
@@ -33,8 +33,8 @@ date
 export DATA_TARBALL=altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_test_results_severalFWHM_309pt68degEofN_ampl_0pt01to0pt06_list_A_stripe_0_of_4_122.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_309pt68degEofN_ampl_0pt01to0pt06_list_A_stripe_0_of_4_122.csv
+export RESULTS_TARBALL=recenter_test_results_severalFWHM_309pt68degEofN_ampl_0pt07to0pt3_list_A_stripe_0_of_4_126.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_309pt68degEofN_ampl_0pt07to0pt3_list_A_stripe_0_of_4_126.csv
 
 ### load python 3.6.5
 module load python/3

@@ -4,18 +4,18 @@
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
-#PBS -W group_list=ktmorz
+#PBS -W group_list=phinz
 ### Sharing settings
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
 ### (1820 for 6 sets of amplitude at a time)
 ### (1204 for 4 sets of amplitude at a time)
-#PBS -l cput=1624:00:00
+#PBS -l cput=1708:00:00
 ### Walltime is how long your job will run
 ### (65 for 6 sets of amplitude at a time)
 ### (43 for 4 sets of amplitude at a time)
-#PBS -l walltime=58:00:00
+#PBS -l walltime=61:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 

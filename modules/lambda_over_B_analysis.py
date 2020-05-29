@@ -56,7 +56,9 @@ def pluck_interesting_file_name(file_names, comp_ampl_pass, dist_asec_pass):
 
     elif (found_one_ticker == 0):
 
-        print("No matching files!")
+        print("No matching files for comp_ampl " + str(comp_ampl_pass) + \
+            ", dist_asec " + str(dist_asec_pass))
+        import ipdb; ipdb.set_trace()
 
     else:
 
@@ -90,27 +92,58 @@ def do_KS(empirical_sample_1,empirical_sample_2):
     return D, val_crit, p_val
 
 
-def main(stripe_w_planet):
+def main(stripe_w_planet, csv_basename):
     '''
     Read in arrays, process them, find residuals, and calculate KS test
 
     INPUTS:
     stripe_w_planet: integer which sets the strip with planets injected along the median angle
+        (choices are [0,1,2,3,4])
+    csv_basename: csv containing the data which will be written
     '''
 
     # retrieve ALL file names
 
     # glob of file names of ADI frames of A block strip 0 of 4
     # (planets are in this strip)
-    file_names_strip_0_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3203135/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip0 = list(glob.glob(stem+"jobs_strip_0_of_4_planetsInStrip0/*.fits"))
     # glob of file names of ADI frames of D block strip 1 of 4
-    file_names_strip_1_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216450/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip0 = list(glob.glob(stem+"jobs_strip_1_of_4_planetsInStrip0/*.fits"))
     # glob of file names of ADI frames of D block strip 2 of 4
-    file_names_strip_2_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216451/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip0 = list(glob.glob(stem+"jobs_strip_2_of_4_planetsInStrip0/*.fits"))
     # glob of file names of ADI frames of D block strip 3 of 4
-    file_names_strip_3_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216452/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip0 = list(glob.glob(stem+"jobs_strip_3_of_4_planetsInStrip0/*.fits"))
     # glob of file names of ADI frames of D block strip 4 of 4
-    file_names_strip_4_of_4_planetsInStrip0 = list(glob.glob(stem+"job_3216453/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip0 = list(glob.glob(stem+"jobs_strip_4_of_4_planetsInStrip0/*.fits"))
+
+    # glob of file names of ADI frames of D block strip 1 of 4
+    file_names_strip_0_of_4_planetsInStrip1 = list(glob.glob(stem+"jobs_strip_0_of_4_planetsInStrip1/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip1 = list(glob.glob(stem+"jobs_strip_1_of_4_planetsInStrip1/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip1 = list(glob.glob(stem+"jobs_strip_2_of_4_planetsInStrip1/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip1 = list(glob.glob(stem+"jobs_strip_3_of_4_planetsInStrip1/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip1 = list(glob.glob(stem+"jobs_strip_4_of_4_planetsInStrip1/*.fits"))
+
+    # glob of file names of ADI frames of D block strip 2 of 4
+    file_names_strip_0_of_4_planetsInStrip2 = list(glob.glob(stem+"jobs_strip_0_of_4_planetsInStrip2/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip2 = list(glob.glob(stem+"jobs_strip_1_of_4_planetsInStrip2/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip2 = list(glob.glob(stem+"jobs_strip_2_of_4_planetsInStrip2/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip2 = list(glob.glob(stem+"jobs_strip_3_of_4_planetsInStrip2/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip2 = list(glob.glob(stem+"jobs_strip_4_of_4_planetsInStrip2/*.fits"))
+
+    # glob of file names of ADI frames of D block strip 3 of 4
+    file_names_strip_0_of_4_planetsInStrip3 = list(glob.glob(stem+"jobs_strip_0_of_4_planetsInStrip3/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip3 = list(glob.glob(stem+"jobs_strip_1_of_4_planetsInStrip3/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip3 = list(glob.glob(stem+"jobs_strip_2_of_4_planetsInStrip3/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip3 = list(glob.glob(stem+"jobs_strip_3_of_4_planetsInStrip3/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip3 = list(glob.glob(stem+"jobs_strip_4_of_4_planetsInStrip3/*.fits"))
+
+    # glob of file names of ADI frames of D block strip 4 of 4
+    file_names_strip_0_of_4_planetsInStrip4 = list(glob.glob(stem+"jobs_strip_0_of_4_planetsInStrip4/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip4 = list(glob.glob(stem+"jobs_strip_1_of_4_planetsInStrip4/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip4 = list(glob.glob(stem+"jobs_strip_2_of_4_planetsInStrip4/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip4 = list(glob.glob(stem+"jobs_strip_3_of_4_planetsInStrip4/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip4 = list(glob.glob(stem+"jobs_strip_4_of_4_planetsInStrip4/*.fits"))
+
 
     # choose the arrays to use in the analysis
     if (stripe_w_planet == 0):
@@ -121,6 +154,46 @@ def main(stripe_w_planet):
         file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip0
         # for differentiating plot file names
         plot_string = "stripe_w_planet_0_"
+        # name of the plot for the publication outside the for-loop below
+        lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
+    elif (stripe_w_planet == 1):
+        file_names_strip_0_of_4 = file_names_strip_0_of_4_planetsInStrip1
+        file_names_strip_1_of_4 = file_names_strip_1_of_4_planetsInStrip1
+        file_names_strip_2_of_4 = file_names_strip_2_of_4_planetsInStrip1
+        file_names_strip_3_of_4 = file_names_strip_3_of_4_planetsInStrip1
+        file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip1
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_1_"
+        # name of the plot for the publication outside the for-loop below
+        lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
+    elif (stripe_w_planet == 2):
+        file_names_strip_0_of_4 = file_names_strip_0_of_4_planetsInStrip2
+        file_names_strip_1_of_4 = file_names_strip_1_of_4_planetsInStrip2
+        file_names_strip_2_of_4 = file_names_strip_2_of_4_planetsInStrip2
+        file_names_strip_3_of_4 = file_names_strip_3_of_4_planetsInStrip2
+        file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip2
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_2_"
+        # name of the plot for the publication outside the for-loop below
+        lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
+    elif (stripe_w_planet == 3):
+        file_names_strip_0_of_4 = file_names_strip_0_of_4_planetsInStrip3
+        file_names_strip_1_of_4 = file_names_strip_1_of_4_planetsInStrip3
+        file_names_strip_2_of_4 = file_names_strip_2_of_4_planetsInStrip3
+        file_names_strip_3_of_4 = file_names_strip_3_of_4_planetsInStrip3
+        file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip3
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_3_"
+        # name of the plot for the publication outside the for-loop below
+        lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
+    elif (stripe_w_planet == 4):
+        file_names_strip_0_of_4 = file_names_strip_0_of_4_planetsInStrip4
+        file_names_strip_1_of_4 = file_names_strip_1_of_4_planetsInStrip4
+        file_names_strip_2_of_4 = file_names_strip_2_of_4_planetsInStrip4
+        file_names_strip_3_of_4 = file_names_strip_3_of_4_planetsInStrip4
+        file_names_strip_4_of_4 = file_names_strip_4_of_4_planetsInStrip4
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_4_"
         # name of the plot for the publication outside the for-loop below
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     else:
@@ -141,9 +214,23 @@ def main(stripe_w_planet):
                 "val_xsec_crit_strip_w_planets_rel_to_strip_4"]
     ks_info_df = pd.DataFrame(columns = col_names)
 
+    # generate lists of companion amplitudes and distances (asec) from host star
+    # initialize DataFrame to hold data from ALL strips
+    '''
+    df_params_all_strips = pd.DataFrame()
+    strip_0_of_4_params =
+    for t in range(0,len(file_names_strip_0_of_4_planetsInStrip0)):
+
+        planet_current_ampl = float(file_names_strip_0_of_4_planetsInStrip0[t].split("_")[-2])
+        planet_loc_asec = float(file_names_strip_0_of_4_planetsInStrip0[t].split("_")[-3])
+        planet_deg_eofn = float(file_names_strip_0_of_4_planetsInStrip0[t].split("_")[-4])
+
+        file_names_strip_0_of_4_planetsInStrip0
+    '''
+
     # loop over each combination of injected companion amplitude and radial distance
-    comp_ampl_array = np.array([0.01,0.1])
-    dist_fwhm_array = np.array([0.1,0.2,0.3,0.4,0.6,1.,2.,3.,4.,5.])
+    comp_ampl_array = np.array([0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3])
+    dist_fwhm_array = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.])
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
     dist_asec_array = np.multiply(dist_pix_array,0.0107)
@@ -260,7 +347,8 @@ def main(stripe_w_planet):
                     "val_xsec_crit_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[1],
                     "val_xsec_crit_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[1],
                     "val_xsec_crit_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[1],
-                    "val_xsec_crit_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[1],}
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[1]}
+            print(my_dic)
             ks_info_df.loc[len(ks_info_df)] = my_dic
 
             '''
@@ -411,7 +499,11 @@ def main(stripe_w_planet):
 
             print("Saved " + new_filename)
 
-    # taking all the data together, make a plot for the publication
+    # taking all the data together, write it out as a csv
+    ks_info_df.to_csv(csv_basename)
+    print("Saved all data in " + csv_basename)
+
+    # ... and make a plot for the publication
 
     # loop over each companion amplitude
     for comp_ampl_num in range(0,len(comp_ampl_array)):
@@ -437,8 +529,8 @@ def main(stripe_w_planet):
         plt.legend()
         plt.title("KS test on cross-sections\ninjected companion amplitude: " +
                     str(np.round(comp_ampl_array[comp_ampl_num],3)))
-        file_name_this = "ampl_" + str(np.round(comp_ampl_array[comp_ampl_num],3)) +
-                            "_" + lambda_over_B_pub_plot_filename_suffix
+        file_name_this = "ampl_" + str(np.round(comp_ampl_array[comp_ampl_num],3)) + \
+            "_" + lambda_over_B_pub_plot_filename_suffix
         plt.savefig(file_name_this)
         plt.close()
         print("Saved lambda-over-B plot as " + file_name_this)

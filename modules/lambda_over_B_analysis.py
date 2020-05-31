@@ -201,13 +201,13 @@ def main(stripe_w_planet, csv_basename):
 
     # choose the arrays to use in the analysis
     if (stripe_w_planet == 0):
-        # E: East of North; i.e., 0<PA<180
+        # frames with planet along the E: East of North; i.e., 0<PA<180
         file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip0_129pt68_deg
         file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip0_129pt68_deg
         file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip0_129pt68_deg
         file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip0_129pt68_deg
         file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip0_129pt68_deg
-        # W: West of North; i.e., 180<PA<360
+        # frames with planet along the W: West of North; i.e., 180<PA<360
         file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip0_309pt68_deg
         file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip0_309pt68_deg
         file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip0_309pt68_deg
@@ -318,11 +318,24 @@ def main(stripe_w_planet, csv_basename):
     '''
 
     # loop over each combination of injected companion amplitude and radial distance
+    ## ## (THIS IS KIND OF CLUNKY; IMPROVE LATER IF TIME)
     comp_ampl_array = np.array([0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3])
     dist_fwhm_array = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.])
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
-    dist_asec_array = np.multiply(dist_pix_array,0.0107)
+    dist_asec_array = np.multiply(dist_pix_array,float(config["instrum_params"]["LMIR_PS"]))
+
+    # read in the baseline images with no planets
+    image_baseline_stripe_0 = fits.getdata(file_name_strip_0_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=39.68)
+    image_baseline_stripe_1 = fits.getdata(file_name_strip_1_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_1 = shave_and_rotate(image_baseline_stripe_1,angle=19.218)
+    image_baseline_stripe_2 = fits.getdata(file_name_strip_2_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_2 = shave_and_rotate(image_baseline_stripe_2,angle=13.43)
+    image_baseline_stripe_3 = fits.getdata(file_name_strip_3_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_3 = shave_and_rotate(image_baseline_stripe_3,angle=6.63)
+    image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=-0.04)
 
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):
@@ -339,104 +352,203 @@ def main(stripe_w_planet, csv_basename):
             print("Doing KS test for comp_ampl " + str(comp_ampl) + \
                                 " and dist_asec " + str(dist_asec))
 
-            # pluck out the interesting file names
-            file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4,
+            ## pluck out the interesting file names
+            # frames with planets along eastern arm of strip
+            file_name_strip_0_of_4_E = pluck_interesting_file_name(file_names_strip_0_of_4_E,
                                                                  comp_ampl_pass=comp_ampl,
                                                                  dist_asec_pass=dist_asec)
-            file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1_of_4,
+            file_name_strip_1_of_4_E = pluck_interesting_file_name(file_names_strip_1_of_4_E,
                                                                  comp_ampl_pass=comp_ampl,
                                                                  dist_asec_pass=dist_asec)
-            file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2_of_4,
+            file_name_strip_2_of_4_E = pluck_interesting_file_name(file_names_strip_2_of_4_E,
                                                                  comp_ampl_pass=comp_ampl,
                                                                  dist_asec_pass=dist_asec)
-            file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3_of_4,
+            file_name_strip_3_of_4_E = pluck_interesting_file_name(file_names_strip_3_of_4_E,
                                                                  comp_ampl_pass=comp_ampl,
                                                                  dist_asec_pass=dist_asec)
-            file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4,
+            file_name_strip_4_of_4_E = pluck_interesting_file_name(file_names_strip_4_of_4_E,
+                                                                comp_ampl_pass=comp_ampl,
+                                                                dist_asec_pass=dist_asec)
+            # frames with planets along western arm of strip
+            file_name_strip_0_of_4_W = pluck_interesting_file_name(file_names_strip_0_of_4_W,
+                                                                 comp_ampl_pass=comp_ampl,
+                                                                 dist_asec_pass=dist_asec)
+            file_name_strip_1_of_4_W = pluck_interesting_file_name(file_names_strip_1_of_4_W,
+                                                                 comp_ampl_pass=comp_ampl,
+                                                                 dist_asec_pass=dist_asec)
+            file_name_strip_2_of_4_W = pluck_interesting_file_name(file_names_strip_2_of_4_W,
+                                                                 comp_ampl_pass=comp_ampl,
+                                                                 dist_asec_pass=dist_asec)
+            file_name_strip_3_of_4_W = pluck_interesting_file_name(file_names_strip_3_of_4_W,
+                                                                 comp_ampl_pass=comp_ampl,
+                                                                 dist_asec_pass=dist_asec)
+            file_name_strip_4_of_4_W = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                 comp_ampl_pass=comp_ampl,
                                                                 dist_asec_pass=dist_asec)
 
-            # read in and process the images
-
-            image_stripe_0 = fits.getdata(file_name_strip_0_of_4,0,header=False)
-            img_processed_stripe_0 = shave_and_rotate(image_stripe_0,angle=39.68)
-
-            image_stripe_1 = fits.getdata(file_name_strip_1_of_4,0,header=False)
-            img_processed_stripe_1 = shave_and_rotate(image_stripe_1,angle=19.218)
-
-            image_stripe_2 = fits.getdata(file_name_strip_2_of_4,0,header=False)
-            img_processed_stripe_2 = shave_and_rotate(image_stripe_2,angle=13.43)
-
-            image_stripe_3 = fits.getdata(file_name_strip_3_of_4,0,header=False)
-            img_processed_stripe_3 = shave_and_rotate(image_stripe_3,angle=6.63)
-
-            image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-            img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=-0.04)
+            ## read in and process the images with planets
+            # frames with planets along eastern arm of strip
+            image_stripe_0_E = fits.getdata(file_name_strip_0_of_4_E,0,header=False)
+            img_processed_stripe_0_E = shave_and_rotate(image_stripe_0_E,angle=39.68)
+            image_stripe_1_E = fits.getdata(file_name_strip_1_of_4_E,0,header=False)
+            img_processed_stripe_1_E = shave_and_rotate(image_stripe_1_E,angle=19.218)
+            image_stripe_2_E = fits.getdata(file_name_strip_2_of_4_E,0,header=False)
+            img_processed_stripe_2_E = shave_and_rotate(image_stripe_2_E,angle=13.43)
+            image_stripe_3_E = fits.getdata(file_name_strip_3_of_4_E,0,header=False)
+            img_processed_stripe_3_E = shave_and_rotate(image_stripe_3_E,angle=6.63)
+            image_stripe_4_E = fits.getdata(file_name_strip_4_of_4_E,0,header=False)
+            img_processed_stripe_4_E = shave_and_rotate(image_stripe_4_E,angle=-0.04)
+            # frames with planets along western arm of strip
+            image_stripe_0_W = fits.getdata(file_name_strip_0_of_4_W,0,header=False)
+            img_processed_stripe_0_W = shave_and_rotate(image_stripe_0_W,angle=39.68)
+            image_stripe_1_W = fits.getdata(file_name_strip_1_of_4_W,0,header=False)
+            img_processed_stripe_1_W = shave_and_rotate(image_stripe_1_W,angle=19.218)
+            image_stripe_2_W = fits.getdata(file_name_strip_2_of_4_W,0,header=False)
+            img_processed_stripe_2_W = shave_and_rotate(image_stripe_2_W,angle=13.43)
+            image_stripe_3_W = fits.getdata(file_name_strip_3_of_4_W,0,header=False)
+            img_processed_stripe_3_W = shave_and_rotate(image_stripe_3_W,angle=6.63)
+            image_stripe_4_W = fits.getdata(file_name_strip_4_of_4_W,0,header=False)
+            img_processed_stripe_4_W = shave_and_rotate(image_stripe_4_W,angle=-0.04)
 
             # find the cross-sections and marginalizations
 
             marginalization_dict = {}
             cross_sec_dict = {}
 
-            marginalization_dict["strip_0"] = np.sum(img_processed_stripe_0,axis=0)
-            marginalization_dict["strip_1"] = np.sum(img_processed_stripe_1,axis=0)
-            marginalization_dict["strip_2"] = np.sum(img_processed_stripe_2,axis=0)
-            marginalization_dict["strip_3"] = np.sum(img_processed_stripe_3,axis=0)
-            marginalization_dict["strip_4"] = np.sum(img_processed_stripe_4,axis=0)
+            ## marginalizations
+            # baseline frames without planets
+            marginalization_dict["baseline_strip_0"] = np.sum(baseline_processed_stripe_0,axis=0)
+            marginalization_dict["baseline_strip_1"] = np.sum(baseline_processed_stripe_1,axis=0)
+            marginalization_dict["baseline_strip_2"] = np.sum(baseline_processed_stripe_2,axis=0)
+            marginalization_dict["baseline_strip_3"] = np.sum(baseline_processed_stripe_3,axis=0)
+            marginalization_dict["baseline_strip_4"] = np.sum(baseline_processed_stripe_4,axis=0)
+            # frames with planets in eastern or western arm
+            marginalization_dict["strip_0_E"] = np.sum(img_processed_stripe_0_E,axis=0)
+            marginalization_dict["strip_1_E"] = np.sum(img_processed_stripe_1_E,axis=0)
+            marginalization_dict["strip_2_E"] = np.sum(img_processed_stripe_2_E,axis=0)
+            marginalization_dict["strip_3_E"] = np.sum(img_processed_stripe_3_E,axis=0)
+            marginalization_dict["strip_4_E"] = np.sum(img_processed_stripe_4_E,axis=0)
+            marginalization_dict["strip_0_W"] = np.sum(img_processed_stripe_0_W,axis=0)
+            marginalization_dict["strip_1_W"] = np.sum(img_processed_stripe_1_W,axis=0)
+            marginalization_dict["strip_2_W"] = np.sum(img_processed_stripe_2_W,axis=0)
+            marginalization_dict["strip_3_W"] = np.sum(img_processed_stripe_3_W,axis=0)
+            marginalization_dict["strip_4_W"] = np.sum(img_processed_stripe_4_W,axis=0)
 
-            cross_sec_dict["strip_0"] = img_processed_stripe_0[int(0.5*np.shape(img_processed_stripe_0)[0]),:]
-            cross_sec_dict["strip_1"] = img_processed_stripe_1[int(0.5*np.shape(img_processed_stripe_1)[0]),:]
-            cross_sec_dict["strip_2"] = img_processed_stripe_2[int(0.5*np.shape(img_processed_stripe_2)[0]),:]
-            cross_sec_dict["strip_3"] = img_processed_stripe_3[int(0.5*np.shape(img_processed_stripe_3)[0]),:]
-            cross_sec_dict["strip_4"] = img_processed_stripe_4[int(0.5*np.shape(img_processed_stripe_4)[0]),:]
+            ## cross-sections
+            # baseline frames without planets
+            cross_sec_dict["baseline_strip_0"] = baseline_processed_stripe_0[int(0.5*np.shape(baseline_processed_stripe_0)[0]),:]
+            cross_sec_dict["baseline_strip_1"] = baseline_processed_stripe_1[int(0.5*np.shape(baseline_processed_stripe_1)[0]),:]
+            cross_sec_dict["baseline_strip_2"] = baseline_processed_stripe_2[int(0.5*np.shape(baseline_processed_stripe_2)[0]),:]
+            cross_sec_dict["baseline_strip_3"] = baseline_processed_stripe_3[int(0.5*np.shape(baseline_processed_stripe_3)[0]),:]
+            cross_sec_dict["baseline_strip_4"] = baseline_processed_stripe_4[int(0.5*np.shape(baseline_processed_stripe_4)[0]),:]
+            # frames with planets in eastern or western arm
+            cross_sec_dict["strip_0_E"] = img_processed_stripe_0_E[int(0.5*np.shape(img_processed_stripe_0)[0]),:]
+            cross_sec_dict["strip_1_E"] = img_processed_stripe_1_E[int(0.5*np.shape(img_processed_stripe_1)[0]),:]
+            cross_sec_dict["strip_2_E"] = img_processed_stripe_2_E[int(0.5*np.shape(img_processed_stripe_2)[0]),:]
+            cross_sec_dict["strip_3_E"] = img_processed_stripe_3_E[int(0.5*np.shape(img_processed_stripe_3)[0]),:]
+            cross_sec_dict["strip_4_E"] = img_processed_stripe_4_E[int(0.5*np.shape(img_processed_stripe_4)[0]),:]
+            cross_sec_dict["strip_0_W"] = img_processed_stripe_0_W[int(0.5*np.shape(img_processed_stripe_0)[0]),:]
+            cross_sec_dict["strip_1_W"] = img_processed_stripe_1_W[int(0.5*np.shape(img_processed_stripe_1)[0]),:]
+            cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2)[0]),:]
+            cross_sec_dict["strip_3_W"] = img_processed_stripe_3_W[int(0.5*np.shape(img_processed_stripe_3)[0]),:]
+            cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4)[0]),:]
 
             if (stripe_w_planet == 0):
-                image_injected_planet = img_processed_stripe_0
-                cross_sec_injected_planet = cross_sec_dict["strip_0"]
-                marginalization_injected_planet = marginalization_dict["strip_0"]
+                image_injected_planet_E = img_processed_stripe_0_E
+                image_injected_planet_W = img_processed_stripe_0_W
+                cross_sec_baseline = cross_sec_dict["baseline_strip_0"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_0_E"]
+                cross_sec_injected_planet_W = cross_sec_dict["strip_0_W"]
+                marginalization_baseline = marginalization_dict["baseline_strip_0"]
+                marginalization_injected_planet_E = marginalization_dict["strip_0_E"]
+                marginalization_injected_planet_W = marginalization_dict["strip_0_W"]
             elif (stripe_w_planet == 1):
-                image_injected_planet = img_processed_stripe_1
-                cross_sec_injected_planet = cross_sec_dict["strip_1"]
-                marginalization_injected_planet = marginalization_dict["strip_1"]
+                image_injected_planet_E = img_processed_stripe_1_E
+                image_injected_planet_W = img_processed_stripe_1_W
+                cross_sec_baseline = cross_sec_dict["baseline_strip_1"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_1_E"]
+                cross_sec_injected_planet_W = cross_sec_dict["strip_1_W"]
+                marginalization_baseline = marginalization_dict["baseline_strip_1"]
+                marginalization_injected_planet_E = marginalization_dict["strip_1_E"]
+                marginalization_injected_planet_W = marginalization_dict["strip_1_W"]
             elif (stripe_w_planet == 2):
-                image_injected_planet = img_processed_stripe_2
-                cross_sec_injected_planet = cross_sec_dict["strip_2"]
-                marginalization_injected_planet = marginalization_dict["strip_2"]
+                image_injected_planet_E = img_processed_stripe_2_E
+                image_injected_planet_W = img_processed_stripe_2_W
+                cross_sec_baseline = cross_sec_dict["baseline_strip_2"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_2_E"]
+                cross_sec_injected_planet_W = cross_sec_dict["strip_2_W"]
+                marginalization_baseline = marginalization_dict["baseline_strip_2"]
+                marginalization_injected_planet_E = marginalization_dict["strip_2_E"]
+                marginalization_injected_planet_W = marginalization_dict["strip_2_W"]
             elif (stripe_w_planet == 3):
-                image_injected_planet = img_processed_stripe_3
-                cross_sec_injected_planet = cross_sec_dict["strip_3"]
-                marginalization_injected_planet = marginalization_dict["strip_3"]
+                image_injected_planet_E = img_processed_stripe_3_E
+                image_injected_planet_W = img_processed_stripe_3_W
+                cross_sec_baseline = cross_sec_dict["baseline_strip_3"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_3_E"]
+                cross_sec_injected_planet_W = cross_sec_dict["strip_3_W"]
+                marginalization_baseline = marginalization_dict["baseline_strip_3"]
+                marginalization_injected_planet_E = marginalization_dict["strip_3_E"]
+                marginalization_injected_planet_W = marginalization_dict["strip_3_W"]
             elif (stripe_w_planet == 4):
-                image_injected_planet = img_processed_stripe_4
-                cross_sec_injected_planet = cross_sec_dict["strip_4"]
-                marginalization_injected_planet = marginalization_dict["strip_4"]
+                image_injected_planet_E = img_processed_stripe_4_E
+                image_injected_planet_W = img_processed_stripe_4_W
+                cross_sec_baseline = cross_sec_dict["baseline_strip_4"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_4_E"]
+                cross_sec_injected_planet_W = cross_sec_dict["strip_4_W"]
+                marginalization_baseline = marginalization_dict["baseline_strip_4"]
+                marginalization_injected_planet_E = marginalization_dict["strip_4_E"]
+                marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
                 print("No strip with planet specified!")
 
-            # calculate relevant quantities, put them into dataframe
-            strip_0_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0"])
-            strip_1_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_1"])
-            strip_2_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_2"])
-            strip_3_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_3"])
-            strip_4_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_4"])
-            strip_0_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_0"])
-            strip_1_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_1"])
-            strip_2_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_2"])
-            strip_3_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_3"])
-            strip_4_ks_marg = do_KS(marginalization_injected_planet,marginalization_dict["strip_4"])
+            ## calculate relevant quantities, put them into dataframe
+            # KS statistic from cross-sections
+            strip_0_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_0_E"])
+            strip_1_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_1_E"])
+            strip_2_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_2_E"])
+            strip_3_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_3_E"])
+            strip_4_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_4_E"])
+            strip_0_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_0_W"])
+            strip_1_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_1_W"])
+            strip_2_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_2_W"])
+            strip_3_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_3_W"])
+            strip_4_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_4_W"])
+            # KS statistic from marginalizations
+            strip_0_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_0_E"])
+            strip_1_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_1_E"])
+            strip_2_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_2_E"])
+            strip_3_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_3_E"])
+            strip_4_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_4_E"])
+            strip_0_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_0_W"])
+            strip_1_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_1_W"])
+            strip_2_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_2_W"])
+            strip_3_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_3_W"])
+            strip_4_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_4_W"])
 
+            # put stats into a dictionary; note there are entries corresponding to
+            # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,
                     "comp_ampl": comp_ampl,
-                    "D_xsec_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[0],
-                    "D_xsec_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[0],
-                    "D_xsec_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[0],
-                    "D_xsec_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[0],
-                    "D_xsec_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[0],
-                    "val_xsec_crit_strip_w_planets_rel_to_strip_0": strip_0_ks_cross_sec[1],
-                    "val_xsec_crit_strip_w_planets_rel_to_strip_1": strip_1_ks_cross_sec[1],
-                    "val_xsec_crit_strip_w_planets_rel_to_strip_2": strip_2_ks_cross_sec[1],
-                    "val_xsec_crit_strip_w_planets_rel_to_strip_3": strip_3_ks_cross_sec[1],
-                    "val_xsec_crit_strip_w_planets_rel_to_strip_4": strip_4_ks_cross_sec[1]}
+                    "D_xsec_strip_w_planets_rel_to_strip_0_E": strip_0_ks_cross_sec_E[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_1_E": strip_1_ks_cross_sec_E[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_2_E": strip_2_ks_cross_sec_E[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_3_E": strip_3_ks_cross_sec_E[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_4_E": strip_4_ks_cross_sec_E[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_0_W": strip_0_ks_cross_sec_W[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_1_W": strip_1_ks_cross_sec_W[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_2_W": strip_2_ks_cross_sec_W[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_3_W": strip_3_ks_cross_sec_W[0],
+                    "D_xsec_strip_w_planets_rel_to_strip_4_W": strip_4_ks_cross_sec_W[0],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_0_E": strip_0_ks_cross_sec_E[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_1_E": strip_1_ks_cross_sec_E[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_2_E": strip_2_ks_cross_sec_E[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_3_E": strip_3_ks_cross_sec_E[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_4_E": strip_4_ks_cross_sec_E[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_0_W": strip_0_ks_cross_sec_W[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_1_W": strip_1_ks_cross_sec_W[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_2_W": strip_2_ks_cross_sec_W[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_3_W": strip_3_ks_cross_sec_W[1],
+                    "val_xsec_crit_strip_w_planets_rel_to_strip_4_W": strip_4_ks_cross_sec_W[1]}
             print(my_dic)
             ks_info_df.loc[len(ks_info_df)] = my_dic
 

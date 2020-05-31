@@ -577,6 +577,7 @@ def main(stripe_w_planet, csv_basename):
             print("strip_w_planets_rel_to_strip_4, marginalization: " + str(strip_4_ks_marg))
             '''
             planet_loc_pix = np.divide(dist_asec,0.0107)
+            import ipdb; ipdb.set_trace()
 
             ## giant block of code to make a plot
 

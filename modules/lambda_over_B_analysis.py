@@ -291,16 +291,26 @@ def main(stripe_w_planet, csv_basename):
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
-                "D_xsec_strip_w_planets_rel_to_strip_0",
-                "D_xsec_strip_w_planets_rel_to_strip_1",
-                "D_xsec_strip_w_planets_rel_to_strip_2",
-                "D_xsec_strip_w_planets_rel_to_strip_3",
-                "D_xsec_strip_w_planets_rel_to_strip_4",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_0",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_1",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_2",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_3",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_4"]
+                "D_xsec_strip_w_planets_rel_to_strip_0_E",
+                "D_xsec_strip_w_planets_rel_to_strip_1_E",
+                "D_xsec_strip_w_planets_rel_to_strip_2_E",
+                "D_xsec_strip_w_planets_rel_to_strip_3_E",
+                "D_xsec_strip_w_planets_rel_to_strip_4_E",
+                "D_xsec_strip_w_planets_rel_to_strip_0_W",
+                "D_xsec_strip_w_planets_rel_to_strip_1_W",
+                "D_xsec_strip_w_planets_rel_to_strip_2_W",
+                "D_xsec_strip_w_planets_rel_to_strip_3_W",
+                "D_xsec_strip_w_planets_rel_to_strip_4_W",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_0_E",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_1_E",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_2_E",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_3_E",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_4_E",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_0_W",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_2_W",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_3_W",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_4_W"]
     ks_info_df = pd.DataFrame(columns = col_names)
 
     # generate lists of companion amplitudes and distances (asec) from host star

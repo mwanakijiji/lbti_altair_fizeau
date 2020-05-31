@@ -442,16 +442,16 @@ def main(stripe_w_planet, csv_basename):
             cross_sec_dict["baseline_strip_3"] = baseline_processed_stripe_3[int(0.5*np.shape(baseline_processed_stripe_3)[0]),:]
             cross_sec_dict["baseline_strip_4"] = baseline_processed_stripe_4[int(0.5*np.shape(baseline_processed_stripe_4)[0]),:]
             # frames with planets in eastern or western arm
-            cross_sec_dict["strip_0_E"] = img_processed_stripe_0_E[int(0.5*np.shape(img_processed_stripe_0)[0]),:]
-            cross_sec_dict["strip_1_E"] = img_processed_stripe_1_E[int(0.5*np.shape(img_processed_stripe_1)[0]),:]
-            cross_sec_dict["strip_2_E"] = img_processed_stripe_2_E[int(0.5*np.shape(img_processed_stripe_2)[0]),:]
-            cross_sec_dict["strip_3_E"] = img_processed_stripe_3_E[int(0.5*np.shape(img_processed_stripe_3)[0]),:]
-            cross_sec_dict["strip_4_E"] = img_processed_stripe_4_E[int(0.5*np.shape(img_processed_stripe_4)[0]),:]
-            cross_sec_dict["strip_0_W"] = img_processed_stripe_0_W[int(0.5*np.shape(img_processed_stripe_0)[0]),:]
-            cross_sec_dict["strip_1_W"] = img_processed_stripe_1_W[int(0.5*np.shape(img_processed_stripe_1)[0]),:]
-            cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2)[0]),:]
-            cross_sec_dict["strip_3_W"] = img_processed_stripe_3_W[int(0.5*np.shape(img_processed_stripe_3)[0]),:]
-            cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4)[0]),:]
+            cross_sec_dict["strip_0_E"] = img_processed_stripe_0_E[int(0.5*np.shape(img_processed_stripe_0_E)[0]),:]
+            cross_sec_dict["strip_1_E"] = img_processed_stripe_1_E[int(0.5*np.shape(img_processed_stripe_1_E)[0]),:]
+            cross_sec_dict["strip_2_E"] = img_processed_stripe_2_E[int(0.5*np.shape(img_processed_stripe_2_E)[0]),:]
+            cross_sec_dict["strip_3_E"] = img_processed_stripe_3_E[int(0.5*np.shape(img_processed_stripe_3_E)[0]),:]
+            cross_sec_dict["strip_4_E"] = img_processed_stripe_4_E[int(0.5*np.shape(img_processed_stripe_4_E)[0]),:]
+            cross_sec_dict["strip_0_W"] = img_processed_stripe_0_W[int(0.5*np.shape(img_processed_stripe_0_W)[0]),:]
+            cross_sec_dict["strip_1_W"] = img_processed_stripe_1_W[int(0.5*np.shape(img_processed_stripe_1_W)[0]),:]
+            cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2_W)[0]),:]
+            cross_sec_dict["strip_3_W"] = img_processed_stripe_3_W[int(0.5*np.shape(img_processed_stripe_3_W)[0]),:]
+            cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4_W)[0]),:]
 
             if (stripe_w_planet == 0):
                 image_injected_planet_E = img_processed_stripe_0_E

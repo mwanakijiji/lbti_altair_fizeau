@@ -902,7 +902,7 @@ def main(inject_iteration=None):
 
         fake_params_pre_permute = {"angle_deg_EofN": [283.43],
                                "rad_asec": list(B),
-                               "ampl_linear_norm": [0.01,0.02,0.03,0.04,0.05,0.06]}
+                               "ampl_linear_norm": [0.07,0.08,0.09,0.1,0.2,0.3]}
 
         # average angles along long baseline deg E of N for lambda/B strips
         # Block A, strip 0 of 4: 129.68 / 309.68 (-39.68 along short baseline)

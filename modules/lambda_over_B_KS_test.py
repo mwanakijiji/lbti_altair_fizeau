@@ -113,7 +113,7 @@ def main(stripe_w_planet, csv_basename):
     # - every set of planet injections (with two different azimuths around the host star)
     # - as imprinted in every one of the five stripes
 
-    # first get baseline frames with no planets at all
+    # first get baseline ADI frames with no injected planets at all
     file_name_strip_0_of_4_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
         "strip_0_of_4_no_planets.fits"
     file_name_strip_1_of_4_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
@@ -196,8 +196,6 @@ def main(stripe_w_planet, csv_basename):
     file_names_strip_3_of_4_planetsInStrip4_269pt96_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"jobs_strip_3_of_4_planetsInStrip4_269pt96_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip4_269pt96_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"jobs_strip_4_of_4_planetsInStrip4_269pt96_deg/*.fits"))
 
-    print("stem_adi_frames_lambda_over_B")
-    print(stem_adi_frames_lambda_over_B)
 
     # choose the arrays to use in the analysis
     if (stripe_w_planet == 0):
@@ -315,6 +313,7 @@ def main(stripe_w_planet, csv_basename):
 
     # generate lists of companion amplitudes and distances (asec) from host star
     # initialize DataFrame to hold data from ALL strips
+    ## ## THIS MIGHT BE MORE WORK THAN IS WORTH IT FOR NOW
     '''
     df_params_all_strips = pd.DataFrame()
     strip_0_of_4_params =
@@ -347,6 +346,7 @@ def main(stripe_w_planet, csv_basename):
     image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=-0.04)
 
+    # loop over all fake planet east-west pairs distinguished by amplitude and radius
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):
 
@@ -422,10 +422,14 @@ def main(stripe_w_planet, csv_basename):
 
             # find the cross-sections and marginalizations
 
+            # initialize dictionaries
             marginalization_dict = {}
             cross_sec_dict = {}
 
             ## marginalizations
+            ## (AS OF 2020 JUNE 2 THESE ARE ACTUALLY IGNORED, BECAUSE I DID NOT
+            ## FIND THEM TO BE VERY INDICATIVE; NOTE I HAVE NOT TAKEN THE
+            ## TIME TO SEPARATE BASELINES INTO E, W HALVES --E.S.)
             # baseline frames without planets
             marginalization_dict["baseline_strip_0"] = np.sum(baseline_processed_stripe_0,axis=0)
             marginalization_dict["baseline_strip_1"] = np.sum(baseline_processed_stripe_1,axis=0)
@@ -433,6 +437,8 @@ def main(stripe_w_planet, csv_basename):
             marginalization_dict["baseline_strip_3"] = np.sum(baseline_processed_stripe_3,axis=0)
             marginalization_dict["baseline_strip_4"] = np.sum(baseline_processed_stripe_4,axis=0)
             # frames with planets in eastern or western arm
+            # (NOTE THERE IS NO FLIPPING OF 'EAST' HALVES HERE, UNLESS MARGINALIZATION
+            # PROVES USEFUL LATER ON)
             marginalization_dict["strip_0_E"] = np.sum(img_processed_stripe_0_E,axis=0)
             marginalization_dict["strip_1_E"] = np.sum(img_processed_stripe_1_E,axis=0)
             marginalization_dict["strip_2_E"] = np.sum(img_processed_stripe_2_E,axis=0)
@@ -445,18 +451,25 @@ def main(stripe_w_planet, csv_basename):
             marginalization_dict["strip_4_W"] = np.sum(img_processed_stripe_4_W,axis=0)
 
             ## cross-sections
-            # baseline frames without planets
-            cross_sec_dict["baseline_strip_0"] = baseline_processed_stripe_0[int(0.5*np.shape(baseline_processed_stripe_0)[0]),:]
-            cross_sec_dict["baseline_strip_1"] = baseline_processed_stripe_1[int(0.5*np.shape(baseline_processed_stripe_1)[0]),:]
-            cross_sec_dict["baseline_strip_2"] = baseline_processed_stripe_2[int(0.5*np.shape(baseline_processed_stripe_2)[0]),:]
-            cross_sec_dict["baseline_strip_3"] = baseline_processed_stripe_3[int(0.5*np.shape(baseline_processed_stripe_3)[0]),:]
-            cross_sec_dict["baseline_strip_4"] = baseline_processed_stripe_4[int(0.5*np.shape(baseline_processed_stripe_4)[0]),:]
+            # baseline frames without planets: eastern halves and western halves
+            # set down convention that host star is on the left side (i.e., 'east'
+            # strips have to be flipped)
+            cross_sec_dict["baseline_strip_0_E"] = np.flip(baseline_processed_stripe_0, axis=1)[int(0.5*np.shape(baseline_processed_stripe_0)[0]),:]
+            cross_sec_dict["baseline_strip_1_E"] = np.flip(baseline_processed_stripe_1, axis=1)[int(0.5*np.shape(baseline_processed_stripe_1)[0]),:]
+            cross_sec_dict["baseline_strip_2_E"] = np.flip(baseline_processed_stripe_2, axis=1)[int(0.5*np.shape(baseline_processed_stripe_2)[0]),:]
+            cross_sec_dict["baseline_strip_3_E"] = np.flip(baseline_processed_stripe_3, axis=1)[int(0.5*np.shape(baseline_processed_stripe_3)[0]),:]
+            cross_sec_dict["baseline_strip_4_E"] = np.flip(baseline_processed_stripe_4, axis=1)[int(0.5*np.shape(baseline_processed_stripe_4)[0]),:]
+            cross_sec_dict["baseline_strip_0_W"] = baseline_processed_stripe_0[int(0.5*np.shape(baseline_processed_stripe_0)[0]),:]
+            cross_sec_dict["baseline_strip_1_W"] = baseline_processed_stripe_1[int(0.5*np.shape(baseline_processed_stripe_1)[0]),:]
+            cross_sec_dict["baseline_strip_2_W"] = baseline_processed_stripe_2[int(0.5*np.shape(baseline_processed_stripe_2)[0]),:]
+            cross_sec_dict["baseline_strip_3_W"] = baseline_processed_stripe_3[int(0.5*np.shape(baseline_processed_stripe_3)[0]),:]
+            cross_sec_dict["baseline_strip_4_W"] = baseline_processed_stripe_4[int(0.5*np.shape(baseline_processed_stripe_4)[0]),:]
             # frames with planets in eastern or western arm
-            cross_sec_dict["strip_0_E"] = img_processed_stripe_0_E[int(0.5*np.shape(img_processed_stripe_0_E)[0]),:]
-            cross_sec_dict["strip_1_E"] = img_processed_stripe_1_E[int(0.5*np.shape(img_processed_stripe_1_E)[0]),:]
-            cross_sec_dict["strip_2_E"] = img_processed_stripe_2_E[int(0.5*np.shape(img_processed_stripe_2_E)[0]),:]
-            cross_sec_dict["strip_3_E"] = img_processed_stripe_3_E[int(0.5*np.shape(img_processed_stripe_3_E)[0]),:]
-            cross_sec_dict["strip_4_E"] = img_processed_stripe_4_E[int(0.5*np.shape(img_processed_stripe_4_E)[0]),:]
+            cross_sec_dict["strip_0_E"] = np.flip(img_processed_stripe_0_E, axis=1)[int(0.5*np.shape(img_processed_stripe_0_E)[0]),:]
+            cross_sec_dict["strip_1_E"] = np.flip(img_processed_stripe_1_E, axis=1)[int(0.5*np.shape(img_processed_stripe_1_E)[0]),:]
+            cross_sec_dict["strip_2_E"] = np.flip(img_processed_stripe_2_E, axis=1)[int(0.5*np.shape(img_processed_stripe_2_E)[0]),:]
+            cross_sec_dict["strip_3_E"] = np.flip(img_processed_stripe_3_E, axis=1)[int(0.5*np.shape(img_processed_stripe_3_E)[0]),:]
+            cross_sec_dict["strip_4_E"] = np.flip(img_processed_stripe_4_E, axis=1)[int(0.5*np.shape(img_processed_stripe_4_E)[0]),:]
             cross_sec_dict["strip_0_W"] = img_processed_stripe_0_W[int(0.5*np.shape(img_processed_stripe_0_W)[0]),:]
             cross_sec_dict["strip_1_W"] = img_processed_stripe_1_W[int(0.5*np.shape(img_processed_stripe_1_W)[0]),:]
             cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2_W)[0]),:]
@@ -464,48 +477,53 @@ def main(stripe_w_planet, csv_basename):
             cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4_W)[0]),:]
 
             if (stripe_w_planet == 0):
-                image_injected_planet_E = img_processed_stripe_0_E
+                image_injected_planet_E = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
                 image_injected_planet_W = img_processed_stripe_0_W
-                cross_sec_baseline = cross_sec_dict["baseline_strip_0"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_0_E"]
+                cross_sec_baseline_E = cross_sec_dict["baseline_strip_0_E"] # already flipped
+                cross_sec_baseline_W = cross_sec_dict["baseline_strip_0_W"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_0_E"] # already flipped
                 cross_sec_injected_planet_W = cross_sec_dict["strip_0_W"]
-                marginalization_baseline = marginalization_dict["baseline_strip_0"]
+                marginalization_baseline = marginalization_dict["baseline_strip_0"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_0_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_0_W"]
             elif (stripe_w_planet == 1):
-                image_injected_planet_E = img_processed_stripe_1_E
+                image_injected_planet_E = np.flip(img_processed_stripe_1_E, axis=1) # note flipping of 'east' half
                 image_injected_planet_W = img_processed_stripe_1_W
-                cross_sec_baseline = cross_sec_dict["baseline_strip_1"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_1_E"]
+                cross_sec_baseline_E = cross_sec_dict["baseline_strip_1_E"] # already flipped
+                cross_sec_baseline_W = cross_sec_dict["baseline_strip_1_W"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_1_E"] # already flipped
                 cross_sec_injected_planet_W = cross_sec_dict["strip_1_W"]
-                marginalization_baseline = marginalization_dict["baseline_strip_1"]
+                marginalization_baseline = marginalization_dict["baseline_strip_1"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_1_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_1_W"]
             elif (stripe_w_planet == 2):
-                image_injected_planet_E = img_processed_stripe_2_E
+                image_injected_planet_E = np.flip(img_processed_stripe_2_E, axis=1) # note flipping of 'east' half
                 image_injected_planet_W = img_processed_stripe_2_W
-                cross_sec_baseline = cross_sec_dict["baseline_strip_2"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_2_E"]
+                cross_sec_baseline_E = cross_sec_dict["baseline_strip_2_E"] # already flipped
+                cross_sec_baseline_W = cross_sec_dict["baseline_strip_2_W"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_2_E"] # already flipped
                 cross_sec_injected_planet_W = cross_sec_dict["strip_2_W"]
-                marginalization_baseline = marginalization_dict["baseline_strip_2"]
+                marginalization_baseline = marginalization_dict["baseline_strip_2"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_2_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_2_W"]
             elif (stripe_w_planet == 3):
-                image_injected_planet_E = img_processed_stripe_3_E
+                image_injected_planet_E = np.flip(img_processed_stripe_3_E, axis=1) # note flipping of 'east' half
                 image_injected_planet_W = img_processed_stripe_3_W
-                cross_sec_baseline = cross_sec_dict["baseline_strip_3"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_3_E"]
+                cross_sec_baseline_E = cross_sec_dict["baseline_strip_3_E"] # already flipped
+                cross_sec_baseline_W = cross_sec_dict["baseline_strip_3_W"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_3_E"] # already flipped
                 cross_sec_injected_planet_W = cross_sec_dict["strip_3_W"]
-                marginalization_baseline = marginalization_dict["baseline_strip_3"]
+                marginalization_baseline = marginalization_dict["baseline_strip_3"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_3_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_3_W"]
             elif (stripe_w_planet == 4):
-                image_injected_planet_E = img_processed_stripe_4_E
+                image_injected_planet_E = np.flip(img_processed_stripe_4_E, axis=1) # note flipping of 'east' half
                 image_injected_planet_W = img_processed_stripe_4_W
-                cross_sec_baseline = cross_sec_dict["baseline_strip_4"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_4_E"]
+                cross_sec_baseline_E = cross_sec_dict["baseline_strip_4_E"] # already flipped
+                cross_sec_baseline_W = cross_sec_dict["baseline_strip_4_W"]
+                cross_sec_injected_planet_E = cross_sec_dict["strip_4_E"] # already flipped
                 cross_sec_injected_planet_W = cross_sec_dict["strip_4_W"]
-                marginalization_baseline = marginalization_dict["baseline_strip_4"]
+                marginalization_baseline = marginalization_dict["baseline_strip_4"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_4_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
@@ -559,7 +577,7 @@ def main(stripe_w_planet, csv_basename):
                     "val_xsec_crit_strip_w_planets_rel_to_strip_2_W": strip_2_ks_cross_sec_W[1],
                     "val_xsec_crit_strip_w_planets_rel_to_strip_3_W": strip_3_ks_cross_sec_W[1],
                     "val_xsec_crit_strip_w_planets_rel_to_strip_4_W": strip_4_ks_cross_sec_W[1]}
-            print(my_dic)
+
             ks_info_df.loc[len(ks_info_df)] = my_dic
 
             '''
@@ -576,10 +594,12 @@ def main(stripe_w_planet, csv_basename):
             print("strip_w_planets_rel_to_strip_4, cross-sec: " + str(strip_4_ks_cross_sec))
             print("strip_w_planets_rel_to_strip_4, marginalization: " + str(strip_4_ks_marg))
             '''
-            planet_loc_pix = np.divide(dist_asec,0.0107)
-            import ipdb; ipdb.set_trace()
 
-            ## giant block of code to make a plot
+            ##############################################
+            ## BEGIN GIANT BLOCK OF CODE TO MAKE A PLOT
+
+            # planet location in pixels to indicate in plot
+            planet_loc_pix = np.divide(dist_asec,float(config["instrum_params"]["LMIR_PS"]))
 
             f, ((ax1, ax2, ax3, ax4, ax5, ax6), (ax7, ax8, ax9, ax10, ax11, ax12)) = plt.subplots(2, 6, figsize=(24, 16))
 
@@ -593,115 +613,117 @@ def main(stripe_w_planet, csv_basename):
             #plt.colorbar(subplot1)
 
             # plot cross-sections and their differences between different strips
-            ax2.plot(cross_sec_dict["strip_0"], label="cross sec")
-            ax2.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0"]), label="diff")
+            ax2.plot(cross_sec_dict["strip_0_E"], label="cross sec")
+            ax2.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0_E"]), label="diff")
             ax2.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
 
             ax2.legend()
-            ax2.set_title("Cross-sec rel. to strip 0\nD = "
-                          + str(np.round(strip_0_ks_cross_sec[0],4))
-                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec[1],4))
-                          + ",\np_val = " + str(np.round(strip_0_ks_cross_sec[2],4)))
+            ax2.set_title("Cross-sec rel. to strip 0, E\nD = "
+                          + str(np.round(strip_0_ks_cross_sec_E[0],4))
+                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_E[1],4))
+                          + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_E[2],4)))
 
-            ax3.plot(cross_sec_dict["strip_1"], label="cross sec")
-            ax3.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1"]), label="diff")
+            ax3.plot(cross_sec_dict["strip_1_E"], label="cross sec")
+            ax3.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1_E"]), label="diff")
             ax3.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax3.legend()
-            ax3.set_title("Cross-sec rel. to strip 1\nD = "
-                          + str(np.round(strip_1_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_1_ks_cross_sec[1],4)) + ",\np_val = "
-                          + str(np.round(strip_1_ks_cross_sec[2],4)))
+            ax3.set_title("Cross-sec rel. to strip 1, E\nD = "
+                          + str(np.round(strip_1_ks_cross_sec_E[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_1_ks_cross_sec_E[1],4)) + ",\np_val = "
+                          + str(np.round(strip_1_ks_cross_sec_E[2],4)))
 
 
-            ax4.plot(cross_sec_dict["strip_2"], label="cross sec")
-            ax4.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_2"]), label="diff")
+            ax4.plot(cross_sec_dict["strip_2_E"], label="cross sec")
+            ax4.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_2_E"]), label="diff")
             ax4.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax4.legend()
-            ax4.set_title("Cross-sec rel. to strip 2\nD = "
-                          + str(np.round(strip_2_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_2_ks_cross_sec[1],4)) + ",\np_val = "
-                          + str(np.round(strip_2_ks_cross_sec[2],4)))
+            ax4.set_title("Cross-sec rel. to strip 2, E\nD = "
+                          + str(np.round(strip_2_ks_cross_sec_E[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_2_ks_cross_sec_E[1],4)) + ",\np_val = "
+                          + str(np.round(strip_2_ks_cross_sec_E[2],4)))
 
 
-            ax5.plot(cross_sec_dict["strip_3"], label="cross sec")
-            ax5.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_3"]), label="diff")
+            ax5.plot(cross_sec_dict["strip_3_E"], label="cross sec")
+            ax5.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_3_E"]), label="diff")
             ax5.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax5.legend()
-            ax5.set_title("Cross-sec rel. to strip 3\nD = "
-                          + str(np.round(strip_3_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_3_ks_cross_sec[1],4)) + ",\np_val = "
-                          + str(np.round(strip_3_ks_cross_sec[2],4)))
+            ax5.set_title("Cross-sec rel. to strip 3, E\nD = "
+                          + str(np.round(strip_3_ks_cross_sec_E[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_3_ks_cross_sec_E[1],4)) + ",\np_val = "
+                          + str(np.round(strip_3_ks_cross_sec_E[2],4)))
 
 
-            ax6.plot(cross_sec_dict["strip_4"], label="cross sec")
-            ax6.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_4"]), label="diff")
+            ax6.plot(cross_sec_dict["strip_4_E"], label="cross sec")
+            ax6.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_4_E"]), label="diff")
             ax6.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax6.legend()
-            ax6.set_title("Cross-sec rel. to strip 4\nD = "
-                          + str(np.round(strip_4_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_4_ks_cross_sec[1],4)) + ",\np_val = "
-                          + str(np.round(strip_4_ks_cross_sec[2],4)))
+            ax6.set_title("Cross-sec rel. to strip 4, E\nD = "
+                          + str(np.round(strip_4_ks_cross_sec_E[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_4_ks_cross_sec_E[1],4)) + ",\np_val = "
+                          + str(np.round(strip_4_ks_cross_sec_E[2],4)))
 
 
             # bottom-left (ax7): blank
 
             # plot cross-sections and their differences between different strips
-            ax8.plot(marginalization_dict["strip_0"], label="marginalization")
-            ax8.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_0"]), label="diff")
+            ax8.plot(cross_sec_dict["strip_0_W"], label="cross sec")
+            ax8.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0_W"]), label="diff")
             ax8.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax8.legend()
-            ax8.set_title("Marg rel. to strip 0\nD = "
-                          + str(np.round(strip_0_ks_marg[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_0_ks_marg[1],4)) + ",\np_val = "
-                          + str(np.round(strip_0_ks_marg[2],4)))
 
-            ax9.plot(marginalization_dict["strip_1"], label="marginalization")
-            ax9.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_1"]), label="diff")
+            ax8.legend()
+            ax8.set_title("Cross-sec rel. to strip 0, W\nD = "
+                          + str(np.round(strip_0_ks_cross_sec_W[0],4))
+                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_W[1],4))
+                          + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_W[2],4)))
+
+            ax9.plot(cross_sec_dict["strip_1_W"], label="cross sec")
+            ax9.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1_W"]), label="diff")
             ax9.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax9.legend()
-            ax9.set_title("Marg rel. to strip 1\nD = "
-                          + str(np.round(strip_1_ks_marg[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_1_ks_marg[1],4)) + ",\np_val = "
-                          + str(np.round(strip_1_ks_marg[2],4)))
+            ax9.set_title("Cross-sec rel. to strip 1, W\nD = "
+                          + str(np.round(strip_1_ks_cross_sec_W[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_1_ks_cross_sec_W[1],4)) + ",\np_val = "
+                          + str(np.round(strip_1_ks_cross_sec_W[2],4)))
 
-            ax10.plot(cross_sec_dict["strip_2"], label="marginalization")
-            ax10.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_2"]), label="diff")
+
+            ax10.plot(cross_sec_dict["strip_2_W"], label="cross sec")
+            ax10.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_2_W"]), label="diff")
             ax10.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax10.legend()
-            ax10.set_title("Marg rel. to strip 2\nD = "
-                           + str(np.round(strip_2_ks_marg[0],4)) + ",\nval_crit = "
-                           + str(np.round(strip_2_ks_marg[1],4)) + ",\np_val = "
-                           + str(np.round(strip_2_ks_marg[2],4)))
-            ax11.plot(cross_sec_dict["strip_3"], label="marginalization")
-            ax11.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_3"]), label="diff")
+            ax10.set_title("Cross-sec rel. to strip 2, W\nD = "
+                          + str(np.round(strip_2_ks_cross_sec_W[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_2_ks_cross_sec_W[1],4)) + ",\np_val = "
+                          + str(np.round(strip_2_ks_cross_sec_W[2],4)))
+
+
+            ax11.plot(cross_sec_dict["strip_3_W"], label="cross sec")
+            ax11.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_3_W"]), label="diff")
             ax11.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax11.legend()
-            ax11.set_title("Marg rel. to strip 3\nD = "
-                           + str(np.round(strip_3_ks_marg[0],4)) + ",\nval_crit = "
-                           + str(np.round(strip_3_ks_marg[1],4)) + ",\np_val = "
-                           + str(np.round(strip_3_ks_marg[2],4)))
+            ax11.set_title("Cross-sec rel. to strip 3, W\nD = "
+                          + str(np.round(strip_3_ks_cross_sec_W[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_3_ks_cross_sec_W[1],4)) + ",\np_val = "
+                          + str(np.round(strip_3_ks_cross_sec_W[2],4)))
 
-            ax12.plot(cross_sec_dict["strip_4"], label="marginalization")
-            ax12.plot(np.subtract(marginalization_injected_planet,marginalization_dict["strip_4"]), label="diff")
+
+            ax12.plot(cross_sec_dict["strip_4_W"], label="cross sec")
+            ax12.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_4_W"]), label="diff")
             ax12.axvline(x=0.5*np.shape(image_injected_planet)[0]-planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax12.legend()
-            ax12.set_title("Marg rel. to strip 4\nD = "
-                           + str(np.round(strip_4_ks_marg[0],4)) + ",\nval_crit = "
-                           + str(np.round(strip_4_ks_marg[1],4)) + ",\np_val = "
-                           + str(np.round(strip_4_ks_marg[2],4)))
-
-            #ax6.set_ylim([-400,700]) # for 0.01 companions
-            #ax3.set_ylim([-3000,6000]) # for 0.1 companions
+            ax12.set_title("Cross-sec rel. to strip 4, W\nD = "
+                          + str(np.round(strip_4_ks_cross_sec_W[0],4)) + ",\nval_crit = "
+                          + str(np.round(strip_4_ks_cross_sec_W[1],4)) + ",\np_val = "
+                          + str(np.round(strip_4_ks_cross_sec_W[2],4)))
 
             #f.suptitle(plot_file_name_prefix + os.path.basename(file_name_array_choice[file_num]))
             #plt.tight_layout()

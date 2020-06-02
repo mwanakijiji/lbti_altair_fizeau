@@ -13,7 +13,8 @@ from modules import (basic_red,
                      detection,
                      sensitivity,
                      convert_contrast_limits_to_masses,
-                     lambda_over_B_analysis)
+                     lambda_over_B_KS_test,
+                     lambda_over_B_contrast_curves)
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD
 ## ## WITH BASIC REDUCTIONS, OR SKIP THEM? ETC.
@@ -89,4 +90,6 @@ sensitivity.main(small_angle_correction=True)
 convert_contrast_limits_to_masses.main()
 '''
 # lambda/B cross-sections
-lambda_over_B_analysis.main(stripe_w_planet = 0, csv_basename = "test2.csv")
+lambda_over_B_KS_test.main(stripe_w_planet = 0, csv_basename = "test2.csv")
+
+lambda_over_B_contrast_curves.main()

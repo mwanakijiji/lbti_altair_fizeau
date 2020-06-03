@@ -285,7 +285,7 @@ def main(stripe_w_planet, csv_basename):
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     else:
         print("Don't know which lists of file names to use in the analysis!")
-
+    import ipdb; ipdb.set_trace()
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
@@ -345,7 +345,7 @@ def main(stripe_w_planet, csv_basename):
     baseline_processed_stripe_3 = shave_and_rotate(image_baseline_stripe_3,angle=6.63)
     image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=-0.04)
-
+    import ipdb; ipdb.set_trace()
     # loop over all fake planet east-west pairs distinguished by amplitude and radius
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):
@@ -395,7 +395,7 @@ def main(stripe_w_planet, csv_basename):
             file_name_strip_4_of_4_W = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                 comp_ampl_pass=comp_ampl,
                                                                 dist_asec_pass=dist_asec)
-
+            import ipdb; ipdb.set_trace()
             ## read in and process the images with planets
             # frames with planets along eastern arm of strip
             image_stripe_0_E = fits.getdata(file_name_strip_0_of_4_E,0,header=False)
@@ -419,7 +419,7 @@ def main(stripe_w_planet, csv_basename):
             img_processed_stripe_3_W = shave_and_rotate(image_stripe_3_W,angle=6.63)
             image_stripe_4_W = fits.getdata(file_name_strip_4_of_4_W,0,header=False)
             img_processed_stripe_4_W = shave_and_rotate(image_stripe_4_W,angle=-0.04)
-
+            import ipdb; ipdb.set_trace()
             # find the cross-sections and marginalizations
 
             # initialize dictionaries
@@ -475,7 +475,7 @@ def main(stripe_w_planet, csv_basename):
             cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2_W)[0]),:]
             cross_sec_dict["strip_3_W"] = img_processed_stripe_3_W[int(0.5*np.shape(img_processed_stripe_3_W)[0]),:]
             cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4_W)[0]),:]
-
+            import ipdb; ipdb.set_trace()
             if (stripe_w_planet == 0):
                 image_injected_planet_E = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
                 image_injected_planet_W = img_processed_stripe_0_W
@@ -528,7 +528,7 @@ def main(stripe_w_planet, csv_basename):
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
                 print("No strip with planet specified!")
-
+            import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             strip_0_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_0_E"])
@@ -552,7 +552,7 @@ def main(stripe_w_planet, csv_basename):
             strip_2_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_2_W"])
             strip_3_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_3_W"])
             strip_4_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_4_W"])
-
+            import ipdb; ipdb.set_trace()
             # put stats into a dictionary; note there are entries corresponding to
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,
@@ -738,7 +738,7 @@ def main(stripe_w_planet, csv_basename):
     print("Saved all data in " + csv_basename)
 
     # ... and make a plot for the publication
-
+    '''
     # loop over each companion amplitude
     for comp_ampl_num in range(0,len(comp_ampl_array)):
 
@@ -768,3 +768,4 @@ def main(stripe_w_planet, csv_basename):
         plt.savefig(file_name_this)
         plt.close()
         print("Saved lambda-over-B plot as " + file_name_this)
+    '''

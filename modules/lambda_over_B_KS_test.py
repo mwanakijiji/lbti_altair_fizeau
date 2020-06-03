@@ -87,6 +87,12 @@ def do_KS(empirical_sample_1,empirical_sample_2):
     # set significance level
     #alpha = 0.05
 
+    # if one of the samples is just NaNs, just return NaNs
+    if np.logical_and(not np.isfinite(np.nanmin(empirical_sample_1)),not np.isfinite(np.nanmax(empirical_sample_1))):
+        return np.nan, np.nan, np.nan
+    if np.logical_and(not np.isfinite(np.nanmin(empirical_sample_2)),not np.isfinite(np.nanmax(empirical_sample_2))):
+        return np.nan, np.nan, np.nan
+
     return D, val_crit, p_val
 
 

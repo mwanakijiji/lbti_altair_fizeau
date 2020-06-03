@@ -596,7 +596,7 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     "val_xsec_crit_strip_w_planets_rel_to_strip_4_W": strip_4_ks_cross_sec_W[1]}
 
             ks_info_df.loc[len(ks_info_df)] = my_dic
-            import ipdb; ipdb.set_trace()
+
             '''
             print("dist_asec: " + str(np.round(dist_asec,3)))
             print("comp_ampl: " + str(np.round(comp_ampl,2)))

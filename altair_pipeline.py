@@ -91,5 +91,6 @@ convert_contrast_limits_to_masses.main()
 '''
 # lambda/B cross-sections
 lambda_over_B_KS_test.main(stripe_w_planet = 0, csv_basename = "test2.csv")
-
+'''
 lambda_over_B_contrast_curves.main(stripe_w_planet = 0)
+'''

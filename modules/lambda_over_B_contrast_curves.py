@@ -6,15 +6,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 
-def main(stripe_w_planet):
+def main(stripe_w_planet,read_csv_basename):
     '''
     INPUTS:
     stripe_w_planet: integer which sets the strip with planets injected along the median angle
         (choices are [0,1,2,3,4])
+    read_csv_basename: file name of csv which contains the KS test data
     '''
 
-    ## ## STAND-IN
-    df = pd.read_csv("data/test_lambda_over_b_1.csv")
+    df = pd.read_csv(read_csv_basename)
 
     # print out a FYI plot, so that the user can see level of completion
     # represented by the files available
@@ -43,12 +43,13 @@ def main(stripe_w_planet):
                         len(contour_data["comp_ampl"].unique()),
                         len(contour_data["dist_asec"].unique())
                         ))
-
+    import ipdb; ipdb.set_trace()
     # loop over all stripes
     for i in range(0,num_stripes):
 
         # which stripes are we comparing with? (note that we will remove
-        # the half of the one strip where the planets were injected)
+        # the half of the one strip where the planets were injected, since
+        # that would represent a comparison with itself)
         if (i==0):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_0_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_0_W'

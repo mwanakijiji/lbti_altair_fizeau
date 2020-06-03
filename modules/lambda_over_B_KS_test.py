@@ -90,7 +90,7 @@ def do_KS(empirical_sample_1,empirical_sample_2):
     return D, val_crit, p_val
 
 
-def main(stripe_w_planet, half_w_planet, csv_basename):
+def main(stripe_w_planet, half_w_planet, write_csv_basename):
     '''
     Read in arrays, process them, find residuals, and calculate KS test
 
@@ -99,7 +99,7 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
         (choices are [0,1,2,3,4])
     half_w_planet: the East/West half of the stripe_w_planet which contains the
         planet (choices are [E,W])
-    csv_basename: csv containing the data which will be written
+    write_csv_basename: csv containing the data which will be written
     '''
 
     # configuration data
@@ -291,7 +291,8 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
-                "D_xsec_strip_w_planets_rel_to_same_strip_wo_planet",
+                "D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet",
+                "D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet",
                 "D_xsec_strip_w_planets_rel_to_strip_0_E",
                 "D_xsec_strip_w_planets_rel_to_strip_1_E",
                 "D_xsec_strip_w_planets_rel_to_strip_2_E",
@@ -484,10 +485,16 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     image_injected_planet = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
                     cross_sec_injected_planet = cross_sec_dict["strip_0_E"] # already flipped
                     cross_sec_baseline = cross_sec_dict["baseline_strip_0_E"] # already flipped
+                    # we need to check for azimuthal variations that are not just
+                    # due to phase changes between one stripe and another; so,
+                    # here is a string for tagging the stats relevant to the opposite
+                    # half of the stripe which has the planet injected
+                    string_opposite_indicator = "strip_0_W"
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_0_W
                     cross_sec_injected_planet = cross_sec_dict["strip_0_W"]
                     cross_sec_baseline_W = cross_sec_dict["baseline_strip_0_W"]
+                    string_opposite_indicator = "strip_0_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_0"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_0_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_0_W"]
@@ -496,10 +503,12 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     image_injected_planet = np.flip(img_processed_stripe_1_E, axis=1) # note flipping of 'east' half
                     cross_sec_injected_planet = cross_sec_dict["strip_1_E"] # already flipped
                     cross_sec_baseline = cross_sec_dict["baseline_strip_1_E"] # already flipped
+                    string_opposite_indicator = "strip_1_W"
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_1_W
                     cross_sec_injected_planet = cross_sec_dict["strip_1_W"]
                     cross_sec_baseline_W = cross_sec_dict["baseline_strip_1_W"]
+                    string_opposite_indicator = "strip_1_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_1"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_1_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_1_W"]
@@ -508,10 +517,12 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     image_injected_planet = np.flip(img_processed_stripe_2_E, axis=1) # note flipping of 'east' half
                     cross_sec_injected_planet = cross_sec_dict["strip_2_E"] # already flipped
                     cross_sec_baseline = cross_sec_dict["baseline_strip_2_E"] # already flipped
+                    string_opposite_indicator = "strip_2_W"
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_2_W
                     cross_sec_injected_planet = cross_sec_dict["strip_2_W"]
                     cross_sec_baseline_W = cross_sec_dict["baseline_strip_2_W"]
+                    string_opposite_indicator = "strip_2_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_2"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_2_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_2_W"]
@@ -520,10 +531,12 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     image_injected_planet = np.flip(img_processed_stripe_3_E, axis=1) # note flipping of 'east' half
                     cross_sec_injected_planet = cross_sec_dict["strip_3_E"] # already flipped
                     cross_sec_baseline = cross_sec_dict["baseline_strip_3_E"] # already flipped
+                    string_opposite_indicator = "strip_3_W"
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_3_W
                     cross_sec_injected_planet = cross_sec_dict["strip_3_W"]
                     cross_sec_baseline_W = cross_sec_dict["baseline_strip_3_W"]
+                    string_opposite_indicator = "strip_3_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_3"] # note I'm not bothering with flipping since marginalization is not being used as of 2323 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_3_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_3_W"]
@@ -532,10 +545,12 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     image_injected_planet = np.flip(img_processed_stripe_4_E, axis=1) # note flipping of 'east' half
                     cross_sec_injected_planet = cross_sec_dict["strip_4_E"] # already flipped
                     cross_sec_baseline = cross_sec_dict["baseline_strip_4_E"] # already flipped
+                    string_opposite_indicator = "strip_4_W"
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_4_W
                     cross_sec_injected_planet = cross_sec_dict["strip_4_W"]
                     cross_sec_baseline_W = cross_sec_dict["baseline_strip_4_W"]
+                    string_opposite_indicator = "strip_4_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_4"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_4_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
@@ -546,8 +561,14 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all
             strip_baseline_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_baseline)
-            strip_0_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0_E"])
+            # opposite half: comparison with the *opposite* side of the strip
+            # with the planet injected
+            strip_opposite_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict[string_opposite_indicator])
             # others: different strips with planets along the same angle
+            # (note one of these will be a repeat of strip_opposite_ks_cross_sec, and
+            # so we slip in a 'poison pill' here to replace the repeat with NaNs)
+            cross_sec_dict[string_opposite_indicator] = np.multiply(np.nan,cross_sec_dict[string_opposite_indicator])
+            strip_0_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0_E"])
             strip_1_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_1_E"])
             strip_2_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_2_E"])
             strip_3_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_3_E"])
@@ -573,7 +594,8 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,
                     "comp_ampl": comp_ampl,
-                    "D_xsec_strip_w_planets_rel_to_same_strip_wo_planet": strip_baseline_ks_cross_sec[0],
+                    "D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet": strip_baseline_ks_cross_sec[0],
+                    "D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet": strip_opposite_ks_cross_sec[0],
                     "D_xsec_strip_w_planets_rel_to_strip_0_E": strip_0_ks_cross_sec_E[0],
                     "D_xsec_strip_w_planets_rel_to_strip_1_E": strip_1_ks_cross_sec_E[0],
                     "D_xsec_strip_w_planets_rel_to_strip_2_E": strip_2_ks_cross_sec_E[0],
@@ -596,7 +618,7 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
                     "val_xsec_crit_strip_w_planets_rel_to_strip_4_W": strip_4_ks_cross_sec_W[1]}
 
             ks_info_df.loc[len(ks_info_df)] = my_dic
-
+            import ipdb; ipdb.set_trace()
             '''
             print("dist_asec: " + str(np.round(dist_asec,3)))
             print("comp_ampl: " + str(np.round(comp_ampl,2)))

@@ -90,8 +90,8 @@ sensitivity.main(small_angle_correction=True)
 convert_contrast_limits_to_masses.main()
 
 # lambda/B cross-sections
-relevant_csv = "test2.csv"
 '''
+relevant_csv = "test2.csv"
 lambda_over_B_KS_test.main(stripe_w_planet = 0, half_w_planet = "E", write_csv_basename = relevant_csv)
 '''
 lambda_over_B_contrast_curves.main(stripe_w_planet = 0, read_csv_basename = relevant_csv)

@@ -779,8 +779,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             print("Saved " + new_filename)
 
     # taking all the data together, write it out as a csv
-    ks_info_df.to_csv(csv_basename)
-    print("Saved all data in " + csv_basename)
+    ks_info_df.to_csv(write_csv_basename)
+    print("Saved all data in " + write_csv_basename)
 
     # ... and make a plot for the publication
     '''

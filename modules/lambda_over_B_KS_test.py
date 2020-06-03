@@ -291,6 +291,7 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
+                "D_xsec_strip_w_planets_rel_to_same_strip_wo_planet",
                 "D_xsec_strip_w_planets_rel_to_strip_0_E",
                 "D_xsec_strip_w_planets_rel_to_strip_1_E",
                 "D_xsec_strip_w_planets_rel_to_strip_2_E",
@@ -572,6 +573,7 @@ def main(stripe_w_planet, half_w_planet, csv_basename):
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,
                     "comp_ampl": comp_ampl,
+                    "D_xsec_strip_w_planets_rel_to_same_strip_wo_planet": strip_baseline_ks_cross_sec[0],
                     "D_xsec_strip_w_planets_rel_to_strip_0_E": strip_0_ks_cross_sec_E[0],
                     "D_xsec_strip_w_planets_rel_to_strip_1_E": strip_1_ks_cross_sec_E[0],
                     "D_xsec_strip_w_planets_rel_to_strip_2_E": strip_2_ks_cross_sec_E[0],

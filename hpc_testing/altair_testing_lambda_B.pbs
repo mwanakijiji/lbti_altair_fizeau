@@ -4,7 +4,7 @@
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
-#PBS -W group_list=phinz
+#PBS -W group_list=ktmorz
 ### Sharing settings
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.

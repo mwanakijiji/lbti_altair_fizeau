@@ -6,11 +6,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 
-def main(stripe_w_planet,read_csv_basename):
+def main(stripe_w_planet,half_w_planet,read_csv_basename):
     '''
     INPUTS:
     stripe_w_planet: integer which sets the strip with planets injected along the median angle
         (choices are [0,1,2,3,4])
+    half_w_planet: the East/West half of the stripe with the planet where the
+        planet actually lies (choices are [E/W])
     read_csv_basename: file name of csv which contains the KS test data
     '''
 
@@ -43,49 +45,73 @@ def main(stripe_w_planet,read_csv_basename):
                         len(contour_data["comp_ampl"].unique()),
                         len(contour_data["dist_asec"].unique())
                         ))
+
+    # initialize cube to hold *interpolated* KS statistic
+    ngridx = 100
+    ngridy = 200
+    cube_stat_interp = np.zeros((
+                        num_comparisons,
+                        ngridy,
+                        ngridx
+                        ))
+                        
     import ipdb; ipdb.set_trace()
+
+    # initialize ticker to adding data to cube
+    ticker_num = int(0)
+
     # loop over all stripes
     for i in range(0,num_stripes):
 
         # which stripes are we comparing with? (note that we will remove
         # the half of the one strip where the planets were injected, since
         # that would represent a comparison with itself)
-        if (i==0):
+        if np.logical_and(i==0,stripe_w_planet!=0):
+            #if (half_w_planet == "E"):
+            #if (half_w_planet == "W"):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_0_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_0_W'
-        elif (i==1):
+        elif np.logical_and(i==1,stripe_w_planet!=1):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_1_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_1_W'
-        elif (i==2):
+        elif np.logical_and(i==2,stripe_w_planet!=2):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_2_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_2_W'
-        elif (i==3):
+        elif np.logical_and(i==3,stripe_w_planet!=3):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_3_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_3_W'
-        elif (i==4):
+        elif np.logical_and(i==4,stripe_w_planet!=4):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_4_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_4_W'
+        else: # this stripe in this iteration of the for-loop contains the planet
+            if half_w_planet == "E":
+                comparison_string_E = np.nan
+                comparison_string_W = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
+            elif half_w_planet == "W":
+                comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
+                comparison_string_W = np.nan
 
-        # rearrange 1-D KS statistics into a matrix
-        Z = contour_data.pivot_table(index='dist_asec',
+        if (comparison_string_E != np.nan):
+            # rearrange 1-D KS statistics into a matrix
+            Z_E = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
-                                     values=comparison_string).T.values
+                                     values=comparison_string_E).T.values
+        elif (comparison_string_W != np.nan):
+            Z_W = contour_data.pivot_table(index='dist_asec',
+                                     columns='comp_ampl',
+                                     values=comparison_string_W).T.values
 
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
 
         # add this slice to non-interpolated cube
-        cube_stat_no_interpolation[i,:,:] = Z
+        cube_stat_no_interpolation[ticker_num,:,:] = Z_E
+        ticker_num += 1 # advance ticker
+        cube_stat_no_interpolation[ticker_num,:,:] = Z_W
+        ticker_num += 1 # advance ticker
 
-        # initialize cube to hold *interpolated* KS statistic
-        ngridx = 100
-        ngridy = 200
-        cube_stat_interp = np.zeros((
-                                    num_comparisons,
-                                    ngridy,
-                                    ngridx
-                                    ))
+
 
         # linearly interpolate the data we have onto a regular grid in magnitude space
         xi = np.linspace(0, 0.55, num=ngridx)

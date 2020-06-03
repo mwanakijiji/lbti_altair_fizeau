@@ -90,13 +90,15 @@ def do_KS(empirical_sample_1,empirical_sample_2):
     return D, val_crit, p_val
 
 
-def main(stripe_w_planet, csv_basename):
+def main(stripe_w_planet, half_w_planet, csv_basename):
     '''
     Read in arrays, process them, find residuals, and calculate KS test
 
     INPUTS:
     stripe_w_planet: integer which sets the strip with planets injected along the median angle
         (choices are [0,1,2,3,4])
+    half_w_planet: the East/West half of the stripe_w_planet which contains the
+        planet (choices are [E,W])
     csv_basename: csv containing the data which will be written
     '''
 
@@ -477,52 +479,62 @@ def main(stripe_w_planet, csv_basename):
             cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4_W)[0]),int(0.5*np.shape(img_processed_stripe_4_W)[1]):]
             import ipdb; ipdb.set_trace()
             if (stripe_w_planet == 0):
-                image_injected_planet_E = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
-                image_injected_planet_W = img_processed_stripe_0_W
-                cross_sec_baseline_E = cross_sec_dict["baseline_strip_0_E"] # already flipped
-                cross_sec_baseline_W = cross_sec_dict["baseline_strip_0_W"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_0_E"] # already flipped
-                cross_sec_injected_planet_W = cross_sec_dict["strip_0_W"]
+                if (half_w_planet == "E"):
+                    image_injected_planet = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
+                    cross_sec_injected_planet = cross_sec_dict["strip_0_E"] # already flipped
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_0_E"] # already flipped
+                elif (half_w_planet == "W"):
+                    image_injected_planet = img_processed_stripe_0_W
+                    cross_sec_injected_planet = cross_sec_dict["strip_0_W"]
+                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_0_W"]
                 marginalization_baseline = marginalization_dict["baseline_strip_0"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_0_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_0_W"]
             elif (stripe_w_planet == 1):
-                image_injected_planet_E = np.flip(img_processed_stripe_1_E, axis=1) # note flipping of 'east' half
-                image_injected_planet_W = img_processed_stripe_1_W
-                cross_sec_baseline_E = cross_sec_dict["baseline_strip_1_E"] # already flipped
-                cross_sec_baseline_W = cross_sec_dict["baseline_strip_1_W"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_1_E"] # already flipped
-                cross_sec_injected_planet_W = cross_sec_dict["strip_1_W"]
+                if (half_w_planet == "E"):
+                    image_injected_planet = np.flip(img_processed_stripe_1_E, axis=1) # note flipping of 'east' half
+                    cross_sec_injected_planet = cross_sec_dict["strip_1_E"] # already flipped
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_1_E"] # already flipped
+                elif (half_w_planet == "W"):
+                    image_injected_planet = img_processed_stripe_1_W
+                    cross_sec_injected_planet = cross_sec_dict["strip_1_W"]
+                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_1_W"]
                 marginalization_baseline = marginalization_dict["baseline_strip_1"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_1_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_1_W"]
             elif (stripe_w_planet == 2):
-                image_injected_planet_E = np.flip(img_processed_stripe_2_E, axis=1) # note flipping of 'east' half
-                image_injected_planet_W = img_processed_stripe_2_W
-                cross_sec_baseline_E = cross_sec_dict["baseline_strip_2_E"] # already flipped
-                cross_sec_baseline_W = cross_sec_dict["baseline_strip_2_W"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_2_E"] # already flipped
-                cross_sec_injected_planet_W = cross_sec_dict["strip_2_W"]
+                if (half_w_planet == "E"):
+                    image_injected_planet = np.flip(img_processed_stripe_2_E, axis=1) # note flipping of 'east' half
+                    cross_sec_injected_planet = cross_sec_dict["strip_2_E"] # already flipped
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_2_E"] # already flipped
+                elif (half_w_planet == "W"):
+                    image_injected_planet = img_processed_stripe_2_W
+                    cross_sec_injected_planet = cross_sec_dict["strip_2_W"]
+                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_2_W"]
                 marginalization_baseline = marginalization_dict["baseline_strip_2"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_2_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_2_W"]
             elif (stripe_w_planet == 3):
-                image_injected_planet_E = np.flip(img_processed_stripe_3_E, axis=1) # note flipping of 'east' half
-                image_injected_planet_W = img_processed_stripe_3_W
-                cross_sec_baseline_E = cross_sec_dict["baseline_strip_3_E"] # already flipped
-                cross_sec_baseline_W = cross_sec_dict["baseline_strip_3_W"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_3_E"] # already flipped
-                cross_sec_injected_planet_W = cross_sec_dict["strip_3_W"]
-                marginalization_baseline = marginalization_dict["baseline_strip_3"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
+                if (half_w_planet == "E"):
+                    image_injected_planet = np.flip(img_processed_stripe_3_E, axis=1) # note flipping of 'east' half
+                    cross_sec_injected_planet = cross_sec_dict["strip_3_E"] # already flipped
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_3_E"] # already flipped
+                elif (half_w_planet == "W"):
+                    image_injected_planet = img_processed_stripe_3_W
+                    cross_sec_injected_planet = cross_sec_dict["strip_3_W"]
+                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_3_W"]
+                marginalization_baseline = marginalization_dict["baseline_strip_3"] # note I'm not bothering with flipping since marginalization is not being used as of 2323 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_3_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_3_W"]
             elif (stripe_w_planet == 4):
-                image_injected_planet_E = np.flip(img_processed_stripe_4_E, axis=1) # note flipping of 'east' half
-                image_injected_planet_W = img_processed_stripe_4_W
-                cross_sec_baseline_E = cross_sec_dict["baseline_strip_4_E"] # already flipped
-                cross_sec_baseline_W = cross_sec_dict["baseline_strip_4_W"]
-                cross_sec_injected_planet_E = cross_sec_dict["strip_4_E"] # already flipped
-                cross_sec_injected_planet_W = cross_sec_dict["strip_4_W"]
+                if (half_w_planet == "E"):
+                    image_injected_planet = np.flip(img_processed_stripe_4_E, axis=1) # note flipping of 'east' half
+                    cross_sec_injected_planet = cross_sec_dict["strip_4_E"] # already flipped
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_4_E"] # already flipped
+                elif (half_w_planet == "W"):
+                    image_injected_planet = img_processed_stripe_4_W
+                    cross_sec_injected_planet = cross_sec_dict["strip_4_W"]
+                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_4_W"]
                 marginalization_baseline = marginalization_dict["baseline_strip_4"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
                 marginalization_injected_planet_E = marginalization_dict["strip_4_E"]
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
@@ -531,16 +543,19 @@ def main(stripe_w_planet, csv_basename):
             import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
-            strip_0_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_0_E"])
-            strip_1_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_1_E"])
-            strip_2_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_2_E"])
-            strip_3_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_3_E"])
-            strip_4_ks_cross_sec_E = do_KS(cross_sec_injected_planet_E,cross_sec_dict["strip_4_E"])
-            strip_0_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_0_W"])
-            strip_1_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_1_W"])
-            strip_2_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_2_W"])
-            strip_3_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_3_W"])
-            strip_4_ks_cross_sec_W = do_KS(cross_sec_injected_planet_W,cross_sec_dict["strip_4_W"])
+            # baseline: comparison with same strip but without any planet at all
+            strip_baseline_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_baseline)
+            strip_0_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0_E"])
+            # others: different strips with planets along the same angle
+            strip_1_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_1_E"])
+            strip_2_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_2_E"])
+            strip_3_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_3_E"])
+            strip_4_ks_cross_sec_E = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_4_E"])
+            strip_0_ks_cross_sec_W = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_0_W"])
+            strip_1_ks_cross_sec_W = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_1_W"])
+            strip_2_ks_cross_sec_W = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_2_W"])
+            strip_3_ks_cross_sec_W = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_3_W"])
+            strip_4_ks_cross_sec_W = do_KS(cross_sec_injected_planet,cross_sec_dict["strip_4_W"])
             # KS statistic from marginalizations
             strip_0_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_0_E"])
             strip_1_ks_marg_E = do_KS(marginalization_injected_planet_E,marginalization_dict["strip_1_E"])

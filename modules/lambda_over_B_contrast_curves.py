@@ -155,7 +155,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         if (len(comparison_string_E) > 0):
             cp1_E = ax.contour(X, Y, Z_E)
             # overplot the critical line
-            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
+            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_E",
                                            keep="first",
                                            inplace=False)
             levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
@@ -163,7 +163,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         if (len(comparison_string_W) > 0):
             cp1_W = ax.contour(X, Y, Z_W)
             # overplot the critical line
-            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
+            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
                                            keep="first",
                                            inplace=False)
             levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values

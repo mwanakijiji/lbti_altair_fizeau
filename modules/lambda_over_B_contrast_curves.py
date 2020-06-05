@@ -41,7 +41,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
 
     # initialize cube to hold the non-interpolated KS statistic
     cube_stat_no_interpolation = np.zeros((
-                        num_comparisons,
+                        num_comparisons-1,
                         len(contour_data["comp_ampl"].unique()),
                         len(contour_data["dist_asec"].unique())
                         ))
@@ -50,7 +50,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     ngridx = 100
     ngridy = 200
     cube_stat_interp = np.zeros((
-                        num_comparisons,
+                        num_comparisons-1,
                         ngridy,
                         ngridx
                         ))
@@ -58,10 +58,18 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     import ipdb; ipdb.set_trace()
 
     # initialize ticker to adding data to cube
-    ticker_num = int(0)
+    ticker_num_no_interp = int(0)
+    ticker_num_w_interp = int(0)
 
     # loop over all stripes
     for i in range(0,num_stripes):
+
+        print("num_stripe:")
+        print(i)
+        print("ticker_num_no_interp:")
+        print(ticker_num_no_interp)
+        print("ticker_num_w_interp:")
+        print(ticker_num_w_interp)
 
         # which stripes are we comparing with? (note that we will remove
         # the half of the one strip where the planets were injected, since
@@ -91,42 +99,49 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                 comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
                 comparison_string_W = np.nan
 
+        X_unique = np.sort(contour_data.dist_asec.unique())
+        Y_unique = np.sort(contour_data.comp_ampl.unique())
+        X, Y = np.meshgrid(X_unique, Y_unique)
+
         if (comparison_string_E != np.nan):
             # rearrange 1-D KS statistics into a matrix
             Z_E = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
                                      values=comparison_string_E).T.values
+            # add this slice to non-interpolated cube
+            cube_stat_no_interpolation[ticker_num,:,:] = Z_E
+            ticker_num_no_interp += 1 # advance ticker
+
         elif (comparison_string_W != np.nan):
             Z_W = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
                                      values=comparison_string_W).T.values
+            # add this slice to non-interpolated cube
+            cube_stat_no_interpolation[ticker_num,:,:] = Z_W
+            ticker_num_no_interp += 1 # advance ticker
 
-        X_unique = np.sort(contour_data.dist_asec.unique())
-        Y_unique = np.sort(contour_data.comp_ampl.unique())
-        X, Y = np.meshgrid(X_unique, Y_unique)
-
-        # add this slice to non-interpolated cube
-        cube_stat_no_interpolation[ticker_num,:,:] = Z_E
-        ticker_num += 1 # advance ticker
-        cube_stat_no_interpolation[ticker_num,:,:] = Z_W
-        ticker_num += 1 # advance ticker
-
-
-
-        # linearly interpolate the data we have onto a regular grid in magnitude space
+        # slightly different method here: linearly interpolate the data we have
+        # onto a regular grid
         xi = np.linspace(0, 0.55, num=ngridx)
         yi = np.linspace(0, 0.3, num=ngridy)
-
-        # Linearly interpolate the data (X, Y) on a grid defined by (xi, yi).
+        Xi, Yi = np.meshgrid(xi, yi)
         triang_2 = tri.Triangulation(contour_data["dist_asec"].values,
                                    contour_data["comp_ampl"].values)
-        interpolator = tri.LinearTriInterpolator(triang_2, contour_data[comparison_string].values)
-        Xi, Yi = np.meshgrid(xi, yi)
-        zi = interpolator(Xi, Yi)
 
-        # add this slice to interpolated cube
-        cube_stat_interp[i,:,:] = zi
+        if (comparison_string_E != np.nan):
+            # Linearly interpolate the data (X, Y) on a grid defined by (xi, yi).
+            interpolator_E = tri.LinearTriInterpolator(triang_2, contour_data[comparison_string_E].values)
+            zi_E = interpolator_E(Xi, Yi)
+            # add this slice to interpolated cube
+            cube_stat_interp[ticker_num_w_interp,:,:] = zi_E
+            ticker_num_w_interp += 1 # advance ticker
+        elif (comparison_string_W != np.nan):
+            interpolator_W = tri.LinearTriInterpolator(triang_2, contour_data[comparison_string_W].values)
+            zi_W = interpolator_W(Xi, Yi)
+            cube_stat_interp[ticker_num_w_interp,:,:] = zi_W
+            ticker_num_w_interp += 1 # advance ticker
 
+        import ipdb; ipdb.set_trace()
         ###################################
         ## BEGIN PLOTS
 
@@ -176,8 +191,10 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         ## END PLOTS INSIDE FOR-LOOP
         ###################################
 
-    # take an average across the cube
+    # remove unused slices
 
+
+    # take an average across the cube
     cube_stat_avg = np.mean(cube_stat, axis=0)
 
     # map contrast curve to magnitudes

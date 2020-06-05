@@ -54,7 +54,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                         ngridy,
                         ngridx
                         ))
-                        
+
     import ipdb; ipdb.set_trace()
 
     # initialize ticker to adding data to cube
@@ -215,6 +215,12 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     filename4 = "contour_avg.png"
     plt.savefig(filename4)
     print(filename4)
+
+    __START HERE __# extract the contour information
+    p = cs.collections[0].get_paths()[0]
+    v = p.vertices
+    x = v[:,0]
+    y = v[:,1]
 
     # FYI 2D color plot
     '''

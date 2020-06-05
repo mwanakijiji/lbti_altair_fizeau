@@ -169,6 +169,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         plot_file_name = "fyi_comp_w_contours_comparison_"+str(int(i))+"_of_"+str(int(num_stripes))+".pdf"
         plt.savefig(plot_file_name)
         print("Saved " + str(plot_file_name))
+        plt.close()
 
 
         # FYI contour plot of KS statistic, WITH interpolation
@@ -202,6 +203,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         filename2 = "junk_" + str(int(i)) + "_with_interpolation.png"
         plt.savefig(filename2)
         print("Saved " + filename2)
+        plt.close()
 
         print("------------")
 
@@ -212,14 +214,16 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
 
     import ipdb; ipdb.set_trace()
     # take an average across the cube
-    cube_stat_avg = np.mean(cube_stat, axis=0)
+    cube_stat_interp_avg = np.mean(cube_stat_interp, axis=0)
+    cube_stat_no_interp_avg = np.mean(cube_stat_no_interpolation, axis=0)
 
     # map contrast curve to magnitudes
     Y_mag = -2.5*np.log10(Y)
     comp_ampl_mag = -2.5*np.log10(df["comp_ampl"])
 
+    '''
     # generate 2D contour plots for each individual slice, and then for the average
-    levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+    levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values
     for t in range(0,4):
         # loop over stripe comparisons
         plt.clf()
@@ -235,11 +239,11 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         filename3 = "contour_mags_" + str(int(t)) + ".png"
         plt.savefig(filename3)
         print("Saved " + filename3)
-
+    '''
     # now plot the average
     plt.clf()
-    cp3 = plt.contour(X, Y_mag, cube_stat_avg, alpha = 0.5)
-    cp4 = plt.contour(X, Y_mag, cube_stat_avg, levels = levels, linewidths=5, color="k")
+    #cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
+    cp4 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, levels = levels, linewidths=5, color="k")
     plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
     plt.gca().invert_yaxis()
     plt.xlabel("R (arcsec)")
@@ -251,7 +255,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     print(filename4)
 
     # extract the contour information
-    p = cs.collections[0].get_paths()[0]
+    p = cp4.collections[0].get_paths()[0]
     v = p.vertices
     x = v[:,0]
     y = v[:,1]

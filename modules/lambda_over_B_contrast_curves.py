@@ -128,14 +128,14 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         triang_2 = tri.Triangulation(contour_data["dist_asec"].values,
                                    contour_data["comp_ampl"].values)
 
-        if (comparison_string_E != np.nan):
+        if (len(comparison_string_E) > 0):
             # Linearly interpolate the data (X, Y) on a grid defined by (xi, yi).
             interpolator_E = tri.LinearTriInterpolator(triang_2, contour_data[comparison_string_E].values)
             zi_E = interpolator_E(Xi, Yi)
             # add this slice to interpolated cube
             cube_stat_interp[ticker_num_w_interp,:,:] = zi_E
             ticker_num_w_interp += 1 # advance ticker
-        elif (comparison_string_W != np.nan):
+        if (len(comparison_string_W) > 0):
             interpolator_W = tri.LinearTriInterpolator(triang_2, contour_data[comparison_string_W].values)
             zi_W = interpolator_W(Xi, Yi)
             cube_stat_interp[ticker_num_w_interp,:,:] = zi_W

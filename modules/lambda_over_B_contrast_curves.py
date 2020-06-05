@@ -256,11 +256,12 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     import ipdb; ipdb.set_trace()
 
     # extract the contour information
-    p = cp4.collections[0].get_paths()[0]
-    v = p.vertices
+    p_info = cp4.collections[0].get_paths()[0]
+    v = p_info.vertices
     x = v[:,0]
     y = v[:,1]
-    contour_info_df = pd.DataFrame([])
+    d = {"x": x, "y": y}
+    contour_info_df = pd.DataFrame(data=d)
 
     # FYI 2D color plot
     '''

@@ -102,7 +102,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
-
+        import ipdb; ipdb.set_trace()
         if (comparison_string_E != np.nan):
             # rearrange 1-D KS statistics into a matrix
             Z_E = contour_data.pivot_table(index='dist_asec',
@@ -111,7 +111,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             # add this slice to non-interpolated cube
             cube_stat_no_interpolation[ticker_num,:,:] = Z_E
             ticker_num_no_interp += 1 # advance ticker
-
+            import ipdb; ipdb.set_trace()
         elif (comparison_string_W != np.nan):
             Z_W = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
@@ -119,7 +119,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             # add this slice to non-interpolated cube
             cube_stat_no_interpolation[ticker_num,:,:] = Z_W
             ticker_num_no_interp += 1 # advance ticker
-
+            import ipdb; ipdb.set_trace()
         # slightly different method here: linearly interpolate the data we have
         # onto a regular grid
         xi = np.linspace(0, 0.55, num=ngridx)

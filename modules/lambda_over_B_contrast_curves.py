@@ -93,17 +93,17 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_4_W'
         else: # this stripe in this iteration of the for-loop contains the planet
             if half_w_planet == "E":
-                comparison_string_E = np.nan
+                comparison_string_E = ''
                 comparison_string_W = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
             elif half_w_planet == "W":
                 comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
-                comparison_string_W = np.nan
+                comparison_string_W = ''
 
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
         import ipdb; ipdb.set_trace()
-        if np.isfinite(comparison_string_E):
+        if (len(comparison_string_E) > 0):
             # rearrange 1-D KS statistics into a matrix
             Z_E = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
@@ -112,7 +112,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             cube_stat_no_interpolation[ticker_num,:,:] = Z_E
             ticker_num_no_interp += 1 # advance ticker
             import ipdb; ipdb.set_trace()
-        if np.isfinite(comparison_string_W):
+        if (len(comparison_string_W) > 0):
             Z_W = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
                                      values=comparison_string_W).T.values

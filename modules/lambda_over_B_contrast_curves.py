@@ -233,7 +233,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     plt.savefig(filename4)
     print(filename4)
 
-    __START HERE __# extract the contour information
+    # extract the contour information
     p = cs.collections[0].get_paths()[0]
     v = p.vertices
     x = v[:,0]

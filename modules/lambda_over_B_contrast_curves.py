@@ -253,12 +253,14 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     filename4 = "contour_avg.png"
     plt.savefig(filename4)
     print(filename4)
+    import ipdb; ipdb.set_trace()
 
     # extract the contour information
     p = cp4.collections[0].get_paths()[0]
     v = p.vertices
     x = v[:,0]
     y = v[:,1]
+    contour_info_df = pd.DataFrame([])
 
     # FYI 2D color plot
     '''

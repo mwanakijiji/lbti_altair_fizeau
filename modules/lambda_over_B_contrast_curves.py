@@ -55,8 +55,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                         ngridx
                         ))
 
-    import ipdb; ipdb.set_trace()
-
     # initialize ticker to adding data to cube
     ticker_num_no_interp = int(0)
     ticker_num_w_interp = int(0)
@@ -102,7 +100,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
-        import ipdb; ipdb.set_trace()
+
         if (len(comparison_string_E) > 0):
             # rearrange 1-D KS statistics into a matrix
             Z_E = contour_data.pivot_table(index='dist_asec',
@@ -111,7 +109,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             # add this slice to non-interpolated cube
             cube_stat_no_interpolation[ticker_num_no_interp,:,:] = Z_E
             ticker_num_no_interp += 1 # advance ticker
-            import ipdb; ipdb.set_trace()
         if (len(comparison_string_W) > 0):
             Z_W = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
@@ -119,7 +116,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             # add this slice to non-interpolated cube
             cube_stat_no_interpolation[ticker_num_no_interp,:,:] = Z_W
             ticker_num_no_interp += 1 # advance ticker
-            import ipdb; ipdb.set_trace()
         # slightly different method here: linearly interpolate the data we have
         # onto a regular grid
         xi = np.linspace(0, 0.55, num=ngridx)
@@ -141,7 +137,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             cube_stat_interp[ticker_num_w_interp,:,:] = zi_W
             ticker_num_w_interp += 1 # advance ticker
 
-        import ipdb; ipdb.set_trace()
         ###################################
         ## BEGIN PLOTS
 

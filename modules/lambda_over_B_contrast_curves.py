@@ -151,17 +151,30 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         ax = fig.add_subplot(111)
         # underplot scatter plot of sampled points
         sp = ax.scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
-        # plot a contour plot
-        cp1 = ax.contour(X, Y, Z)
-        # overplot the critical line
-        df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
-                                       keep="first",
-                                       inplace=False)
-        levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
-        cp2 = ax.contour(X, Y, Z, levels = levels)
+        # plot contour plots
+        if (len(comparison_string_E) > 0):
+            cp1_E = ax.contour(X, Y, Z_E)
+            # overplot the critical line
+            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
+                                           keep="first",
+                                           inplace=False)
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            cp2_E = ax.contour(X, Y, Z_E, levels = levels)
+        if (len(comparison_string_W) > 0):
+            cp1_W = ax.contour(X, Y, Z_W)
+            # overplot the critical line
+            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
+                                           keep="first",
+                                           inplace=False)
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            cp2_W = ax.contour(X, Y, Z_W, levels = levels)
+
         ax.set_xlabel("dist_asec")
         ax.set_ylabel("companion_ampl")
-        plt.savefig("fyi_comp_w_contours_comparison_"+str(int(i))+"_of_"+str(int(num_stripes))+".pdf")
+        plot_file_name = "fyi_comp_w_contours_comparison_"+str(int(i))+"_of_"+str(int(num_stripes))+".pdf"
+        plt.savefig(plot_file_name)
+        print("Saved " + str(plot_file_name))
+
 
         # FYI contour plot of KS statistic, WITH interpolation
         plt.clf()
@@ -170,13 +183,22 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         # underplot scatter plot of sampled points
         sp = ax.scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         # plot a contour plot
-        cp1 = ax.contour(Xi, Yi, zi)
-        # overplot the critical line
-        df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
+        if (len(comparison_string_E) > 0):
+            cp1_E = ax.contour(Xi, Yi, zi_E)
+            # overplot the critical line
+            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
                                        keep='first',
                                        inplace=False)
-        levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
-        cp2 = ax.contour(Xi, Yi, zi, levels = levels)
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            cp2_E = ax.contour(Xi, Yi, zi_E, levels = levels)
+        if (len(comparison_string_W) > 0):
+            cp1_W = ax.contour(Xi, Yi, zi_W)
+            # overplot the critical line
+            df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1",
+                                       keep='first',
+                                       inplace=False)
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            cp2_W = ax.contour(Xi, Yi, zi_W, levels = levels)
 
         ax.set_xlabel("dist_asec")
         ax.set_ylabel("companion_ampl")

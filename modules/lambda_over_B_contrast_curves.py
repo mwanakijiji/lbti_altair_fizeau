@@ -158,7 +158,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_E",
                                            keep="first",
                                            inplace=False)
-            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values
             cp2_E = ax.contour(X, Y, Z_E, levels = levels)
         if (len(comparison_string_W) > 0):
             cp1_W = ax.contour(X, Y, Z_W)
@@ -166,7 +166,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
                                            keep="first",
                                            inplace=False)
-            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_W"].values
             cp2_W = ax.contour(X, Y, Z_W, levels = levels)
 
         ax.set_xlabel("dist_asec")
@@ -189,7 +189,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_E",
                                        keep='first',
                                        inplace=False)
-            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values
             cp2_E = ax.contour(Xi, Yi, zi_E, levels = levels)
         if (len(comparison_string_W) > 0):
             cp1_W = ax.contour(Xi, Yi, zi_W)
@@ -197,7 +197,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
                                        keep='first',
                                        inplace=False)
-            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1"].values
+            levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_W"].values
             cp2_W = ax.contour(Xi, Yi, zi_W, levels = levels)
 
         ax.set_xlabel("dist_asec")
@@ -215,7 +215,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
 
     # remove unused slices
 
-
+    import ipdb; ipdb.set_trace()
     # take an average across the cube
     cube_stat_avg = np.mean(cube_stat, axis=0)
 

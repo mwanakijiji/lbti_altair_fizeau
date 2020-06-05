@@ -109,7 +109,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                                      columns='comp_ampl',
                                      values=comparison_string_E).T.values
             # add this slice to non-interpolated cube
-            cube_stat_no_interpolation[ticker_num,:,:] = Z_E
+            cube_stat_no_interpolation[ticker_num_no_interp,:,:] = Z_E
             ticker_num_no_interp += 1 # advance ticker
             import ipdb; ipdb.set_trace()
         if (len(comparison_string_W) > 0):
@@ -117,7 +117,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                                      columns='comp_ampl',
                                      values=comparison_string_W).T.values
             # add this slice to non-interpolated cube
-            cube_stat_no_interpolation[ticker_num,:,:] = Z_W
+            cube_stat_no_interpolation[ticker_num_no_interp,:,:] = Z_W
             ticker_num_no_interp += 1 # advance ticker
             import ipdb; ipdb.set_trace()
         # slightly different method here: linearly interpolate the data we have

@@ -260,8 +260,9 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     v = p_info.vertices
     x = v[:,0]
     y = v[:,1]
-    d = {"x": x, "y": y}
-    contour_info_df = pd.DataFrame(data=d)
+    dict_pre_df = {"x": x, "y": y}
+    contour_info_df = pd.DataFrame(data=dict_pre_df)
+    contour_info_df.to_csv("lambda_B_cc.csv")
 
     # FYI 2D color plot
     '''

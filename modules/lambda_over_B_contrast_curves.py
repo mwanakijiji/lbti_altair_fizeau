@@ -62,7 +62,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     ticker_num_no_interp = int(0)
     ticker_num_w_interp = int(0)
 
-    # loop over all stripes
+    # loop over all stripes to compare with
     for i in range(0,num_stripes):
 
         print("num_stripe:")
@@ -72,28 +72,16 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         print("ticker_num_w_interp:")
         print(ticker_num_w_interp)
 
-        # apply some logic tests
-        #   1. Is H0 rejected in a comparison between one half strip with a fake
-        #       planet injected, and the same half strip which has not had a fake
-        #       planet injected?
-        #       Y -> proceed to test other half strips
-        #       N -> This is a poor test for this strip. Skip consideration of
-        #           this half-strip.
-        #   2. In a strip with a planet injected, Is H0 rejected in a comparison
-        #       between the half strip which contains the center of the planet
-        #       PSF and the other half strip?
-        #       Y -> proceed to test other half strips
-        #       N -> This is a poor test. Skip consideration of this half-strip.
-
         # which stripes are we comparing with? (note that we will remove
         # the half of the one strip where the planets were injected, since
         # that would represent a comparison with itself)
         if np.logical_and(i==0,stripe_w_planet!=0):
-            #if (half_w_planet == "E"):
-            #if (half_w_planet == "W"):
+            # compare with stripe 0, if stripe 0 is not the one with the planet,
+            # and set the strings which will be needed for that comparison
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_0_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_0_W'
         elif np.logical_and(i==1,stripe_w_planet!=1):
+            # compare with stripe 1, etc.
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_1_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_1_W'
         elif np.logical_and(i==2,stripe_w_planet!=2):
@@ -105,20 +93,49 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         elif np.logical_and(i==4,stripe_w_planet!=4):
             comparison_string_E = 'D_xsec_strip_w_planets_rel_to_strip_4_E'
             comparison_string_W = 'D_xsec_strip_w_planets_rel_to_strip_4_W'
-        else: # this stripe in this iteration of the for-loop contains the planet
+        else:
+            # this stripe in this iteration of the for-loop contains the planet
             if half_w_planet == "E":
-                comparison_string_E = ''
+                comparison_string_E = '' # zero-length string
                 comparison_string_W = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
             elif half_w_planet == "W":
                 comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
                 comparison_string_W = ''
+
+        # Apply some logic tests, for a given permutation of (radius, amplitude)
+        # of the fake planet. Failures of either of the tests will result in NaN
+        # values being substituted for the KS stat values at that permutation
+        #   1. Is H0 rejected in a comparison between one half strip with a fake
+        #       planet injected, and the same half strip which has not had a fake
+        #       planet injected?
+        #       Y -> proceed to test other half strips
+        #       N -> This is a poor test for this strip. Skip consideration of
+        #           this permutation.
+        #   2. In a strip with a planet injected, Is H0 rejected in a comparison
+        #       between the half strip which contains the center of the planet
+        #       PSF and the other half strip?
+        #       Y -> proceed to test other half strips
+        #       N -> This is a poor test. Skip consideration of this permutation.
+        import ipdb; ipdb.set_trace()
+        # critical KS stat value
+        crit_val = df["val_xsec_crit_strip_w_planets_rel_to_strip_0_E"].drop_duplicates().values[0]
+
+        # test 1: compare half strip with and without planet
+        df["D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet"] < crit_val
+
+        # test 2: compare two halves of a given strip, one half of which has the
+        # center of the injected planet PSF
+        df["D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet"] < crit_val
+
+
         import ipdb; ipdb.set_trace()
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
 
         if (len(comparison_string_E) > 0):
-            # rearrange 1-D KS statistics into a matrix
+            # if the eastern half of the stripe is legitimate to compare to,
+            # rearrange 1-D KS statistics of that eastern half into a matrix
             Z_E = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
                                      values=comparison_string_E).T.values
@@ -126,6 +143,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             cube_stat_no_interpolation[ticker_num_no_interp,:,:] = Z_E
             ticker_num_no_interp += 1 # advance ticker
         if (len(comparison_string_W) > 0):
+            # if the western half is legitimate to compare to, etc...
             Z_W = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',
                                      values=comparison_string_W).T.values

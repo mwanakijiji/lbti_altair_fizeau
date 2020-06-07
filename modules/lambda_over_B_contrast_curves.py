@@ -102,7 +102,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                 comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
                 comparison_string_W = ''
 
-        # Apply some logic tests, for a given permutation of (radius, amplitude)
+        # Option for later: Apply some logic tests, for a given permutation of (radius, amplitude)
         # of the fake planet. Failures of either of the tests will result in NaN
         # values being substituted for the KS stat values at that permutation
         #   1. Is H0 rejected in a comparison between one half strip with a fake
@@ -116,9 +116,9 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         #       PSF and the other half strip?
         #       Y -> proceed to test other half strips
         #       N -> This is a poor test. Skip consideration of this permutation.
-        import ipdb; ipdb.set_trace()
 
         # make copy to preserve ampl, radius info when we make NaNs
+        '''
         df_copy = df.copy()
 
         # test 1: compare half strip with and without planet; if test fails, fill with NaNs
@@ -131,7 +131,8 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         # re-insert radius and ampl data
         df["dist_asec"] = df_copy["dist_asec"]
         df["comp_ampl"] = df_copy["comp_ampl"]
-        import ipdb; ipdb.set_trace()
+        '''
+
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)

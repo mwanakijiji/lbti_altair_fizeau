@@ -117,17 +117,20 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         #       Y -> proceed to test other half strips
         #       N -> This is a poor test. Skip consideration of this permutation.
         import ipdb; ipdb.set_trace()
-        # critical KS stat value
-        crit_val = df["val_xsec_crit_strip_w_planets_rel_to_strip_0_E"].drop_duplicates().values[0]
 
-        # test 1: compare half strip with and without planet
-        df["D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet"] < crit_val
+        # make copy to preserve ampl, radius info when we make NaNs
+        df_copy = df.copy()
+
+        # test 1: compare half strip with and without planet; if test fails, fill with NaNs
+        df.loc[df["D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet"] < df["val_xsec_crit_strip_w_planets_rel_to_strip_0_E"]] = np.nan
 
         # test 2: compare two halves of a given strip, one half of which has the
-        # center of the injected planet PSF
-        df["D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet"] < crit_val
+        # center of the injected planet PSF; if test fails, fill with NaNs
+        df.loc[df["D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet"] < df["val_xsec_crit_strip_w_planets_rel_to_strip_0_E"]] = np.nan
 
-
+        # re-insert radius and ampl data
+        df["dist_asec"] = df_copy["dist_asec"]
+        df["comp_ampl"] = df_copy["comp_ampl"]
         import ipdb; ipdb.set_trace()
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())

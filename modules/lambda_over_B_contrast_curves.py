@@ -24,11 +24,14 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     plt.scatter(df["dist_asec"],df["comp_ampl"])
     plt.xlabel("dist (asec)")
     plt.ylabel("comp ampl")
-    plt.savefig("fyi_completion.pdf")
+    plot_file_name = "fyi_completion.pdf"
+    plt.savefig(plot_file_name)
+    print("Saved figure " + plot_file_name)
 
     # make a new DataFrame from a subset of the data
     # contour_data = df[["dist_asec","comp_ampl","D_xsec_strip_w_planets_rel_to_strip_1"]]
     contour_data = df
+    import ipdb; ipdb.set_trace()
 
     # add column of delta_mags (necessary?)
     #contour_data["del_mag"] = 2.5*np.log10(contour_data["comp_ampl"])
@@ -69,6 +72,19 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         print("ticker_num_w_interp:")
         print(ticker_num_w_interp)
 
+        # apply some logic tests
+        #   1. Is H0 rejected in a comparison between one half strip with a fake
+        #       planet injected, and the same half strip which has not had a fake
+        #       planet injected?
+        #       Y -> proceed to test other half strips
+        #       N -> This is a poor test for this strip. Skip consideration of
+        #           this half-strip.
+        #   2. In a strip with a planet injected, Is H0 rejected in a comparison
+        #       between the half strip which contains the center of the planet
+        #       PSF and the other half strip?
+        #       Y -> proceed to test other half strips
+        #       N -> This is a poor test. Skip consideration of this half-strip.
+
         # which stripes are we comparing with? (note that we will remove
         # the half of the one strip where the planets were injected, since
         # that would represent a comparison with itself)
@@ -96,7 +112,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             elif half_w_planet == "W":
                 comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
                 comparison_string_W = ''
-
+        import ipdb; ipdb.set_trace()
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)

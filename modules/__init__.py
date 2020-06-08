@@ -129,7 +129,7 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
         pos_info["x_pix_coord"] = np.nan
         pos_info["y_pix_coord"] = np.nan
         '''
-        BUG-CHECK THIS SNIPPED BEFORE USING
+        BUG-CHECK THIS SNIPPET BEFORE USING
         pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
                                           np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
         pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],

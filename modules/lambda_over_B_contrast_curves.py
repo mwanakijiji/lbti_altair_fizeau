@@ -31,7 +31,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     # make a new DataFrame from a subset of the data
     # contour_data = df[["dist_asec","comp_ampl","D_xsec_strip_w_planets_rel_to_strip_1"]]
     contour_data = df
-    import ipdb; ipdb.set_trace()
 
     # add column of delta_mags (necessary?)
     #contour_data["del_mag"] = 2.5*np.log10(contour_data["comp_ampl"])
@@ -250,7 +249,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
 
     # remove unused slices
 
-    import ipdb; ipdb.set_trace()
     # take an average across the cube
     cube_stat_interp_avg = np.mean(cube_stat_interp, axis=0)
     cube_stat_no_interp_avg = np.mean(cube_stat_no_interpolation, axis=0)
@@ -288,10 +286,9 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     plt.ylabel("$\Delta$m")
     plt.xlim([0,0.55])
     plt.ylim([5.2,1])
-    filename4 = "contour_avg.png"
+    filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".png"
     plt.savefig(filename4)
-    print(filename4)
-    import ipdb; ipdb.set_trace()
+    print("Wrote " + filename4)
 
     # extract the contour information
     p_info = cp4.collections[0].get_paths()[0]
@@ -300,7 +297,9 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     y = v[:,1]
     dict_pre_df = {"x": x, "y": y}
     contour_info_df = pd.DataFrame(data=dict_pre_df)
-    contour_info_df.to_csv("lambda_B_cc.csv")
+    csv_name = "lambda_B_cc_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".csv"
+    contour_info_df.to_csv(csv_name)
+    print("Wrote " + csv_name)
 
     # FYI 2D color plot
     '''

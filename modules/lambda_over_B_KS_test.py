@@ -502,7 +502,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_0_W
                     cross_sec_injected_planet = cross_sec_dict["strip_0_W"]
-                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_0_W"]
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_0_W"]
                     string_w_planet_indicator = "strip_0_W"
                     string_opposite_indicator = "strip_0_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_0"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
@@ -518,7 +518,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_1_W
                     cross_sec_injected_planet = cross_sec_dict["strip_1_W"]
-                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_1_W"]
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_1_W"]
                     string_w_planet_indicator = "strip_1_W"
                     string_opposite_indicator = "strip_1_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_1"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
@@ -534,7 +534,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_2_W
                     cross_sec_injected_planet = cross_sec_dict["strip_2_W"]
-                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_2_W"]
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_2_W"]
                     string_w_planet_indicator = "strip_2_W"
                     string_opposite_indicator = "strip_2_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_2"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2
@@ -550,7 +550,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_3_W
                     cross_sec_injected_planet = cross_sec_dict["strip_3_W"]
-                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_3_W"]
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_3_W"]
                     string_w_planet_indicator = "strip_3_W"
                     string_opposite_indicator = "strip_3_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_3"] # note I'm not bothering with flipping since marginalization is not being used as of 2323 June 2
@@ -566,7 +566,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 elif (half_w_planet == "W"):
                     image_injected_planet = img_processed_stripe_4_W
                     cross_sec_injected_planet = cross_sec_dict["strip_4_W"]
-                    cross_sec_baseline_W = cross_sec_dict["baseline_strip_4_W"]
+                    cross_sec_baseline = cross_sec_dict["baseline_strip_4_W"]
                     string_w_planet_indicator = "strip_4_W"
                     string_opposite_indicator = "strip_4_E"
                 marginalization_baseline = marginalization_dict["baseline_strip_4"] # note I'm not bothering with flipping since marginalization is not being used as of 2020 June 2

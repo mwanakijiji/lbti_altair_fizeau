@@ -148,8 +148,14 @@ class MedianCube:
             # replace nans with zeros to let the rotation work (we'll mask the regions of zeros downstream)
             sci[~np.isfinite(sci)] = 0
 
-            # derotate according to PA
-            sci_derotated = scipy.ndimage.rotate(sci, self.pa_array[t], reshape=False)
+            # derotate according to PA; the ndimage.rotate convention here is
+            # such that a positive rotation angle input means that the image
+            # will be rotated CW by this amount; as applied here, the input angle
+            # needs to be the negative of the PA, because the southern object is
+            # rotating CW as it ascends toward zenith (i.e., as PA goes from 'more
+            # negative' to 'less negative' to zero; in other words, if PA<0, then
+            # rotate the image CW by the absolute value (i.e., the negative) of the PA
+            sci_derotated = scipy.ndimage.rotate(sci, -self.pa_array[t], reshape=False)
 
             # TEST ONLY
             '''
@@ -192,7 +198,7 @@ class MedianCube:
                     mask_nan_regions[:100,:] = 0
 
                 # derotate the mask in the same way as the science image
-                mask_derotated = scipy.ndimage.rotate(mask_nan_regions, self.pa_array[t], reshape=False)
+                mask_derotated = scipy.ndimage.rotate(mask_nan_regions, -self.pa_array[t], reshape=False)
 
                 # multiply the science image by the mask
                 # note the derotation causes some of the edge pixels to be neither 0 nor 1
@@ -382,7 +388,7 @@ class Detection:
             print(injection_loc_dict)
             injection_loc = pd.DataFrame(injection_loc_dict)
             injection_loc["angle_deg_EofN"] = injection_loc["angle_deg"] # this step a kludge due to some name changes
-            loc_vec = polar_to_xy(pos_info = injection_loc, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
+            loc_vec = polar_to_xy(pos_info = injection_loc, pa=0, asec = True) # PA=0 because the frame is derotated
             print("Location vector of fake companion:")
             print(loc_vec)
 
@@ -473,7 +479,7 @@ class Detection:
             patch_loc_dict = {"angle_deg_EofN": other_angles[patch_num],
                                   "rad_asec": [self.header["RADASEC"]],
                                   "ampl_linear_norm": [self.header["AMPLIN"]]}
-            patch_loc_vec = polar_to_xy(pos_info = patch_loc_dict, pa=0, asec = True, south = True) # PA=0 because the frame is derotated
+            patch_loc_vec = polar_to_xy(pos_info = patch_loc_dict, pa=0, asec = True) # PA=0 because the frame is derotated
             # make mask for each necklace patch
             necklace_patch_mask_inv = circ_mask(input_array = smoothed_adi_frame,
                               mask_center = [np.add(y_cen,patch_loc_vec["y_pix_coord"][0]),

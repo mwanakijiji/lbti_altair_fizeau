@@ -109,25 +109,31 @@ def polar_to_xy(pos_info, pa, asec = False, south = False, north = False):
     # Convert to x,y
 
     # Consider variables
-    # PA: parallactic angle
+    # PA: parallactic angle (convention: negative value means North is CCW from +y
+    #       by abs(PA)  )
     # theta: angle E of true N (i.e., CCW from +y axis for a southern target, after derotation of image)
     # R: radial distance from origin (which is at the central host star)
 
-    # In non-derotated frame, the coordinate of interest is
-    # (x,y) = R*( sin(-PA-theta), cos(-PA-theta) )
+    # In non-derotated frame, the coordinate of interest from the center is
+    # (x,y) = R*( sin(PA-theta), cos(PA-theta) )
 
+    print("Calculating coordinates for a southern target in a non-derotated frame...")
     pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
-                                          np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+                                        np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
     pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],
-                                          np.cos(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+                                        np.cos(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
 
     # if target is in north (but higher than Polaris), use the same relations except take -pa -> +pa
     if north:
-        print("Calculating coordinates for a northern target...")
+        print("Calculation of coordinates for a northern target is not bug-checked yet...")
+        pos_info["x_pix_coord"] = np.nan
+        pos_info["y_pix_coord"] = np.nan
+        '''
         pos_info["x_pix_coord"] = np.multiply(pos_info["rad_pix"],
-                                          np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
+                                          np.sin(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
         pos_info["y_pix_coord"] = np.multiply(pos_info["rad_pix"],
-                                          np.cos(np.multiply(np.add(-pos_info["angle_deg_EofN"],pa),np.pi/180.)))
+                                          np.cos(np.multiply(np.add(-pos_info["angle_deg_EofN"],-pa),np.pi/180.)))
+        '''
 
     return pos_info
 

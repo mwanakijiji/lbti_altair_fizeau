@@ -32,11 +32,11 @@ date
 ### altair_20200508_good_frames_list_D_stripe_2_of_4.tar.gz
 ### altair_20200508_good_frames_list_D_stripe_3_of_4.tar.gz
 ### altair_20200508_good_frames_list_D_stripe_4_of_4.tar.gz
-export DATA_TARBALL=altair_20200508_good_frames_list_D_stripe_2_of_4.tar.gz
+export DATA_TARBALL=altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_test_results_severalFWHM_76pt57degEofN_ampl_0pt005to0pt05_list_D_stripe_2_of_4_0001.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_76pt57degEofN_ampl_0pt005to0pt05_list_D_stripe_2_of_4_0001.csv
+export RESULTS_TARBALL=recenter_test_results_severalFWHM_83pt37degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0008.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_83pt37degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0008.csv
 
 ### load python 3.6.5
 module load python/3
@@ -44,11 +44,11 @@ module load python/3
 ### load Singularity
 module load singularity
 
-### check if 450 Gb of storage are available in /tmp
+### check if 400 Gb of storage are available in /tmp
 echo $HOSTNAME
 echo "Check if /tmp has 500GB of storage available"
 available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
-if [ $available_space -gt 450 ]
+if [ $available_space -gt 400 ]
 then
    echo "There is enough storage"
    echo $available_space GB
@@ -129,7 +129,8 @@ then
    ### directory
    echo "Tarring outputs"
    ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
-   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/
+   ### tar a selection of the most important FITS frames:
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/ /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/ /tmp/$USER/180507_fizeau_altair/bin/other_fits/*cube_just_before_median*fits
    echo "Done tarring output:"
    date
    echo "---"

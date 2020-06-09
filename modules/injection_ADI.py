@@ -900,16 +900,16 @@ def main(inject_iteration=None):
         A = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.]) # (SUBSET)
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
 
-        fake_params_pre_permute = {"angle_deg_EofN": [76.57],
+        fake_params_pre_permute = {"angle_deg_EofN": [83.37],
                                "rad_asec": list(B),
                                "ampl_linear_norm": [0.005,0.01,0.02,0.03,0.05,0.1]}
 
         # average angles along long baseline (deg E of N) for lambda/B strips
-        # Block A, strip 0 of 4: - / - (-39.68 along short baseline)
-        # Block D, strip 1 of 4: - / - (-19.218 along short baseline)
-        # Block D, strip 2 of 4: 76.57 / - (-13.43 along short baseline)
-        # Block D, strip 3 of 4: - / - (-6.63 along short baseline)
-        # Block D, strip 4 of 4: - / - (+0.04 along short baseline)
+        # Block A, strip 0 of 4: 50.32 / 230.32 (-39.68 along short baseline)
+        # Block D, strip 1 of 4: 70.782 / 250.782 (-19.218 along short baseline)
+        # Block D, strip 2 of 4: 76.57 / 256.57 (-13.43 along short baseline)
+        # Block D, strip 3 of 4: 83.37 / 263.37 (-6.63 along short baseline)
+        # Block D, strip 4 of 4: 90.04 / 270.04 (+0.04 along short baseline)
         # WRONG Block A, strip 0 of 4: 129.68 / 309.68 (-39.68 along short baseline)
         # WRONG Block D, strip 1 of 4: 109.218 / 289.218 (-19.218 along short baseline)
         # WRONG Block D, strip 2 of 4: 103.43 / 283.43 (-13.43 along short baseline)

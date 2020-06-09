@@ -1,21 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 # This reads in Jordan Stone's LEECH contrast curve for Altair for comparison
-
-
-# In[1]:
-
 
 import pandas as pd
 import matplotlib.pyplot as plt
-
-
-# In[6]:
-
 
 # LEECH data
 contrast_leech = pd.read_csv("data/HIP97649_LEECH.txt")
@@ -24,42 +10,17 @@ radii_leech = pd.read_csv("data/radii_LEECH.txt")
 # our Fizeau data
 data_fizeau =  pd.read_csv("data/modern_contrast_curve.csv")
 
-
-# In[7]:
-
-
-data_fizeau.keys()
-
-
-# In[15]:
-
-
 plt.clf()
-plt.plot(radii,contrast,
-         label="Altair, LEECH\n(one telescope,\nt_int = 2873 sec.,\n83 deg rot,\nseeing 0.9)") # info from Table 4 in Stone+ 2018
+plt.plot(radii_leech,contrast_leech,
+         label="LEECH\n(one telescope,\nt_int = 2873 sec.,\n83 deg rot,\nseeing 0.9)") # info from Table 4 in Stone+ 2018
+plt.annotate("LEECH", xy=(1.5,14), rotation=-30, xycoords="data")
 plt.plot(data_fizeau["rad_asec"],data_fizeau["del_m_modern"],
-         label="Altair, us (Fizeau)\n(\nt_int = TBD sec.,\n83 deg rot,\nseeing ~0.9-1.4)") 
-plt.xlabel("Radius (asec)")
-plt.ylabel("$\Delta m$")
-plt.legend()
+         label="This paper (Fizeau)\n(\nt_int = TBD sec.,\n83 deg rot,\nseeing ~0.9-1.4)")
+plt.xlabel("Radius (asec)", fontsize=18)
+plt.ylabel("$\Delta m$", fontsize=18)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+#plt.legend(loc="lower center")
 plt.gca().invert_yaxis()
-plt.savefig("junk_cc_comparison.pdf")
-
-
-# In[11]:
-
-
-data_fizeau["F"]
-
-
-# In[12]:
-
-
-data_fizeau["rad_fwhm"]
-
-
-# In[ ]:
-
-
-
-
+plt.show()
+#plt.savefig("junk_cc_comparison.pdf")

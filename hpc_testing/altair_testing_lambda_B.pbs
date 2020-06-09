@@ -35,8 +35,8 @@ date
 export DATA_TARBALL=altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_test_results_severalFWHM_90pt04degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0013.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_90pt04degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0013.csv
+export RESULTS_TARBALL=recenter_test_results_severalFWHM_50pt32degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0018.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_50pt32degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0018.csv
 
 ### load python 3.6.5
 module load python/3
@@ -130,7 +130,7 @@ then
    echo "Tarring outputs"
    ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
    ### tar a selection of the most important FITS frames:
-   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/ /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/ /tmp/$USER/180507_fizeau_altair/bin/other_fits/*cube_just_before_median*fits
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/
    echo "Done tarring output:"
    date
    echo "---"

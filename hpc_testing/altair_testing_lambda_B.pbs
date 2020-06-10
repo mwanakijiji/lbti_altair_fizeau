@@ -4,7 +4,7 @@
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
-#PBS -W group_list=phinz
+#PBS -W group_list=ktmorz
 ### Sharing settings
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.
@@ -35,8 +35,8 @@ date
 export DATA_TARBALL=altair_20200508_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_test_results_severalFWHM_70pt782degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0023.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_70pt782degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0023.csv
+export RESULTS_TARBALL=recenter_test_results_severalFWHM_230pt32degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0028.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_test_results_severalFWHM_230pt32degEofN_ampl_0pt005to0pt05_list_A_stripe_0_of_4_0028.csv
 
 ### load python 3.6.5
 module load python/3

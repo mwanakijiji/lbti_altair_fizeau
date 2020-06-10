@@ -3,6 +3,7 @@
 # Created 2020 June 5 by E.S.
 
 import glob
+import os
 import numpy as np
 import pandas as pd
 from scipy import ndimage
@@ -12,9 +13,12 @@ from astropy.io import fits
 
 # make list of all the files
 lambda_over_D = pd.read_csv("./data/modern_contrast_curve.csv")
-lambda_over_B = pd.read_csv("./data/lambda_B_cc.csv")
 psf_profiles = pd.read_csv("./data/example_psf_profiles.csv", index_col=0)
 
+# for lambda/B, there are a number of curves; we will read them all in
+lambda_over_B_file_list = glob.glob("./data/lambda_B*w*planet*csv")
+
+# read in PSF profiles
 psf_profiles_rad_asec = 0.0107*np.arange(-0.5*len(psf_profiles["x_xsec_1"]),0.5*len(psf_profiles["x_xsec_1"]),step=1)
 
 fig = plt.figure(figsize=(8,4))
@@ -26,13 +30,26 @@ for label, content in psf_profiles.items():
              alpha = 0.2, color="gray", linewidth=2)
 plt.plot(lambda_over_D["rad_asec"],lambda_over_D["del_m_modern"],linewidth=4,
          label="$\lambda /D$ regime, based on fake planet injections")
-plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,
-         label="$\lambda /B$ regime, based on KS test")
+for file_name in lambda_over_B_file_list:
+    lambda_over_B = pd.read_csv(file_name)
+    if (file_name == lambda_over_B_file_list[0]):
+        # one name to the legend
+        plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red",
+                label="$\lambda /B$ regime, based on KS test")
+    else:
+        plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red")
+        '''
+        plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,
+            label="$\lambda /B$ regime, based on KS test\n"+str(os.path.basename(file_name)))
+        '''
 plt.gca().invert_yaxis()
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 plt.xlim([0,2.2])
 plt.ylim([10,0])
 plt.legend()
-plt.ylabel("$\Delta$m")
-plt.xlabel("Radius (arcsec)")
+plt.ylabel("$\Delta$m", fontsize=18)
+plt.xlabel("Radius (arcsec)", fontsize=18)
+plt.tight_layout()
 #plt.show()
 plt.savefig("junk.pdf")

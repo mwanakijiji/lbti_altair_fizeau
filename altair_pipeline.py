@@ -82,7 +82,7 @@ while True:
 # interpolate amplitudes
 
 # median along azimuth
-
+'''
 # lambda/D 1-D contrast curve from csv info
 sensitivity.main(small_angle_correction=True)
 
@@ -90,7 +90,7 @@ sensitivity.main(small_angle_correction=True)
 convert_contrast_limits_to_masses.main()
 '''
 # lambda/B cross-sections
-'''
+
 lambda_over_B_KS_test.main(stripe_w_planet = 0,half_w_planet = "E",write_csv_basename = "test_0E.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = 0,half_w_planet = "E",read_csv_basename = "test_0E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = 0,half_w_planet = "W",write_csv_basename = "test_0W.csv")
@@ -100,7 +100,7 @@ lambda_over_B_KS_test.main(stripe_w_planet = 1,half_w_planet = "E",write_csv_bas
 lambda_over_B_contrast_curves.main(stripe_w_planet = 1,half_w_planet = "E",read_csv_basename = "test_1E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = 1,half_w_planet = "W",write_csv_basename = "test_1W.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = 1,half_w_planet = "W",read_csv_basename = "test_1W.csv")
-'''
+
 lambda_over_B_KS_test.main(stripe_w_planet = 2,half_w_planet = "E",write_csv_basename = "test_2E.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = 2,half_w_planet = "E",read_csv_basename = "test_2E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = 2,half_w_planet = "W",write_csv_basename = "test_2W.csv")
@@ -115,3 +115,4 @@ lambda_over_B_KS_test.main(stripe_w_planet = 4,half_w_planet = "E",write_csv_bas
 lambda_over_B_contrast_curves.main(stripe_w_planet = 4,half_w_planet = "E",read_csv_basename = "test_4E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = 4,half_w_planet = "W",write_csv_basename = "test_4W.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = 4,half_w_planet = "W",read_csv_basename = "test_4W.csv")
+'''

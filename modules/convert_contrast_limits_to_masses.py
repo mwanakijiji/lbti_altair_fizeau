@@ -134,16 +134,19 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         plt.legend()
         plt.savefig("junk.pdf")
         '''
-
+        #import ipdb;ipdb.set_trace()
         # ### Interpolate the models to map absolute mag to mass
         # make function to interpolate models
         f_abs_mag_2_mass = interpolate.interp1d(model_data["NB4.05"],model_data["M/Ms"],kind="linear")
+        #import ipdb;ipdb.set_trace()
         # ... and its inverse
         f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"],kind="linear")
+        #import ipdb;ipdb.set_trace()
 
         # return masses (M/M_solar) corresponding to our contrast curve
         key_masses_this_model = model_file_names_df["string_ref"][model_num]
         df_new[key_masses_this_model] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"]) ####
+        #import ipdb;ipdb.set_trace()
         print("masses")
         print(df_new[key_masses_this_model])
 
@@ -223,9 +226,12 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
 
 
-def main():
+def main(regime):
     '''
     Take an input 1D contrast curve and convert it to masses
+
+    regime: for what regime is the contrast curve data being retrieved?
+            choices: "lambda_over_D", "lambda_over_B"
     '''
 
     # configuration data
@@ -236,15 +242,23 @@ def main():
     star_abs_mag = determine_abs_mag_altair.altair_abs_mag()
     print("M of Altair: " + str(star_abs_mag))
 
-    # make/read in a contrast curve, where contrast is defined as the flux ratio
-    # F_planet/F_star where detection has 5-sigma significance
-    # keys: "contrast_lin" and "asec"
-    #contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
-    file_name_cc = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_MODERN_CSV"]
-    contrast_df = pd.read_csv(file_name_cc, sep = ",")
-    # put in some col names that are recognized downstream
-    contrast_df["contrast_lin"] = contrast_df["F"]
-    contrast_df["asec"] = contrast_df["rad_asec"]
+    if (regime=="lambda_over_D"):
+        # make/read in a contrast curve, where contrast is defined as the flux ratio
+        # F_planet/F_star where detection has 5-sigma significance
+        # keys: "contrast_lin" and "asec"
+        #contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
+        file_name_cc_lambda_D = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_MODERN_CSV"]
+        contrast_df = pd.read_csv(file_name_cc_lambda_D, sep = ",")
+        # put in some col names that are recognized downstream
+        contrast_df["contrast_lin"] = contrast_df["F"]
+        contrast_df["asec"] = contrast_df["rad_asec"]
+    elif (regime=="lambda_over_B"):
+        # for now, read in test data
+        file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripe_w_planet_0_half_w_planet_E.csv"
+        contrast_df = pd.read_csv(file_name_cc_lambda_B, sep = ",")
+        # put in some col names that are recognized downstream
+        contrast_df["contrast_lin"] = contrast_df["y"]
+        contrast_df["asec"] = contrast_df["x"]
 
     df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag)
 

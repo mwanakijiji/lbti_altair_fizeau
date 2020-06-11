@@ -35,11 +35,27 @@ m_per_au*np.divide(1.,solar_radii_per_altair_radii)
 zp_vega = 3.885e-12 # units erg /cm2 /sec /angstrom
 
 # ### Read in filter curve: NACO NB4.05 to approximate LMIRcam Br-alpha
+'''
 nb405_transmission = pd.read_csv("./modules/data/Paranal_NACO.NB405.dat.txt",
                                  names=["wavel_angs", "transmission"], delim_whitespace=True)
+info_string = "Absolute M_star in NACO NB4.05 filter on Vega scale:"
 
-# plot filter
+# for tests
+nb405_transmission = pd.read_csv("./modules/data/2MASS_J_dat.txt",
+                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
+info_string = "CAUTION! CAUTION! 2MASS FILTER BEING USED! Absolute M_star in 2MASS J filter on Vega scale (true answer rel. 2MASS j: 0.313):"
+
+nb405_transmission = pd.read_csv("./modules/data/2MASS_H_dat.txt",
+                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
+info_string = "CAUTION! CAUTION! 2MASS FILTER BEING USED! Absolute M_star in 2MASS H filter on Vega scale (true answer rel. 2MASS h: 0.102):"
+#
 '''
+nb405_transmission = pd.read_csv("./modules/data/2MASS_Ks_dat.txt",
+                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
+info_string = "CAUTION! CAUTION! 2MASS FILTER BEING USED! Absolute M_star in 2MASS Ks filter on Vega scale (true answer rel. 2MASS k: 0.102):"
+'''
+# plot filter
+
 plt.clf()
 plt.scatter(nb405_transmission["wavel_angs"],nb405_transmission["transmission"])
 plt.title("Paranal_NACO.NB405.dat.txt")
@@ -235,8 +251,14 @@ def altair_abs_mag():
                                     zp_vega))\
                 -5*np.log10(piece_D)
     print("---------------")
-    print("M_star in NACO NB4.05 filter on Vega scale:")
+    print(info_string)
     print(M_star)
+    print("---------------")
+
+    # Use distance modulus to find apparent magnitude
+    m_rel_star = M_star + 5.*np.log10(d_altair_pc/10.)
+    print("Relative m_star:")
+    print(m_rel_star)
     print("---------------")
     # ### Note 2MASS measured $m_{K}=0.0102$.
     # ### Then, $M_{K}=m_{K}-5\textrm{log}_{10}\left(\frac{\textrm{5.13 pc}}{\textrm{10 pc}}\right) = 1.55$

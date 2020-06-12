@@ -57,23 +57,69 @@ def altair_abs_mag(filter,zp):
     if (filter == "2mass_j"):
         filter_transmission = pd.read_csv("./modules/data/2MASS_J_dat.txt",
                                      names=["wavel_angs", "transmission"], delim_whitespace=True)
-        info_string = "Absolute M_star in 2MASS J filter on Vega scale (true answer m_rel in 2MASS j: 0.313):"
+        info_string1 = "Absolute M_star in 2MASS J filter on Vega scale:"
+        true_m_rel = 0.313
+        info_string2 = "Relative m_star in 2MASS J filter on Vega scale (true answer m_rel in 2MASS J: "+str(true_m_rel)+"):"
     elif (filter == "2mass_h"):
         filter_transmission = pd.read_csv("./modules/data/2MASS_H_dat.txt",
                                      names=["wavel_angs", "transmission"], delim_whitespace=True)
-        info_string = "Absolute M_star in 2MASS H filter on Vega scale (true answer m_rel in 2MASS h: 0.102):"
+        info_string1 = "Absolute M_star in 2MASS H filter on Vega scale:"
+        true_m_rel = 0.102
+        info_string2 = "Relative m_star in 2MASS H filter on Vega scale (true answer m_rel in 2MASS H: "+str(true_m_rel)+"):"
     elif (filter == "2mass_ks"):
         filter_transmission = pd.read_csv("./modules/data/2MASS_Ks_dat.txt",
                                      names=["wavel_angs", "transmission"], delim_whitespace=True)
-        info_string = "Absolute M_star in 2MASS Ks filter on Vega scale (true answer m_rel in 2MASS k: 0.102):"
+        info_string1 = "Absolute M_star in 2MASS Ks filter on Vega scale:"
+        true_m_rel = 0.102
+        info_string2 = "Relative m_star in 2MASS Ks filter on Vega scale (true answer m_rel in 2MASS K: "+str(true_m_rel)+"):"
     elif (filter == "john_U"):
-        filter_transmission = pd.read_csv("./modules/data/GCPD_Johnson_U_Landolt_dat.txt",
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.U.dat.txt",
                                      names=["wavel_angs", "transmission"], delim_whitespace=True)
-        info_string = "Absolute M_star in Johnson U filter on Vega scale (true answer m_rel in Johnson U: 1.07):"
+        info_string1 = "Absolute M_star in Johnson U filter on Vega scale:"
+        true_m_rel = 1.07
+        info_string2 = "Relative m_star in Johnson U filter on Vega scale (true answer m_rel in Johnson U: "+str(true_m_rel)+"):"
+    elif (filter == "john_B"):
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.B.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string1 = "Absolute M_star in Johnson B filter on Vega scale:"
+        true_m_rel = 0.98
+        info_string2 = "Relative m_star in Johnson B filter on Vega scale (true answer m_rel in Johnson B: "+str(true_m_rel)+"):"
+    elif (filter == "john_V"):
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.V.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string1 = "Absolute M_star in Johnson V filter on Vega scale:"
+        true_m_rel = 0.76
+        info_string2 = "Relative m_star in Johnson V filter on Vega scale (true answer m_rel in Johnson V: "+str(true_m_rel)+"):"
+    elif (filter == "john_R"):
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.R.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string1 = "Absolute M_star in Johnson R filter on Vega scale:"
+        true_m_rel = 0.62
+        info_string2 = "Relative m_star in Johnson R filter on Vega scale (true answer m_rel in Johnson R: "+str(true_m_rel)+"):"
+    elif (filter == "john_I"):
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.I.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string1 = "Absolute M_star in Johnson I filter on Vega scale:"
+        true_m_rel = 0.49
+        info_string2 = "Relative m_star in Johnson I filter on Vega scale (true answer m_rel in Johnson I: "+str(true_m_rel)+"):"
+    elif (filter == "john_J"):
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.J.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string1 = "Absolute M_star in Johnson J filter on Vega scale:"
+        true_m_rel = 0.35
+        info_string2 = "Relative m_star in Johnson J filter on Vega scale (true answer m_rel in Johnson J: "+str(true_m_rel)+"):"
+    elif (filter == "john_K"):
+        filter_transmission = pd.read_csv("./modules/data/Generic_Johnson_UBVRIJHKL.K.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string1 = "Absolute M_star in Johnson K filter on Vega scale:"
+        true_m_rel = 0.24
+        info_string2 = "Relative m_star in Johnson K filter on Vega scale (true answer m_rel in Johnson K: "+str(true_m_rel)+"):"
     elif (filter == "nb405"):
         filter_transmission = pd.read_csv("./modules/data/Paranal_NACO.NB405.dat.txt",
                                      names=["wavel_angs", "transmission"], delim_whitespace=True)
-        info_string = "Absolute M_star in NACO NB4.05 filter on Vega scale:"
+        info_string1 = "Absolute M_star in NACO NB4.05 filter on Vega scale:"
+        true_m_rel = np.nan
+        info_string2 = ""
 
     # ### Read in model spectra (of a host star and Vega, though we likely
     # ### don't need the host star here)
@@ -174,25 +220,6 @@ def altair_abs_mag(filter,zp):
     # integrate
     piece_B = np.trapz(integrand_piece_B,x=filter_transmission["wavel_angs"])
 
-    # plot everything so far
-    '''
-    plt.clf()
-    plt.scatter(filter_transmission["wavel_angs"],
-                np.divide(model_surf_flux_filter_abcissa,np.max(model_surf_flux_filter_abcissa)),
-                label="Model spectrum f")
-    plt.scatter(filter_transmission["wavel_angs"],
-                np.divide(filter_transmission["transmission"],np.max(filter_transmission["transmission"])),
-                label="Filter response R")
-    plt.scatter(filter_transmission["wavel_angs"],
-                np.divide(integrand_piece_B,np.max(integrand_piece_B)),
-                label="R*f")
-    plt.legend()
-    plt.xlabel("Wavel ($\AA$)")
-    plt.ylabel("Normalized quantities")
-    plt.savefig("junk.pdf")
-    plt.close()
-    '''
-
     # ### $\textrm{piece_C}$: The normalization constant:
     # ### $\textrm{piece_C} \equiv \int d\lambda R_{\lambda}(\lambda) $
     # integrate the filter transmission
@@ -260,16 +287,76 @@ def altair_abs_mag(filter,zp):
                                     zp))\
                 -5*np.log10(piece_D)
     print("---------------")
-    print(info_string)
+    print(info_string1)
     print(M_star)
     print("---------------")
 
     # Use distance modulus to find apparent magnitude
     m_rel_star = M_star + 5.*np.log10(d_altair_pc/10.)
-    print("Relative m_star:")
+    print("Relative m_star calculated by us:")
     print(m_rel_star)
+    print(info_string2)
+    print("Difference with measured elsewhere (m_star - m_star_measured):")
+    print(np.round(np.subtract(m_rel_star,true_m_rel),3))
     print("---------------")
     # ### Note 2MASS measured $m_{K}=0.0102$.
     # ### Then, $M_{K}=m_{K}-5\textrm{log}_{10}\left(\frac{\textrm{5.13 pc}}{\textrm{10 pc}}\right) = 1.55$
+
+    # make an FYI plot everything so far around the filter region
+    '''
+    plt.clf()
+    plt.scatter(filter_transmission["wavel_angs"],
+                np.divide(model_surf_flux_filter_abcissa,np.max(model_surf_flux_filter_abcissa)),
+                label="Model spectrum f")
+    plt.scatter(filter_transmission["wavel_angs"],
+                np.divide(filter_transmission["transmission"],np.max(filter_transmission["transmission"])),
+                label="Filter response R")
+    plt.scatter(filter_transmission["wavel_angs"],
+                np.divide(integrand_piece_B,np.max(integrand_piece_B)),
+                label="R*f")
+    plt.title("Filter " + filter +
+                "\nm_star calculated by us: " + str(np.round(m_rel_star,3)) +
+                "\nm_star measured elsewhere: " + str(np.round(true_m_rel,3)))
+    plt.legend()
+    plt.xlabel("Wavel ($\AA$)")
+    plt.ylabel("Normalized quantities")
+    plt.savefig("junk_filter_"+filter+"_zoom.pdf")
+    plt.close()
+    '''
+
+    # make a more global plot of the model spectrum
+    if (filter=="john_U"): # if statement here to allow overplotting outside function
+        plt.figure(figsize=(16,8))
+    if ("john" in filter):
+        plt.plot(np.divide(filter_transmission["wavel_angs"],1e4),
+                np.divide(filter_transmission["transmission"],np.max(filter_transmission["transmission"])),
+                color="darkgreen", alpha=0.5, linewidth=4,
+                label=filter)
+    if ("mass" in filter):
+        plt.plot(np.divide(filter_transmission["wavel_angs"],1e4),
+                np.divide(filter_transmission["transmission"],np.max(filter_transmission["transmission"])),
+                color="red", alpha=0.5, linewidth=4,
+                label=filter)
+    if (filter=="nb405"):
+        plt.plot(np.divide(filter_transmission["wavel_angs"],1e4),
+                np.divide(filter_transmission["transmission"],np.max(filter_transmission["transmission"])),
+                color="orange", linewidth=4,
+                label=filter)
+        plt.plot(np.divide(model_spectrum["wavel_angs"],1e4),
+                np.divide(model_spectrum["flux"],np.max(model_spectrum["flux"])),color="k", linewidth=4,
+                label="Altair model")
+        plt.ylim([0,1.1])
+        plt.xlim([0,5])
+        #plt.yscale('log')
+        #plt.title("Filter " + filter +
+        #            "\nm_star calculated by us: " + str(np.round(m_rel_star,3)) +
+        #            "\nm_star measured elsewhere: " + str(np.round(true_m_rel,3)))
+        #plt.legend()
+        plt.xlabel("Wavelength ($\mu$m)", fontsize=18)
+        plt.ylabel("Normalized Filter Transmission\nor Surface Flux (erg/cm$^{2}$/s/$\AA$)", fontsize=18)
+        plt.xticks(np.arange(0, 5, step=0.5), rotation=45, fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.savefig("junk_filter_"+filter+"_global.pdf")
+        plt.close()
 
     return M_star

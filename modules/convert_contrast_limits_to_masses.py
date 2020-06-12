@@ -238,16 +238,37 @@ def main(regime):
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
 
-    # some checks to ensure consistency with other filters
-    # zero point on the Vega scale, specific to GCPD/Johnson.U_Landolt filter, from SVO filter service
-    zp_vega_john_U = 3.749e-9 # units erg /cm2 /sec /angstrom
+    # some checks to ensure consistency with other filters (from SVO filter service)
+
+    # zero points on the Vega scale, specific to
+    # Generic/Johnson_UBVRIJHKL.U filter,
+    zp_vega_john_U = 3.678e-9 # units erg /cm2 /sec /angstrom
+    # Generic/Johnson_UBVRIJHKL.B filter,
+    zp_vega_john_B = 6.263e-9 # units erg /cm2 /sec /angstrom
+    # Generic/Johnson_UBVRIJHKL.V filter,
+    zp_vega_john_V = 3.575e-9 # units erg /cm2 /sec /angstrom
+    # Generic/Johnson_UBVRIJHKL.R filter,
+    zp_vega_john_R = 1.882e-9 # units erg /cm2 /sec /angstrom
+    # Generic/Johnson_UBVRIJHKL.I filter,
+    zp_vega_john_I = 9.329e-10 # units erg /cm2 /sec /angstrom
+    # Generic/Johnson_UBVRIJHKL.J filter,
+    zp_vega_john_J = 3.217e-10 # units erg /cm2 /sec /angstrom
+    # Generic/Johnson_UBVRIJHKL.K filter,
+    zp_vega_john_K = 4.269e-11 # units erg /cm2 /sec /angstrom
     # zero point on the Vega scale, specific to 2MASS/2MASS.Ks filter, from SVO filter service
     zp_vega_2mass_ks = 4.306e-11 # units erg /cm2 /sec /angstrom
     # zero point on the Vega scale, specific to 2MASS/2MASS.J filter, from SVO filter service
     zp_vega_2mass_j = 3.143e-10 # units erg /cm2 /sec /angstrom
     # zero point on the Vega scale, specific to 2MASS/2MASS.H filter, from SVO filter service
     zp_vega_2mass_h = 1.144e-10 # units erg /cm2 /sec /angstrom
+
     star_abs_mag_john_u = determine_abs_mag_altair.altair_abs_mag(filter="john_U",zp=zp_vega_john_U)
+    star_abs_mag_john_b = determine_abs_mag_altair.altair_abs_mag(filter="john_B",zp=zp_vega_john_B)
+    star_abs_mag_john_v = determine_abs_mag_altair.altair_abs_mag(filter="john_V",zp=zp_vega_john_V)
+    star_abs_mag_john_r = determine_abs_mag_altair.altair_abs_mag(filter="john_R",zp=zp_vega_john_R)
+    star_abs_mag_john_i = determine_abs_mag_altair.altair_abs_mag(filter="john_I",zp=zp_vega_john_I)
+    star_abs_mag_john_j = determine_abs_mag_altair.altair_abs_mag(filter="john_J",zp=zp_vega_john_J)
+    star_abs_mag_john_k = determine_abs_mag_altair.altair_abs_mag(filter="john_K",zp=zp_vega_john_K)
     star_abs_mag_2mass_j = determine_abs_mag_altair.altair_abs_mag(filter="2mass_j",zp=zp_vega_2mass_j)
     star_abs_mag_2mass_h = determine_abs_mag_altair.altair_abs_mag(filter="2mass_h",zp=zp_vega_2mass_h)
     star_abs_mag_2mass_ks = determine_abs_mag_altair.altair_abs_mag(filter="2mass_ks",zp=zp_vega_2mass_ks)

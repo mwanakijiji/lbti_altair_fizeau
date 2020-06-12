@@ -30,34 +30,11 @@ au_per_pc = np.divide(360*60*60,2*np.pi) # units AU/pc
 d_altair_altair_radii = d_altair_pc*au_per_pc*np.divide(1.,m_per_solar_radius)*\
 m_per_au*np.divide(1.,solar_radii_per_altair_radii)
 
-# zero point on the Vega scale, specific to Paranal-NACO NB405 filter, from SVO filter service
-# http://svo2.cab.inta-csic.es/theory/fps/index.php?id=Paranal/NACO.NB405&&mode=browse&gname=Paranal&gname2=NACO#filter
-zp_vega = 3.885e-12 # units erg /cm2 /sec /angstrom
-
-# ### Read in filter curve: NACO NB4.05 to approximate LMIRcam Br-alpha
-'''
-nb405_transmission = pd.read_csv("./modules/data/Paranal_NACO.NB405.dat.txt",
-                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
-info_string = "Absolute M_star in NACO NB4.05 filter on Vega scale:"
-
-# for tests
-nb405_transmission = pd.read_csv("./modules/data/2MASS_J_dat.txt",
-                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
-info_string = "CAUTION! CAUTION! 2MASS FILTER BEING USED! Absolute M_star in 2MASS J filter on Vega scale (true answer rel. 2MASS j: 0.313):"
-
-nb405_transmission = pd.read_csv("./modules/data/2MASS_H_dat.txt",
-                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
-info_string = "CAUTION! CAUTION! 2MASS FILTER BEING USED! Absolute M_star in 2MASS H filter on Vega scale (true answer rel. 2MASS h: 0.102):"
-#
-'''
-nb405_transmission = pd.read_csv("./modules/data/2MASS_Ks_dat.txt",
-                                 names=["wavel_angs", "transmission"], delim_whitespace=True)
-info_string = "CAUTION! CAUTION! 2MASS FILTER BEING USED! Absolute M_star in 2MASS Ks filter on Vega scale (true answer rel. 2MASS k: 0.102):"
 '''
 # plot filter
 
 plt.clf()
-plt.scatter(nb405_transmission["wavel_angs"],nb405_transmission["transmission"])
+plt.scatter(filter_transmission["wavel_angs"],filter_transmission["transmission"])
 plt.title("Paranal_NACO.NB405.dat.txt")
 plt.xlabel("Wavelength ($\AA$)")
 plt.ylabel("Transmission")
@@ -65,10 +42,42 @@ plt.savefig("junk1.pdf")
 plt.close()
 '''
 
-def altair_abs_mag():
+def altair_abs_mag(filter,zp):
+    '''
+    Determine absolute magnitude of Altair through different filters: a few
+    for consistency checks, and the NB4.05 one for our science
+
+    INPUTS:
+    filter: string to set the filter to read in
+        "john_U"/"2mass_j"/"2mass_h"/"2mass_ks"
+    zp: zero point on Vega scale to use
+    '''
+
+    # ### Read in filter curve: NACO NB4.05 to approximate LMIRcam Br-alpha
+    if (filter == "2mass_j"):
+        filter_transmission = pd.read_csv("./modules/data/2MASS_J_dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string = "Absolute M_star in 2MASS J filter on Vega scale (true answer m_rel in 2MASS j: 0.313):"
+    elif (filter == "2mass_h"):
+        filter_transmission = pd.read_csv("./modules/data/2MASS_H_dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string = "Absolute M_star in 2MASS H filter on Vega scale (true answer m_rel in 2MASS h: 0.102):"
+    elif (filter == "2mass_ks"):
+        filter_transmission = pd.read_csv("./modules/data/2MASS_Ks_dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string = "Absolute M_star in 2MASS Ks filter on Vega scale (true answer m_rel in 2MASS k: 0.102):"
+    elif (filter == "john_U"):
+        filter_transmission = pd.read_csv("./modules/data/GCPD_Johnson_U_Landolt_dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string = "Absolute M_star in Johnson U filter on Vega scale (true answer m_rel in Johnson U: 1.07):"
+    elif (filter == "nb405"):
+        filter_transmission = pd.read_csv("./modules/data/Paranal_NACO.NB405.dat.txt",
+                                     names=["wavel_angs", "transmission"], delim_whitespace=True)
+        info_string = "Absolute M_star in NACO NB4.05 filter on Vega scale:"
 
     # ### Read in model spectra (of a host star and Vega, though we likely
     # ### don't need the host star here)
+
 
     ##################################################################################################
     # Surface flux of a model spectrum, based on a Kurucz model, courtesy SVO
@@ -113,7 +122,7 @@ def altair_abs_mag():
     '''
     plt.clf()
     plt.plot(S.Vega.wave, S.Vega.flux)
-    plt.scatter(nb405_transmission["wavel_angs"],np.max(S.Vega.flux)*nb405_transmission["transmission"],s=2,
+    plt.scatter(filter_transmission["wavel_angs"],np.max(S.Vega.flux)*filter_transmission["transmission"],s=2,
                 label="NB405 trans.")
     plt.xlim(0, 50000)
     plt.xlabel(S.Vega.waveunits)
@@ -155,26 +164,26 @@ def altair_abs_mag():
     # To do the integration over two functions represented by input arrays, use the abcissa
     # of the filter transmission $R$ to make an interpolated form of $f$ pinned to the same
     # ordinate. Then multiply the two arrays together and integrate over that.
-    model_surf_flux_filter_abcissa = np.interp(nb405_transmission["wavel_angs"].values,
+    model_surf_flux_filter_abcissa = np.interp(filter_transmission["wavel_angs"].values,
                                                  model_spectrum["wavel_angs"].values,
                                                  model_spectrum["flux"].values)
 
     # now multiply the surface flux by the filter transmission to obtain the integrand
-    integrand_piece_B = np.multiply(nb405_transmission["transmission"],
+    integrand_piece_B = np.multiply(filter_transmission["transmission"],
                                     model_surf_flux_filter_abcissa)
     # integrate
-    piece_B = np.trapz(integrand_piece_B,x=nb405_transmission["wavel_angs"])
+    piece_B = np.trapz(integrand_piece_B,x=filter_transmission["wavel_angs"])
 
     # plot everything so far
     '''
     plt.clf()
-    plt.scatter(nb405_transmission["wavel_angs"],
+    plt.scatter(filter_transmission["wavel_angs"],
                 np.divide(model_surf_flux_filter_abcissa,np.max(model_surf_flux_filter_abcissa)),
                 label="Model spectrum f")
-    plt.scatter(nb405_transmission["wavel_angs"],
-                np.divide(nb405_transmission["transmission"],np.max(nb405_transmission["transmission"])),
+    plt.scatter(filter_transmission["wavel_angs"],
+                np.divide(filter_transmission["transmission"],np.max(filter_transmission["transmission"])),
                 label="Filter response R")
-    plt.scatter(nb405_transmission["wavel_angs"],
+    plt.scatter(filter_transmission["wavel_angs"],
                 np.divide(integrand_piece_B,np.max(integrand_piece_B)),
                 label="R*f")
     plt.legend()
@@ -187,7 +196,7 @@ def altair_abs_mag():
     # ### $\textrm{piece_C}$: The normalization constant:
     # ### $\textrm{piece_C} \equiv \int d\lambda R_{\lambda}(\lambda) $
     # integrate the filter transmission
-    piece_C = np.trapz(nb405_transmission["transmission"],x=nb405_transmission["wavel_angs"])
+    piece_C = np.trapz(filter_transmission["transmission"],x=filter_transmission["wavel_angs"])
 
     # ### $\textrm{piece_D}$: Multiples of 10 pc:
     # ### $\textrm{piece_D} \equiv \frac{\textrm{5.13 pc}}{\textrm{10 pc}} $
@@ -199,13 +208,13 @@ def altair_abs_mag():
     '''
     ## as SVO defines it
     # interpolate to put Vega flux on same abcissa
-    vega_earth_flux_filter_abcissa = np.interp(nb405_transmission["wavel_angs"].values,
+    vega_earth_flux_filter_abcissa = np.interp(filter_transmission["wavel_angs"].values,
                                                S.Vega.wave,
                                                S.Vega.flux)
     # now multiply the surface flux by the filter transmission to obtain the integrand
-    integrand_piece_vega = np.multiply(nb405_transmission["transmission"],vega_earth_flux_filter_abcissa)
+    integrand_piece_vega = np.multiply(filter_transmission["transmission"],vega_earth_flux_filter_abcissa)
     # integrate
-    piece_vega = np.trapz(integrand_piece_vega,x=nb405_transmission["wavel_angs"])
+    piece_vega = np.trapz(integrand_piece_vega,x=filter_transmission["wavel_angs"])
     zp_vega_svo_defined_calc = np.divide(piece_vega,piece_C)
     print("zp_vega_svo_defined_calc:")
     print(zp_vega_svo_defined_calc)
@@ -215,13 +224,13 @@ def altair_abs_mag():
     #
     # ### $\textrm{zp_vega_extra_lambd} \equiv \frac{\int d\lambda R_{\lambda} \lambda f_{Vega}^{(0)}}{\int d\lambda R_{\lambda} \lambda } \equiv \frac{\textrm{piece_vega_extra_lambd}}{\textrm{piece_C_extra_lambd}} $
     # now multiply the surface flux by the filter transmission to obtain the integrand
-    integrand_piece_vega_extra_lambd = np.multiply(integrand_piece_vega,nb405_transmission["wavel_angs"])
+    integrand_piece_vega_extra_lambd = np.multiply(integrand_piece_vega,filter_transmission["wavel_angs"])
     # integrate to get numerator
-    piece_vega_extra_lambd = np.trapz(integrand_piece_vega_extra_lambd,x=nb405_transmission["wavel_angs"])
+    piece_vega_extra_lambd = np.trapz(integrand_piece_vega_extra_lambd,x=filter_transmission["wavel_angs"])
     # integrand of denominator
-    integrand_piece_C_extra_lambd = np.multiply(nb405_transmission["transmission"],nb405_transmission["wavel_angs"])
+    integrand_piece_C_extra_lambd = np.multiply(filter_transmission["transmission"],filter_transmission["wavel_angs"])
     # integrate to get denominator
-    piece_C_extra_lambd = np.trapz(integrand_piece_C_extra_lambd,x=nb405_transmission["wavel_angs"])
+    piece_C_extra_lambd = np.trapz(integrand_piece_C_extra_lambd,x=filter_transmission["wavel_angs"])
     zp_vega_extra_lambda_calc = np.divide(piece_vega_extra_lambd,piece_C_extra_lambd)
     print("zp_vega_extra_lambda_calc:")
     print(zp_vega_extra_lambda_calc)
@@ -241,14 +250,14 @@ def altair_abs_mag():
     print("piece_C:")
     print(piece_C)
     print("zp_vega:")
-    print(zp_vega)
+    print(zp)
     print("piece_D:")
     print(piece_D)
 
     # ### Final answer
     M_star =    -2.5*np.log10(piece_A*np.divide(
                                     np.divide(piece_B,piece_C),
-                                    zp_vega))\
+                                    zp))\
                 -5*np.log10(piece_D)
     print("---------------")
     print(info_string)

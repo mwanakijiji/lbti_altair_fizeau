@@ -238,9 +238,27 @@ def main(regime):
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
 
+    # some checks to ensure consistency with other filters
+    # zero point on the Vega scale, specific to GCPD/Johnson.U_Landolt filter, from SVO filter service
+    zp_vega_john_U = 3.749e-9 # units erg /cm2 /sec /angstrom
+    # zero point on the Vega scale, specific to 2MASS/2MASS.Ks filter, from SVO filter service
+    zp_vega_2mass_ks = 4.306e-11 # units erg /cm2 /sec /angstrom
+    # zero point on the Vega scale, specific to 2MASS/2MASS.J filter, from SVO filter service
+    zp_vega_2mass_j = 3.143e-10 # units erg /cm2 /sec /angstrom
+    # zero point on the Vega scale, specific to 2MASS/2MASS.H filter, from SVO filter service
+    zp_vega_2mass_h = 1.144e-10 # units erg /cm2 /sec /angstrom
+    star_abs_mag_john_u = determine_abs_mag_altair.altair_abs_mag(filter="john_U",zp=zp_vega_john_U)
+    star_abs_mag_2mass_j = determine_abs_mag_altair.altair_abs_mag(filter="2mass_j",zp=zp_vega_2mass_j)
+    star_abs_mag_2mass_h = determine_abs_mag_altair.altair_abs_mag(filter="2mass_h",zp=zp_vega_2mass_h)
+    star_abs_mag_2mass_ks = determine_abs_mag_altair.altair_abs_mag(filter="2mass_ks",zp=zp_vega_2mass_ks)
+
     # get abs magnitude of Altair in NB205 filter
-    star_abs_mag = determine_abs_mag_altair.altair_abs_mag()
-    print("M of Altair: " + str(star_abs_mag))
+    # zero point on the Vega scale, specific to Paranal-NACO NB405 filter, from SVO filter service
+    # http://svo2.cab.inta-csic.es/theory/fps/index.php?id=Paranal/NACO.NB405&&mode=browse&gname=Paranal&gname2=NACO#filter
+    zp_vega_nb405 = 3.885e-12 # units erg /cm2 /sec /angstrom
+    star_abs_mag_nb405 = determine_abs_mag_altair.altair_abs_mag(filter="nb405",zp=zp_vega_nb405)
+    print("M of Altair: " + str(star_abs_mag_nb405))
+    print("-------------")
 
     if (regime=="lambda_over_D"):
         # make/read in a contrast curve, where contrast is defined as the flux ratio
@@ -260,7 +278,7 @@ def main(regime):
         contrast_df["contrast_lin"] = contrast_df["y"]
         contrast_df["asec"] = contrast_df["x"]
 
-    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag)
+    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag_nb405)
 
     # sources of error:
     # 1. uncertainty of distance from parallax

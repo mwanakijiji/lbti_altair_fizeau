@@ -240,6 +240,7 @@ class FakePlanetInjectorCube:
         #print("injection_ADI: Memory error, 0 " + str(len(abs_sci_name_array)))
         #print("injection_ADI: Memory error, shape " + str(np.shape(test_image)))
         cube_frames = np.nan*np.ones((len(abs_sci_name_array),np.shape(test_image)[0],np.shape(test_image)[1]))
+        recon_2d_cube = np.copy(cube_frames)
         # initialize the array to hold the parallactic angles (for de-rotation later)
         pa_array = np.nan*np.ones(len(abs_sci_name_array))
         # initialize the array to hold the frame numbers (to define masks to apply over pixel regions to make them
@@ -258,11 +259,7 @@ class FakePlanetInjectorCube:
             ## ## fine-tune this step later!
             mask_weird = np.ones(np.shape(sci))
             no_mask = np.copy(mask_weird) # a non-mask for reconstructing sat PSFs
-            ## COMMENTED THIS OUT SO THAT I CAN TEST FAKE DATA
-            ## mask_weird[sci > 55000] = np.nan # mask saturating region
-            ## THE BELOW FOR FAKE DATA
-            mask_weird[sci > 4.5e9] = np.nan
-            #
+            mask_weird[sci > 55000] = np.nan
 
             ## TEST: WRITE OUT
             #hdu = fits.PrimaryHDU(mask_weird)
@@ -347,14 +344,18 @@ class FakePlanetInjectorCube:
             # actually inject it
             image_w_fake_planet = np.add(sci, reconImg_shifted_ampl)
 
-            # add image to cube, add PA to array, and add frame number to array
+            # add image with injected planet to cube
             cube_frames[frame_num] = image_w_fake_planet
+            # add the reconstruction of the host star to cube
+            recon_2d_cube[frame_num = fit_fake_planet["recon_2d"]
+            # add PA to array, and add frame number to array
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])
 
 
         # convert to 32-bit float to save space
         cube_frames = cube_frames.astype(np.float32)
+        recon_2d_cube = recon_2d_cube.astype(np.float32)
 
         # if writing to disk for checking
         if self.write:
@@ -371,6 +372,8 @@ class FakePlanetInjectorCube:
             if not os.path.exists(abs_path_name):
                 os.makedirs(abs_path_name)
                 print("Made directory " + abs_path_name)
+
+            # the cube with the fake planets
             file_name = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
                 injection_iteration_string + "/" + \
                 "fake_planet_injected_cube_" + \
@@ -386,11 +389,30 @@ class FakePlanetInjectorCube:
                 "Wrote fake-planet-injected cube to disk as " + file_name)
             print("-"*prog_bar_width)
 
+            # the cube with the reconstructed host star
+            file_name2 = self.config_data["data_dirs"]["DIR_OTHER_FITS"] + \
+                injection_iteration_string + "/" + \
+                "host_star_recon_2d_cube_" + \
+                str(self.fake_params["angle_deg_EofN"]) + "_" + \
+                str(self.fake_params["rad_asec"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm"]) + \
+                "_" + str(self.fake_params["ampl_linear_norm_0"]) + ".fits"
+            fits.writeto(filename = file_name2,
+                         data = recon_2d_cube,
+                         header = hdr,
+                         overwrite = True)
+            print("injection_ADI: "+str(datetime.datetime.now())+\
+                "Wrote host-star reconstructed cube to disk as " + file_name)
+            print("-"*prog_bar_width)
+
         #print("injection_ADI: Array of PA")
         #print(pa_array)
 
-        # return cube of frames and array of PAs
-        return cube_frames, pa_array, frame_nums_array
+        # return cube of frames, array of PAs, array of frame numbers, and cube
+        # of same frames as cube_frames except that these are the 2D reconstructions
+        # which reconstruct over the saturated regions (if they have been
+        # appropriately masked)
+        return cube_frames, pa_array, frame_nums_array, recon_2d_cube
 
 
 def inject_remove_adi(this_param_combo):
@@ -755,7 +777,7 @@ class SyntheticFizeauInjectRemoveADI:
                                           write = False)
 
             # call fake planet injection
-            cube_pre_removal_A, pas_array_A, frame_array_0_A = inject_fake_psfs_A(self.cookies_centered_06_name_array)
+            cube_pre_removal_A, pas_array_A, frame_array_0_A, host_recon_2d_A = inject_fake_psfs_A(self.cookies_centered_06_name_array)
 
         # instantiate removal of host star from each frame in the cube, whether or not
         # these are frames with fake planets
@@ -787,13 +809,13 @@ class SyntheticFizeauInjectRemoveADI:
         # don't know of a better/clearer way of doing it)
         median_instance_sci = detection.MedianCube(injection_iteration = None,
                                                 fake_params = this_param_combo,
-                                               host_subt_cube = cube_pre_removal_A,
+                                               host_subt_cube = host_recon_2d_A,
                                                pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
-        #import ipdb; ipdb.set_trace()
+
         print("injection_ADI: "+str(datetime.datetime.now())
-              +": Writing out median of derotated 'raw' science frames, for finding host star amplitude, as\n"
+              +": Writing out median of derotated host-star-reconstructed science frames, for finding host star amplitude, as\n"
               +self.write_name_abs_derotated_sci_median +", string "+res)
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,
@@ -1173,8 +1195,6 @@ def main(inject_iteration=None):
     # all the unsaturated frames: cubes B and C
     cookies_unsats_B_and_C_cube_frames_06_name_array = cookies_B_only_centered_06_name_array + cookies_C_only_centered_06_name_array
 
-    # ref: block diagram from 2019 Apr 5
-
     synthetic_fizeau_inject_remove_adi_A_and_D_frames = SyntheticFizeauInjectRemoveADI(
         injection_iteration = inject_iteration,
         file_name_list = cookies_sats_A_and_D_cube_frames_06_name_array,
@@ -1196,76 +1216,6 @@ def main(inject_iteration=None):
         write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                            + "psf_PCA_vector_cookie_all_A_and_D_frames_pcaNum_100_host_resids.fits")
                                            )
-
-    '''
-    # instantiate reduction of A frames (frames 4259-5608 and 5826-6301)
-    synthetic_fizeau_inject_remove_adi_A_frames = SyntheticFizeauInjectRemoveADI(
-        injection_iteration = inject_iteration,
-        file_name_list = cookies_A_only_centered_06_name_array,
-        n_PCA_host_removal = 100,
-        read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                            "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
-        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + "median_frame_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
-        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                            + "psf_PCA_vector_cookie_seqStart_06303_seqStop_06921_pcaNum_100_host_resids.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
-        write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                            + "simple_synthetic_sci_frame_cube_A.fits"),
-        write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits"),
-        write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
-                                                  + config["file_names"]["MEDIAN_SCI_FRAME"]),
-        write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_seqStart_04259_seqStop_05608_pcaNum_100_host_resids.fits")
-                                           )
-
-    # instantiate reduction of D frames (frames 7927-10722 and 10742-11408)
-    synthetic_fizeau_inject_remove_adi_D_frames = SyntheticFizeauInjectRemoveADI(
-        injection_iteration = inject_iteration,
-        file_name_list = cookies_centered_06_name_array,
-        n_PCA_host_removal = 100,
-        read_name_abs_test_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"] +
-                                            'psf_PCA_vector_cookie_seqStart_000000_seqStop_010000.fits'),
-        read_name_abs_pca_pre_decomposition_median = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                          + 'median_frame_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits'),
-        read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                            + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_recon.fits"),
-        read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_rings_4quad_fits_complete.fits"),
-        write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                            + "simple_synthetic_sci_frame_cube_A.fits"),
-        write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                                + "psf_PCA_vector_cookie_seqStart_007000_seqStop_007500.fits"),
-        write_name_abs_derotated_sci_median = str(config["data_dirs"]["DIR_OTHER_FITS"]
-                                                  + config["file_names"]["MEDIAN_SCI_FRAME"]),
-        write_name_abs_host_star_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
-                                           + "psf_PCA_vector_cookie_seqStart_00000_seqStop_10000_pcaNum_100_host_resids.fits")
-                                           )
-    '''
-    '''
-    Note that tesselation region options are
-    mask_100x100pix_whole_frame.fits
-    mask_100x100_4quad.fits
-    mask_quad4_circ.fits
-    mask_quad4_circ_ring.fits
-    tesselation_10_psfs_in_each_region.fits
-    mask_10x10_100squares.fits
-    mask_406x406_rings_4quad_fits_complete.fits
-    mask_406x406_rings_4quad_fits_truncated.fits
-    mask_406x406_rings_4quad_fits_coarse_20200404.fits
-    mask_406x406_rings_4quad_fits_coarse_20200409.fits
-    mask_406x406_center_strip_lamb_over_B.fits
-    '''
-
-    ## ## BEGIN SERIAL TEST
-    '''
-    for param_num in range(0,len(param_dict_list)):
-        print(":")
-        synthetic_fizeau_inject_remove_adi_A_frames(param_dict_list[param_num]) # test on just one at a time
-    '''
-    ## ## END TEST
 
     # run in parallel
     pool.map(synthetic_fizeau_inject_remove_adi_A_and_D_frames, param_dict_list)

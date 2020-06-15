@@ -347,7 +347,7 @@ class FakePlanetInjectorCube:
             # add image with injected planet to cube
             cube_frames[frame_num] = image_w_fake_planet
             # add the reconstruction of the host star to cube
-            recon_2d_cube[frame_num = fit_fake_planet["recon_2d"]
+            recon_2d_cube[frame_num] = fit_fake_planet["recon_2d"]
             # add PA to array, and add frame number to array
             pa_array[frame_num] = header_sci["LBT_PARA"]
             frame_nums_array[frame_num] = int(os.path.basename(abs_sci_name_array[frame_num]).split("_")[-1].split(".")[0])

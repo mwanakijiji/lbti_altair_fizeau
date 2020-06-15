@@ -187,8 +187,8 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         if (model_num == 0):
             plt.clf()
             fig, ax = plt.subplots()
-            fig.suptitle("Contrast curve\n(based on M_altair = " + \
-                str(np.round(star_abs_mag_pass,1))+")")
+            #fig.suptitle("Contrast curve\n(based on M_altair = " + \
+            #    str(np.round(star_abs_mag_pass,1))+")")
             #ax2 = ax.twinx()
             ax.set_xlim([0,2.2]) # 0 to 2.2 asec
             #ax.get_shared_y_axes().join(ax,ax2)
@@ -214,7 +214,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     ax.legend()
     for hline_num in range(5,10):
         ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
-    ax.set_ylim([0.5,0.75])
+    ax.set_ylim([0.45,0.7])
     #ax.axvline(x=1, linewidth=4, linestyle=":", color="k", alpha=0.5)
     plt.tight_layout()
     file_name_cc_masses_plot_name = config["data_dirs"]["DIR_S2N"] + \
@@ -301,7 +301,7 @@ def main(regime,classical=False):
             contrast_df.loc[contrast_df.rad_asec > 2.0] = np.nan
             contrast_df = contrast_df.dropna()
             # put in some col names that are recognized downstream
-            contrast_df["contrast_lin"] = contrast_df["std"]
+            contrast_df["contrast_lin"] = contrast_df["linear_5_sig"]
             contrast_df["asec"] = contrast_df["rad_asec"]
     elif (regime=="lambda_over_B"):
         # for now, read in test data
@@ -312,7 +312,7 @@ def main(regime,classical=False):
         contrast_df["asec"] = contrast_df["x"]
     print(contrast_df)
     #import ipdb; ipdb.set_trace()
-    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag_nb405)
+    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = 1.70)
 
     # sources of error:
     # 1. uncertainty of distance from parallax

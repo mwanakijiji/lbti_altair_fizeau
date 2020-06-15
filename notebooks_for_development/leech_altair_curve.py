@@ -8,7 +8,11 @@ contrast_leech = pd.read_csv("data/HIP97649_LEECH.txt")
 radii_leech = pd.read_csv("data/radii_LEECH.txt")
 
 # our Fizeau data
-data_fizeau =  pd.read_csv("data/modern_contrast_curve.csv")
+#data_fizeau =  pd.read_csv("data/modern_contrast_curve.csv")
+
+# (ersatz Fizeau data)
+data_fizeau =  pd.read_csv("data/ersatz_data.dat")
+data_fizeau["del_m_modern"] = data_fizeau["del_m_5_sig"]
 
 plt.clf()
 plt.annotate("LEECH", xy=(1.5,14.5), rotation=-30, xycoords="data", fontsize=14)

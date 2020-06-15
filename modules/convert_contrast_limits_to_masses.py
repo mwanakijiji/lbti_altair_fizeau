@@ -226,7 +226,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
 
 
 
-def main(regime):
+def main(regime,classical=False):
     '''
     Take an input 1D contrast curve and convert it to masses
 
@@ -286,11 +286,23 @@ def main(regime):
         # F_planet/F_star where detection has 5-sigma significance
         # keys: "contrast_lin" and "asec"
         #contrast_df = pd.read_csv("./notebooks_for_development/data/placeholder_classical_curve_20200316.csv")
-        file_name_cc_lambda_D = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_MODERN_CSV"]
-        contrast_df = pd.read_csv(file_name_cc_lambda_D, sep = ",")
-        # put in some col names that are recognized downstream
-        contrast_df["contrast_lin"] = contrast_df["F"]
-        contrast_df["asec"] = contrast_df["rad_asec"]
+        if not classical:
+            file_name_cc_lambda_D = config["data_dirs"]["DIR_S2N"] + config["file_names"]["CONTCURV_MODERN_CSV"]
+            contrast_df = pd.read_csv(file_name_cc_lambda_D, sep = ",")
+            # put in some col names that are recognized downstream
+            contrast_df["contrast_lin"] = contrast_df["F"]
+            contrast_df["asec"] = contrast_df["rad_asec"]
+        elif classical:
+            file_name_cc_lambda_D = config["data_dirs"]["DIR_S2N"] + config["file_names"]["ERSATZ_CLASSICAL_CSV"]
+            contrast_df = pd.read_csv(file_name_cc_lambda_D, sep = ",")
+            # chop off asec<0.3
+            #n.where(contrast_df["rad_asec"] < 0.3) = np.nan
+            contrast_df.loc[contrast_df.rad_asec < 0.3] = np.nan
+            contrast_df.loc[contrast_df.rad_asec > 2.0] = np.nan
+            contrast_df = contrast_df.dropna()
+            # put in some col names that are recognized downstream
+            contrast_df["contrast_lin"] = contrast_df["std"]
+            contrast_df["asec"] = contrast_df["rad_asec"]
     elif (regime=="lambda_over_B"):
         # for now, read in test data
         file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripe_w_planet_0_half_w_planet_E.csv"
@@ -298,7 +310,8 @@ def main(regime):
         # put in some col names that are recognized downstream
         contrast_df["contrast_lin"] = contrast_df["y"]
         contrast_df["asec"] = contrast_df["x"]
-
+    print(contrast_df)
+    #import ipdb; ipdb.set_trace()
     df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = star_abs_mag_nb405)
 
     # sources of error:

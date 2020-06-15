@@ -12,8 +12,15 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 
 # make list of all the files
-lambda_over_D = pd.read_csv("./data/modern_contrast_curve.csv")
+#lambda_over_D = pd.read_csv("./data/modern_contrast_curve.csv")
 psf_profiles = pd.read_csv("./data/example_psf_profiles.csv", index_col=0)
+
+############
+# begin ersatz here, which is just stdev as fcn of radius
+lambda_over_D = pd.read_csv("./data/ersatz_data.dat")
+lambda_over_D["del_m_modern"] = lambda_over_D["del_m_5_sig"]
+# end ersatz
+##########
 
 # for lambda/B, there are a number of curves; we will read them all in
 lambda_over_B_file_list = glob.glob("./data/lambda_B*w*planet*csv")
@@ -46,7 +53,7 @@ plt.gca().invert_yaxis()
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 plt.xlim([0,2.2])
-plt.ylim([10,0])
+plt.ylim([11,0])
 plt.legend()
 plt.ylabel("$\Delta$m", fontsize=18)
 plt.xlabel("Radius (arcsec)", fontsize=18)

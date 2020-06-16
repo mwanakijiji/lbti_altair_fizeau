@@ -112,7 +112,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
 
-    # directory containing subdirectory of different stripes with injected planets
+    # directory containing subdirectory of files of different stripes with injected planets
     stem_adi_frames_lambda_over_B = str(config["data_dirs"]["DIR_ADI_LAMBDA_B_W_PLANETS"])
     # directory of baseline frames with no injected planets
     stem_adi_frames_lambda_over_B_no_planets = str(config["data_dirs"]["DIR_ADI_LAMBDA_B_NO_PLANETS"])

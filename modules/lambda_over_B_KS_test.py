@@ -180,17 +180,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     # choose the arrays to use in the analysis
     if (stripe_w_planet == 0):
         # frames with planet along the E: East of North; i.e., 0<PA<180
-        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip0_129pt68_deg
-        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip0_129pt68_deg
-        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip0_129pt68_deg
-        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip0_129pt68_deg
-        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip0_129pt68_deg
+        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip0_50pt32_deg
+        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip0_50pt32_deg
+        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip0_50pt32_deg
+        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip0_50pt32_deg
+        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip0_50pt32_deg
         # frames with planet along the W: West of North; i.e., 180<PA<360
-        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip0_309pt68_deg
-        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip0_309pt68_deg
-        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip0_309pt68_deg
-        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip0_309pt68_deg
-        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip0_309pt68_deg
+        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip0_230pt32_deg
+        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip0_230pt32_deg
+        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip0_230pt32_deg
+        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip0_230pt32_deg
+        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip0_230pt32_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_0_"
         # name of the plot for the publication outside the for-loop below

@@ -278,8 +278,12 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     '''
     # now plot the average
     plt.clf()
+    #cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
+    #cp3.levels
     cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
+    plt.clabel(cp3, inline=1, fontsize=10)
     cp4 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, levels = levels, linewidths=5, color="k")
+    plt.clabel(cp4, inline=1, fontsize=10)
     plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
     plt.gca().invert_yaxis()
     plt.xlabel("R (arcsec)", fontsize=18)
@@ -290,6 +294,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     plt.yticks(fontsize=14)
     plt.tight_layout()
     filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".pdf"
+    #plt.show()
     plt.savefig(filename4)
     print("Wrote " + filename4)
 

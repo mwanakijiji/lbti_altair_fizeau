@@ -403,7 +403,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             img_processed_stripe_3_W = shave_and_rotate(image_stripe_3_W,angle=6.63)
             image_stripe_4_W = fits.getdata(file_name_strip_4_of_4_W,0,header=False)
             img_processed_stripe_4_W = shave_and_rotate(image_stripe_4_W,angle=-0.04)
-
+            import ipdb; ipdb.set_trace()
             # find the cross-sections and marginalizations
 
             # initialize dictionaries
@@ -459,7 +459,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2_W)[0]),int(0.5*np.shape(img_processed_stripe_2_W)[1]):]
             cross_sec_dict["strip_3_W"] = img_processed_stripe_3_W[int(0.5*np.shape(img_processed_stripe_3_W)[0]),int(0.5*np.shape(img_processed_stripe_3_W)[1]):]
             cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4_W)[0]),int(0.5*np.shape(img_processed_stripe_4_W)[1]):]
-
+            import ipdb; ipdb.set_trace()
             if (stripe_w_planet == 0):
                 if (half_w_planet == "E"):
                     image_injected_planet = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
@@ -546,7 +546,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
                 print("No strip with planet specified!")
-
+            import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all

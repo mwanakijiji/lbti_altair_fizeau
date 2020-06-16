@@ -320,16 +320,16 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
     # read in the baseline images with no planets
     image_baseline_stripe_0 = fits.getdata(file_name_strip_0_of_4_baseline_no_planet,0,header=False)
-    baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=50.32)
-    #image_baseline_stripe_1 = fits.getdata(file_name_strip_1_of_4_baseline_no_planet,0,header=False)
-    #baseline_processed_stripe_1 = shave_and_rotate(image_baseline_stripe_1,angle=19.218)
-    #image_baseline_stripe_2 = fits.getdata(file_name_strip_2_of_4_baseline_no_planet,0,header=False)
-    #baseline_processed_stripe_2 = shave_and_rotate(image_baseline_stripe_2,angle=13.43)
-    #image_baseline_stripe_3 = fits.getdata(file_name_strip_3_of_4_baseline_no_planet,0,header=False)
-    #baseline_processed_stripe_3 = shave_and_rotate(image_baseline_stripe_3,angle=6.63)
-    #image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
-    #baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=-0.04)
-
+    baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=-39.68)
+    image_baseline_stripe_1 = fits.getdata(file_name_strip_1_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_1 = shave_and_rotate(image_baseline_stripe_1,angle=-19.218)
+    image_baseline_stripe_2 = fits.getdata(file_name_strip_2_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_2 = shave_and_rotate(image_baseline_stripe_2,angle=-13.43)
+    image_baseline_stripe_3 = fits.getdata(file_name_strip_3_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_3 = shave_and_rotate(image_baseline_stripe_3,angle=-6.63)
+    image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=0.04)
+    import ipdb; ipdb.set_trace()
     # loop over all fake planet east-west pairs distinguished by amplitude and radius
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):

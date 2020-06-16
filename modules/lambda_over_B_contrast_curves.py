@@ -285,7 +285,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     plt.xlabel("R (arcsec)")
     plt.ylabel("$\Delta$m")
     plt.xlim([0,0.55])
-    plt.ylim([5.2,1])
+    plt.ylim([6,2])
     filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".png"
     plt.savefig(filename4)
     print("Wrote " + filename4)

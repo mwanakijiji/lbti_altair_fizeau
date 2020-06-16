@@ -282,11 +282,13 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     cp4 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, levels = levels, linewidths=5, color="k")
     plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
     plt.gca().invert_yaxis()
-    plt.xlabel("R (arcsec)")
-    plt.ylabel("$\Delta$m")
+    plt.xlabel("R (arcsec)", fontsize=18)
+    plt.ylabel("$\Delta$m", fontsize=18)
     plt.xlim([0,0.55])
     plt.ylim([6,2])
-    filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".png"
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".pdf"
     plt.savefig(filename4)
     print("Wrote " + filename4)
 

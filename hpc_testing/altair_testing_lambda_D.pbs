@@ -1,6 +1,6 @@
 #PBS -q standard
 ### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
-#PBS -l select=1:ncpus=14:mem=168gb
+#PBS -l select=1:ncpus=28:mem=336gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
@@ -9,7 +9,9 @@
 #PBS -l place=free
 ### CPUtime required in hhh:mm:ss.
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
-#PBS -l cput=2100:00:00
+### 2 planets: 28 cores, 4200 CPU-hours; 150 hr wall-time
+### 1 planets: 14 cores, 2100 CPU-hours; 150 hr wall-time
+#PBS -l cput=4200:00:00
 ### Walltime is how long your job will run
 #PBS -l walltime=150:00:00
 ### send email when done
@@ -21,14 +23,14 @@ date
 
 ### set variables: filenames of the data tarball and Singularity container
 ### input files
-### export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
-export DATA_TARBALL=altair_20200608_test_pa_convention.tar.gz
+export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
+### export DATA_TARBALL=altair_20200608_test_pa_convention.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
 ### export RESULTS_TARBALL=results_lambda_D_fwhm4_240degEofN_001.tar
 ### export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm4_240degEofN_001.csv
-export RESULTS_TARBALL=results_lambda_D_fwhm4_240degEofN_001_test_of_recon2dampl.tar
-export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm4_240degEofN_001_test_of_recon2dampl.csv
+export RESULTS_TARBALL=results_lambda_D_fwhm4_120and240degEofN_002.tar
+export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm4_120and240degEofN_002.csv
 
 ### load python 3.6.5
 module load python/3
@@ -123,7 +125,7 @@ then
    ### command to tar everything:
    ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/
    ### command to tar the ADI, median-host-star, and other frames:
-   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/ /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/ /tmp/$USER/180507_fizeau_altair/bin/other_fits/median_sci_frame*
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/ /tmp/$USER/180507_fizeau_altair/bin/other_fits/median_sci_frame*
    echo "Done tarring output:"
    date
    echo "---"

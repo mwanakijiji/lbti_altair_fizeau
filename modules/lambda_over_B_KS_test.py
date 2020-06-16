@@ -546,7 +546,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
                 print("No strip with planet specified!")
-            import ipdb; ipdb.set_trace()
+
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all

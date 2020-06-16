@@ -85,7 +85,7 @@ while True:
 
 # lambda/D 1-D contrast curve from csv info
 sensitivity.main(small_angle_correction=True)
-'''
+
 # lambda/D mass limits
 convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=True)
 '''
@@ -95,7 +95,7 @@ lambda_over_B_KS_test.main(stripe_w_planet = 0,half_w_planet = "E",write_csv_bas
 lambda_over_B_contrast_curves.main(stripe_w_planet = 0,half_w_planet = "E",read_csv_basename = "test_0E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = 0,half_w_planet = "W",write_csv_basename = "test_0W.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = 0,half_w_planet = "W",read_csv_basename = "test_0W.csv")
-
+'''
 lambda_over_B_KS_test.main(stripe_w_planet = 1,half_w_planet = "E",write_csv_basename = "test_1E.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = 1,half_w_planet = "E",read_csv_basename = "test_1E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = 1,half_w_planet = "W",write_csv_basename = "test_1W.csv")

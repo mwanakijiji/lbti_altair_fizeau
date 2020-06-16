@@ -288,6 +288,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     plt.ylim([6,2])
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
+    plt.tight_layout()
     filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".pdf"
     plt.savefig(filename4)
     print("Wrote " + filename4)

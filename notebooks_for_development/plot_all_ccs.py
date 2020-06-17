@@ -19,6 +19,9 @@ psf_profiles = pd.read_csv("./data/example_psf_profiles.csv", index_col=0)
 # begin ersatz here, which is just stdev as fcn of radius
 lambda_over_D = pd.read_csv("./data/ersatz_data.dat")
 lambda_over_D["del_m_modern"] = lambda_over_D["del_m_5_sig"]
+# blot out the stuff that the fake planet injections would not contain anyway
+lambda_over_D["del_m_modern"] = lambda_over_D["del_m_5_sig"]
+lambda_over_D.loc[lambda_over_D['rad_asec'] <= 0.2] = np.nan
 # end ersatz
 ##########
 

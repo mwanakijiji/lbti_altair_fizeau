@@ -1,6 +1,6 @@
 #PBS -q standard
 ### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
-#PBS -l select=1:ncpus=28:mem=336gb
+#PBS -l select=1:ncpus=28:mem=168gb
 ### Specify a name for the job
 #PBS -N fizeau_altair
 ### Specify the group name
@@ -27,10 +27,8 @@ export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
 ### export DATA_TARBALL=altair_20200608_test_pa_convention.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-### export RESULTS_TARBALL=results_lambda_D_fwhm4_240degEofN_001.tar
-### export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm4_240degEofN_001.csv
-export RESULTS_TARBALL=results_lambda_D_fwhm4_120and240degEofN_002.tar
-export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm4_120and240degEofN_002.csv
+export RESULTS_TARBALL=results_lambda_D_fwhm6_120and240degEofN_003.tar
+export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm6_120and240degEofN_003.csv
 
 ### load python 3.6.5
 module load python/3

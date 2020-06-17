@@ -28,7 +28,7 @@ def AU_to_asec(input_AU):
     return output_asec
 
 
-def linear_2_mass(df_pass, star_abs_mag_pass):
+def linear_2_mass(df_pass, star_abs_mag_pass, regime):
     '''
     Takes linear contrast and
     1. converts it to magnitude difference
@@ -39,6 +39,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     df_pass: dataframe containing "asec" and "contrast_lin" (after any small
         angle correction, if applicable)
     star_abs_mag_pass: absolute magnitude of the star through the bandpass
+    regime: "lambda_over_D" or "lambda_over_B"
 
     RETURNS:
     df_w_masses: dataframe same as the input, but with a column for masses
@@ -141,7 +142,6 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
         #import ipdb;ipdb.set_trace()
         # ... and its inverse
         f_mass_2_abs_mag = interpolate.interp1d(model_data["M/Ms"],model_data["NB4.05"],kind="linear")
-        #import ipdb;ipdb.set_trace()
 
         # return masses (M/M_solar) corresponding to our contrast curve
         key_masses_this_model = model_file_names_df["string_ref"][model_num]
@@ -190,7 +190,10 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
             #fig.suptitle("Contrast curve\n(based on M_altair = " + \
             #    str(np.round(star_abs_mag_pass,1))+")")
             #ax2 = ax.twinx()
-            ax.set_xlim([0,2.2]) # 0 to 2.2 asec
+            if (regime == "lambda_over_D"):
+                ax.set_xlim([0,2.2]) # 0 to 2.2 asec for lambda/D
+            elif (regime == "lambda_over_B"):
+                ax.set_xlim([0,0.3]) # 0 to 2.2 asec for lambda/B
             #ax.get_shared_y_axes().join(ax,ax2)
             ax.set_ylabel('Mass (M/Ms)')
             ax.set_xlabel('Angle (asec)')
@@ -214,7 +217,10 @@ def linear_2_mass(df_pass, star_abs_mag_pass):
     ax.legend()
     for hline_num in range(5,10):
         ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
-    ax.set_ylim([0.45,0.7])
+    if (regime == "lambda_over_B"):
+        ax.set_ylim([0.8,1.5]) # for lambda/B
+    elif (regime == "lambda_over_D"):
+        ax.set_ylim([0.45,0.7]) # for lambda/D
     #ax.axvline(x=1, linewidth=4, linestyle=":", color="k", alpha=0.5)
     plt.tight_layout()
     file_name_cc_masses_plot_name = config["data_dirs"]["DIR_S2N"] + \
@@ -308,11 +314,13 @@ def main(regime,classical=False):
         file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripe_w_planet_0_half_w_planet_E.csv"
         contrast_df = pd.read_csv(file_name_cc_lambda_B, sep = ",")
         # put in some col names that are recognized downstream
-        contrast_df["contrast_lin"] = contrast_df["y"]
+        # (important! contrast_df["y"] is already in magnitudes, and the contrast_df["contrast_lin"]
+        # gets converted to mags downstream, so we have to change them back to linear here)
+        contrast_df["contrast_lin"] = np.power(10,-0.4*contrast_df["y"])
         contrast_df["asec"] = contrast_df["x"]
     print(contrast_df)
     #import ipdb; ipdb.set_trace()
-    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = 1.70)
+    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = 1.70, regime = regime)
 
     # sources of error:
     # 1. uncertainty of distance from parallax

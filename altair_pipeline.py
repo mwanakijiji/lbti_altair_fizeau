@@ -49,8 +49,7 @@ print(np.round(elapsed_time_iteration))
 
 ## ## DETERMINE AMPLITUDES OF COMPANIONS TO GIVE S/N=5
 iter_num = 1
-#while True:
-while (iter_num<2):
+while True:
     # Read in detection csv, check S/N (or FPF? maybe I should add that to csv)
     # for each fake companion.
     # Companion-by-companion, change fake companion amplitude by del_X / del_Y /

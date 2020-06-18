@@ -27,8 +27,8 @@ export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
 ### export DATA_TARBALL=altair_20200608_test_pa_convention.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=results_lambda_D_fwhm15_120and240degEofN_008.tar
-export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm15_120and240degEofN_008.csv
+export RESULTS_TARBALL=results_lambda_D_fwhm02_120and240degEofN_009.tar
+export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm02_120and240degEofN_009.csv
 
 ### load python 3.6.5
 module load python/3

@@ -1,4 +1,4 @@
-#PBS -q standard
+#PBS -q qualified
 ### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
 #PBS -l select=1:ncpus=14:mem=84gb
 ### Specify a name for the job
@@ -11,9 +11,9 @@
 ### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
 ### 2 planets: 28 cores, 4200 CPU-hours; 150 hr wall-time
 ### 1 planets: 14 cores, 2100 CPU-hours; 150 hr wall-time
-#PBS -l cput=4200:00:00
+#PBS -l cput=2100:00:00
 ### Walltime is how long your job will run
-#PBS -l walltime=300:00:00
+#PBS -l walltime=150:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 
@@ -27,8 +27,8 @@ export DATA_TARBALL=altair_20200409_allgoodframes.tar.gz
 ### export DATA_TARBALL=altair_20200608_test_pa_convention.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=results_lambda_D_fwhm7_240degEofN_021.tar
-export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm7_240degEofN_021.csv
+export RESULTS_TARBALL=results_lambda_D_fwhm12_120degEofN_022.tar
+export OUTPUT_CSV_FILE_BASENAME=csv_output_results_lambda_D_fwhm12_120degEofN_022.csv
 
 ### load python 3.6.5
 module load python/3

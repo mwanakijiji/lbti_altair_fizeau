@@ -427,7 +427,6 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             img_processed_stripe_3_W = shave_and_rotate(image_stripe_3_W,angle=-6.63)
             image_stripe_4_W = fits.getdata(file_name_strip_4_of_4_W,0,header=False)
             img_processed_stripe_4_W = shave_and_rotate(image_stripe_4_W,angle=0.04)
-            import ipdb; ipdb.set_trace()
 
             # find the cross-sections and marginalizations
 

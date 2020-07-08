@@ -98,7 +98,8 @@ def do_KS(empirical_sample_1,empirical_sample_2):
 
 def main(stripe_w_planet, half_w_planet, write_csv_basename):
     '''
-    Read in arrays, process them, find residuals, and calculate KS test
+    Read in arrays, process them, find residuals, calculate KS test, and
+    write out the results as csv files (plus some FYI plots)
 
     INPUTS:
     stripe_w_planet: integer which sets the strip with planets injected along the median angle
@@ -289,7 +290,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     else:
         print("Don't know which lists of file names to use in the analysis!")
-
+    import ipdb; ipdb.set_trace()
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
@@ -341,7 +342,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
     dist_asec_array = np.multiply(dist_pix_array,float(config["instrum_params"]["LMIR_PS"]))
-
+    import ipdb; ipdb.set_trace()
     # read in the baseline images with no planets
     image_baseline_stripe_0 = fits.getdata(file_name_strip_0_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=-39.68)
@@ -403,9 +404,9 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             file_name_strip_4_of_4_W = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                 comp_ampl_pass=comp_ampl,
                                                                 dist_asec_pass=dist_asec)
-
+            import ipdb; ipdb.set_trace()
             ## read in and process the images with planets
-            # frames with planets along eastern arm of strip
+            # ... these are the frames with planets along eastern arm of strip
             image_stripe_0_E = fits.getdata(file_name_strip_0_of_4_E,0,header=False)
             img_processed_stripe_0_E = shave_and_rotate(image_stripe_0_E,angle=-39.68)
             image_stripe_1_E = fits.getdata(file_name_strip_1_of_4_E,0,header=False)
@@ -416,7 +417,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             img_processed_stripe_3_E = shave_and_rotate(image_stripe_3_E,angle=-6.63)
             image_stripe_4_E = fits.getdata(file_name_strip_4_of_4_E,0,header=False)
             img_processed_stripe_4_E = shave_and_rotate(image_stripe_4_E,angle=0.04)
-            # frames with planets along western arm of strip
+            # ... and these are the frames with planets along western arm of strip
             image_stripe_0_W = fits.getdata(file_name_strip_0_of_4_W,0,header=False)
             img_processed_stripe_0_W = shave_and_rotate(image_stripe_0_W,angle=-39.68)
             image_stripe_1_W = fits.getdata(file_name_strip_1_of_4_W,0,header=False)
@@ -427,7 +428,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             img_processed_stripe_3_W = shave_and_rotate(image_stripe_3_W,angle=-6.63)
             image_stripe_4_W = fits.getdata(file_name_strip_4_of_4_W,0,header=False)
             img_processed_stripe_4_W = shave_and_rotate(image_stripe_4_W,angle=0.04)
-
+            import ipdb; ipdb.set_trace()
             # find the cross-sections and marginalizations
 
             # initialize dictionaries
@@ -483,7 +484,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             cross_sec_dict["strip_2_W"] = img_processed_stripe_2_W[int(0.5*np.shape(img_processed_stripe_2_W)[0]),int(0.5*np.shape(img_processed_stripe_2_W)[1]):]
             cross_sec_dict["strip_3_W"] = img_processed_stripe_3_W[int(0.5*np.shape(img_processed_stripe_3_W)[0]),int(0.5*np.shape(img_processed_stripe_3_W)[1]):]
             cross_sec_dict["strip_4_W"] = img_processed_stripe_4_W[int(0.5*np.shape(img_processed_stripe_4_W)[0]),int(0.5*np.shape(img_processed_stripe_4_W)[1]):]
-
+            import ipdb; ipdb.set_trace()
             if (stripe_w_planet == 0):
                 if (half_w_planet == "E"):
                     image_injected_planet = np.flip(img_processed_stripe_0_E, axis=1) # note flipping of 'east' half
@@ -570,7 +571,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
                 print("No strip with planet specified!")
-
+            import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all
@@ -603,7 +604,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             strip_2_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_2_W"])
             strip_3_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_3_W"])
             strip_4_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_4_W"])
-
+            import ipdb; ipdb.set_trace()
             # put stats into a dictionary; note there are entries corresponding to
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,

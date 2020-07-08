@@ -135,46 +135,70 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
     # files where planets are injected along the strip 0 of 4, along 129.68 deg E of N)
     # glob of file names of ADI frames of A block strip 0 of 4
-    file_names_strip_0_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip2_50pt32_deg/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip0_50pt32_deg/*.fits"))
     # glob of file names of ADI frames of D block strip 1 of 4, with planets aligned with strip 0 along 129.68 deg E of N
-    file_names_strip_1_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip2_50pt32_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip0_50pt32_deg/*.fits"))
     # glob of file names of ADI frames of D block strip 2 of 4, with planets aligned with strip 0 along 129.68 deg E of N
-    file_names_strip_2_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip2_50pt32_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip0_50pt32_deg/*.fits"))
     # glob of file names of ADI frames of D block strip 3 of 4, with planets aligned with strip 0 along 129.68 deg E of N
-    file_names_strip_3_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip2_50pt32_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip0_50pt32_deg/*.fits"))
     # glob of file names of ADI frames of D block strip 4 of 4, with planets aligned with strip 0 along 129.68 deg E of N
-    file_names_strip_4_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip2_50pt32_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip0_50pt32_deg/*.fits"))
     # globs of files with planets aligned with strip 0 again, but along opposite
     # azimuth of 230.32 deg E of N
-    file_names_strip_0_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip2_230pt32_deg/*.fits"))
-    file_names_strip_1_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip2_230pt32_deg/*.fits"))
-    file_names_strip_2_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip2_230pt32_deg/*.fits"))
-    file_names_strip_3_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip2_230pt32_deg/*.fits"))
-    file_names_strip_4_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip2_230pt32_deg/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip0_230pt32_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip0_230pt32_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip0_230pt32_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip0_230pt32_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip0_230pt32_deg/*.fits"))
 
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 70.782 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_109pt218_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
+    # glob of file names of ADI frames with planets in strip 1 of 4, along 70.782 deg E of N and opposite 250.782 deg E of N
+    file_names_strip_0_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip1_70pt782_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip1_70pt782_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip1_70pt782_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip1_70pt782_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip1_70pt782_deg/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip1_250pt782_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip1_250pt782_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip1_250pt782_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip1_250pt782_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip1_250pt782_deg/*.fits"))
 
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 250.782 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
+    # glob of file names of ADI frames with planets in strip 2 of 4, along 76.57 deg E of N and opposite 256.57 deg E of N
+    file_names_strip_0_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip2_76pt57_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip2_76pt57_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip2_76pt57_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip2_76pt57_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip2_76pt57_deg/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip2_256pt57_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip2_256pt57_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip2_256pt57_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip2_256pt57_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip2_256pt57_deg/*.fits"))
 
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 76.57 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_109pt218_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
+    # glob of file names of ADI frames with planets in strip 3 of 4, along 83.37 deg E of N and opposite 263.37 deg E of N
+    file_names_strip_0_of_4_planetsInStrip3_83pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip3_83pt37_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip3_83pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip3_83pt37_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip3_83pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip3_83pt37_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip3_83pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip3_83pt37_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip3_83pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip3_83pt37_deg/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip3_263pt37_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip3_263pt37_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip3_263pt37_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip3_263pt37_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip3_263pt37_deg/*.fits"))
 
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 250.782 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
-
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 83.37 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_109pt218_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
-
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 263.37 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
-
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 90.04 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_109pt218_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
-
-    # glob of file names of ADI frames with planets in strip 1 of 4, along 270.04 deg E of N
-    #file_names_strip_0_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"__/*.fits"))
+    # glob of file names of ADI frames with planets in strip 4 of 4, along 90.04 deg E of N and opposite 270.04 deg E of N
+    file_names_strip_0_of_4_planetsInStrip4_90pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip4_90pt04_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip4_90pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip4_90pt04_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip4_90pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip4_90pt04_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip4_90pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip4_90pt04_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip4_90pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip4_90pt04_deg/*.fits"))
+    file_names_strip_0_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip4_270pt04_deg/*.fits"))
+    file_names_strip_1_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip4_270pt04_deg/*.fits"))
+    file_names_strip_2_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip4_270pt04_deg/*.fits"))
+    file_names_strip_3_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip4_270pt04_deg/*.fits"))
+    file_names_strip_4_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip4_270pt04_deg/*.fits"))
 
 
     # choose the arrays to use in the analysis
@@ -197,68 +221,68 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     elif (stripe_w_planet == 1):
         # E: East of North; i.e., 0<PA<180
-        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip1_109pt218_deg
-        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip1_109pt218_deg
-        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip1_109pt218_deg
-        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip1_109pt218_deg
-        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip1_109pt218_deg
+        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip1_70pt782_deg
+        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip1_70pt782_deg
+        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip1_70pt782_deg
+        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip1_70pt782_deg
+        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip1_70pt782_deg
         # W: West of North; i.e., 180<PA<360
-        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip1_289pt218_deg
-        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip1_289pt218_deg
-        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip1_289pt218_deg
-        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip1_289pt218_deg
-        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip1_289pt218_deg
+        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip1_250pt782_deg
+        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip1_250pt782_deg
+        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip1_250pt782_deg
+        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip1_250pt782_deg
+        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip1_250pt782_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_1_"
         # name of the plot for the publication outside the for-loop below
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     elif (stripe_w_planet == 2):
         # E: East of North; i.e., 0<PA<180
-        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip2_103pt43_deg
-        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip2_103pt43_deg
-        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip2_103pt43_deg
-        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip2_103pt43_deg
-        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip2_103pt43_deg
+        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip2_76pt57_deg
+        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip2_76pt57_deg
+        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip2_76pt57_deg
+        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip2_76pt57_deg
+        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip2_76pt57_deg
         # W: West of North; i.e., 180<PA<360
-        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip2_283pt43_deg
-        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip2_283pt43_deg
-        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip2_283pt43_deg
-        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip2_283pt43_deg
-        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip2_283pt43_deg
+        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip3_263pt37_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_2_"
         # name of the plot for the publication outside the for-loop below
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     elif (stripe_w_planet == 3):
         # E: East of North; i.e., 0<PA<180
-        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip3_96pt63_deg
-        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip3_96pt63_deg
-        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip3_96pt63_deg
-        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip3_96pt63_deg
-        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip3_96pt63_deg
+        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip3_83pt37_deg
+        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip3_83pt37_deg
+        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip3_83pt37_deg
+        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip3_83pt37_deg
+        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip3_83pt37_deg
         # W: West of North; i.e., 180<PA<360
-        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip3_276pt63_deg
-        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip3_276pt63_deg
-        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip3_276pt63_deg
-        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip3_276pt63_deg
-        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip3_276pt63_deg
+        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip3_263pt37_deg
+        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip3_263pt37_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_3_"
         # name of the plot for the publication outside the for-loop below
         lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     elif (stripe_w_planet == 4):
         # E: East of North; i.e., 0<PA<180
-        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip4_89pt96_deg
-        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip4_89pt96_deg
-        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip4_89pt96_deg
-        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip4_89pt96_deg
-        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip4_89pt96_deg
+        file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip4_90pt04_deg
+        file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip4_90pt04_deg
+        file_names_strip_2_of_4_E = file_names_strip_2_of_4_planetsInStrip4_90pt04_deg
+        file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip4_90pt04_deg
+        file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip4_90pt04_deg
         # W: West of North; i.e., 180<PA<360
-        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip4_269pt96_deg
-        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip4_269pt96_deg
-        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip4_269pt96_deg
-        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip4_269pt96_deg
-        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip4_269pt96_deg
+        file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip4_270pt04_deg
+        file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip4_270pt04_deg
+        file_names_strip_2_of_4_W = file_names_strip_2_of_4_planetsInStrip4_270pt04_deg
+        file_names_strip_3_of_4_W = file_names_strip_3_of_4_planetsInStrip4_270pt04_deg
+        file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip4_270pt04_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_4_"
         # name of the plot for the publication outside the for-loop below
@@ -329,6 +353,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     baseline_processed_stripe_3 = shave_and_rotate(image_baseline_stripe_3,angle=-6.63)
     image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=0.04)
+    import ipdb; ipdb.set_trace()
 
     # loop over all fake planet east-west pairs distinguished by amplitude and radius
     for comp_ampl_num in range(0,len(comp_ampl_array)):

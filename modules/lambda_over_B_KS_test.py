@@ -353,7 +353,6 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     baseline_processed_stripe_3 = shave_and_rotate(image_baseline_stripe_3,angle=-6.63)
     image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=0.04)
-    import ipdb; ipdb.set_trace()
 
     # loop over all fake planet east-west pairs distinguished by amplitude and radius
     for comp_ampl_num in range(0,len(comp_ampl_array)):
@@ -428,6 +427,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             img_processed_stripe_3_W = shave_and_rotate(image_stripe_3_W,angle=-6.63)
             image_stripe_4_W = fits.getdata(file_name_strip_4_of_4_W,0,header=False)
             img_processed_stripe_4_W = shave_and_rotate(image_stripe_4_W,angle=0.04)
+            import ipdb; ipdb.set_trace()
 
             # find the cross-sections and marginalizations
 

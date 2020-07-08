@@ -358,6 +358,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     # loop over all fake planet east-west pairs distinguished by amplitude and radius
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):
+            import ipdb; ipdb.set_trace()
 
             comp_ampl = comp_ampl_array[comp_ampl_num]
             dist_asec = dist_asec_array[dist_asec_num]

@@ -296,7 +296,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         print("Don't know which lists of file names to use in the analysis!")
     # name of the plot for the publication outside the for-loop below
     lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # initialize DataFrame to hold KS test info
     col_names = ["dist_asec",
                 "comp_ampl",
@@ -348,7 +348,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
     dist_asec_array = np.multiply(dist_pix_array,float(config["instrum_params"]["LMIR_PS"]))
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # read in the baseline images with no planets
     image_baseline_stripe_0 = fits.getdata(file_name_strip_0_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=-39.68)
@@ -366,7 +366,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     # the half_w_planet
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             comp_ampl = comp_ampl_array[comp_ampl_num]
             dist_asec = dist_asec_array[dist_asec_num]
@@ -415,7 +415,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             ## read in and process the images with planets
             # ... these are the frames with planets along eastern arm of strip
 
@@ -430,7 +430,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
             img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=0.04)
 
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # find the cross-sections and marginalizations
 
             # initialize dictionaries
@@ -486,7 +486,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             cross_sec_dict["strip_2_W"] = img_processed_stripe_2[int(0.5*np.shape(img_processed_stripe_2)[0]),int(0.5*np.shape(img_processed_stripe_2)[1]):]
             cross_sec_dict["strip_3_W"] = img_processed_stripe_3[int(0.5*np.shape(img_processed_stripe_3)[0]),int(0.5*np.shape(img_processed_stripe_3)[1]):]
             cross_sec_dict["strip_4_W"] = img_processed_stripe_4[int(0.5*np.shape(img_processed_stripe_4)[0]),int(0.5*np.shape(img_processed_stripe_4)[1]):]
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             if np.logical_and((stripe_w_planet == 0),(half_w_planet == "E")):
                 # image of the injected stripe, with the planet to the right, for FYI plot
                 # (note flipping, since the planet is 'east')
@@ -586,7 +586,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 marginalization_injected_planet_W = marginalization_dict["strip_4_W"]
             else:
                 print("No strip with planet specified!")
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all
@@ -624,7 +624,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             strip_2_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_2_W"])
             strip_3_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_3_W"])
             strip_4_ks_marg_W = do_KS(marginalization_injected_planet_W,marginalization_dict["strip_4_W"])
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # put stats into a dictionary; note there are entries corresponding to
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,

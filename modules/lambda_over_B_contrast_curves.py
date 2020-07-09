@@ -54,7 +54,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     ticker_num_no_interp = int(0)
 
     # loop over all stripes for comparison
-    # (one will be skipped, because it's just a comparison with itself)
+    # (note this includes E and W halves of each stripe)
     for i in range(0,num_stripes):
         import ipdb; ipdb.set_trace()
         print("num_stripe:")
@@ -119,33 +119,36 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         ###################################
         ## BEGIN PLOTS
 
-        # FYI contour plot of KS statistic, no interpolation
+        # FYI contour plot of KS statistic, no interpolation, both E and W halves
         plt.clf()
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        fig, axs = plt.subplots(2)
         # underplot scatter plot of sampled points
-        sp = ax.scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
+        sp0 = axs[0].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
+        sp1 = axs[1].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         # plot contour plots
         if (len(comparison_string_E) > 0):
-            cp1_E = ax.contour(X, Y, Z_E)
-            # overplot the critical line
+            cp1_E = axs[0].contour(X, Y, Z_E)
+            # overplot the critical line (which is always the same, regardless of strip being compared)
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_E",
                                            keep="first",
                                            inplace=False)
             levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values
-            cp2_E = ax.contour(X, Y, Z_E, levels = levels)
+            cp2_E = axs[0].contour(X, Y, Z_E, levels = levels)
+            title_E = axs[0].set_title("E")
         if (len(comparison_string_W) > 0):
             cp1_W = ax.contour(X, Y, Z_W)
-            # overplot the critical line
+            # overplot the critical line (which is always the same, regardless of strip being compared)
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
                                            keep="first",
                                            inplace=False)
             levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_W"].values
-            cp2_W = ax.contour(X, Y, Z_W, levels = levels)
-
-        ax.set_xlabel("dist_asec")
-        ax.set_ylabel("companion_ampl")
+            cp2_W = axs[1].contour(X, Y, Z_W, levels = levels)
+            title_W = axs[1].set_title("W")
+        axs[0].set_xlabel("dist_asec")
+        axs[1].set_xlabel("dist_asec")
+        axs[0].set_ylabel("companion_ampl")
         plot_file_name = "fyi_comp_w_contours_comparison_"+str(int(i))+"_of_"+str(int(num_stripes))+".pdf"
+        plt.suptitle("Comparison with stripe "+str(int(i)))
         plt.savefig(plot_file_name)
         print("Saved " + str(plot_file_name))
         plt.close()

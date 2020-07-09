@@ -56,7 +56,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     # loop over all stripes for comparison
     # (note this includes E and W halves of each stripe)
     for i in range(0,num_stripes):
-        import ipdb; ipdb.set_trace()
+
         print("num_stripe:")
         print(i)
         print("ticker_num_no_interp:")
@@ -91,13 +91,13 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             elif half_w_planet == "W":
                 comparison_string_E = 'D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet'
                 comparison_string_W = ''
-        import ipdb; ipdb.set_trace()
+
         X_unique = np.sort(contour_data.dist_asec.unique())
         Y_unique = np.sort(contour_data.comp_ampl.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
 
         if (len(comparison_string_E) > 0):
-            import ipdb; ipdb.set_trace()
+
             # if the eastern half of the stripe is legitimate to compare to,
             # rearrange 1-D KS statistics of that eastern half into a matrix
             Z_E = contour_data.pivot_table(index='dist_asec',
@@ -107,7 +107,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             cube_stat_no_interpolation[ticker_num_no_interp,:,:] = Z_E
             ticker_num_no_interp += 1 # advance ticker
         if (len(comparison_string_W) > 0):
-            import ipdb; ipdb.set_trace()
+
             # if the western half is legitimate to compare to, etc...
             Z_W = contour_data.pivot_table(index='dist_asec',
                                      columns='comp_ampl',

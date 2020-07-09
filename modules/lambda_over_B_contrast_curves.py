@@ -136,7 +136,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
             cp2_E = axs[0].contour(X, Y, Z_E, levels = levels)
             title_E = axs[0].set_title("E")
         if (len(comparison_string_W) > 0):
-            cp1_W = ax.contour(X, Y, Z_W)
+            cp1_W = axs[1].contour(X, Y, Z_W)
             # overplot the critical line (which is always the same, regardless of strip being compared)
             df_levels = df.drop_duplicates(subset="val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
                                            keep="first",

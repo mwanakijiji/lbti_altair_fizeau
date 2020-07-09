@@ -147,7 +147,9 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         axs[0].set_xlabel("dist_asec")
         axs[1].set_xlabel("dist_asec")
         axs[0].set_ylabel("companion_ampl")
-        plot_file_name = "fyi_comp_w_contours_comparison_"+str(int(i))+"_of_"+str(int(num_stripes))+".pdf"
+        plot_file_name = "fyi_comp_w_contours_comparison_stripe_w_planet_"+str(int(stripe_w_planet))+\
+            "_half_w_planet_"+str(half_w_planet)+\
+            "_comparison_stripe_"+str(int(i))+"_of_"+str(int(num_stripes-1))+".pdf"
         plt.suptitle("Comparison with stripe "+str(int(i)))
         plt.savefig(plot_file_name)
         print("Saved " + str(plot_file_name))
@@ -155,7 +157,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
 
         ## END PLOTS INSIDE FOR-LOOP
         ###################################
-    import ipdb; ipdb.set_trace()
+
     # take an average across the cube
     cube_stat_no_interp_avg = np.mean(cube_stat_no_interpolation, axis=0)
 

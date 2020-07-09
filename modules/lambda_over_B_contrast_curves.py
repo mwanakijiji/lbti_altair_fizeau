@@ -121,7 +121,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
 
         # FYI contour plot of KS statistic, no interpolation, both E and W halves
         plt.clf()
-        fig, axs = plt.subplots(2)
+        fig, axs = plt.subplots(1, 2)
         # underplot scatter plot of sampled points
         sp0 = axs[0].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         sp1 = axs[1].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)

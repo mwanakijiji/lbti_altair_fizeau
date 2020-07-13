@@ -229,6 +229,23 @@ def one_d_modern_contrast():
     print("Saved publication plot of modern contrast curve as " + str(contrast_curves_publication_file_name))
     plt.close()
 
+    # make an FYI plot of the difference between the classical and modern curves
+    diff_contrast_curves_file_name = config["data_dirs"]["DIR_S2N"] + \
+                                            config["file_names"]["CONTCURV_DIFFERENCE_CLASSICAL_MODERN"]
+    plt.clf()
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12,9))
+    plt.grid(True, which="both")
+    ax.plot(df_corrxn["rad_fwhm"], np.subtract(df_corrxn["del_m_modern"],df_corrxn["del_m_classical"]),
+        'r-', lw=5, label="Modern-minus-Classical contrast curve")
+    ax.set_xlabel("Radius (FWHM)")
+    ax.set_ylabel("$\Delta$m")
+    ax.set_xlim([0,20])
+    ax.legend()
+    plt.gca().invert_yaxis()
+    plt.savefig(diff_contrast_curves_file_name)
+    print("Saved plot of modern-minus-classical contrast curve as " + str(diff_contrast_curves_file_name))
+    plt.close()
+
 
     # test with some FYI plots
     # (note the input contrast curve has to be divided by 5 first)

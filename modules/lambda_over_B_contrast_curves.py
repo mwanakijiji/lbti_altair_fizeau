@@ -126,7 +126,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         sp0 = axs[0].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         sp1 = axs[1].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         # plot contour plots
-        import ipdb; ipdb.set_trace()
+
         if (len(comparison_string_E) > 0):
             cp1_E = axs[0].contour(X, Y, Z_E)
             # overplot the critical line (which is always the same, regardless of strip being compared)
@@ -176,7 +176,12 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     pickle_file_name = "ks_data_"+id_string+".p"
     pickle.dump( data_dict, open( pickle_file_name, "wb" ) )
     print("Saved pickle file " + pickle_file_name)
-
+    # and some other vital stats
+    vital_stats_dict = { "comp_ampl_mag": comp_ampl_mag, "df_stuff": df}
+    pickle_file_name2 = "vital_stats_"+id_string+".p"
+    pickle.dump( data_dict, open( pickle_file_name2, "wb" ) )
+    print("Saved pickle file " + pickle_file_name2)
+    import ipdb; ipdb.set_trace()
     '''
     # generate 2D contour plots for each individual slice, and then for the average
     levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values

@@ -320,7 +320,7 @@ def main(regime,classical=False):
         contrast_df["asec"] = contrast_df["x"]
     print(contrast_df)
     #import ipdb; ipdb.set_trace()
-    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = 1.70, regime = regime)
+    df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = 1.70, star_abs_mag_error_pass = 0.10, regime = regime)
 
     # sources of error:
     # 1. uncertainty of distance from parallax

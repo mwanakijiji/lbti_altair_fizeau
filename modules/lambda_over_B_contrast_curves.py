@@ -161,6 +161,17 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     # take an average across the cube
     cube_stat_no_interp_avg = np.mean(cube_stat_no_interpolation, axis=0)
 
+    # pickle this data (I want to separately read these in and take an average
+    # over averages)
+    import pickle
+    data_dict = { "x_axis": X,
+                    "Y_axis": Y_mag,
+                    "cube_stat_no_interp_avg": cube_stat_no_interp_avg }
+    id_string = read_csv_basename.split(".")[0] # to distinguish this from others
+    pickle_file_name = "ks_data_"+id_string+".p"
+    pickle.dump( data_dict, open( pickle_file_name, "wb" ) )
+    print("Saved pickle file " + pickle_file_name)
+
     # map contrast curve to magnitudes
     Y_mag = -2.5*np.log10(Y)
     comp_ampl_mag = -2.5*np.log10(df["comp_ampl"])

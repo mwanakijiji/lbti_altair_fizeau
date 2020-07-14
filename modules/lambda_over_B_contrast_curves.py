@@ -161,6 +161,10 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     # take an average across the cube
     cube_stat_no_interp_avg = np.mean(cube_stat_no_interpolation, axis=0)
 
+    # map contrast curve to magnitudes
+    Y_mag = -2.5*np.log10(Y)
+    comp_ampl_mag = -2.5*np.log10(df["comp_ampl"])
+
     # pickle this data (I want to separately read these in and take an average
     # over averages)
     import pickle
@@ -171,10 +175,6 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     pickle_file_name = "ks_data_"+id_string+".p"
     pickle.dump( data_dict, open( pickle_file_name, "wb" ) )
     print("Saved pickle file " + pickle_file_name)
-
-    # map contrast curve to magnitudes
-    Y_mag = -2.5*np.log10(Y)
-    comp_ampl_mag = -2.5*np.log10(df["comp_ampl"])
 
     '''
     # generate 2D contour plots for each individual slice, and then for the average

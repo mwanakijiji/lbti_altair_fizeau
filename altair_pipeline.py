@@ -87,7 +87,7 @@ while True:
 sensitivity.main(small_angle_correction=True)
 '''
 # lambda/D mass limits
-convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=True)
+convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
 '''
 # lambda/B cross-sections
 

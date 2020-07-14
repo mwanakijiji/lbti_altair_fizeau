@@ -28,7 +28,7 @@ def AU_to_asec(input_AU):
     return output_asec
 
 
-def linear_2_mass(df_pass, star_abs_mag_pass, regime):
+def linear_2_mass(df_pass, star_abs_mag_pass, star_abs_mag_error_pass, regime):
     '''
     Takes linear contrast and
     1. converts it to magnitude difference
@@ -39,6 +39,9 @@ def linear_2_mass(df_pass, star_abs_mag_pass, regime):
     df_pass: dataframe containing "asec" and "contrast_lin" (after any small
         angle correction, if applicable)
     star_abs_mag_pass: absolute magnitude of the star through the bandpass
+    star_abs_mag_error_pass: error in the absolute magnitude (found by taking
+        the stdev of differences between our calculated and previously
+        measured values, m_calc-m_meas)
     regime: "lambda_over_D" or "lambda_over_B"
 
     RETURNS:
@@ -109,6 +112,10 @@ def linear_2_mass(df_pass, star_abs_mag_pass, regime):
         ],
         columns=["annotation","string_ref","file_name"])
 
+    # colors for plotting
+    CB_color_cycle = ['#4daf4a', '#e41a1c','#a65628','#999999',
+                  '#f781bf',  '#984ea3',
+                   '#377eb8', '#ff7f00']
     for model_num in range(0,len(model_file_names_df)):
 
         model_data = pd.read_csv("./notebooks_for_development/data/"+model_file_names_df["file_name"][model_num],
@@ -145,7 +152,14 @@ def linear_2_mass(df_pass, star_abs_mag_pass, regime):
 
         # return masses (M/M_solar) corresponding to our contrast curve
         key_masses_this_model = model_file_names_df["string_ref"][model_num]
-        df_new[key_masses_this_model] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"]) ####
+        key_masses_this_model_upper = key_masses_this_model + str("_error_bound_upper") # error limit, based on variation in mag
+        key_masses_this_model_lower = key_masses_this_model + str("_error_bound_lower") # other error limit, based on variation in mag
+        #df_new["abs_mag_LMIR"] = 12.7
+        #import ipdb; ipdb.set_trace()
+        df_new[key_masses_this_model] = f_abs_mag_2_mass(df_new["abs_mag_LMIR"])
+        df_new[key_masses_this_model_upper] = f_abs_mag_2_mass(np.add(df_new["abs_mag_LMIR"],star_abs_mag_error_pass))
+        df_new[key_masses_this_model_lower] = f_abs_mag_2_mass(np.subtract(df_new["abs_mag_LMIR"],star_abs_mag_error_pass))
+
         #import ipdb;ipdb.set_trace()
         print("masses")
         print(df_new[key_masses_this_model])
@@ -195,11 +209,13 @@ def linear_2_mass(df_pass, star_abs_mag_pass, regime):
             elif (regime == "lambda_over_B"):
                 ax.set_xlim([0,0.3]) # 0 to 2.2 asec for lambda/B
             #ax.get_shared_y_axes().join(ax,ax2)
-            ax.set_ylabel('Mass (M/Ms)')
-            ax.set_xlabel('Angle (asec)')
+            ax.set_ylabel('M/M$_{\odot}$', fontsize=18)
+            ax.set_xlabel('Angle (arcsec)', fontsize=18)
             # secondary x axis on top
             secax_x = ax.secondary_xaxis('top', functions=(asec_to_AU, AU_to_asec))
-            secax_x.set_xlabel('Distance (AU)')
+            secax_x.set_xlabel('Distance (AU)',fontsize=18)
+            #secax_x.set_xticks(labelsize=14)
+            secax_x.tick_params(axis='both', which='major', labelsize=14)
 
             # draw horizontal lines corresponding to certain masses
             '''
@@ -212,15 +228,24 @@ def linear_2_mass(df_pass, star_abs_mag_pass, regime):
                 ax2.set_ylabel('Masses (M/Ms)')
             '''
 
+        # central value
         ax.plot(df_new["asec"], df_new[key_masses_this_model],
-            label=model_file_names_df["annotation"][model_num])
-    ax.legend()
-    for hline_num in range(5,10):
-        ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
+            label=model_file_names_df["annotation"][model_num], color=CB_color_cycle[model_num])
+        # upper and lower bounds set by magnitude uncertainty
+        #ax.plot(df_new["asec"], df_new[key_masses_this_model_upper], color=CB_color_cycle[model_num])
+        #ax.plot(df_new["asec"], df_new[key_masses_this_model_lower], color=CB_color_cycle[model_num])
+        ax.fill_between(df_new["asec"], y1=df_new[key_masses_this_model_upper],
+                                        y2=df_new[key_masses_this_model_lower],
+                                        color=CB_color_cycle[model_num],alpha=0.4)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    ax.legend(fontsize=14)
+    #for hline_num in range(5,10):
+    #    ax.axhline(y=0.1*hline_num, linestyle=":", color="k", alpha=0.5)
     if (regime == "lambda_over_B"):
         ax.set_ylim([0.8,1.5]) # for lambda/B
     elif (regime == "lambda_over_D"):
-        ax.set_ylim([0.45,0.7]) # for lambda/D
+        ax.set_ylim([0.45,0.95]) # for lambda/D
     #ax.axvline(x=1, linewidth=4, linestyle=":", color="k", alpha=0.5)
     plt.tight_layout()
     file_name_cc_masses_plot_name = config["data_dirs"]["DIR_S2N"] + \

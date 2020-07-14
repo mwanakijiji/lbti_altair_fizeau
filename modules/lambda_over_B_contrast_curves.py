@@ -126,6 +126,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         sp0 = axs[0].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         sp1 = axs[1].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
         # plot contour plots
+        import ipdb; ipdb.set_trace()
         if (len(comparison_string_E) > 0):
             cp1_E = axs[0].contour(X, Y, Z_E)
             # overplot the critical line (which is always the same, regardless of strip being compared)

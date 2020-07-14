@@ -179,7 +179,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     # and some other vital stats
     vital_stats_dict = { "comp_ampl_mag": comp_ampl_mag, "df_stuff": df}
     pickle_file_name2 = "vital_stats_"+id_string+".p"
-    pickle.dump( data_dict, open( pickle_file_name2, "wb" ) )
+    pickle.dump( vital_stats_dict, open( pickle_file_name2, "wb" ) )
     print("Saved pickle file " + pickle_file_name2)
     import ipdb; ipdb.set_trace()
     '''

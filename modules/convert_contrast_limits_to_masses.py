@@ -207,7 +207,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass, star_abs_mag_error_pass, regime):
             if (regime == "lambda_over_D"):
                 ax.set_xlim([0,2.2]) # 0 to 2.2 asec for lambda/D
             elif (regime == "lambda_over_B"):
-                ax.set_xlim([0,0.3]) # 0 to 2.2 asec for lambda/B
+                ax.set_xlim([0.1,0.3]) # 0 to 2.2 asec for lambda/B
             #ax.get_shared_y_axes().join(ax,ax2)
             ax.set_ylabel('M/M$_{\odot}$', fontsize=18)
             ax.set_xlabel('Radius (arcsec)', fontsize=18)
@@ -335,8 +335,8 @@ def main(regime,classical=False):
             contrast_df["contrast_lin"] = contrast_df["linear_5_sig"]
             contrast_df["asec"] = contrast_df["rad_asec"]
     elif (regime=="lambda_over_B"):
-        # for now, read in test data
-        file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripe_w_planet_0_half_w_planet_E.csv"
+        # read in the average of averages
+        file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripes_w_planets_avg_avg_20200714.csv"
         contrast_df = pd.read_csv(file_name_cc_lambda_B, sep = ",")
         # put in some col names that are recognized downstream
         # (important! contrast_df["y"] is already in magnitudes, and the contrast_df["contrast_lin"]

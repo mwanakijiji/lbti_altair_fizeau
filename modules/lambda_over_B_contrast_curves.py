@@ -181,7 +181,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
     pickle_file_name2 = "vital_stats_"+id_string+".p"
     pickle.dump( vital_stats_dict, open( pickle_file_name2, "wb" ) )
     print("Saved pickle file " + pickle_file_name2)
-    import ipdb; ipdb.set_trace()
+
     '''
     # generate 2D contour plots for each individual slice, and then for the average
     levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values

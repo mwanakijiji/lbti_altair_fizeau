@@ -13,7 +13,9 @@ from astropy.io import fits
 
 # make list of all the files
 #lambda_over_D = pd.read_csv("./data/modern_contrast_curve.csv")
-psf_profiles = pd.read_csv("./data/example_psf_profiles.csv", index_col=0)
+psf_profiles_all = pd.read_csv("./data/example_psf_profiles.csv", index_col=0)
+# select subset
+psf_profiles = psf_profiles_all.iloc[:, 0:10]
 
 # lambda/D data
 lambda_over_D = pd.read_csv("./data/modern_curve_20200713.csv")

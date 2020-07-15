@@ -92,7 +92,10 @@ plt.show()
 #plt.savefig("junk.pdf")
 
 # extract the contour information
-p_info = cp4.collections[0].get_paths()[0]
+# regenerate the critical line without breaking it with a label
+cp5 = plt.contour(X, Y_mag, cube_stat_no_interp_avg_avg, levels = crit_level, linewidths=5, color="k")
+plt.clabel(cp5, inline=0, fontsize=0)
+p_info = cp5.collections[0].get_paths()[0]
 v = p_info.vertices
 x = v[:,0] # radius (asec)
 y = v[:,1] # delta_m (mag)

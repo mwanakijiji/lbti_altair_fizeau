@@ -8,9 +8,6 @@ contrast_leech = pd.read_csv("data/HIP97649_LEECH.txt")
 radii_leech = pd.read_csv("data/radii_LEECH.txt")
 
 # our Fizeau data
-#data_fizeau =  pd.read_csv("data/modern_contrast_curve.csv")
-
-# (ersatz Fizeau data)
 data_fizeau =  pd.read_csv("data/modern_curve_20200713.csv")
 print(data_fizeau.keys())
 #data_fizeau["del_m_modern"] = data_fizeau["del_m_5_sig"]

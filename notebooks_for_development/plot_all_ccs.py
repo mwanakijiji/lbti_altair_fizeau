@@ -15,18 +15,11 @@ from astropy.io import fits
 #lambda_over_D = pd.read_csv("./data/modern_contrast_curve.csv")
 psf_profiles = pd.read_csv("./data/example_psf_profiles.csv", index_col=0)
 
-############
-# begin ersatz here, which is just stdev as fcn of radius
-lambda_over_D = pd.read_csv("./data/ersatz_data.dat")
-lambda_over_D["del_m_modern"] = lambda_over_D["del_m_5_sig"]
-# blot out the stuff that the fake planet injections would not contain anyway
-lambda_over_D["del_m_modern"] = lambda_over_D["del_m_5_sig"]
-lambda_over_D.loc[lambda_over_D['rad_asec'] <= 0.2] = np.nan
-# end ersatz
-##########
+# lambda/D data
+lambda_over_D = pd.read_csv("./data/modern_curve_20200713.csv")
 
 # for lambda/B, there are a number of curves; we will read them all in
-lambda_over_B_file_list = glob.glob("./data/lambda_B*w*planet*csv")
+lambda_over_B = pd.read_csv("./data/lambda_B_cc_stripes_w_planets_avg_avg_20200714.csv")
 
 # read in PSF profiles
 psf_profiles_rad_asec = 0.0107*np.arange(-0.5*len(psf_profiles["x_xsec_1"]),0.5*len(psf_profiles["x_xsec_1"]),step=1)
@@ -38,26 +31,19 @@ for label, content in psf_profiles.items():
     content_smoothed = gaussian_filter(content,sigma=2)
     plt.plot(psf_profiles_rad_asec,-2.5*np.log10(np.divide(content_smoothed,6e4)),
              alpha = 0.2, color="gray", linewidth=2)
+# lambda/D data
 plt.plot(lambda_over_D["rad_asec"],lambda_over_D["del_m_modern"],linewidth=4,
          label="$\lambda /D$ regime, based on fake planet injections")
-for file_name in lambda_over_B_file_list:
-    lambda_over_B = pd.read_csv(file_name)
-    if (file_name == lambda_over_B_file_list[0]):
-        # one name to the legend
-        plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red",
-                label="$\lambda /B$ regime, based on KS test")
-    else:
-        plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red")
-        '''
-        plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,
-            label="$\lambda /B$ regime, based on KS test\n"+str(os.path.basename(file_name)))
-        '''
+# lambda/B data
+plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red",
+        label="$\lambda /B$ regime, based on KS test")
+
 plt.gca().invert_yaxis()
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 plt.xlim([0,2.2])
 plt.ylim([11,0])
-plt.legend()
+plt.legend(fontsize=14)
 plt.ylabel("$\Delta$m", fontsize=18)
 plt.xlabel("Radius (arcsec)", fontsize=18)
 plt.tight_layout()

@@ -210,10 +210,10 @@ def linear_2_mass(df_pass, star_abs_mag_pass, star_abs_mag_error_pass, regime):
                 ax.set_xlim([0,0.3]) # 0 to 2.2 asec for lambda/B
             #ax.get_shared_y_axes().join(ax,ax2)
             ax.set_ylabel('M/M$_{\odot}$', fontsize=18)
-            ax.set_xlabel('Angle (arcsec)', fontsize=18)
+            ax.set_xlabel('Radius (arcsec)', fontsize=18)
             # secondary x axis on top
             secax_x = ax.secondary_xaxis('top', functions=(asec_to_AU, AU_to_asec))
-            secax_x.set_xlabel('Distance (AU)',fontsize=18)
+            secax_x.set_xlabel('Projected distance (AU)',fontsize=18)
             #secax_x.set_xticks(labelsize=14)
             secax_x.tick_params(axis='both', which='major', labelsize=14)
 

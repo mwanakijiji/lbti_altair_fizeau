@@ -26,7 +26,7 @@ lambda_over_B = pd.read_csv("./data/lambda_B_cc_stripes_w_planets_avg_avg_202007
 # read in PSF profiles
 psf_profiles_rad_asec = 0.0107*np.arange(-0.5*len(psf_profiles["x_xsec_1"]),0.5*len(psf_profiles["x_xsec_1"]),step=1)
 
-fig = plt.figure(figsize=(8,4))
+fig = plt.figure(figsize=(8,6))
 # loop over all keys
 for label, content in psf_profiles.items():
     # smooth the PSF profile and plot
@@ -35,19 +35,19 @@ for label, content in psf_profiles.items():
              alpha = 0.2, color="gray", linewidth=2)
 # lambda/D data
 plt.plot(lambda_over_D["rad_asec"],lambda_over_D["del_m_modern"],linewidth=4,
-         label="$\lambda /D$ regime, based on fake planet injections")
+         label="$\lambda /D$ regime (fake planet injections)")
 # lambda/B data
 plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red",
-        label="$\lambda /B$ regime, based on KS test")
+        label="$\lambda /B$ regime (KS test)")
 
 plt.gca().invert_yaxis()
-plt.xticks(fontsize=14)
-plt.yticks(fontsize=14)
+plt.xticks(fontsize=17)
+plt.yticks(fontsize=17)
 plt.xlim([0,2.2])
 plt.ylim([11,0])
-plt.legend(fontsize=14)
-plt.ylabel("$\Delta$m", fontsize=18)
-plt.xlabel("Radius (arcsec)", fontsize=18)
+plt.legend(fontsize=17)
+plt.ylabel("$\Delta$m", fontsize=23)
+plt.xlabel("Radius (arcsec)", fontsize=23)
 plt.tight_layout()
-#plt.show()
-plt.savefig("junk.pdf")
+plt.show()
+#plt.savefig("junk.pdf")

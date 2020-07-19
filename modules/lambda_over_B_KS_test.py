@@ -694,7 +694,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax2.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0_E"]), label="diff")
             ax2.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-
+            ax2.set_ylim([-2000,2000])
             ax2.legend()
             ax2.set_title("Cross-sec rel. to strip 0, E\nD = "
                           + str(np.round(strip_0_ks_cross_sec_E[0],4))
@@ -706,6 +706,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax3.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1_E"]), label="diff")
             ax3.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax3.set_ylim([-2000,2000])
             ax3.legend()
             ax3.set_title("Cross-sec rel. to strip 1, E\nD = "
                           + str(np.round(strip_1_ks_cross_sec_E[0],4)) + ",\nval_crit = "
@@ -718,6 +719,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax4.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_2_E"]), label="diff")
             ax4.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax4.set_ylim([-2000,2000])
             ax4.legend()
             ax4.set_title("Cross-sec rel. to strip 2, E\nD = "
                           + str(np.round(strip_2_ks_cross_sec_E[0],4)) + ",\nval_crit = "
@@ -730,6 +732,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax5.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_3_E"]), label="diff")
             ax5.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax5.set_ylim([-2000,2000])
             ax5.legend()
             ax5.set_title("Cross-sec rel. to strip 3, E\nD = "
                           + str(np.round(strip_3_ks_cross_sec_E[0],4)) + ",\nval_crit = "
@@ -742,6 +745,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax6.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_4_E"]), label="diff")
             ax6.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax6.set_ylim([-2000,2000])
             ax6.legend()
             ax6.set_title("Cross-sec rel. to strip 4, E\nD = "
                           + str(np.round(strip_4_ks_cross_sec_E[0],4)) + ",\nval_crit = "
@@ -755,6 +759,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax7.plot(np.subtract(cross_sec_injected_planet,cross_sec_baseline), label="diff")
             ax7.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax7.set_ylim([-2000,2000])
             ax7.legend()
             ax7.set_title("Cross-sec rel. to baseline, E\nD = "
                           + str(np.round(strip_baseline_ks_cross_sec[0],4)) + ",\nval_crit = "
@@ -767,7 +772,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax8.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0_W"]), label="diff")
             ax8.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-
+            ax8.set_ylim([-2000,2000])
             ax8.legend()
             ax8.set_title("Cross-sec rel. to strip 0, W\nD = "
                           + str(np.round(strip_0_ks_cross_sec_W[0],4))
@@ -779,6 +784,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax9.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1_W"]), label="diff")
             ax9.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax9.set_ylim([-2000,2000])
             ax9.legend()
             ax9.set_title("Cross-sec rel. to strip 1, W\nD = "
                           + str(np.round(strip_1_ks_cross_sec_W[0],4)) + ",\nval_crit = "
@@ -791,6 +797,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax10.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_2_W"]), label="diff")
             ax10.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax10.set_ylim([-2000,2000])
             ax10.legend()
             ax10.set_title("Cross-sec rel. to strip 2, W\nD = "
                           + str(np.round(strip_2_ks_cross_sec_W[0],4)) + ",\nval_crit = "
@@ -803,6 +810,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax11.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_3_W"]), label="diff")
             ax11.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax11.set_ylim([-2000,2000])
             ax11.legend()
             ax11.set_title("Cross-sec rel. to strip 3, W\nD = "
                           + str(np.round(strip_3_ks_cross_sec_W[0],4)) + ",\nval_crit = "
@@ -815,6 +823,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax12.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_4_W"]), label="diff")
             ax12.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
+            ax12.set_ylim([-2000,2000])
             ax12.legend()
             ax12.set_title("Cross-sec rel. to strip 4, W\nD = "
                           + str(np.round(strip_4_ks_cross_sec_W[0],4)) + ",\nval_crit = "

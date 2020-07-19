@@ -157,7 +157,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
         plt.savefig(plot_file_name)
         print("Saved " + str(plot_file_name))
         plt.close()
-
+        import ipdb; ipdb.set_trace()
         ## END PLOTS INSIDE FOR-LOOP
         ###################################
 

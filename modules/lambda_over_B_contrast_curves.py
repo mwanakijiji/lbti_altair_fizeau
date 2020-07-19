@@ -135,6 +135,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                                            inplace=False)
             levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_E"].values
             cp2_E = axs[0].contour(X, Y, Z_E, levels = levels)
+            axs[0].clabel(cp2_E, inline=True, fontsize=10)
             title_E = axs[0].set_title("E")
         if (len(comparison_string_W) > 0):
             cp1_W = axs[1].contour(X, Y, Z_W)
@@ -144,6 +145,7 @@ def main(stripe_w_planet,half_w_planet,read_csv_basename):
                                            inplace=False)
             levels = df_levels["val_xsec_crit_strip_w_planets_rel_to_strip_1_W"].values
             cp2_W = axs[1].contour(X, Y, Z_W, levels = levels)
+            axs[1].clabel(cp2_W, inline=True, fontsize=10)
             title_W = axs[1].set_title("W")
         axs[0].set_xlabel("dist_asec")
         axs[1].set_xlabel("dist_asec")

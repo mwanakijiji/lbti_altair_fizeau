@@ -704,7 +704,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_0_ks_cross_sec_E[0],4))
                           + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_E[1],4))
                           + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_E[2],4)))
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
 
             # cdfs
             cdf_strip = discrete_cdf(cross_sec_dict["strip_0_E"])

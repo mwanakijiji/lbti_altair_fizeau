@@ -932,6 +932,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             max_index = np.argmax(diff_abs)
             plt.axvline(x=cdf_inj[0][max_index],linestyle=":")
             plt.plot(cdf_inj[0], diff_abs, label="diff")
+            plt.legend()
             plt.title("max abs diff: " + str(diff_abs[max_index]))
             plt.savefig("zoom_in_" + new_filename)
             plt.close()

@@ -922,6 +922,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             print("Saved " + new_filename)
 
+            # make zoomed-in plot of one of the subplots
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_4_E"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_strip_interp = np.interp(cdf_inj[0],cdf_strip[0],cdf_strip[1]) # interpolate to find differences
+            plt.plot(cdf_inj[0],cdf_strip_interp,label="strip in question")
+            plt.plot(cdf_inj[0],cdf_inj[1],label="strip w planet")
+            diff_abs = np.abs(np.subtract(cdf_strip_interp,cdf_inj[1]))
+            max_index = np.argmax(diff_abs)
+            plt.axvline(x=max_index,linestyle=":")
+            plt.plot(cdf_inj[0], diff_abs, label="diff")
+            plt.savefig("zoom_in_" + new_filename)
+            print("Saved " + "zoom_in_" + new_filename)
+
     # taking all the data together, write it out as a csv
     ks_info_df.to_csv(write_csv_basename)
     print("Saved all data in " + write_csv_basename)

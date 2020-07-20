@@ -727,6 +727,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_1_ks_cross_sec_E[1],4)) + ",\np_val = "
                           + str(np.round(strip_1_ks_cross_sec_E[2],4)))
 
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_1_E"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax3cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax3cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax3cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax3cdf.legend()
+            ax3cdf.set_title("CDF")
+
 
             ax4.plot(cross_sec_dict["strip_2_E"], label="strip_2_E")
             ax4.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
@@ -739,6 +747,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_2_ks_cross_sec_E[0],4)) + ",\nval_crit = "
                           + str(np.round(strip_2_ks_cross_sec_E[1],4)) + ",\np_val = "
                           + str(np.round(strip_2_ks_cross_sec_E[2],4)))
+
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_2_E"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax4cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax4cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax4cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax4cdf.legend()
+            ax4cdf.set_title("CDF")
 
 
             ax5.plot(cross_sec_dict["strip_3_E"], label="strip_3_E")
@@ -753,6 +769,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_3_ks_cross_sec_E[1],4)) + ",\np_val = "
                           + str(np.round(strip_3_ks_cross_sec_E[2],4)))
 
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_3_E"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax5cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax5cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax5cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax5cdf.legend()
+            ax5cdf.set_title("CDF")
+
 
             ax6.plot(cross_sec_dict["strip_4_E"], label="strip_4_E")
             ax6.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
@@ -765,6 +789,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_4_ks_cross_sec_E[0],4)) + ",\nval_crit = "
                           + str(np.round(strip_4_ks_cross_sec_E[1],4)) + ",\np_val = "
                           + str(np.round(strip_4_ks_cross_sec_E[2],4)))
+
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_4_E"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax6cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax6cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax6cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax6cdf.legend()
+            ax6cdf.set_title("CDF")
 
 
             # bottom-left (ax7): baseline
@@ -793,6 +825,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_W[1],4))
                           + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_W[2],4)))
 
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_0_W"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax8cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax8cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax8cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax8cdf.legend()
+            ax8cdf.set_title("CDF")
+
             ax9.plot(cross_sec_dict["strip_1_W"], label="strip_1_W")
             ax9.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
             ax9.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_1_W"]), label="diff")
@@ -804,6 +844,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_1_ks_cross_sec_W[0],4)) + ",\nval_crit = "
                           + str(np.round(strip_1_ks_cross_sec_W[1],4)) + ",\np_val = "
                           + str(np.round(strip_1_ks_cross_sec_W[2],4)))
+
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_1_W"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax9cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax9cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax9cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax9cdf.legend()
+            ax9cdf.set_title("CDF")
 
 
             ax10.plot(cross_sec_dict["strip_2_W"], label="strip_2_W")
@@ -818,6 +866,13 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_2_ks_cross_sec_W[1],4)) + ",\np_val = "
                           + str(np.round(strip_2_ks_cross_sec_W[2],4)))
 
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_2_W"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax10cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax10cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax10cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax10cdf.legend()
+            ax10cdf.set_title("CDF")
 
             ax11.plot(cross_sec_dict["strip_3_W"], label="strip_3_W")
             ax11.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
@@ -831,6 +886,13 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_3_ks_cross_sec_W[1],4)) + ",\np_val = "
                           + str(np.round(strip_3_ks_cross_sec_W[2],4)))
 
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_3_W"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax11cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax11cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax11cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax11cdf.legend()
+            ax11cdf.set_title("CDF")
 
             ax12.plot(cross_sec_dict["strip_4_W"], label="strip_4_W")
             ax12.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
@@ -843,6 +905,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_4_ks_cross_sec_W[0],4)) + ",\nval_crit = "
                           + str(np.round(strip_4_ks_cross_sec_W[1],4)) + ",\np_val = "
                           + str(np.round(strip_4_ks_cross_sec_W[2],4)))
+
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_4_W"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax12cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax12cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            #ax12cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            ax12cdf.legend()
+            ax12cdf.set_title("CDF")
 
             #f.suptitle(plot_file_name_prefix + os.path.basename(file_name_array_choice[file_num]))
             #plt.tight_layout()

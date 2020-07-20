@@ -923,7 +923,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             print("Saved " + new_filename)
 
             # make zoomed-in plot of one of the subplots
-            cdf_strip = discrete_cdf(cross_sec_dict["strip_4_E"])
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_4_W"])
             cdf_inj = discrete_cdf(cross_sec_injected_planet)
             cdf_strip_interp = np.interp(cdf_inj[0],cdf_strip[0],cdf_strip[1]) # interpolate to find differences
             plt.plot(cdf_inj[0],cdf_strip_interp,label="strip in question")

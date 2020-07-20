@@ -711,7 +711,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             cdf_inj = discrete_cdf(cross_sec_injected_planet)
             ax2cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax2cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            ax2cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
+            #ax2cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
             ax2cdf.legend()
             ax2cdf.set_title("CDF")
 

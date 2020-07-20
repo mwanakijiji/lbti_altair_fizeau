@@ -594,10 +594,6 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             # opposite half: comparison with the *opposite* side of the strip
             # with the planet injected
 
-            #############
-            ## BUG HERE?? PLANET IS INJECTED IN THE OPPOSITE HALF OF STRIP, TOO
-            #############
-
             strip_opposite_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_dict[string_opposite_indicator])
             # others: different strips with planets along the same angle
             # (note one of these will be a repeat of strip_opposite_ks_cross_sec,
@@ -671,16 +667,24 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             print("strip_w_planets_rel_to_strip_4, marginalization: " + str(strip_4_ks_marg))
             '''
 
+            ## some code to make discrete CDFs
+            def discrete_cdf(input_array):
+                N = len(input_array)
+                X2 = np.sort(input_array)
+                F2 = np.array(range(N))/float(N)
+                return X2, F2
+
             ##############################################
             ## BEGIN GIANT BLOCK OF CODE TO MAKE A PLOT
 
             # planet location in pixels to indicate in plot
             planet_loc_pix = np.divide(dist_asec,float(config["instrum_params"]["LMIR_PS"]))
 
-            f, ((ax1, ax2, ax3, ax4, ax5, ax6), (ax7, ax8, ax9, ax10, ax11, ax12)) = plt.subplots(2, 6, figsize=(24, 16))
+            f, ((ax1, ax2, ax3, ax4, ax5, ax6), (ax1cdf, ax2cdf, ax3cdf, ax4cdf, ax5cdf, ax6cdf),
+                (ax7, ax8, ax9, ax10, ax11, ax12), (ax7cdf, ax8cdf, ax9cdf, ax10cdf, ax11cdf, ax12cdf)) = plt.subplots(4, 6, figsize=(24, 32))
 
             # top row: 2D color plot and cross-sections
-            # bottom row: marginalizations
+            # second row: CDFs
 
             # top left: 2D color plot (which has been flipped if the planet is in the E half)
             subplot1 = ax1.imshow(image_injected_planet, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
@@ -700,6 +704,15 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_0_ks_cross_sec_E[0],4))
                           + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_E[1],4))
                           + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_E[2],4)))
+
+            # cdfs
+            cdf_strip = discrete_cdf(cross_sec_dict["strip_0_E"])
+            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            ax2cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
+            ax2cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
+            ax2cdf.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0_E"]), label="diff")
+            ax2cdf.legend()
+            ax2cdf.set_title("CDF")
 
             ax3.plot(cross_sec_dict["strip_1_E"], label="strip_1_E")
             ax3.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")

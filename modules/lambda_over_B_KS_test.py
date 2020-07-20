@@ -704,13 +704,14 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(strip_0_ks_cross_sec_E[0],4))
                           + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_E[1],4))
                           + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_E[2],4)))
+            import ipdb; ipdb.set_trace()
 
             # cdfs
             cdf_strip = discrete_cdf(cross_sec_dict["strip_0_E"])
             cdf_inj = discrete_cdf(cross_sec_injected_planet)
             ax2cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax2cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            ax2cdf.plot(np.subtract(cross_sec_injected_planet,cross_sec_dict["strip_0_E"]), label="diff")
+            ax2cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
             ax2cdf.legend()
             ax2cdf.set_title("CDF")
 

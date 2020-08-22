@@ -901,7 +901,7 @@ def main(inject_iteration=None):
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
 
 
-        fake_params_pre_permute = {"angle_deg_EofN": [270.04],
+        fake_params_pre_permute = {"angle_deg_EofN": [320.32],
                                "rad_asec": list(B),
                                "ampl_linear_norm": [0.005,0.01,0.02,0.03,0.05,0.1]}
 
@@ -911,11 +911,12 @@ def main(inject_iteration=None):
         # Block D, strip 2 of 4: 76.57 / 256.57 (-13.43 along short baseline)
         # Block D, strip 3 of 4: 83.37 / 263.37 (-6.63 along short baseline)
         # Block D, strip 4 of 4: 90.04 / 270.04 (+0.04 along short baseline)
-        # WRONG Block A, strip 0 of 4: 129.68 / 309.68 (-39.68 along short baseline)
-        # WRONG Block D, strip 1 of 4: 109.218 / 289.218 (-19.218 along short baseline)
-        # WRONG Block D, strip 2 of 4: 103.43 / 283.43 (-13.43 along short baseline)
-        # WRONG Block D, strip 3 of 4: 96.63 / 276.63 (-6.63 along short baseline)
-        # WRONG Block D, strip 4 of 4: 89.96 / 269.96 (+0.04 along short baseline)
+        # injection angles for injections and tesselation strips along short baseline
+        # Block A, strip 0V of 4V: 320.32 / 140.32 (-39.68 along short baseline)
+        # Block D, strip 1V of 4V: 340.782 / 160.782 (-19.218 along short baseline)
+        # Block D, strip 2V of 4V: 346.57 / 166.57 (-13.43 along short baseline)
+        # Block D, strip 3V of 4V: 353.37 / 173.37 (-6.63 along short baseline)
+        # Block D, strip 4V of 4V: 0.04 / 180.04 (+0.04 along short baseline)
 
         '''
         fake_params_pre_permute = {"angle_deg_EofN": [0.],
@@ -1213,7 +1214,7 @@ def main(inject_iteration=None):
         read_name_abs_fake_planet_PCA = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                             + "psf_PCA_vector_cookie_all_B_and_C_frames_pcaNum_100_host_resids.fits"),
         read_name_abs_pca_tesselation_pattern = str(config["data_dirs"]["DIR_OTHER_FITS"] +
-                                                    "mask_406x406_center_strip_width_2_FWHM_lamb_over_B.fits"),
+                                                    "mask_406x406_vertical_center_strip_width_2_FWHM_lamb_over_B.fits"),
         write_name_abs_cube_put_frames_into_it_simple = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
                                                             + "simple_synthetic_sci_frame_cube_A_and_D.fits"),
         write_name_abs_cube_A_PCA_vector = str(config["data_dirs"]["DIR_PCA_CUBES_PSFS"]
@@ -1239,6 +1240,7 @@ def main(inject_iteration=None):
     mask_406x406_center_strip_lamb_over_B.fits
     mask_406x406_center_strip_width_1_FWHM_lamb_over_B.fits
     mask_406x406_center_strip_width_2_FWHM_lamb_over_B.fits
+    mask_406x406_vertical_center_strip_width_2_FWHM_lamb_over_B.fits
     '''
 
     ## ## BEGIN SERIAL TEST

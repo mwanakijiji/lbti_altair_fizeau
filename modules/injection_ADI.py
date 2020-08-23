@@ -901,7 +901,7 @@ def main(inject_iteration=None):
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
 
 
-        fake_params_pre_permute = {"angle_deg_EofN": [340.782],
+        fake_params_pre_permute = {"angle_deg_EofN": [346.57],
                                "rad_asec": list(B),
                                "ampl_linear_norm": [0.005,0.01,0.02,0.03,0.05,0.1]}
 

@@ -1,0 +1,161 @@
+#!/bin/bash
+#SBATCH --account=ktmorz
+#SBATCH --partition=standard
+### Specify cores/memory; NEED TO ALSO SET THIS IN __INIT__ FILE
+#SBATCH --nodes=1
+#SBATCH --ntasks=28
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=168gb
+### Specify a name for the job
+#SBATCH --job-name=fizeau_altair
+
+### Sharing settings
+###PBS -l place=free
+### CPUtime required in hhh:mm:ss.
+### Leading 0's can be omitted e.g 48:0:0 sets 48 hours
+### (1300 for 6 sets of amplitude at a time if 20 CPU)
+### (1820 for 6 sets of amplitude at a time if 28 CPU)
+### (1204 for 4 sets of amplitude at a time if 28 CPU)
+### (588 for 2 sets of amplitude at a time if 28 CPU)
+###PBS -l cput=1824:00:00
+### Walltime is how long your job will run
+### (65 for 6 sets of amplitude at a time)
+### (43 for 4 sets of amplitude at a time)
+### (21 for 2 sets of amplitude at a time)
+#SBATCH --time 65:00:00
+### send email when done
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=spalding@email.arizona.edu
+
+### start timestamp
+echo "Start time"
+date
+
+### set variables: filenames of the data tarball and Singularity container
+### input files: for lambda/B regime, probably want to choose data tarball from
+### altair_20200822_good_frames_list_A_stripe_0_of_4.tar.gz
+### altair_20200822_good_frames_list_D_stripe_1_of_4.tar.gz
+### altair_20200822_good_frames_list_D_stripe_2_of_4.tar.gz
+### altair_20200822_good_frames_list_D_stripe_3_of_4.tar.gz
+### altair_20200822_good_frames_list_D_stripe_4_of_4.tar.gz
+export DATA_TARBALL=altair_20200822_good_frames_list_D_stripe_4_of_4.tar.gz
+export SING_FILE=lbti_altair_fizeau_latest.sif
+### output files
+export RESULTS_TARBALL=recenter_180pt04degEofN_list_D_stripe_4_of_4_0091.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_180pt04degEofN_list_D_stripe_4_of_4_0091.csv
+
+module avail
+
+### load python 3.6.5
+module load python/3.6
+
+### load Singularity
+### module load singularity
+
+### check if 400 Gb of storage are available in /tmp
+echo $HOSTNAME
+echo "Check if /tmp has 500GB of storage available"
+available_space=$(df -h /tmp | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+if [ $available_space -gt 400 ]
+then
+   echo "There is enough storage"
+   echo $available_space GB
+   date
+
+   ### get current (home) directory
+   export HOME_DIR=$PWD
+
+   ### check available space in home
+   available_space_home=$(df -h /home/u6/spalding | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+   echo "Available space in /home/u6/spalding:"
+   echo $available_space_home GB
+
+   ### make a new /tmp/ directory on the compute node
+   rm -fr /tmp/$USER
+   mkdir /tmp/$USER
+
+   ### check available space in new /tmp directory
+   available_space_tmp=$(df -h /tmp/$USER | tail -n +2 | awk '{print $4}' | sed 's/.$//')
+   echo "Available space in /tmp/spalding:"
+   echo $available_space_tmp GB
+
+   ### copy tarball into the /tmp/ directory
+   ### (for 180507 Altair data, the top-level directory produced in the untarring
+   ### is /180507_fizeau_altair/ and NOT /vol_c/)
+   cp /xdisk/phinz/mig2020/xdisk/$USER/$DATA_TARBALL /tmp/$USER
+   cd /tmp/$USER
+   echo "Changed to tarball and Singularity file directory"
+   pwd
+   echo "---"
+   date
+
+   ### unpack data
+   echo "Unpacking data in directory"
+   pwd
+   echo "---"
+   tar -xvf $DATA_TARBALL
+   echo "Tarball extracted"
+   date
+   echo "---"
+
+   ### pull the Singularity file (which contains the code + environment)
+   singularity pull --name $SING_FILE shub://mwanakijiji/lbti_altair_fizeau:latest
+   echo "Singularity file pulled in directory"
+   pwd
+   date
+   echo "---"
+
+   ### BEGIN TEST
+   echo "List of files in directory Singularity file was pulled to"
+   ls
+   echo "---"
+   echo "List of files in /xdisk/phinz/mig2020/xdisk/spalding/ dir:"
+   ls /xdisk/phinz/mig2020/xdisk/$USER/
+   echo "---"
+   echo "List of files in /tmp/user/ dir:"
+   ls /tmp/$USER
+   echo "---"
+   ### END TEST
+
+   ### run Singularity container (bind syntax is host:container)
+   ### data files -> /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair
+   ### code files -> (is it necessary to bind this?) :/modules
+   singularity exec \
+    --bind /tmp/$USER/180507_fizeau_altair:/vol_c/180507_fizeau_altair \
+    /tmp/$USER/$SING_FILE \
+    python3 /altair_pipeline.py
+
+   echo "Ran Singularity:"
+   date
+   echo "---"
+
+   ### copy the output text file separately to /home/u6/spalding/
+   export CSV_FILE=/tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/test_csv_file_all_iterations.csv
+   cp $CSV_FILE /home/u6/$USER/$OUTPUT_CSV_FILE_BASENAME
+
+   ### create tar archive of the results in /tmp/, and leave it in /xdisk/phinz/mig2020/xdisk/spalding/
+   ### directory
+   echo "Tarring outputs"
+   ### tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_10_signal_to_noise/
+   ### tar a selection of the most important FITS frames:
+   tar -czf $RESULTS_TARBALL /tmp/$USER/180507_fizeau_altair/pipeline_09a_adi_fake_psf_present/
+   echo "Done tarring output:"
+   date
+   echo "---"
+   cp $RESULTS_TARBALL /xdisk/phinz/mig2020/xdisk/$USER/
+   echo "Done copying output to /xdisk/phinz/mig2020/xdisk/spalding/:"
+   date
+   echo "---"
+
+   ### delete the stuff remaining in /tmp/
+   rm -fr /tmp/$USER
+   echo "Deleted stuff in the /tmp/ directory:"
+
+   ### timestamp end
+   date
+
+else
+
+  echo "There is not enough storage"
+  echo $available_space GB
+fi

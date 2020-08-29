@@ -903,7 +903,7 @@ def main(inject_iteration=None):
         mag_array = [0,1.5,7,8,9,10] # if I want the flux array to be based on mag steps
         flux_array = np.divide(1.,np.power(10.,np.multiply(0.4,(mag_array))))
 
-        fake_params_pre_permute = {"angle_deg_EofN": [346.57,353.37],
+        fake_params_pre_permute = {"angle_deg_EofN": [0.04,140.32],
                                "rad_asec": list(B),
                                "ampl_linear_norm": flux_array}
 

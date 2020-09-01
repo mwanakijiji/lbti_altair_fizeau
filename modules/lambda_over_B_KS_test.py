@@ -201,7 +201,6 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_3_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip4_270pt04_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip4_270pt04_deg/*.fits"))
 
-
     # choose the arrays to use in the analysis
     if np.logical_and((stripe_w_planet == 0),(half_w_planet == "E")):
         # frames with planet along the E: East of North; i.e., 0<PA<180
@@ -382,6 +381,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             ## pluck out the interesting file names
             # frames with planets along eastern arm of strip
+            import ipdb; ipdb.set_trace()
             if (half_w_planet == "E"):
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_E,
                                                                      comp_ampl_pass=comp_ampl,
@@ -465,6 +465,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             # baseline frames without planets: eastern halves and western halves
             # set down convention that host star is on the left side (i.e., 'east'
             # strips have to be flipped)
+            import ipdb; ipdb.set_trace()
             cross_sec_dict["baseline_strip_0_E"] = np.flip(baseline_processed_stripe_0, axis=1)[int(0.5*np.shape(baseline_processed_stripe_0)[0]),int(0.5*np.shape(baseline_processed_stripe_0)[1]):]
             cross_sec_dict["baseline_strip_1_E"] = np.flip(baseline_processed_stripe_1, axis=1)[int(0.5*np.shape(baseline_processed_stripe_1)[0]),int(0.5*np.shape(baseline_processed_stripe_1)[1]):]
             cross_sec_dict["baseline_strip_2_E"] = np.flip(baseline_processed_stripe_2, axis=1)[int(0.5*np.shape(baseline_processed_stripe_2)[0]),int(0.5*np.shape(baseline_processed_stripe_2)[1]):]

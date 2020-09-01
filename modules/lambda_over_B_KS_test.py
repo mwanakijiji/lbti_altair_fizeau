@@ -56,13 +56,97 @@ def pluck_interesting_file_name(file_names, comp_ampl_pass, dist_asec_pass):
 
         print("No matching files for comp_ampl " + str(comp_ampl_pass) + \
             ", dist_asec " + str(dist_asec_pass))
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
 
     else:
 
         print("Found matching file \n" + str(file_name_this_strip_of_interest))
 
     return file_name_this_strip_of_interest
+
+
+def return_residuals(array_loaded):
+    '''
+    Feed in an array and have two sets of residuals returned and ready for
+    comparison
+
+    INPUT:
+    array_loaded: a derotated array arranged so that E is on the left, W on the right
+
+    OUTPUTS:
+    radial_median_array_E: median of residuals of the eastern half-strip
+    radial_median_array_W: " " " western half-strip
+    '''
+
+    # remove ~zeros from consideration
+    array_relevant = np.copy(array_loaded)
+    array_relevant[np.abs(array_loaded)<1e-10] = np.nan
+
+    # convolve with a smoothing function? I've decided against it for now...
+
+    # make grid to define center
+    X,Y = np.meshgrid(np.arange(-0.5*np.shape(array_loaded)[1],0.5*np.shape(array_loaded)[1],1),
+                  np.arange(-0.5*np.shape(array_loaded)[0],0.5*np.shape(array_loaded)[0],1))
+    # remove centering error
+    X = np.add(X,0.5)
+    Y = np.add(Y,0.5)
+
+    # initialize arrays to hold residuals
+    arr_length = 50 # boundary of 50 is slightly short of the radius of the long-baseline masks
+    radial_std_array_E = np.nan*np.ones(arr_length)
+    radial_median_array_E = np.nan*np.ones(arr_length)
+    radial_max_array_E = np.nan*np.ones(arr_length)
+    radial_std_array_W = np.nan*np.ones(arr_length)
+    radial_median_array_W = np.nan*np.ones(arr_length)
+    radial_max_array_W = np.nan*np.ones(arr_length)
+
+    # thickness of ring to use (in pixels)
+    rad_thickness = 1
+
+    # loop over radii, one pixel at a time
+    for rad_central in range(0,arr_length):
+
+        rad_inner = rad_central-0.5*rad_thickness
+        rad_outer = rad_central+0.5*rad_thickness
+
+        # select pixels
+        mask_ring_bool = np.logical_and(np.power(X,2) + np.power(Y,2) <= np.power(rad_outer,2),
+                            np.power(X,2) + np.power(Y,2) >= np.power(rad_inner,2))
+        # cast boolean -> int
+        mask_ring_int = 1*mask_ring_bool
+        # cast zeros -> nans
+        mask_ring_nans = np.copy(mask_ring_int).astype(float)
+        mask_ring_nans[mask_ring_nans == 0] = np.nan
+
+        # mask the array
+        array_masked = np.multiply(array_relevant,mask_ring_nans)
+
+        # chop into E (left) and W (right) halves
+        # (note that the derotation should have been done beforehand)
+        print("rad_central")
+        print(rad_central)
+        array_masked_E = array_masked[:,0:int(0.5*np.shape(array_loaded)[1])]
+        array_masked_W = array_masked[:,int(0.5*np.shape(array_loaded)[1]):]
+
+        # extract data
+        stdev_E = np.nanstd(array_masked_E)
+        stdev_W = np.nanstd(array_masked_W)
+        median_E = np.nanmedian(array_masked_E)
+        median_W = np.nanmedian(array_masked_W)
+        max_E = np.nanmax(array_masked_E)
+        max_W = np.nanmax(array_masked_W)
+
+        # populate arrays
+        # (note that they are both in r-space, such that r:0->inf is left->right;
+        # no additional flipping is necessary)
+        radial_std_array_E[rad_central] = stdev_E
+        radial_std_array_W[rad_central] = stdev_W
+        radial_median_array_E[rad_central] = median_E
+        radial_median_array_W[rad_central] = median_W
+        radial_max_array_E[rad_central] = max_E
+        radial_max_array_W[rad_central] = max_W
+
+    return radial_median_array_E, radial_median_array_W
 
 
 def do_KS(empirical_sample_1,empirical_sample_2):
@@ -386,6 +470,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_E,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                ## REMOVE THIS COMMENT
+                '''
                 file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1_of_4_E,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
@@ -398,6 +484,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4_E,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
+                '''
+                ## ## END COMMENT
             elif (half_w_planet == "W"):
                 # frames with planets along western arm of strip
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_W,
@@ -421,6 +509,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             image_stripe_0 = fits.getdata(file_name_strip_0_of_4,0,header=False)
             img_processed_stripe_0 = shave_and_rotate(image_stripe_0,angle=-39.68)
+            '''
+            ## ## REMOVE THIS COMMENT
             image_stripe_1 = fits.getdata(file_name_strip_1_of_4,0,header=False)
             img_processed_stripe_1 = shave_and_rotate(image_stripe_1,angle=-19.218)
             image_stripe_2 = fits.getdata(file_name_strip_2_of_4,0,header=False)
@@ -429,6 +519,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             img_processed_stripe_3 = shave_and_rotate(image_stripe_3,angle=-6.63)
             image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
             img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=0.04)
+            '''
 
             #import ipdb; ipdb.set_trace()
             # find the cross-sections and marginalizations
@@ -443,6 +534,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ## TIME TO SEPARATE BASELINES INTO E, W HALVES --E.S.)
             # baseline frames without planets
             marginalization_dict["baseline_strip_0"] = np.sum(baseline_processed_stripe_0,axis=0)
+            '''
+            ## ## REMOVE THIS COMMENT
             marginalization_dict["baseline_strip_1"] = np.sum(baseline_processed_stripe_1,axis=0)
             marginalization_dict["baseline_strip_2"] = np.sum(baseline_processed_stripe_2,axis=0)
             marginalization_dict["baseline_strip_3"] = np.sum(baseline_processed_stripe_3,axis=0)
@@ -460,7 +553,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             marginalization_dict["strip_2_W"] = np.sum(img_processed_stripe_2,axis=0)
             marginalization_dict["strip_3_W"] = np.sum(img_processed_stripe_3,axis=0)
             marginalization_dict["strip_4_W"] = np.sum(img_processed_stripe_4,axis=0)
-
+            '''
             ## cross-sections
             # baseline frames without planets: eastern halves and western halves
             # set down convention that host star is on the left side (i.e., 'east'

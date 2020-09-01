@@ -13,12 +13,12 @@
 ### (1820 for 6 sets of amplitude at a time if 28 CPU)
 ### (1204 for 4 sets of amplitude at a time if 28 CPU)
 ### (588 for 2 sets of amplitude at a time if 28 CPU)
-#PBS -l cput=3640:00:00
+#PBS -l cput=2800:00:00
 ### Walltime is how long your job will run
 ### (65 for 6 sets of amplitude at a time)
 ### (43 for 4 sets of amplitude at a time)
 ### (21 for 2 sets of amplitude at a time)
-#PBS -l walltime=130:00:00
+#PBS -l walltime=100:00:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 

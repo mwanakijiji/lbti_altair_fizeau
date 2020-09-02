@@ -902,8 +902,8 @@ def main(inject_iteration=None):
         B = fwhm_pix*ps_asec_per_pix*A # array of angular offsets where fake planets are to be injected
 
         mag_array = [0,1.5,7,8,9,10] # if I want the flux array to be based on mag steps
-        #flux_array = np.divide(1.,np.power(10.,np.multiply(0.4,(mag_array))))
-        flux_array = [0]
+        flux_array = np.divide(1.,np.power(10.,np.multiply(0.4,(mag_array))))
+        #flux_array = [0]
 
         fake_params_pre_permute = {"angle_deg_EofN": [0],
                                "rad_asec": list(B),

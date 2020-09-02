@@ -13,12 +13,12 @@
 ### (1820 for 6 sets of amplitude at a time if 28 CPU)
 ### (1204 for 4 sets of amplitude at a time if 28 CPU)
 ### (588 for 2 sets of amplitude at a time if 28 CPU)
-#PBS -l cput=2800:00:00
+#PBS -l cput=294:00:00
 ### Walltime is how long your job will run
 ### (65 for 6 sets of amplitude at a time)
 ### (43 for 4 sets of amplitude at a time)
 ### (21 for 2 sets of amplitude at a time)
-#PBS -l walltime=100:00:00
+#PBS -l walltime=10:30:00
 ### send email when done
 #PBS -M spalding@email.arizona.edu
 
@@ -36,8 +36,8 @@ date
 export DATA_TARBALL=altair_20200822_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_173pt37_180pt04degEofN_ampl_del_mag_0to9_list_A_stripe_0_of_4_0112.tar
-export OUTPUT_CSV_FILE_BASENAME=recenter_173pt37_180pt04degEofN_ampl_del_mag_0to9_list_A_stripe_0_of_4_0112.csv
+export RESULTS_TARBALL=recenter_0degEofN_ampl_0_list_A_stripe_0_of_4_0117.tar
+export OUTPUT_CSV_FILE_BASENAME=recenter_0degEofN_ampl_0_list_A_stripe_0_of_4_0117.csv
 
 ### load python 3.6.5
 module load python/3

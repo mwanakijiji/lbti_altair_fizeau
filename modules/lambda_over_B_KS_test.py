@@ -123,8 +123,6 @@ def return_residuals(array_loaded):
 
         # chop into E (left) and W (right) halves
         # (note that the derotation should have been done beforehand)
-        print("rad_central")
-        print(rad_central)
         array_masked_E = array_masked[:,0:int(0.5*np.shape(array_loaded)[1])]
         array_masked_W = array_masked[:,int(0.5*np.shape(array_loaded)[1]):]
 
@@ -559,28 +557,47 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             # set down convention that host star is on the left side (i.e., 'east'
             # strips have to be flipped)
             import ipdb; ipdb.set_trace()
-            cross_sec_dict["baseline_strip_0_E"] = np.flip(baseline_processed_stripe_0, axis=1)[int(0.5*np.shape(baseline_processed_stripe_0)[0]),int(0.5*np.shape(baseline_processed_stripe_0)[1]):]
-            cross_sec_dict["baseline_strip_1_E"] = np.flip(baseline_processed_stripe_1, axis=1)[int(0.5*np.shape(baseline_processed_stripe_1)[0]),int(0.5*np.shape(baseline_processed_stripe_1)[1]):]
-            cross_sec_dict["baseline_strip_2_E"] = np.flip(baseline_processed_stripe_2, axis=1)[int(0.5*np.shape(baseline_processed_stripe_2)[0]),int(0.5*np.shape(baseline_processed_stripe_2)[1]):]
-            cross_sec_dict["baseline_strip_3_E"] = np.flip(baseline_processed_stripe_3, axis=1)[int(0.5*np.shape(baseline_processed_stripe_3)[0]),int(0.5*np.shape(baseline_processed_stripe_3)[1]):]
-            cross_sec_dict["baseline_strip_4_E"] = np.flip(baseline_processed_stripe_4, axis=1)[int(0.5*np.shape(baseline_processed_stripe_4)[0]),int(0.5*np.shape(baseline_processed_stripe_4)[1]):]
-            cross_sec_dict["baseline_strip_0_W"] = baseline_processed_stripe_0[int(0.5*np.shape(baseline_processed_stripe_0)[0]),int(0.5*np.shape(baseline_processed_stripe_0)[1]):]
-            cross_sec_dict["baseline_strip_1_W"] = baseline_processed_stripe_1[int(0.5*np.shape(baseline_processed_stripe_1)[0]),int(0.5*np.shape(baseline_processed_stripe_1)[1]):]
-            cross_sec_dict["baseline_strip_2_W"] = baseline_processed_stripe_2[int(0.5*np.shape(baseline_processed_stripe_2)[0]),int(0.5*np.shape(baseline_processed_stripe_2)[1]):]
-            cross_sec_dict["baseline_strip_3_W"] = baseline_processed_stripe_3[int(0.5*np.shape(baseline_processed_stripe_3)[0]),int(0.5*np.shape(baseline_processed_stripe_3)[1]):]
-            cross_sec_dict["baseline_strip_4_W"] = baseline_processed_stripe_4[int(0.5*np.shape(baseline_processed_stripe_4)[0]),int(0.5*np.shape(baseline_processed_stripe_4)[1]):]
+            baseline_processed_stripe_0_resids = return_residuals(baseline_processed_stripe_0)
+            cross_sec_dict["baseline_strip_0_E"] = baseline_processed_stripe_0_resids[0]
+            cross_sec_dict["baseline_strip_0_W"] = baseline_processed_stripe_0_resids[1]
+
+            baseline_processed_stripe_1_resids = return_residuals(baseline_processed_stripe_1)
+            cross_sec_dict["baseline_strip_1_E"] = baseline_processed_stripe_1_resids[0]
+            cross_sec_dict["baseline_strip_1_W"] = baseline_processed_stripe_1_resids[1]
+
+            baseline_processed_stripe_2_resids = return_residuals(baseline_processed_stripe_2)
+            cross_sec_dict["baseline_strip_2_E"] = baseline_processed_stripe_2_resids[0]
+            cross_sec_dict["baseline_strip_2_W"] = baseline_processed_stripe_2_resids[1]
+
+            baseline_processed_stripe_3_resids = return_residuals(baseline_processed_stripe_3)
+            cross_sec_dict["baseline_strip_3_E"] = baseline_processed_stripe_3_resids[0]
+            cross_sec_dict["baseline_strip_3_W"] = baseline_processed_stripe_3_resids[1]
+
+            baseline_processed_stripe_4_resids = return_residuals(baseline_processed_stripe_4)
+            cross_sec_dict["baseline_strip_4_E"] = baseline_processed_stripe_4_resids[0]
+            cross_sec_dict["baseline_strip_4_W"] = baseline_processed_stripe_4_resids[1]
+
             # cross-sections of frames from datasets where a fake planet exists
-            cross_sec_dict["strip_0_E"] = np.flip(img_processed_stripe_0, axis=1)[int(0.5*np.shape(img_processed_stripe_0)[0]),int(0.5*np.shape(img_processed_stripe_0)[1]):]
-            cross_sec_dict["strip_1_E"] = np.flip(img_processed_stripe_1, axis=1)[int(0.5*np.shape(img_processed_stripe_1)[0]),int(0.5*np.shape(img_processed_stripe_1)[1]):]
-            cross_sec_dict["strip_2_E"] = np.flip(img_processed_stripe_2, axis=1)[int(0.5*np.shape(img_processed_stripe_2)[0]),int(0.5*np.shape(img_processed_stripe_2)[1]):]
-            cross_sec_dict["strip_3_E"] = np.flip(img_processed_stripe_3, axis=1)[int(0.5*np.shape(img_processed_stripe_3)[0]),int(0.5*np.shape(img_processed_stripe_3)[1]):]
-            cross_sec_dict["strip_4_E"] = np.flip(img_processed_stripe_4, axis=1)[int(0.5*np.shape(img_processed_stripe_4)[0]),int(0.5*np.shape(img_processed_stripe_4)[1]):]
-            cross_sec_dict["strip_0_W"] = img_processed_stripe_0[int(0.5*np.shape(img_processed_stripe_0)[0]),int(0.5*np.shape(img_processed_stripe_0)[1]):]
-            cross_sec_dict["strip_1_W"] = img_processed_stripe_1[int(0.5*np.shape(img_processed_stripe_1)[0]),int(0.5*np.shape(img_processed_stripe_1)[1]):]
-            cross_sec_dict["strip_2_W"] = img_processed_stripe_2[int(0.5*np.shape(img_processed_stripe_2)[0]),int(0.5*np.shape(img_processed_stripe_2)[1]):]
-            cross_sec_dict["strip_3_W"] = img_processed_stripe_3[int(0.5*np.shape(img_processed_stripe_3)[0]),int(0.5*np.shape(img_processed_stripe_3)[1]):]
-            cross_sec_dict["strip_4_W"] = img_processed_stripe_4[int(0.5*np.shape(img_processed_stripe_4)[0]),int(0.5*np.shape(img_processed_stripe_4)[1]):]
-            #import ipdb; ipdb.set_trace()
+            img_processed_stripe_0_resids = return_residuals(img_processed_stripe_0)
+            cross_sec_dict["strip_0_E"] = img_processed_stripe_0_resids[0]
+            cross_sec_dict["strip_0_W"] = img_processed_stripe_0_resids[1]
+            img_processed_stripe_1_resids = return_residuals(img_processed_stripe_1)
+            cross_sec_dict["strip_1_E"] = img_processed_stripe_1_resids[0]
+            cross_sec_dict["strip_1_W"] = img_processed_stripe_1_resids[1]
+            img_processed_stripe_2_resids = return_residuals(img_processed_stripe_2)
+            cross_sec_dict["strip_2_E"] = img_processed_stripe_2_resids[0]
+            cross_sec_dict["strip_2_W"] = img_processed_stripe_2_resids[1]
+            img_processed_stripe_3_resids = return_residuals(img_processed_stripe_3)
+            cross_sec_dict["strip_3_E"] = img_processed_stripe_3_resids[0]
+            cross_sec_dict["strip_3_W"] = img_processed_stripe_3_resids[1]
+            img_processed_stripe_4_resids = return_residuals(img_processed_stripe_4)
+            cross_sec_dict["strip_4_E"] = img_processed_stripe_4_resids[0]
+            cross_sec_dict["strip_4_W"] = img_processed_stripe_4_resids[1]
+
+
+
+
+            import ipdb; ipdb.set_trace()
             if np.logical_and((stripe_w_planet == 0),(half_w_planet == "E")):
                 # image of the injected stripe, with the planet to the right, for FYI plot
                 # (note flipping, since the planet is 'east')

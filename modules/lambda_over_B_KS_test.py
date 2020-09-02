@@ -42,7 +42,7 @@ def pluck_interesting_file_name(file_names, comp_ampl_pass, dist_asec_pass):
         planet_loc_asec = float(file_names[file_num].split("_")[-3])
 
         # grab the interesting name
-        if ((np.round(planet_current_ampl,3) == np.round(comp_ampl_pass,3)) and
+        if ((np.round(planet_current_ampl,6) == np.round(comp_ampl_pass,6)) and
             (np.round(planet_loc_asec,3) == np.round(dist_asec_pass,3))):
 
             file_name_this_strip_of_interest = file_names[file_num]
@@ -424,7 +424,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
     # loop over each combination of injected companion amplitude and radial distance
     ## ## (THIS IS KIND OF CLUNKY; IMPROVE LATER IF TIME)
-    comp_ampl_array = np.array([0.005,0.01,0.02,0.03,0.05,0.1])
+    comp_ampl_array = np.array([0.0001,0.000251188643,0.000630957344,0.00158489319,0.005,0.01,0.02,0.03,0.05,0.1,0.251188643,1.])
     dist_fwhm_array = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.])
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)

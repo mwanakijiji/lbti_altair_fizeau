@@ -820,6 +820,18 @@ class SyntheticFizeauInjectRemoveADI:
         make_median_sci = median_instance_sci(adi_write_name = self.write_name_abs_derotated_sci_median,
                                           apply_mask_after_derot = True,
                                           fake_planet = True)
+        ## ## BEGIN TEST WITH OPPOSITE PA DIRECTION
+        median_instance_sci_test = detection.MedianCube(injection_iteration = None,
+                                                fake_params = this_param_combo,
+                                               host_subt_cube = host_recon_2d_A,
+                                               pa_array = -pas_array_A,
+                                               frame_array = frame_array_0_A,
+                                               write_cube = True)
+        make_median_sci_test = median_instance_sci_test(adi_write_name = str(config["data_dirs"]["DIR_OTHER_FITS"])+"junkfyiderotraw.fits",
+                                                apply_mask_after_derot = True,
+                                                fake_planet = True)
+        print("Writing out "+str(config["data_dirs"]["DIR_OTHER_FITS"])+"junkfyiderotraw.fits")
+        ## ## END TEST
         print("-"*prog_bar_width)
 
         ###############################################################################################

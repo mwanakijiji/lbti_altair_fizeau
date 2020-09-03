@@ -823,8 +823,8 @@ class SyntheticFizeauInjectRemoveADI:
         ## ## BEGIN TEST WITH OPPOSITE PA DIRECTION
         median_instance_sci_test = detection.MedianCube(injection_iteration = None,
                                                 fake_params = this_param_combo,
-                                               host_subt_cube = host_recon_2d_A,
-                                               pa_array = -pas_array_A,
+                                               host_subt_cube = cube_pre_removal_A,
+                                               pa_array = pas_array_A,
                                                frame_array = frame_array_0_A,
                                                write_cube = True)
         make_median_sci_test = median_instance_sci_test(adi_write_name = str(config["data_dirs"]["DIR_OTHER_FITS"])+"junkfyiderotraw.fits",

@@ -184,9 +184,9 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     write out the results as csv files (plus some FYI plots)
 
     INPUTS:
-    stripe_w_planet: integer which sets the strip with planets injected along the median angle
-        (choices are [0,1,2,3,4])
-    half_w_planet: the East/West half of the stripe_w_planet which contains the
+    stripe_w_planet: string which sets the strip with planets injected along the median angle
+        (choices are ["0","1","2","3","4","0V","1V","2V","3V","4V"])
+    half_w_planet: the East/West/North/South half of the stripe_w_planet which contains the
         planet (choices are [E,W])
     write_csv_basename: csv containing the data which will be written
     '''
@@ -194,7 +194,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
-
+    import ipdb; ipdb.set_trace()
     # directory containing subdirectory of files of different stripes with injected planets
     stem_adi_frames_lambda_over_B = str(config["data_dirs"]["DIR_ADI_LAMBDA_B_W_PLANETS"])
     # directory of baseline frames with no injected planets
@@ -215,7 +215,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         "strip_3_of_4_no_planets.fits"
     file_name_strip_4_of_4_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
         "strip_4_of_4_no_planets.fits"
-
+    file_name_strip_0V_of_4V_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
+        "strip_0V_of_4V_no_planets.fits"
+    file_name_strip_1V_of_4V_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
+        "strip_1V_of_4V_no_planets.fits"
+    file_name_strip_2V_of_4V_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
+        "strip_2V_of_4V_no_planets.fits"
+    file_name_strip_3V_of_4V_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
+        "strip_3V_of_4V_no_planets.fits"
+    file_name_strip_4V_of_4V_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
+        "strip_4V_of_4V_no_planets.fits"
+    import ipdb; ipdb.set_trace()
     # files where planets are injected along the strip 0 of 4, along 129.68 deg E of N)
     # glob of file names of ADI frames of A block strip 0 of 4
     file_names_strip_0_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip0_50pt32_deg/*.fits"))
@@ -234,7 +244,18 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip0_230pt32_deg/*.fits"))
     file_names_strip_3_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip0_230pt32_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip0_230pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip0_230pt32_deg/*.fits"))
-
+    # now North/South stripes
+    file_names_strip_0V_of_4V_planetsInStrip0V_320pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip0V_320pt32_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip0V_320pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip0V_320pt32_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip0V_320pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip0V_320pt32_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip0V_320pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip0V_320pt32_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip0V_320pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip0V_320pt32_deg/*.fits"))
+    file_names_strip_0V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
+    import ipdb; ipdb.set_trace()
     # glob of file names of ADI frames with planets in strip 1 of 4, along 70.782 deg E of N and opposite 250.782 deg E of N
     file_names_strip_0_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip1_70pt782_deg/*.fits"))
     file_names_strip_1_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip1_70pt782_deg/*.fits"))
@@ -246,7 +267,18 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip1_250pt782_deg/*.fits"))
     file_names_strip_3_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip1_250pt782_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip1_250pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip1_250pt782_deg/*.fits"))
-
+    # now North/South stripes
+    file_names_strip_0V_of_4V_planetsInStrip1V_340pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip1V_340pt782_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip1V_340pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip1V_340pt782_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip1V_340pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip1V_340pt782_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip1V_340pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip1V_340pt782_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip1V_340pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip1V_340pt782_deg/*.fits"))
+    file_names_strip_0V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
+    import ipdb; ipdb.set_trace()
     # glob of file names of ADI frames with planets in strip 2 of 4, along 76.57 deg E of N and opposite 256.57 deg E of N
     file_names_strip_0_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip2_76pt57_deg/*.fits"))
     file_names_strip_1_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip2_76pt57_deg/*.fits"))
@@ -258,6 +290,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip2_256pt57_deg/*.fits"))
     file_names_strip_3_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip2_256pt57_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip2_256pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip2_256pt57_deg/*.fits"))
+    # now North/South stripes
+    file_names_strip_0V_of_4V_planetsInStrip2V_346pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip2V_346pt57_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip2V_346pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip2V_346pt57_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip2V_346pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip2V_346pt57_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip2V_346pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip2V_346pt57_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip2V_346pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip2V_346pt57_deg/*.fits"))
+    file_names_strip_0V_of_4V_planetsInStrip2V_166pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip2V_166pt57_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip2V_166pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip2V_166pt57_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip2V_166pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip2V_166pt57_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip2V_166pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip2V_166pt57_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip2V_166pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip2V_166pt57_deg/*.fits"))
 
     # glob of file names of ADI frames with planets in strip 3 of 4, along 83.37 deg E of N and opposite 263.37 deg E of N
     file_names_strip_0_of_4_planetsInStrip3_83pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip3_83pt37_deg/*.fits"))
@@ -270,6 +313,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip3_263pt37_deg/*.fits"))
     file_names_strip_3_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip3_263pt37_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip3_263pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip3_263pt37_deg/*.fits"))
+    # now North/South stripes
+    file_names_strip_0V_of_4V_planetsInStrip3V_353pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip3V_353pt37_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip3V_353pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip3V_353pt37_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip3V_353pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip3V_353pt37_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip3V_353pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip3V_353pt37_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip3V_353pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip3V_353pt37_deg/*.fits"))
+    file_names_strip_0V_of_4V_planetsInStrip3V_173pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip3V_173pt37_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip3V_173pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip3V_173pt37_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip3V_173pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip3V_173pt37_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip3V_173pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip3V_173pt37_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip3V_173pt37_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip3V_173pt37_deg/*.fits"))
 
     # glob of file names of ADI frames with planets in strip 4 of 4, along 90.04 deg E of N and opposite 270.04 deg E of N
     file_names_strip_0_of_4_planetsInStrip4_90pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip4_90pt04_deg/*.fits"))
@@ -282,7 +336,18 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2_of_4_planetsInStrip4_270pt04_deg/*.fits"))
     file_names_strip_3_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3_of_4_planetsInStrip4_270pt04_deg/*.fits"))
     file_names_strip_4_of_4_planetsInStrip4_270pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4_of_4_planetsInStrip4_270pt04_deg/*.fits"))
-
+    # now North/South stripes
+    file_names_strip_0V_of_4V_planetsInStrip4V_0pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip4V_0pt04_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip4V_0pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip4V_0pt04_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip4V_0pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip4V_0pt04_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip4V_0pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip4V_0pt04_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip4V_0pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip4V_0pt04_deg/*.fits"))
+    file_names_strip_0V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
+    file_names_strip_1V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
+    file_names_strip_2V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
+    file_names_strip_3V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
+    file_names_strip_4V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
+    import ipdb; ipdb.set_trace()
     # choose the arrays to use in the analysis
     if np.logical_and((stripe_w_planet == 0),(half_w_planet == "E")):
         # frames with planet along the E: East of North; i.e., 0<PA<180

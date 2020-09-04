@@ -633,8 +633,6 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_E,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                ## REMOVE THIS COMMENT
-                '''
                 file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1_of_4_E,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
@@ -647,11 +645,9 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4_E,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
-                '''
-                ## ## END COMMENT
             elif (half_w_planet == "W"):
                 # frames with planets along western arm of strip
-                file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_W,
+                file_name_strip_0_of_4_ = pluck_interesting_file_name(file_names_strip_0_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
                 file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1_of_4_W,
@@ -666,7 +662,41 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
-            #import ipdb; ipdb.set_trace()
+            elif (half_w_planet == "N"):
+                # frames with planets along western arm of strip
+                file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_N,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1V_of_4V_N,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2V_of_4V_N,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3V_of_4V_N,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4V_of_4V_N,
+                                                                    comp_ampl_pass=comp_ampl,
+                                                                    dist_asec_pass=dist_asec)
+            elif (half_w_planet == "S"):
+                # frames with planets along western arm of strip
+                file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_S,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1V_of_4V_S,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2V_of_4V_S,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3V_of_4V_S,
+                                                                     comp_ampl_pass=comp_ampl,
+                                                                     dist_asec_pass=dist_asec)
+                file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4V_of_4V_S,
+                                                                    comp_ampl_pass=comp_ampl,
+                                                                    dist_asec_pass=dist_asec)
+            import ipdb; ipdb.set_trace()
             ## read in and process the images with planets
             # ... these are the frames with planets along eastern arm of strip
 

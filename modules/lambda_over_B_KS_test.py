@@ -537,29 +537,27 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     col_names = ["dist_asec",
                 "comp_ampl",
                 "id_strip_w_planet",
-                "id_opposite_to_half_w_planet",
                 "D_xsec_strip_w_planets_rel_to_same_half_strip_wo_planet",
-                "D_xsec_strip_w_planets_rel_to_other_half_same_strip_with_planet",
-                "D_xsec_strip_w_planets_rel_to_strip_0_E",
-                "D_xsec_strip_w_planets_rel_to_strip_1_E",
-                "D_xsec_strip_w_planets_rel_to_strip_2_E",
-                "D_xsec_strip_w_planets_rel_to_strip_3_E",
-                "D_xsec_strip_w_planets_rel_to_strip_4_E",
-                "D_xsec_strip_w_planets_rel_to_strip_0_W",
-                "D_xsec_strip_w_planets_rel_to_strip_1_W",
-                "D_xsec_strip_w_planets_rel_to_strip_2_W",
-                "D_xsec_strip_w_planets_rel_to_strip_3_W",
-                "D_xsec_strip_w_planets_rel_to_strip_4_W",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_0_E",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_1_E",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_2_E",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_3_E",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_4_E",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_0_W",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_1_W",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_2_W",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_3_W",
-                "val_xsec_crit_strip_w_planets_rel_to_strip_4_W"]
+                "D_xsec_strip_w_planets_rel_to_strip_0_or_0V",
+                "D_xsec_strip_w_planets_rel_to_strip_1_or_1V",
+                "D_xsec_strip_w_planets_rel_to_strip_2_or_2V",
+                "D_xsec_strip_w_planets_rel_to_strip_3_or_3V",
+                "D_xsec_strip_w_planets_rel_to_strip_4_or_4V",
+                "D_xsec_strip_w_planets_rel_to_strip_0_or_0V",
+                "D_xsec_strip_w_planets_rel_to_strip_1_or_1V",
+                "D_xsec_strip_w_planets_rel_to_strip_2_or_2V",
+                "D_xsec_strip_w_planets_rel_to_strip_3_or_3V",
+                "D_xsec_strip_w_planets_rel_to_strip_4_or_4V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_0_or_0V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_1_or_1V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_2_or_2V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_3_or_3V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_4_or_4V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_0_or_0V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_1_or_1V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_2_or_2V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_3_or_3V",
+                "val_xsec_crit_strip_w_planets_rel_to_strip_4_or_4V"]
     ks_info_df = pd.DataFrame(columns = col_names)
 
     # generate lists of companion amplitudes and distances (asec) from host star
@@ -579,7 +577,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
     # loop over each combination of injected companion amplitude and radial distance
     ## ## (THIS IS KIND OF CLUNKY; IMPROVE LATER IF TIME)
-    comp_ampl_array = np.array([0.0001,0.000251188643,0.000630957344,0.00158489319,0.005,0.01,0.02,0.03,0.05,0.1,0.251188643,1.])
+    #comp_ampl_array = np.array([0.0001,0.000251188643,0.000630957344,0.00158489319,0.005,0.01,0.02,0.03,0.05,0.1,0.251188643,1.])
+    comp_ampl_array = np.array([0.005,0.01,0.02,0.03,0.05,0.1])
     dist_fwhm_array = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.])
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
@@ -597,6 +596,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     image_baseline_stripe_4 = fits.getdata(file_name_strip_4_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4 = shave_and_rotate(image_baseline_stripe_4,angle=0.04)
 
+    image_baseline_stripe_0V = fits.getdata(file_name_strip_0V_of_4V_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_0V = shave_and_rotate(image_baseline_stripe_0V,angle=50.32)
+    image_baseline_stripe_1V = fits.getdata(file_name_strip_1V_of_4V_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_1V = shave_and_rotate(image_baseline_stripe_1V,angle=70.782)
+    image_baseline_stripe_2V = fits.getdata(file_name_strip_2V_of_4V_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_2V = shave_and_rotate(image_baseline_stripe_2V,angle=76.57)
+    image_baseline_stripe_3V = fits.getdata(file_name_strip_3V_of_4V_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_3V = shave_and_rotate(image_baseline_stripe_3V,angle=83.37)
+    image_baseline_stripe_4V = fits.getdata(file_name_strip_4V_of_4V_baseline_no_planet,0,header=False)
+    baseline_processed_stripe_4V = shave_and_rotate(image_baseline_stripe_4V,angle=90.04)
+    import ipdb; ipdb.set_trace()
     # loop over all pairs of (amplitude,radius); note that the half (E/W) of the
     # strips in which the planet with that (amplitude,radius) sits is set by
     # the half_w_planet

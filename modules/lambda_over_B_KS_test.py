@@ -349,7 +349,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_4V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
     import ipdb; ipdb.set_trace()
     # choose the arrays to use in the analysis
-    if np.logical_and((stripe_w_planet == 0),(half_w_planet == "E")):
+    if np.logical_and((stripe_w_planet == "0"),(half_w_planet == "E")):
         # frames with planet along the E: East of North; i.e., 0<PA<180
         file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip0_50pt32_deg
         file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip0_50pt32_deg
@@ -357,7 +357,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_3_of_4_E = file_names_strip_3_of_4_planetsInStrip0_50pt32_deg
         file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip0_50pt32_deg
         plot_string = "stripe_w_planet_0E_"
-    elif np.logical_and((stripe_w_planet == 0),(half_w_planet == "W")):
+    elif np.logical_and((stripe_w_planet == "0"),(half_w_planet == "W")):
         # frames with planet along the W: West of North; i.e., 180<PA<360
         file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip0_230pt32_deg
         file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip0_230pt32_deg
@@ -366,7 +366,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip0_230pt32_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_0W_"
-    elif np.logical_and((stripe_w_planet == 1),(half_w_planet == "E")):
+    elif np.logical_and((stripe_w_planet == "1"),(half_w_planet == "E")):
         # E: East of North; i.e., 0<PA<180
         file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip1_70pt782_deg
         file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip1_70pt782_deg
@@ -375,7 +375,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip1_70pt782_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_1E_"
-    elif np.logical_and((stripe_w_planet == 1),(half_w_planet == "W")):
+    elif np.logical_and((stripe_w_planet == "1"),(half_w_planet == "W")):
         # W: West of North; i.e., 180<PA<360
         file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip1_250pt782_deg
         file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip1_250pt782_deg
@@ -384,7 +384,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip1_250pt782_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_1W_"
-    elif np.logical_and((stripe_w_planet == 2),(half_w_planet == "E")):
+    elif np.logical_and((stripe_w_planet == "2"),(half_w_planet == "E")):
         # E: East of North; i.e., 0<PA<180
         file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip2_76pt57_deg
         file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip2_76pt57_deg
@@ -393,7 +393,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip2_76pt57_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_2E_"
-    elif np.logical_and((stripe_w_planet == 2),(half_w_planet == "W")):
+    elif np.logical_and((stripe_w_planet == "2"),(half_w_planet == "W")):
         # W: West of North; i.e., 180<PA<360
         file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip2_256pt57_deg
         file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip2_256pt57_deg
@@ -402,7 +402,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip2_256pt57_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_2W_"
-    elif np.logical_and((stripe_w_planet == 3),(half_w_planet == "E")):
+    elif np.logical_and((stripe_w_planet == "3"),(half_w_planet == "E")):
         # E: East of North; i.e., 0<PA<180
         file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip3_83pt37_deg
         file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip3_83pt37_deg
@@ -411,7 +411,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip3_83pt37_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_3E_"
-    elif np.logical_and((stripe_w_planet == 3),(half_w_planet == "W")):
+    elif np.logical_and((stripe_w_planet == "3"),(half_w_planet == "W")):
         # W: West of North; i.e., 180<PA<360
         file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip3_263pt37_deg
         file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip3_263pt37_deg
@@ -420,7 +420,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip3_263pt37_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_3W_"
-    elif np.logical_and((stripe_w_planet == 4),(half_w_planet == "E")):
+    elif np.logical_and((stripe_w_planet == "4"),(half_w_planet == "E")):
         # E: East of North; i.e., 0<PA<180
         file_names_strip_0_of_4_E = file_names_strip_0_of_4_planetsInStrip4_90pt04_deg
         file_names_strip_1_of_4_E = file_names_strip_1_of_4_planetsInStrip4_90pt04_deg
@@ -429,7 +429,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_E = file_names_strip_4_of_4_planetsInStrip4_90pt04_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_4E_"
-    elif np.logical_and((stripe_w_planet == 4),(half_w_planet == "W")):
+    elif np.logical_and((stripe_w_planet == "4"),(half_w_planet == "W")):
         # W: West of North; i.e., 180<PA<360
         file_names_strip_0_of_4_W = file_names_strip_0_of_4_planetsInStrip4_270pt04_deg
         file_names_strip_1_of_4_W = file_names_strip_1_of_4_planetsInStrip4_270pt04_deg
@@ -438,8 +438,98 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         file_names_strip_4_of_4_W = file_names_strip_4_of_4_planetsInStrip4_270pt04_deg
         # for differentiating plot file names
         plot_string = "stripe_w_planet_4W_"
+    elif np.logical_and((stripe_w_planet == "0V"),(half_w_planet == "N")):
+        # frames with planet along the E: East of North; i.e., 0<PA<180
+        file_names_strip_0V_of_4V_N = file_names_strip_0V_of_4V_planetsInStrip0V_320pt32_deg
+        file_names_strip_1V_of_4V_N = file_names_strip_1V_of_4V_planetsInStrip0V_320pt32_deg
+        file_names_strip_2V_of_4V_N = file_names_strip_2V_of_4V_planetsInStrip0V_320pt32_deg
+        file_names_strip_3V_of_4V_N = file_names_strip_3V_of_4V_planetsInStrip0V_320pt32_deg
+        file_names_strip_4V_of_4V_N = file_names_strip_4V_of_4V_planetsInStrip0V_320pt32_deg
+        plot_string = "stripe_w_planet_0E_"
+    elif np.logical_and((stripe_w_planet == "0V"),(half_w_planet == "S")):
+        # frames with planet along the W: West of North; i.e., 180<PA<360
+        file_names_strip_0V_of_4V_S = file_names_strip_0V_of_4V_planetsInStrip0V_140pt32_deg
+        file_names_strip_1V_of_4V_S = file_names_strip_1V_of_4V_planetsInStrip0V_140pt32_deg
+        file_names_strip_2V_of_4V_S = file_names_strip_2V_of_4V_planetsInStrip0V_140pt32_deg
+        file_names_strip_3V_of_4V_S = file_names_strip_3V_of_4V_planetsInStrip0V_140pt32_deg
+        file_names_strip_4V_of_4V_S = file_names_strip_4V_of_4V_planetsInStrip0V_140pt32_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_0W_"
+    elif np.logical_and((stripe_w_planet == "1V"),(half_w_planet == "N")):
+        # E: East of North; i.e., 0<PA<180
+        file_names_strip_0V_of_4V_N = file_names_strip_0V_of_4V_planetsInStrip1V_340pt782_deg
+        file_names_strip_1V_of_4V_N = file_names_strip_1V_of_4V_planetsInStrip1V_340pt782_deg
+        file_names_strip_2V_of_4V_N = file_names_strip_2V_of_4V_planetsInStrip1V_340pt782_deg
+        file_names_strip_3V_of_4V_N = file_names_strip_3V_of_4V_planetsInStrip1V_340pt782_deg
+        file_names_strip_4V_of_4V_N = file_names_strip_4V_of_4V_planetsInStrip1V_340pt782_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_1E_"
+    elif np.logical_and((stripe_w_planet == "1V"),(half_w_planet == "S")):
+        # W: West of North; i.e., 180<PA<360
+        file_names_strip_0V_of_4V_S = file_names_strip_0V_of_4V_planetsInStrip1V_160pt782_deg
+        file_names_strip_1V_of_4V_S = file_names_strip_1V_of_4V_planetsInStrip1V_160pt782_deg
+        file_names_strip_2V_of_4V_S = file_names_strip_2V_of_4V_planetsInStrip1V_160pt782_deg
+        file_names_strip_3V_of_4V_S = file_names_strip_3V_of_4V_planetsInStrip1V_160pt782_deg
+        file_names_strip_4V_of_4V_S = file_names_strip_4V_of_4V_planetsInStrip1V_160pt782_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_1W_"
+    elif np.logical_and((stripe_w_planet == "2V"),(half_w_planet == "N")):
+        # E: East of North; i.e., 0<PA<180
+        file_names_strip_0V_of_4V_N = file_names_strip_0V_of_4V_planetsInStrip2V_346pt57_deg
+        file_names_strip_1V_of_4V_N = file_names_strip_1V_of_4V_planetsInStrip2V_346pt57_deg
+        file_names_strip_2V_of_4V_N = file_names_strip_2V_of_4V_planetsInStrip2V_346pt57_deg
+        file_names_strip_3V_of_4V_N = file_names_strip_3V_of_4V_planetsInStrip2V_346pt57_deg
+        file_names_strip_4V_of_4V_N = file_names_strip_4V_of_4V_planetsInStrip2V_346pt57_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_2E_"
+    elif np.logical_and((stripe_w_planet == "2V"),(half_w_planet == "S")):
+        # W: West of North; i.e., 180<PA<360
+        file_names_strip_0V_of_4V_S = file_names_strip_0V_of_4V_planetsInStrip2V_166pt57_deg
+        file_names_strip_1V_of_4V_S = file_names_strip_1V_of_4V_planetsInStrip2V_166pt57_deg
+        file_names_strip_2V_of_4V_S = file_names_strip_2V_of_4V_planetsInStrip2V_166pt57_deg
+        file_names_strip_3V_of_4V_S = file_names_strip_3V_of_4V_planetsInStrip2V_166pt57_deg
+        file_names_strip_4V_of_4V_S = file_names_strip_4V_of_4V_planetsInStrip2V_166pt57_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_2W_"
+    elif np.logical_and((stripe_w_planet == "3V"),(half_w_planet == "N")):
+        # E: East of North; i.e., 0<PA<180
+        file_names_strip_0V_of_4V_N = file_names_strip_0V_of_4V_planetsInStrip3V_353pt37_deg
+        file_names_strip_1V_of_4V_N = file_names_strip_1V_of_4V_planetsInStrip3V_353pt37_deg
+        file_names_strip_2V_of_4V_N = file_names_strip_2V_of_4V_planetsInStrip3V_353pt37_deg
+        file_names_strip_3V_of_4V_N = file_names_strip_3V_of_4V_planetsInStrip3V_353pt37_deg
+        file_names_strip_4V_of_4V_N = file_names_strip_4V_of_4V_planetsInStrip3V_353pt37_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_3E_"
+    elif np.logical_and((stripe_w_planet == "3V"),(half_w_planet == "S")):
+        # W: West of North; i.e., 180<PA<360
+        file_names_strip_0V_of_4V_S = file_names_strip_0V_of_4V_planetsInStrip3V_173pt37_deg
+        file_names_strip_1V_of_4V_S = file_names_strip_1V_of_4V_planetsInStrip3V_173pt37_deg
+        file_names_strip_2V_of_4V_S = file_names_strip_2V_of_4V_planetsInStrip3V_173pt37_deg
+        file_names_strip_3V_of_4V_S = file_names_strip_3V_of_4V_planetsInStrip3V_173pt37_deg
+        file_names_strip_4V_of_4V_S = file_names_strip_4V_of_4V_planetsInStrip3V_173pt37_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_3W_"
+    elif np.logical_and((stripe_w_planet == "4V"),(half_w_planet == "N")):
+        # E: East of North; i.e., 0<PA<180
+        file_names_strip_0V_of_4V_N = file_names_strip_0V_of_4V_planetsInStrip4V_0pt04_deg
+        file_names_strip_1V_of_4V_N = file_names_strip_1V_of_4V_planetsInStrip4V_0pt04_deg
+        file_names_strip_2V_of_4V_N = file_names_strip_2V_of_4V_planetsInStrip4V_0pt04_deg
+        file_names_strip_3V_of_4V_N = file_names_strip_3V_of_4V_planetsInStrip4V_0pt04_deg
+        file_names_strip_4V_of_4V_N = file_names_strip_4V_of_4V_planetsInStrip4V_0pt04_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_4E_"
+    elif np.logical_and((stripe_w_planet == "4V"),(half_w_planet == "S")):
+        # W: West of North; i.e., 180<PA<360
+        file_names_strip_0V_of_4V_S = file_names_strip_0V_of_4V_planetsInStrip4V_180pt04_deg
+        file_names_strip_1V_of_4V_S = file_names_strip_1V_of_4V_planetsInStrip4V_180pt04_deg
+        file_names_strip_2V_of_4V_S = file_names_strip_2V_of_4V_planetsInStrip4V_180pt04_deg
+        file_names_strip_3V_of_4V_S = file_names_strip_3V_of_4V_planetsInStrip4V_180pt04_deg
+        file_names_strip_4V_of_4V_S = file_names_strip_4V_of_4V_planetsInStrip4V_180pt04_deg
+        # for differentiating plot file names
+        plot_string = "stripe_w_planet_4W_"
     else:
         print("Don't know which lists of file names to use in the analysis!")
+    import ipdb; ipdb.set_trace()
     # name of the plot for the publication outside the for-loop below
     lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     #import ipdb; ipdb.set_trace()

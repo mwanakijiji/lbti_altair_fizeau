@@ -895,7 +895,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_E"])
                 ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_E"])
                 ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_E"])
-            elif (half_w_planet == "W")):
+            elif (half_w_planet == "W"):
                 ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_W"])
                 ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_W"])
                 ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_W"])

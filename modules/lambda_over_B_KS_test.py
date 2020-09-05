@@ -194,7 +194,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     # configuration data
     config = configparser.ConfigParser() # for parsing values in .init file
     config.read("./modules/config.ini")
-    import ipdb; ipdb.set_trace()
+
     # directory containing subdirectory of files of different stripes with injected planets
     stem_adi_frames_lambda_over_B = str(config["data_dirs"]["DIR_ADI_LAMBDA_B_W_PLANETS"])
     # directory of baseline frames with no injected planets
@@ -650,52 +650,95 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 file_name_strip_0_of_4_ = pluck_interesting_file_name(file_names_strip_0_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_0 = fits.getdata(file_name_strip_0_of_4,0,header=False)
+                img_processed_stripe_0 = shave_and_rotate(image_stripe_0,angle=-39.68)
+
                 file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_1 = fits.getdata(file_name_strip_1_of_4,0,header=False)
+                img_processed_stripe_1 = shave_and_rotate(image_stripe_1,angle=-39.68)
+
                 file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_2 = fits.getdata(file_name_strip_2_of_4,0,header=False)
+                img_processed_stripe_2 = shave_and_rotate(image_stripe_2,angle=-39.68)
+
                 file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_3 = fits.getdata(file_name_strip_3_of_4,0,header=False)
+                img_processed_stripe_3 = shave_and_rotate(image_stripe_3,angle=-39.68)
+
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=-39.68)
             elif (half_w_planet == "N"):
                 # frames with planets along western arm of strip
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=50.32)
+
                 file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=70.782)
+
                 file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=76.57)
+
                 file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=83.37)
+
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4V_of_4V_N,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=90.04)
             elif (half_w_planet == "S"):
                 # frames with planets along western arm of strip
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=50.32)
+
                 file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=70.782)
+
                 file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=76.57)
+
                 file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=83.37)
+
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4V_of_4V_S,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
+                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=90.04)
+
             import ipdb; ipdb.set_trace()
             ## read in and process the images with planets
             # ... these are the frames with planets along eastern arm of strip
@@ -707,11 +750,13 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             marginalization_dict = {}
             residuals_dict = {}
 
-            ## cross-sections
+            ## get residuals
             # baseline frames without planets: eastern halves and western halves
             # set down convention that host star is on the left side (i.e., 'east'
             # strips have to be flipped)
             import ipdb; ipdb.set_trace()
+            # note that input to return_residuals is a derotated array arranged
+            # so that E is on the left, W on the right
             baseline_processed_stripe_0_resids = return_residuals(baseline_processed_stripe_0)
             residuals_dict["baseline_strip_0_E"] = baseline_processed_stripe_0_resids[0]
             residuals_dict["baseline_strip_0_W"] = baseline_processed_stripe_0_resids[1]
@@ -751,7 +796,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             baseline_processed_stripe_4V_resids = return_residuals(baseline_processed_stripe_4V)
             residuals_dict["baseline_strip_4V_N"] = baseline_processed_stripe_4V_resids[0]
             residuals_dict["baseline_strip_4V_S"] = baseline_processed_stripe_4V_resids[1]
-
+            import ipdb; ipdb.set_trace()
             # cross-sections of frames from half-stripes where a fake planet exists
             if np.logical_or((half_w_planet == "E"),(half_w_planet == "W")):
                 img_processed_stripe_0_resids = return_residuals(img_processed_stripe_0)
@@ -812,8 +857,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 # (note flipping, since the planet is 'east')
                 image_injected_planet = np.flip(img_processed_stripe_0, axis=1)
                 # cross-sections (already flipped)
-                cross_sec_injected_planet = residuals_dict["strip_0_E"]
-                cross_sec_baseline = residuals_dict["baseline_strip_0_E"]
+                resids_1d_injected_planet = residuals_dict["strip_0_E"]
+                resids_1d_baseline = residuals_dict["baseline_strip_0_E"]
                 # we need to check for azimuthal variations that are not just
                 # due to phase changes between one stripe and another; so,
                 # here is a string for tagging the stats relevant to the opposite
@@ -822,99 +867,99 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 string_opposite_indicator = "strip_0_W"
             elif np.logical_and((stripe_w_planet == 0),(half_w_planet == "W")):
                 image_injected_planet = img_processed_stripe_0
-                cross_sec_injected_planet = residuals_dict["strip_0_W"]
-                cross_sec_baseline = residuals_dict["baseline_strip_0_W"]
+                resids_1d_injected_planet = residuals_dict["strip_0_W"]
+                resids_1d_baseline = residuals_dict["baseline_strip_0_W"]
                 string_w_planet_indicator = "strip_0_W"
                 string_opposite_indicator = "strip_0_E"
             elif np.logical_and((stripe_w_planet == 1),(half_w_planet == "E")):
                 image_injected_planet = np.flip(img_processed_stripe_1, axis=1) # note flipping of 'east' half
-                cross_sec_injected_planet = residuals_dict["strip_1_E"] # already flipped
-                cross_sec_baseline = residuals_dict["baseline_strip_1_E"] # already flipped
+                resids_1d_injected_planet = residuals_dict["strip_1_E"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_1_E"] # already flipped
                 string_w_planet_indicator = "strip_1_E"
                 string_opposite_indicator = "strip_1_W"
             elif np.logical_and((stripe_w_planet == 1),(half_w_planet == "W")):
                 image_injected_planet = img_processed_stripe_1
-                cross_sec_injected_planet = residuals_dict["strip_1_W"]
-                cross_sec_baseline = residuals_dict["baseline_strip_1_W"]
+                resids_1d_injected_planet = residuals_dict["strip_1_W"]
+                resids_1d_baseline = residuals_dict["baseline_strip_1_W"]
                 string_w_planet_indicator = "strip_1_W"
                 string_opposite_indicator = "strip_1_E"
             elif np.logical_and((stripe_w_planet == 2),(half_w_planet == "E")):
                 image_injected_planet = np.flip(img_processed_stripe_2, axis=1) # note flipping of 'east' half
-                cross_sec_injected_planet = residuals_dict["strip_2_E"] # already flipped
-                cross_sec_baseline = residuals_dict["baseline_strip_2_E"] # already flipped
+                resids_1d_injected_planet = residuals_dict["strip_2_E"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_2_E"] # already flipped
                 string_w_planet_indicator = "strip_2_E"
                 string_opposite_indicator = "strip_2_W"
             elif np.logical_and((stripe_w_planet == 2),(half_w_planet == "W")):
                 image_injected_planet = img_processed_stripe_2
-                cross_sec_injected_planet = residuals_dict["strip_2_W"]
-                cross_sec_baseline = residuals_dict["baseline_strip_2_W"]
+                resids_1d_injected_planet = residuals_dict["strip_2_W"]
+                resids_1d_baseline = residuals_dict["baseline_strip_2_W"]
                 string_w_planet_indicator = "strip_2_W"
                 string_opposite_indicator = "strip_2_E"
             elif np.logical_and((stripe_w_planet == 3),(half_w_planet == "E")):
                 image_injected_planet = np.flip(img_processed_stripe_3, axis=1) # note flipping of 'east' half
-                cross_sec_injected_planet = residuals_dict["strip_3_E"] # already flipped
-                cross_sec_baseline = residuals_dict["baseline_strip_3_E"] # already flipped
+                resids_1d_injected_planet = residuals_dict["strip_3_E"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_3_E"] # already flipped
                 string_w_planet_indicator = "strip_3_E"
                 string_opposite_indicator = "strip_3_W"
             elif np.logical_and((stripe_w_planet == 3),(half_w_planet == "W")):
                 image_injected_planet = img_processed_stripe_3
-                cross_sec_injected_planet = residuals_dict["strip_3_W"]
-                cross_sec_baseline = residuals_dict["baseline_strip_3_W"]
+                resids_1d_injected_planet = residuals_dict["strip_3_W"]
+                resids_1d_baseline = residuals_dict["baseline_strip_3_W"]
                 string_w_planet_indicator = "strip_3_W"
                 string_opposite_indicator = "strip_3_E"
             elif np.logical_and((stripe_w_planet == 4),(half_w_planet == "E")):
                 image_injected_planet = np.flip(img_processed_stripe_4, axis=1) # note flipping of 'east' half
-                cross_sec_injected_planet = residuals_dict["strip_4_E"] # already flipped
-                cross_sec_baseline = residuals_dict["baseline_strip_4_E"] # already flipped
+                resids_1d_injected_planet = residuals_dict["strip_4_E"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_4_E"] # already flipped
                 string_w_planet_indicator = "strip_4_E"
                 string_opposite_indicator = "strip_4_W"
             elif np.logical_and((stripe_w_planet == 4),(half_w_planet == "W")):
                 image_injected_planet = img_processed_stripe_4
-                cross_sec_injected_planet = residuals_dict["strip_4_W"]
-                cross_sec_baseline = residuals_dict["baseline_strip_4_W"]
+                resids_1d_injected_planet = residuals_dict["strip_4_W"]
+                resids_1d_baseline = residuals_dict["baseline_strip_4_W"]
                 string_w_planet_indicator = "strip_4_W"
                 string_opposite_indicator = "strip_4_E"
             else:
                 print("No strip with planet specified!")
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all
-            ks_compare_w_baseline = do_KS(cross_sec_injected_planet,cross_sec_baseline)
+            ks_compare_w_baseline = do_KS(resids_1d_injected_planet,resids_1d_baseline)
             # opposite half: comparison with the *opposite* side of the strip
             # with the planet injected
 
-            ks_compare_w_opposite = do_KS(cross_sec_injected_planet,residuals_dict[string_opposite_indicator])
+            ks_compare_w_opposite = do_KS(resids_1d_injected_planet,residuals_dict[string_opposite_indicator])
             # others: different strips with planets along the same angle
             # (note one of these will be a repeat of strip_opposite_ks_cross_sec,
             # which will be removed further downstream in the pipeline)
             #residuals_dict[string_opposite_indicator] = np.multiply(np.nan,residuals_dict[string_opposite_indicator])
             if (half_w_planet == "E"):
-                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_E"])
-                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_E"])
-                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_E"])
-                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_E"])
-                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_E"])
+                ks_compare_with_0 = do_KS(resids_1d_injected_planet,residuals_dict["strip_0_E"])
+                ks_compare_with_1 = do_KS(resids_1d_injected_planet,residuals_dict["strip_1_E"])
+                ks_compare_with_2 = do_KS(resids_1d_injected_planet,residuals_dict["strip_2_E"])
+                ks_compare_with_3 = do_KS(resids_1d_injected_planet,residuals_dict["strip_3_E"])
+                ks_compare_with_4 = do_KS(resids_1d_injected_planet,residuals_dict["strip_4_E"])
             elif (half_w_planet == "W"):
-                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_W"])
-                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_W"])
-                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_W"])
-                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_W"])
-                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_W"])
+                ks_compare_with_0 = do_KS(resids_1d_injected_planet,residuals_dict["strip_0_W"])
+                ks_compare_with_1 = do_KS(resids_1d_injected_planet,residuals_dict["strip_1_W"])
+                ks_compare_with_2 = do_KS(resids_1d_injected_planet,residuals_dict["strip_2_W"])
+                ks_compare_with_3 = do_KS(resids_1d_injected_planet,residuals_dict["strip_3_W"])
+                ks_compare_with_4 = do_KS(resids_1d_injected_planet,residuals_dict["strip_4_W"])
             elif (half_w_planet == "N"):
-                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0V_N"])
-                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1V_N"])
-                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2V_N"])
-                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3V_N"])
-                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4V_N"])
+                ks_compare_with_0 = do_KS(resids_1d_injected_planet,residuals_dict["strip_0V_N"])
+                ks_compare_with_1 = do_KS(resids_1d_injected_planet,residuals_dict["strip_1V_N"])
+                ks_compare_with_2 = do_KS(resids_1d_injected_planet,residuals_dict["strip_2V_N"])
+                ks_compare_with_3 = do_KS(resids_1d_injected_planet,residuals_dict["strip_3V_N"])
+                ks_compare_with_4 = do_KS(resids_1d_injected_planet,residuals_dict["strip_4V_N"])
             elif (half_w_planet == "S"):
-                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0V_S"])
-                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1V_S"])
-                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2V_S"])
-                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3V_S"])
-                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4V_S"])
+                ks_compare_with_0 = do_KS(resids_1d_injected_planet,residuals_dict["strip_0V_S"])
+                ks_compare_with_1 = do_KS(resids_1d_injected_planet,residuals_dict["strip_1V_S"])
+                ks_compare_with_2 = do_KS(resids_1d_injected_planet,residuals_dict["strip_2V_S"])
+                ks_compare_with_3 = do_KS(resids_1d_injected_planet,residuals_dict["strip_3V_S"])
+                ks_compare_with_4 = do_KS(resids_1d_injected_planet,residuals_dict["strip_4V_S"])
 
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
             # put stats into a dictionary; note there are entries corresponding to
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,
@@ -935,7 +980,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                     "val_crit_strip_w_planets_rel_to_strip_4": ks_compare_with_4[1]}
 
             ks_info_df.loc[len(ks_info_df)] = my_dic
-
+            import ipdb; ipdb.set_trace()
             '''
             print("dist_asec: " + str(np.round(dist_asec,3)))
             print("comp_ampl: " + str(np.round(comp_ampl,2)))

@@ -538,26 +538,16 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 "comp_ampl",
                 "id_strip_w_planet",
                 "D_strip_w_planets_rel_to_same_half_strip_wo_planet",
-                "D_strip_w_planets_rel_to_strip_0_or_0V",
-                "D_strip_w_planets_rel_to_strip_1_or_1V",
-                "D_strip_w_planets_rel_to_strip_2_or_2V",
-                "D_strip_w_planets_rel_to_strip_3_or_3V",
-                "D_strip_w_planets_rel_to_strip_4_or_4V",
-                "D_strip_w_planets_rel_to_strip_0_or_0V",
-                "D_strip_w_planets_rel_to_strip_1_or_1V",
-                "D_strip_w_planets_rel_to_strip_2_or_2V",
-                "D_strip_w_planets_rel_to_strip_3_or_3V",
-                "D_strip_w_planets_rel_to_strip_4_or_4V",
-                "val_crit_strip_w_planets_rel_to_strip_0_or_0V",
-                "val_crit_strip_w_planets_rel_to_strip_1_or_1V",
-                "val_crit_strip_w_planets_rel_to_strip_2_or_2V",
-                "val_crit_strip_w_planets_rel_to_strip_3_or_3V",
-                "val_crit_strip_w_planets_rel_to_strip_4_or_4V",
-                "val_crit_strip_w_planets_rel_to_strip_0_or_0V",
-                "val_crit_strip_w_planets_rel_to_strip_1_or_1V",
-                "val_crit_strip_w_planets_rel_to_strip_2_or_2V",
-                "val_crit_strip_w_planets_rel_to_strip_3_or_3V",
-                "val_crit_strip_w_planets_rel_to_strip_4_or_4V"]
+                "D_strip_w_planets_rel_to_strip_0",
+                "D_strip_w_planets_rel_to_strip_1",
+                "D_strip_w_planets_rel_to_strip_2",
+                "D_strip_w_planets_rel_to_strip_3",
+                "D_strip_w_planets_rel_to_strip_4",
+                "val_crit_strip_w_planets_rel_to_strip_0",
+                "val_crit_strip_w_planets_rel_to_strip_1",
+                "val_crit_strip_w_planets_rel_to_strip_2",
+                "val_crit_strip_w_planets_rel_to_strip_3",
+                "val_crit_strip_w_planets_rel_to_strip_4"]
     ks_info_df = pd.DataFrame(columns = col_names)
 
     # generate lists of companion amplitudes and distances (asec) from host star
@@ -890,37 +880,39 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all
-            strip_baseline_ks_cross_sec = do_KS(cross_sec_injected_planet,cross_sec_baseline)
+            ks_compare_w_baseline = do_KS(cross_sec_injected_planet,cross_sec_baseline)
             # opposite half: comparison with the *opposite* side of the strip
             # with the planet injected
 
-            strip_opposite_ks_cross_sec = do_KS(cross_sec_injected_planet,residuals_dict[string_opposite_indicator])
+            ks_compare_w_opposite = do_KS(cross_sec_injected_planet,residuals_dict[string_opposite_indicator])
             # others: different strips with planets along the same angle
             # (note one of these will be a repeat of strip_opposite_ks_cross_sec,
             # which will be removed further downstream in the pipeline)
             #residuals_dict[string_opposite_indicator] = np.multiply(np.nan,residuals_dict[string_opposite_indicator])
-            if np.logical_or((half_w_planet == "E"),(half_w_planet == "W")):
-                ks_compare_with_0_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_E"])
-                ks_compare_with_1_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_E"])
-                ks_compare_with_2_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_E"])
-                ks_compare_with_3_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_E"])
-                ks_compare_with_4_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_E"])
-                ks_compare_with_0_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_W"])
-                ks_compare_with_1_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_W"])
-                ks_compare_with_2_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_W"])
-                ks_compare_with_3_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_W"])
-                ks_compare_with_4_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_W"])
-            elif np.logical_or((half_w_planet == "N"),(half_w_planet == "S")):
-                ks_compare_with_0_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_0V_N"])
-                ks_compare_with_1_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_1V_N"])
-                ks_compare_with_2_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_2V_N"])
-                ks_compare_with_3_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_3V_N"])
-                ks_compare_with_4_E_or_N = do_KS(cross_sec_injected_planet,residuals_dict["strip_4V_N"])
-                ks_compare_with_0_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_0V_N"])
-                ks_compare_with_1_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_1V_N"])
-                ks_compare_with_2_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_2V_N"])
-                ks_compare_with_3_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_3V_N"])
-                ks_compare_with_4_W_or_S = do_KS(cross_sec_injected_planet,residuals_dict["strip_4V_N"])
+            if (half_w_planet == "E"):
+                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_E"])
+                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_E"])
+                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_E"])
+                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_E"])
+                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_E"])
+            elif (half_w_planet == "W")):
+                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0_W"])
+                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1_W"])
+                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2_W"])
+                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3_W"])
+                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4_W"])
+            elif (half_w_planet == "N"):
+                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0V_N"])
+                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1V_N"])
+                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2V_N"])
+                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3V_N"])
+                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4V_N"])
+            elif (half_w_planet == "S"):
+                ks_compare_with_0 = do_KS(cross_sec_injected_planet,residuals_dict["strip_0V_S"])
+                ks_compare_with_1 = do_KS(cross_sec_injected_planet,residuals_dict["strip_1V_S"])
+                ks_compare_with_2 = do_KS(cross_sec_injected_planet,residuals_dict["strip_2V_S"])
+                ks_compare_with_3 = do_KS(cross_sec_injected_planet,residuals_dict["strip_3V_S"])
+                ks_compare_with_4 = do_KS(cross_sec_injected_planet,residuals_dict["strip_4V_S"])
 
             #import ipdb; ipdb.set_trace()
             # put stats into a dictionary; note there are entries corresponding to
@@ -929,23 +921,18 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                     "comp_ampl": comp_ampl,
                     "id_strip_w_planet": string_w_planet_indicator,
                     "id_opposite_to_half_w_planet": string_opposite_indicator,
-                    "D_strip_w_planets_rel_to_same_half_strip_wo_planet": strip_baseline_ks_cross_sec[0],
-                    "D_strip_w_planets_rel_to_other_half_same_strip_with_planet": strip_opposite_ks_cross_sec[0],
-                    "D_strip_w_planets_rel_to_strip_0_or_0V": strip_0_ks_cross_sec_E[0],
-                    "D_strip_w_planets_rel_to_strip_1_or_1V": strip_1_ks_cross_sec_E[0],
-                    "D_strip_w_planets_rel_to_strip_2_or_2V": strip_2_ks_cross_sec_E[0],
-                    "D_strip_w_planets_rel_to_strip_3_or_3V": strip_3_ks_cross_sec_E[0],
-                    "D_strip_w_planets_rel_to_strip_4_or_4V": strip_4_ks_cross_sec_E[0],
-                    "val_crit_strip_w_planets_rel_to_strip_0_E": strip_0_ks_cross_sec_E[1],
-                    "val_crit_strip_w_planets_rel_to_strip_1_E": strip_1_ks_cross_sec_E[1],
-                    "val_crit_strip_w_planets_rel_to_strip_2_E": strip_2_ks_cross_sec_E[1],
-                    "val_crit_strip_w_planets_rel_to_strip_3_E": strip_3_ks_cross_sec_E[1],
-                    "val_crit_strip_w_planets_rel_to_strip_4_E": strip_4_ks_cross_sec_E[1],
-                    "val_crit_strip_w_planets_rel_to_strip_0_W": strip_0_ks_cross_sec_W[1],
-                    "val_crit_strip_w_planets_rel_to_strip_1_W": strip_1_ks_cross_sec_W[1],
-                    "val_crit_strip_w_planets_rel_to_strip_2_W": strip_2_ks_cross_sec_W[1],
-                    "val_crit_strip_w_planets_rel_to_strip_3_W": strip_3_ks_cross_sec_W[1],
-                    "val_crit_strip_w_planets_rel_to_strip_4_W": strip_4_ks_cross_sec_W[1]}
+                    "D_strip_w_planets_rel_to_same_half_strip_wo_planet": ks_compare_w_baseline[0],
+                    "D_strip_w_planets_rel_to_other_half_same_strip_with_planet": ks_compare_w_opposite[0],
+                    "D_strip_w_planets_rel_to_strip_0": ks_compare_with_0[0],
+                    "D_strip_w_planets_rel_to_strip_1": ks_compare_with_1[0],
+                    "D_strip_w_planets_rel_to_strip_2": ks_compare_with_2[0],
+                    "D_strip_w_planets_rel_to_strip_3": ks_compare_with_3[0],
+                    "D_strip_w_planets_rel_to_strip_4": ks_compare_with_4[0],
+                    "val_crit_strip_w_planets_rel_to_strip_0": ks_compare_with_0[1],
+                    "val_crit_strip_w_planets_rel_to_strip_1": ks_compare_with_1[1],
+                    "val_crit_strip_w_planets_rel_to_strip_2": ks_compare_with_2[1],
+                    "val_crit_strip_w_planets_rel_to_strip_3": ks_compare_with_3[1],
+                    "val_crit_strip_w_planets_rel_to_strip_4": ks_compare_with_4[1]}
 
             ks_info_df.loc[len(ks_info_df)] = my_dic
 

@@ -858,13 +858,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 # image of the injected stripe, with the planet to the right, for FYI plot
                 # (note flipping, since the planet is 'east')
                 image_injected_planet = np.flip(img_processed_stripe_0, axis=1)
-                # cross-sections (already flipped)
                 resids_1d_injected_planet = residuals_dict["strip_0_E"]
                 resids_1d_baseline = residuals_dict["baseline_strip_0_E"]
-                # we need to check for azimuthal variations that are not just
-                # due to phase changes between one stripe and another; so,
-                # here is a string for tagging the stats relevant to the opposite
-                # half of the stripe which has the planet injected
                 string_w_planet_indicator = "strip_0_E"
                 string_opposite_indicator = "strip_0_W"
             elif np.logical_and((stripe_w_planet == "0"),(half_w_planet == "W")):
@@ -1011,8 +1006,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             # planet location in pixels to indicate in plot
             planet_loc_pix = np.divide(dist_asec,float(config["instrum_params"]["LMIR_PS"]))
 
-            f, ((ax1, ax2, ax3, ax4, ax5, ax6), (ax1cdf, ax2cdf, ax3cdf, ax4cdf, ax5cdf, ax6cdf),
-                (ax7, ax8, ax9, ax10, ax11, ax12), (ax7cdf, ax8cdf, ax9cdf, ax10cdf, ax11cdf, ax12cdf)) = plt.subplots(4, 6, figsize=(24, 32))
+            f, ((ax1, ax2, ax3, ax4, ax5, ax6, ax7),
+                (ax1cdf, ax2cdf, ax3cdf, ax4cdf, ax5cdf, ax6cdf, ax7cdf)) = plt.subplots(2, 7, figsize=(24, 32))
 
             # top row: 2D color plot and cross-sections
             # second row: CDFs
@@ -1025,21 +1020,21 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             # plot cross-sections and their differences between different strips
             ax2.plot(residuals_dict["strip_0_E"], label="strip_0_E")
-            ax2.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax2.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_0_E"]), label="diff")
+            ax2.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
+            ax2.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_0_E"]), label="diff")
             ax2.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax2.set_ylim([-2000,2000])
             ax2.legend()
-            ax2.set_title("Cross-sec rel. to strip 0, E\nD = "
-                          + str(np.round(strip_0_ks_cross_sec_E[0],4))
-                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_E[1],4))
-                          + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_E[2],4)))
+            ax2.set_title("Resids rel. to strip 0, E\nD = "
+                          + str(np.round(ks_compare_with_0[0],4))
+                          + ",\nval_crit = " + str(np.round(ks_compare_with_0[1],4))
+                          + ",\np_val = " + str(np.round(ks_compare_with_0[2],4)))
             #import ipdb; ipdb.set_trace()
 
             # cdfs
             cdf_strip = discrete_cdf(residuals_dict["strip_0_E"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax2cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax2cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
             #ax2cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
@@ -1047,19 +1042,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax2cdf.set_title("CDF")
 
             ax3.plot(residuals_dict["strip_1_E"], label="strip_1_E")
-            ax3.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax3.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_1_E"]), label="diff")
+            ax3.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
+            ax3.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_1_E"]), label="diff")
             ax3.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax3.set_ylim([-2000,2000])
             ax3.legend()
-            ax3.set_title("Cross-sec rel. to strip 1, E\nD = "
-                          + str(np.round(strip_1_ks_cross_sec_E[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_1_ks_cross_sec_E[1],4)) + ",\np_val = "
-                          + str(np.round(strip_1_ks_cross_sec_E[2],4)))
+            ax3.set_title("Resids rel. to strip 1, E\nD = "
+                          + str(np.round(ks_compare_with_1[0],4)) + ",\nval_crit = "
+                          + str(np.round(ks_compare_with_1[1],4)) + ",\np_val = "
+                          + str(np.round(ks_compare_with_1[2],4)))
 
             cdf_strip = discrete_cdf(residuals_dict["strip_1_E"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax3cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax3cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
             #ax3cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
@@ -1068,19 +1063,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
 
             ax4.plot(residuals_dict["strip_2_E"], label="strip_2_E")
-            ax4.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax4.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_2_E"]), label="diff")
+            ax4.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
+            ax4.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_2_E"]), label="diff")
             ax4.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax4.set_ylim([-2000,2000])
             ax4.legend()
-            ax4.set_title("Cross-sec rel. to strip 2, E\nD = "
-                          + str(np.round(strip_2_ks_cross_sec_E[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_2_ks_cross_sec_E[1],4)) + ",\np_val = "
-                          + str(np.round(strip_2_ks_cross_sec_E[2],4)))
+            ax4.set_title("Resids rel. to strip 2, E\nD = "
+                          + str(np.round(ks_compare_with_2[0],4)) + ",\nval_crit = "
+                          + str(np.round(ks_compare_with_2[1],4)) + ",\np_val = "
+                          + str(np.round(ks_compare_with_2[2],4)))
 
             cdf_strip = discrete_cdf(residuals_dict["strip_2_E"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax4cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax4cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
             #ax4cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
@@ -1089,19 +1084,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
 
             ax5.plot(residuals_dict["strip_3_E"], label="strip_3_E")
-            ax5.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax5.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_3_E"]), label="diff")
+            ax5.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
+            ax5.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_3_E"]), label="diff")
             ax5.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax5.set_ylim([-2000,2000])
             ax5.legend()
-            ax5.set_title("Cross-sec rel. to strip 3, E\nD = "
-                          + str(np.round(strip_3_ks_cross_sec_E[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_3_ks_cross_sec_E[1],4)) + ",\np_val = "
-                          + str(np.round(strip_3_ks_cross_sec_E[2],4)))
+            ax5.set_title("Resids rel. to strip 3, E\nD = "
+                          + str(np.round(ks_compare_with_3[0],4)) + ",\nval_crit = "
+                          + str(np.round(ks_compare_with_3[1],4)) + ",\np_val = "
+                          + str(np.round(ks_compare_with_3[2],4)))
 
             cdf_strip = discrete_cdf(residuals_dict["strip_3_E"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax5cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax5cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
             #ax5cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
@@ -1110,19 +1105,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
 
             ax6.plot(residuals_dict["strip_4_E"], label="strip_4_E")
-            ax6.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax6.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_4_E"]), label="diff")
+            ax6.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
+            ax6.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_4_E"]), label="diff")
             ax6.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax6.set_ylim([-2000,2000])
             ax6.legend()
-            ax6.set_title("Cross-sec rel. to strip 4, E\nD = "
-                          + str(np.round(strip_4_ks_cross_sec_E[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_4_ks_cross_sec_E[1],4)) + ",\np_val = "
-                          + str(np.round(strip_4_ks_cross_sec_E[2],4)))
+            ax6.set_title("Resids rel. to strip 4, E\nD = "
+                          + str(np.round(ks_compare_with_4[0],4)) + ",\nval_crit = "
+                          + str(np.round(ks_compare_with_4[1],4)) + ",\np_val = "
+                          + str(np.round(ks_compare_with_4[2],4)))
 
             cdf_strip = discrete_cdf(residuals_dict["strip_4_E"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax6cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax6cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
             #ax6cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
@@ -1132,118 +1127,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             # bottom-left (ax7): baseline
             ax7.plot(cross_sec_baseline, label="baseline w/o planet")
-            ax7.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax7.plot(np.subtract(cross_sec_injected_planet,cross_sec_baseline), label="diff")
+            ax7.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
+            ax7.plot(np.subtract(resids_1d_injected_planet,cross_sec_baseline), label="diff")
             ax7.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax7.set_ylim([-2000,2000])
             ax7.legend()
-            ax7.set_title("Cross-sec rel. to baseline, E\nD = "
+            ax7.set_title("Resids rel. to baseline, E\nD = "
                           + str(np.round(strip_baseline_ks_cross_sec[0],4)) + ",\nval_crit = "
                           + str(np.round(strip_baseline_ks_cross_sec[1],4)) + ",\np_val = "
                           + str(np.round(strip_baseline_ks_cross_sec[2],4)))
 
-            # plot cross-sections and their differences between different strips
-            ax8.plot(residuals_dict["strip_0_W"], label="strip_0_W")
-            ax8.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax8.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_0_W"]), label="diff")
-            ax8.axvline(x=planet_loc_pix,
-                linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax8.set_ylim([-2000,2000])
-            ax8.legend()
-            ax8.set_title("Cross-sec rel. to strip 0, W\nD = "
-                          + str(np.round(strip_0_ks_cross_sec_W[0],4))
-                          + ",\nval_crit = " + str(np.round(strip_0_ks_cross_sec_W[1],4))
-                          + ",\np_val = " + str(np.round(strip_0_ks_cross_sec_W[2],4)))
-
-            cdf_strip = discrete_cdf(residuals_dict["strip_0_W"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
-            ax8cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
-            ax8cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            #ax8cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
-            ax8cdf.legend()
-            ax8cdf.set_title("CDF")
-
-            ax9.plot(residuals_dict["strip_1_W"], label="strip_1_W")
-            ax9.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax9.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_1_W"]), label="diff")
-            ax9.axvline(x=planet_loc_pix,
-                linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax9.set_ylim([-2000,2000])
-            ax9.legend()
-            ax9.set_title("Cross-sec rel. to strip 1, W\nD = "
-                          + str(np.round(strip_1_ks_cross_sec_W[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_1_ks_cross_sec_W[1],4)) + ",\np_val = "
-                          + str(np.round(strip_1_ks_cross_sec_W[2],4)))
-
-            cdf_strip = discrete_cdf(residuals_dict["strip_1_W"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
-            ax9cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
-            ax9cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            #ax9cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
-            ax9cdf.legend()
-            ax9cdf.set_title("CDF")
-
-
-            ax10.plot(residuals_dict["strip_2_W"], label="strip_2_W")
-            ax10.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax10.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_2_W"]), label="diff")
-            ax10.axvline(x=planet_loc_pix,
-                linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax10.set_ylim([-2000,2000])
-            ax10.legend()
-            ax10.set_title("Cross-sec rel. to strip 2, W\nD = "
-                          + str(np.round(strip_2_ks_cross_sec_W[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_2_ks_cross_sec_W[1],4)) + ",\np_val = "
-                          + str(np.round(strip_2_ks_cross_sec_W[2],4)))
-
-            cdf_strip = discrete_cdf(residuals_dict["strip_2_W"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
-            ax10cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
-            ax10cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            #ax10cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
-            ax10cdf.legend()
-            ax10cdf.set_title("CDF")
-
-            ax11.plot(residuals_dict["strip_3_W"], label="strip_3_W")
-            ax11.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax11.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_3_W"]), label="diff")
-            ax11.axvline(x=planet_loc_pix,
-                linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax11.set_ylim([-2000,2000])
-            ax11.legend()
-            ax11.set_title("Cross-sec rel. to strip 3, W\nD = "
-                          + str(np.round(strip_3_ks_cross_sec_W[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_3_ks_cross_sec_W[1],4)) + ",\np_val = "
-                          + str(np.round(strip_3_ks_cross_sec_W[2],4)))
-
-            cdf_strip = discrete_cdf(residuals_dict["strip_3_W"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
-            ax11cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
-            ax11cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            #ax11cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
-            ax11cdf.legend()
-            ax11cdf.set_title("CDF")
-
-            ax12.plot(residuals_dict["strip_4_W"], label="strip_4_W")
-            ax12.plot(cross_sec_injected_planet, label="cross_sec_injected_planet")
-            ax12.plot(np.subtract(cross_sec_injected_planet,residuals_dict["strip_4_W"]), label="diff")
-            ax12.axvline(x=planet_loc_pix,
-                linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax12.set_ylim([-2000,2000])
-            ax12.legend()
-            ax12.set_title("Cross-sec rel. to strip 4, W\nD = "
-                          + str(np.round(strip_4_ks_cross_sec_W[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_4_ks_cross_sec_W[1],4)) + ",\np_val = "
-                          + str(np.round(strip_4_ks_cross_sec_W[2],4)))
-
-            cdf_strip = discrete_cdf(residuals_dict["strip_4_W"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
-            ax12cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
-            ax12cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
-            #ax12cdf.plot(np.subtract(cdf_inj[1],cdf_strip[1]), label="diff")
-            ax12cdf.legend()
-            ax12cdf.set_title("CDF")
 
             #f.suptitle(plot_file_name_prefix + os.path.basename(file_name_array_choice[file_num]))
             #plt.tight_layout()
@@ -1255,7 +1149,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             # make zoomed-in plot of one of the subplots
             cdf_strip = discrete_cdf(residuals_dict["strip_4_W"])
-            cdf_inj = discrete_cdf(cross_sec_injected_planet)
+            cdf_inj = discrete_cdf(resids_1d_injected_planet)
             cdf_strip_interp = np.interp(cdf_inj[0],cdf_strip[0],cdf_strip[1]) # interpolate to find differences
             plt.plot(cdf_inj[0],cdf_strip_interp,label="strip in question")
             plt.plot(cdf_inj[0],cdf_inj[1],label="strip w planet")

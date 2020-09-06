@@ -806,18 +806,23 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             # cross-sections of frames from half-stripes where a fake planet exists
             if np.logical_or((half_w_planet == "E"),(half_w_planet == "W")):
                 img_processed_stripe_0_resids = return_residuals(img_processed_stripe_0)
+                fyi_image_stripe_0 = np.copy(img_processed_stripe_0) # for FYI plots
                 residuals_dict["strip_0_E"] = img_processed_stripe_0_resids[0]
                 residuals_dict["strip_0_W"] = img_processed_stripe_0_resids[1]
                 img_processed_stripe_1_resids = return_residuals(img_processed_stripe_1)
+                fyi_image_stripe_1 = np.copy(img_processed_stripe_1) # for FYI plots
                 residuals_dict["strip_1_E"] = img_processed_stripe_1_resids[0]
                 residuals_dict["strip_1_W"] = img_processed_stripe_1_resids[1]
                 img_processed_stripe_2_resids = return_residuals(img_processed_stripe_2)
+                fyi_image_stripe_2 = np.copy(img_processed_stripe_2) # for FYI plots
                 residuals_dict["strip_2_E"] = img_processed_stripe_2_resids[0]
                 residuals_dict["strip_2_W"] = img_processed_stripe_2_resids[1]
                 img_processed_stripe_3_resids = return_residuals(img_processed_stripe_3)
+                fyi_image_stripe_3 = np.copy(img_processed_stripe_3) # for FYI plots
                 residuals_dict["strip_3_E"] = img_processed_stripe_3_resids[0]
                 residuals_dict["strip_3_W"] = img_processed_stripe_3_resids[1]
                 img_processed_stripe_4_resids = return_residuals(img_processed_stripe_4)
+                fyi_image_stripe_4 = np.copy(img_processed_stripe_4) # for FYI plots
                 residuals_dict["strip_4_E"] = img_processed_stripe_4_resids[0]
                 residuals_dict["strip_4_W"] = img_processed_stripe_4_resids[1]
                 residuals_dict["strip_0V_E"] = -9999
@@ -842,18 +847,23 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 residuals_dict["strip_4_E"] = -9999
                 residuals_dict["strip_4_W"] = -9999
                 img_processed_stripe_0V_resids = return_residuals(img_processed_stripe_0V)
+                fyi_image_stripe_0 = np.copy(img_processed_stripe_0V) # for FYI plots
                 residuals_dict["strip_0V_E"] = img_processed_stripe_0V_resids[0]
                 residuals_dict["strip_0V_W"] = img_processed_stripe_0V_resids[1]
                 img_processed_stripe_1V_resids = return_residuals(img_processed_stripe_1V)
+                fyi_image_stripe_1 = np.copy(img_processed_stripe_1V) # for FYI plots
                 residuals_dict["strip_1V_E"] = img_processed_stripe_1V_resids[0]
                 residuals_dict["strip_1V_W"] = img_processed_stripe_1V_resids[1]
                 img_processed_stripe_2V_resids = return_residuals(img_processed_stripe_2V)
+                fyi_image_stripe_2 = np.copy(img_processed_stripe_2V) # for FYI plots
                 residuals_dict["strip_2V_E"] = img_processed_stripe_2V_resids[0]
                 residuals_dict["strip_2V_W"] = img_processed_stripe_2V_resids[1]
                 img_processed_stripe_3V_resids = return_residuals(img_processed_stripe_3V)
+                fyi_image_stripe_3 = np.copy(img_processed_stripe_3V) # for FYI plots
                 residuals_dict["strip_3V_E"] = img_processed_stripe_3V_resids[0]
                 residuals_dict["strip_3V_W"] = img_processed_stripe_3V_resids[1]
                 img_processed_stripe_4V_resids = return_residuals(img_processed_stripe_4V)
+                fyi_image_stripe_4 = np.copy(img_processed_stripe_4V) # for FYI plots
                 residuals_dict["strip_4V_E"] = img_processed_stripe_4V_resids[0]
                 residuals_dict["strip_4V_W"] = img_processed_stripe_4V_resids[1]
 
@@ -1009,6 +1019,27 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             #import ipdb; ipdb.set_trace()
             # planet location in pixels to indicate in plot
             planet_loc_pix = np.divide(dist_asec,float(config["instrum_params"]["LMIR_PS"]))
+
+            # make plot of the stripes
+            f_2d, ((ax0_2d, ax1_2d, ax2_2d), (ax3_2d, ax4_2d, ax5_2d)) = plt.subplots(2, 3, figsize=(24, 36))
+            ax0_2d.imshow(img_processed_stripe_0, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+            ax0_2d.set_title("img_processed_stripe_0")
+            ax1_2d.imshow(img_processed_stripe_1, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+            ax1_2d.set_title("img_processed_stripe_1")
+            ax2_2d.imshow(img_processed_stripe_2, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+            ax2_2d.set_title("img_processed_stripe_2")
+            ax3_2d.imshow(img_processed_stripe_3, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+            ax3_2d.set_title("img_processed_stripe_3")
+            ax4_2d.imshow(img_processed_stripe_4, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+            ax4_2d.set_title("img_processed_stripe_4")
+
+            stripes_filename = "stripes_" + new_filename
+            plt.savefig(stripes_filename, dpi=150)
+            plt.close()
+            print("Wrote FYI plot of stripes as " + stripes_filename)
+
+
+            plt.clf()
 
             f, ((ax1, ax2, ax3, ax4, ax5, ax6, ax7),
                 (ax1cdf, ax2cdf, ax3cdf, ax4cdf, ax5cdf, ax6cdf, ax7cdf)) = plt.subplots(2, 7, figsize=(24, 32))

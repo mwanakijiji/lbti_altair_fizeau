@@ -1126,17 +1126,17 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
 
             # bottom-left (ax7): baseline
-            ax7.plot(cross_sec_baseline, label="baseline w/o planet")
+            ax7.plot(resids_1d_baseline, label="baseline w/o planet")
             ax7.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
-            ax7.plot(np.subtract(resids_1d_injected_planet,cross_sec_baseline), label="diff")
+            ax7.plot(np.subtract(resids_1d_injected_planet,resids_1d_baseline), label="diff")
             ax7.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax7.set_ylim([-2000,2000])
             ax7.legend()
             ax7.set_title("Resids rel. to baseline, E\nD = "
-                          + str(np.round(strip_baseline_ks_cross_sec[0],4)) + ",\nval_crit = "
-                          + str(np.round(strip_baseline_ks_cross_sec[1],4)) + ",\np_val = "
-                          + str(np.round(strip_baseline_ks_cross_sec[2],4)))
+                          + str(np.round(ks_compare_w_baseline[0],4)) + ",\nval_crit = "
+                          + str(np.round(ks_compare_w_baseline[1],4)) + ",\np_val = "
+                          + str(np.round(ks_compare_w_baseline[2],4)))
 
 
             #f.suptitle(plot_file_name_prefix + os.path.basename(file_name_array_choice[file_num]))

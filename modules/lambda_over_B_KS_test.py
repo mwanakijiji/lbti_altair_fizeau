@@ -225,7 +225,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         "strip_3V_of_4V_no_planets.fits"
     file_name_strip_4V_of_4V_baseline_no_planet = stem_adi_frames_lambda_over_B_no_planets + \
         "strip_4V_of_4V_no_planets.fits"
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # files where planets are injected along the strip 0 of 4, along 129.68 deg E of N)
     # glob of file names of ADI frames of A block strip 0 of 4
     file_names_strip_0_of_4_planetsInStrip0_50pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip0_50pt32_deg/*.fits"))
@@ -255,7 +255,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
     file_names_strip_3V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
     file_names_strip_4V_of_4V_planetsInStrip0V_140pt32_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip0V_140pt32_deg/*.fits"))
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # glob of file names of ADI frames with planets in strip 1 of 4, along 70.782 deg E of N and opposite 250.782 deg E of N
     file_names_strip_0_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip1_70pt782_deg/*.fits"))
     file_names_strip_1_of_4_planetsInStrip1_70pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip1_70pt782_deg/*.fits"))
@@ -278,7 +278,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
     file_names_strip_3V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
     file_names_strip_4V_of_4V_planetsInStrip1V_160pt782_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip1V_160pt782_deg/*.fits"))
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # glob of file names of ADI frames with planets in strip 2 of 4, along 76.57 deg E of N and opposite 256.57 deg E of N
     file_names_strip_0_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_0_of_4_planetsInStrip2_76pt57_deg/*.fits"))
     file_names_strip_1_of_4_planetsInStrip2_76pt57_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_1_of_4_planetsInStrip2_76pt57_deg/*.fits"))
@@ -347,7 +347,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     file_names_strip_2V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_2V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
     file_names_strip_3V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_3V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
     file_names_strip_4V_of_4V_planetsInStrip4V_180pt04_deg = list(glob.glob(stem_adi_frames_lambda_over_B+"pa_corrxn_jobs_strip_4V_of_4V_planetsInStrip4V_180pt04_deg/*.fits"))
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # choose the arrays to use in the analysis
     if np.logical_and((stripe_w_planet == "0"),(half_w_planet == "E")):
         # frames with planet along the E: East of North; i.e., 0<PA<180
@@ -529,7 +529,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
         plot_string = "stripe_w_planet_4W_"
     else:
         print("Don't know which lists of file names to use in the analysis!")
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # name of the plot for the publication outside the for-loop below
     lambda_over_B_pub_plot_filename_suffix = plot_string + "pub_plot.pdf"
     #import ipdb; ipdb.set_trace()
@@ -598,7 +598,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     baseline_processed_stripe_3V = shave_and_rotate(image_baseline_stripe_3V,angle=83.37)
     image_baseline_stripe_4V = fits.getdata(file_name_strip_4V_of_4V_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4V = shave_and_rotate(image_baseline_stripe_4V,angle=90.04)
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # loop over all pairs of (amplitude,radius); note that the half (E/W) of the
     # strips in which the planet with that (amplitude,radius) sits is set by
     # the half_w_planet
@@ -620,7 +620,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             ## pluck out the interesting file names
             # frames with planets along eastern arm of strip
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             if (half_w_planet == "E"):
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_E,
                                                                      comp_ampl_pass=comp_ampl,
@@ -741,7 +741,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
                 img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=90.04)
 
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             ## read in and process the images with planets
             # ... these are the frames with planets along eastern arm of strip
 
@@ -798,7 +798,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             baseline_processed_stripe_4V_resids = return_residuals(baseline_processed_stripe_4V)
             residuals_dict["baseline_strip_4V_N"] = baseline_processed_stripe_4V_resids[0]
             residuals_dict["baseline_strip_4V_S"] = baseline_processed_stripe_4V_resids[1]
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # cross-sections of frames from half-stripes where a fake planet exists
             if np.logical_or((half_w_planet == "E"),(half_w_planet == "W")):
                 img_processed_stripe_0_resids = return_residuals(img_processed_stripe_0)
@@ -853,7 +853,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 residuals_dict["strip_4V_E"] = img_processed_stripe_4V_resids[0]
                 residuals_dict["strip_4V_W"] = img_processed_stripe_4V_resids[1]
 
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             if np.logical_and((stripe_w_planet == "0"),(half_w_planet == "E")):
                 # image of the injected stripe, with the planet to the right, for FYI plot
                 # (note flipping, since the planet is 'east')
@@ -918,7 +918,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 string_opposite_indicator = "strip_4_E"
             else:
                 print("No strip with planet specified!")
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             ## calculate relevant quantities, put them into dataframe
             # KS statistic from cross-sections
             # baseline: comparison with same strip but without any planet at all
@@ -956,7 +956,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 ks_compare_with_3 = do_KS(resids_1d_injected_planet,residuals_dict["strip_3V_S"])
                 ks_compare_with_4 = do_KS(resids_1d_injected_planet,residuals_dict["strip_4V_S"])
 
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # put stats into a dictionary; note there are entries corresponding to
             # injected planets on the E and W arms of the strips
             my_dic = {"dist_asec": dist_asec,
@@ -977,7 +977,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                     "val_crit_strip_w_planets_rel_to_strip_4": ks_compare_with_4[1]}
 
             ks_info_df.loc[len(ks_info_df)] = my_dic
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             '''
             print("dist_asec: " + str(np.round(dist_asec,3)))
             print("comp_ampl: " + str(np.round(comp_ampl,2)))

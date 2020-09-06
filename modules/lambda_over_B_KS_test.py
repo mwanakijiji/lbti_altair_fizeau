@@ -85,7 +85,7 @@ def return_residuals(array_loaded):
     array_relevant = np.copy(array_loaded)
     array_relevant[:42,:] = np.nan
     array_relevant[65:,:] = np.nan
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # convolve with a smoothing function? I've decided against it for now...
 
     # make grid to define center

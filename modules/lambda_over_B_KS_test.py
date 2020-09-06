@@ -79,9 +79,12 @@ def return_residuals(array_loaded):
     '''
 
     # remove ~zeros from consideration
+    #array_relevant = np.copy(array_loaded)
+    #array_relevant[np.abs(array_loaded)<1e-10] = np.nan
+    # (the below is a kludge, since the above method was not working well)
     array_relevant = np.copy(array_loaded)
-    array_relevant[np.abs(array_loaded)<1e-10] = np.nan
-
+    array_relevant[:192,:] = np.nan
+    array_relevant[214:,:] = np.nan
     # convolve with a smoothing function? I've decided against it for now...
 
     # make grid to define center
@@ -145,7 +148,7 @@ def return_residuals(array_loaded):
         radial_max_array_E[rad_central] = max_E
         radial_max_array_W[rad_central] = max_W
 
-    return radial_max_array_E, radial_max_array_W
+    return radial_median_array_E, radial_median_array_W
 
 
 def do_KS(empirical_sample_1,empirical_sample_2):

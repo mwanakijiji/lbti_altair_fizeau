@@ -1002,7 +1002,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             ##############################################
             ## BEGIN GIANT BLOCK OF CODE TO MAKE A PLOT
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # planet location in pixels to indicate in plot
             planet_loc_pix = np.divide(dist_asec,float(config["instrum_params"]["LMIR_PS"]))
 

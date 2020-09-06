@@ -1024,7 +1024,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax2.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_0_E"]), label="diff")
             ax2.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax2.set_ylim([-2000,2000])
+            ax2.set_ylim([-200,200])
             ax2.legend()
             ax2.set_title("Resids rel. to strip 0, E\nD = "
                           + str(np.round(ks_compare_with_0[0],4))
@@ -1046,7 +1046,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax3.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_1_E"]), label="diff")
             ax3.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax3.set_ylim([-2000,2000])
+            ax3.set_ylim([-200,200])
             ax3.legend()
             ax3.set_title("Resids rel. to strip 1, E\nD = "
                           + str(np.round(ks_compare_with_1[0],4)) + ",\nval_crit = "
@@ -1067,7 +1067,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax4.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_2_E"]), label="diff")
             ax4.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax4.set_ylim([-2000,2000])
+            ax4.set_ylim([-200,200])
             ax4.legend()
             ax4.set_title("Resids rel. to strip 2, E\nD = "
                           + str(np.round(ks_compare_with_2[0],4)) + ",\nval_crit = "
@@ -1088,7 +1088,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax5.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_3_E"]), label="diff")
             ax5.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax5.set_ylim([-2000,2000])
+            ax5.set_ylim([-200,200])
             ax5.legend()
             ax5.set_title("Resids rel. to strip 3, E\nD = "
                           + str(np.round(ks_compare_with_3[0],4)) + ",\nval_crit = "
@@ -1109,7 +1109,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax6.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_4_E"]), label="diff")
             ax6.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax6.set_ylim([-2000,2000])
+            ax6.set_ylim([-200,200])
             ax6.legend()
             ax6.set_title("Resids rel. to strip 4, E\nD = "
                           + str(np.round(ks_compare_with_4[0],4)) + ",\nval_crit = "
@@ -1131,7 +1131,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax7.plot(np.subtract(resids_1d_injected_planet,resids_1d_baseline), label="diff")
             ax7.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
-            ax7.set_ylim([-2000,2000])
+            ax7.set_ylim([-200,200])
             ax7.legend()
             ax7.set_title("Resids rel. to baseline, E\nD = "
                           + str(np.round(ks_compare_w_baseline[0],4)) + ",\nval_crit = "

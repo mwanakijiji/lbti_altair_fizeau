@@ -1085,16 +1085,28 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             # make plot of the stripes
             f_2d, ((ax0_2d, ax1_2d, ax2_2d), (ax3_2d, ax4_2d, ax5_2d)) = plt.subplots(2, 3, figsize=(24, 36))
-            ax0_2d.imshow(img_processed_stripe_0, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
-            ax0_2d.set_title("img_processed_stripe_0")
-            ax1_2d.imshow(img_processed_stripe_1, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
-            ax1_2d.set_title("img_processed_stripe_1")
-            ax2_2d.imshow(img_processed_stripe_2, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
-            ax2_2d.set_title("img_processed_stripe_2")
-            ax3_2d.imshow(img_processed_stripe_3, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
-            ax3_2d.set_title("img_processed_stripe_3")
-            ax4_2d.imshow(img_processed_stripe_4, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
-            ax4_2d.set_title("img_processed_stripe_4")
+            if np.logical_or((half_w_planet == "E"),(half_w_planet == "W")):
+                ax0_2d.imshow(img_processed_stripe_0, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax0_2d.set_title("img_processed_stripe_0")
+                ax1_2d.imshow(img_processed_stripe_1, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax1_2d.set_title("img_processed_stripe_1")
+                ax2_2d.imshow(img_processed_stripe_2, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax2_2d.set_title("img_processed_stripe_2")
+                ax3_2d.imshow(img_processed_stripe_3, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax3_2d.set_title("img_processed_stripe_3")
+                ax4_2d.imshow(img_processed_stripe_4, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax4_2d.set_title("img_processed_stripe_4")
+            elif np.logical_or((half_w_planet == "N"),(half_w_planet == "S")):
+                ax0_2d.imshow(img_processed_stripe_0V, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax0_2d.set_title("img_processed_stripe_0V")
+                ax1_2d.imshow(img_processed_stripe_1V, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax1_2d.set_title("img_processed_stripe_1V")
+                ax2_2d.imshow(img_processed_stripe_2V, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax2_2d.set_title("img_processed_stripe_2V")
+                ax3_2d.imshow(img_processed_stripe_3V, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax3_2d.set_title("img_processed_stripe_3V")
+                ax4_2d.imshow(img_processed_stripe_4V, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
+                ax4_2d.set_title("img_processed_stripe_4V")
 
             stripes_filename = "stripes_" + new_filename
             plt.savefig(stripes_filename, dpi=150)

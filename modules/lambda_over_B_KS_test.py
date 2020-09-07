@@ -826,16 +826,16 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 fyi_image_stripe_4 = np.copy(img_processed_stripe_4) # for FYI plots
                 residuals_dict["strip_4_E"] = img_processed_stripe_4_resids[0]
                 residuals_dict["strip_4_W"] = img_processed_stripe_4_resids[1]
-                residuals_dict["strip_0V_E"] = -9999
-                residuals_dict["strip_0V_W"] = -9999
-                residuals_dict["strip_1V_E"] = -9999
-                residuals_dict["strip_1V_W"] = -9999
-                residuals_dict["strip_2V_E"] = -9999
-                residuals_dict["strip_2V_W"] = -9999
-                residuals_dict["strip_3V_E"] = -9999
-                residuals_dict["strip_3V_W"] = -9999
-                residuals_dict["strip_4V_E"] = -9999
-                residuals_dict["strip_4V_W"] = -9999
+                residuals_dict["strip_0V_N"] = -9999
+                residuals_dict["strip_0V_S"] = -9999
+                residuals_dict["strip_1V_N"] = -9999
+                residuals_dict["strip_1V_S"] = -9999
+                residuals_dict["strip_2V_N"] = -9999
+                residuals_dict["strip_2V_S"] = -9999
+                residuals_dict["strip_3V_N"] = -9999
+                residuals_dict["strip_3V_S"] = -9999
+                residuals_dict["strip_4V_N"] = -9999
+                residuals_dict["strip_4V_S"] = -9999
             elif np.logical_or((half_w_planet == "N"),(half_w_planet == "S")):
                 residuals_dict["strip_0_E"] = -9999
                 residuals_dict["strip_0_W"] = -9999
@@ -849,24 +849,24 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 residuals_dict["strip_4_W"] = -9999
                 img_processed_stripe_0V_resids = return_residuals(img_processed_stripe_0V)
                 fyi_image_stripe_0 = np.copy(img_processed_stripe_0V) # for FYI plots
-                residuals_dict["strip_0V_E"] = img_processed_stripe_0V_resids[0]
-                residuals_dict["strip_0V_W"] = img_processed_stripe_0V_resids[1]
+                residuals_dict["strip_0V_N"] = img_processed_stripe_0V_resids[0]
+                residuals_dict["strip_0V_S"] = img_processed_stripe_0V_resids[1]
                 img_processed_stripe_1V_resids = return_residuals(img_processed_stripe_1V)
                 fyi_image_stripe_1 = np.copy(img_processed_stripe_1V) # for FYI plots
-                residuals_dict["strip_1V_E"] = img_processed_stripe_1V_resids[0]
-                residuals_dict["strip_1V_W"] = img_processed_stripe_1V_resids[1]
+                residuals_dict["strip_1V_N"] = img_processed_stripe_1V_resids[0]
+                residuals_dict["strip_1V_S"] = img_processed_stripe_1V_resids[1]
                 img_processed_stripe_2V_resids = return_residuals(img_processed_stripe_2V)
                 fyi_image_stripe_2 = np.copy(img_processed_stripe_2V) # for FYI plots
-                residuals_dict["strip_2V_E"] = img_processed_stripe_2V_resids[0]
-                residuals_dict["strip_2V_W"] = img_processed_stripe_2V_resids[1]
+                residuals_dict["strip_2V_N"] = img_processed_stripe_2V_resids[0]
+                residuals_dict["strip_2V_S"] = img_processed_stripe_2V_resids[1]
                 img_processed_stripe_3V_resids = return_residuals(img_processed_stripe_3V)
                 fyi_image_stripe_3 = np.copy(img_processed_stripe_3V) # for FYI plots
-                residuals_dict["strip_3V_E"] = img_processed_stripe_3V_resids[0]
-                residuals_dict["strip_3V_W"] = img_processed_stripe_3V_resids[1]
+                residuals_dict["strip_3V_N"] = img_processed_stripe_3V_resids[0]
+                residuals_dict["strip_3V_S"] = img_processed_stripe_3V_resids[1]
                 img_processed_stripe_4V_resids = return_residuals(img_processed_stripe_4V)
                 fyi_image_stripe_4 = np.copy(img_processed_stripe_4V) # for FYI plots
-                residuals_dict["strip_4V_E"] = img_processed_stripe_4V_resids[0]
-                residuals_dict["strip_4V_W"] = img_processed_stripe_4V_resids[1]
+                residuals_dict["strip_4V_N"] = img_processed_stripe_4V_resids[0]
+                residuals_dict["strip_4V_S"] = img_processed_stripe_4V_resids[1]
 
             #import ipdb; ipdb.set_trace()
             if np.logical_and((stripe_w_planet == "0"),(half_w_planet == "E")):

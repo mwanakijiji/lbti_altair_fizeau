@@ -92,11 +92,11 @@ convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
 # lambda/B tests
 
 lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "E",write_csv_basename = "junk_test_0E.csv")
-'''
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "E",read_csv_basename = "test_0E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "W",write_csv_basename = "test_0W.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "W",read_csv_basename = "test_0W.csv")
 '''
+
 lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "N",write_csv_basename = "junk_test_0VN.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "0V",half_w_planet = "N",read_csv_basename = "test_0VN.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "S",write_csv_basename = "test_0VS.csv")
@@ -106,7 +106,7 @@ lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "E",write_csv_b
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "1",half_w_planet = "E",read_csv_basename = "test_1E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "W",write_csv_basename = "test_1W.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "1",half_w_planet = "W",read_csv_basename = "test_1W.csv")
-'''
+
 lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "N",write_csv_basename = "test_1VN.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "1V",half_w_planet = "N",read_csv_basename = "test_1VN.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "S",write_csv_basename = "test_1VS.csv")

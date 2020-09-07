@@ -653,7 +653,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=0.04)
             elif (half_w_planet == "W"):
                 # frames with planets along western arm of strip
-                file_name_strip_0_of_4_ = pluck_interesting_file_name(file_names_strip_0_of_4_W,
+                file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
                 image_stripe_0 = fits.getdata(file_name_strip_0_of_4,0,header=False)

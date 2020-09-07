@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 def shave_and_rotate(img, angle):
     '''
     Shave off edges of frames (to get rid of the NaNs) and rotate
+    such that E is on the left, W on the right
     '''
 
     # shave off this much of the edges
@@ -663,25 +664,25 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
                 image_stripe_1 = fits.getdata(file_name_strip_1_of_4,0,header=False)
-                img_processed_stripe_1 = shave_and_rotate(image_stripe_1,angle=-39.68)
+                img_processed_stripe_1 = shave_and_rotate(image_stripe_1,angle=-19.218)
 
                 file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
                 image_stripe_2 = fits.getdata(file_name_strip_2_of_4,0,header=False)
-                img_processed_stripe_2 = shave_and_rotate(image_stripe_2,angle=-39.68)
+                img_processed_stripe_2 = shave_and_rotate(image_stripe_2,angle=-13.43)
 
                 file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3_of_4_W,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
                 image_stripe_3 = fits.getdata(file_name_strip_3_of_4,0,header=False)
-                img_processed_stripe_3 = shave_and_rotate(image_stripe_3,angle=-39.68)
+                img_processed_stripe_3 = shave_and_rotate(image_stripe_3,angle=-6.63)
 
                 file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4_of_4_W,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
                 image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=-39.68)
+                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=0.04)
             elif (half_w_planet == "N"):
                 # frames with planets along western arm of strip
                 file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_N,

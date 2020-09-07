@@ -1119,6 +1119,31 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             f, ((ax1, ax2, ax3, ax4, ax5, ax6, ax7),
                 (ax1cdf, ax2cdf, ax3cdf, ax4cdf, ax5cdf, ax6cdf, ax7cdf)) = plt.subplots(2, 7, figsize=(24, 32))
 
+            if (half_w_planet == "E"):
+                residuals_moniker_0 = "strip_0_E"
+                residuals_moniker_1 = "strip_1_E"
+                residuals_moniker_2 = "strip_2_E"
+                residuals_moniker_3 = "strip_3_E"
+                residuals_moniker_4 = "strip_4_E"
+            elif (half_w_planet == "W"):
+                residuals_moniker_0 = "strip_0_W"
+                residuals_moniker_1 = "strip_1_W"
+                residuals_moniker_2 = "strip_2_W"
+                residuals_moniker_3 = "strip_3_W"
+                residuals_moniker_4 = "strip_4_W"
+            elif (half_w_planet == "N"):
+                residuals_moniker_0 = "strip_0V_N"
+                residuals_moniker_1 = "strip_1V_N"
+                residuals_moniker_2 = "strip_2V_N"
+                residuals_moniker_3 = "strip_3V_N"
+                residuals_moniker_4 = "strip_4V_N"
+            elif (half_w_planet == "S"):
+                residuals_moniker_0 = "strip_0V_S"
+                residuals_moniker_1 = "strip_1V_S"
+                residuals_moniker_2 = "strip_2V_S"
+                residuals_moniker_3 = "strip_3V_S"
+                residuals_moniker_4 = "strip_4V_S"
+
             # top row: 2D color plot and cross-sections
             # second row: CDFs
 
@@ -1129,21 +1154,21 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             #plt.colorbar(subplot1)
 
             # plot cross-sections and their differences between different strips
-            ax2.plot(residuals_dict["strip_0_E"], label="strip_0_E")
+            ax2.plot(residuals_dict[residuals_moniker_0], label=residuals_moniker_0)
             ax2.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
-            ax2.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_0_E"]), label="diff")
+            ax2.plot(np.subtract(resids_1d_injected_planet,residuals_dict[residuals_moniker_0]), label="diff")
             ax2.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax2.set_ylim([-2000,2000])
             ax2.legend()
-            ax2.set_title("Resids rel. to strip 0, E\nD = "
+            ax2.set_title("Resids rel. to "+residuals_moniker_0+", E\nD = "
                           + str(np.round(ks_compare_with_0[0],4))
                           + ",\nval_crit = " + str(np.round(ks_compare_with_0[1],4))
                           + ",\np_val = " + str(np.round(ks_compare_with_0[2],4)))
             #import ipdb; ipdb.set_trace()
 
             # cdfs
-            cdf_strip = discrete_cdf(residuals_dict["strip_0_E"])
+            cdf_strip = discrete_cdf(residuals_dict[residuals_moniker_0])
             cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax2cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax2cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
@@ -1151,19 +1176,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax2cdf.legend()
             ax2cdf.set_title("CDF")
 
-            ax3.plot(residuals_dict["strip_1_E"], label="strip_1_E")
+            ax3.plot(residuals_dict[residuals_moniker_1], label=residuals_moniker_1)
             ax3.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
-            ax3.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_1_E"]), label="diff")
+            ax3.plot(np.subtract(resids_1d_injected_planet,residuals_dict[residuals_moniker_1]), label="diff")
             ax3.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax3.set_ylim([-2000,2000])
             ax3.legend()
-            ax3.set_title("Resids rel. to strip 1, E\nD = "
+            ax3.set_title("Resids rel. to "+residuals_moniker_1+", E\nD = "
                           + str(np.round(ks_compare_with_1[0],4)) + ",\nval_crit = "
                           + str(np.round(ks_compare_with_1[1],4)) + ",\np_val = "
                           + str(np.round(ks_compare_with_1[2],4)))
 
-            cdf_strip = discrete_cdf(residuals_dict["strip_1_E"])
+            cdf_strip = discrete_cdf(residuals_dict[residuals_moniker_1])
             cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax3cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax3cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
@@ -1172,19 +1197,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax3cdf.set_title("CDF")
 
 
-            ax4.plot(residuals_dict["strip_2_E"], label="strip_2_E")
+            ax4.plot(residuals_dict[residuals_moniker_2], label=residuals_moniker_2)
             ax4.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
-            ax4.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_2_E"]), label="diff")
+            ax4.plot(np.subtract(resids_1d_injected_planet,residuals_dict[residuals_moniker_2]), label="diff")
             ax4.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax4.set_ylim([-2000,2000])
             ax4.legend()
-            ax4.set_title("Resids rel. to strip 2, E\nD = "
+            ax4.set_title("Resids rel. to "+residuals_moniker_2+", E\nD = "
                           + str(np.round(ks_compare_with_2[0],4)) + ",\nval_crit = "
                           + str(np.round(ks_compare_with_2[1],4)) + ",\np_val = "
                           + str(np.round(ks_compare_with_2[2],4)))
 
-            cdf_strip = discrete_cdf(residuals_dict["strip_2_E"])
+            cdf_strip = discrete_cdf(residuals_dict[residuals_moniker_2])
             cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax4cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax4cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
@@ -1193,19 +1218,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax4cdf.set_title("CDF")
 
 
-            ax5.plot(residuals_dict["strip_3_E"], label="strip_3_E")
+            ax5.plot(residuals_dict[residuals_moniker_3], label=residuals_moniker_3)
             ax5.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
-            ax5.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_3_E"]), label="diff")
+            ax5.plot(np.subtract(resids_1d_injected_planet,residuals_dict[residuals_moniker_3]), label="diff")
             ax5.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax5.set_ylim([-2000,2000])
             ax5.legend()
-            ax5.set_title("Resids rel. to strip 3, E\nD = "
+            ax5.set_title("Resids rel. to "+residuals_moniker_3+", E\nD = "
                           + str(np.round(ks_compare_with_3[0],4)) + ",\nval_crit = "
                           + str(np.round(ks_compare_with_3[1],4)) + ",\np_val = "
                           + str(np.round(ks_compare_with_3[2],4)))
 
-            cdf_strip = discrete_cdf(residuals_dict["strip_3_E"])
+            cdf_strip = discrete_cdf(residuals_dict[residuals_moniker_3])
             cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax5cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax5cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
@@ -1214,19 +1239,19 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             ax5cdf.set_title("CDF")
 
 
-            ax6.plot(residuals_dict["strip_4_E"], label="strip_4_E")
+            ax6.plot(residuals_dict[residuals_moniker_4], label=residuals_moniker_4)
             ax6.plot(resids_1d_injected_planet, label="resids_1d_injected_planet")
-            ax6.plot(np.subtract(resids_1d_injected_planet,residuals_dict["strip_4_E"]), label="diff")
+            ax6.plot(np.subtract(resids_1d_injected_planet,residuals_dict[residuals_moniker_4]), label="diff")
             ax6.axvline(x=planet_loc_pix,
                 linestyle=":", color="k", linewidth=4, alpha=0.4)
             ax6.set_ylim([-2000,2000])
             ax6.legend()
-            ax6.set_title("Resids rel. to strip 4, E\nD = "
+            ax6.set_title("Resids rel. to "+residuals_moniker_4+", E\nD = "
                           + str(np.round(ks_compare_with_4[0],4)) + ",\nval_crit = "
                           + str(np.round(ks_compare_with_4[1],4)) + ",\np_val = "
                           + str(np.round(ks_compare_with_4[2],4)))
 
-            cdf_strip = discrete_cdf(residuals_dict["strip_4_E"])
+            cdf_strip = discrete_cdf(residuals_dict[residuals_moniker_4])
             cdf_inj = discrete_cdf(resids_1d_injected_planet)
             ax6cdf.plot(cdf_strip[0], cdf_strip[1], label="strip cdf")
             ax6cdf.plot(cdf_inj[0], cdf_inj[1], label="injected cdf")
@@ -1248,7 +1273,6 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                           + str(np.round(ks_compare_w_baseline[1],4)) + ",\np_val = "
                           + str(np.round(ks_compare_w_baseline[2],4)))
 
-
             #f.suptitle(plot_file_name_prefix + os.path.basename(file_name_array_choice[file_num]))
             #plt.tight_layout()
             plt.savefig(new_filename, dpi=150)
@@ -1258,7 +1282,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             print("Saved " + new_filename)
 
             # make zoomed-in plot of one of the subplots
-            cdf_strip = discrete_cdf(residuals_dict["strip_4_W"])
+            cdf_strip = discrete_cdf(residuals_dict[residuals_moniker_3])
             cdf_inj = discrete_cdf(resids_1d_injected_planet)
             cdf_strip_interp = np.interp(cdf_inj[0],cdf_strip[0],cdf_strip[1]) # interpolate to find differences
             plt.plot(cdf_inj[0],cdf_strip_interp,label="strip in question")
@@ -1269,7 +1293,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
             plt.plot(cdf_inj[0], diff_abs, label="diff")
             plt.xlim([-500,2500])
             plt.legend()
-            plt.title("max abs diff: " + str(diff_abs[max_index]))
+            plt.title(residuals_moniker_3 + "\nmax abs diff: " + str(diff_abs[max_index]))
             plt.savefig("zoom_in_" + new_filename)
             plt.close()
             print("Saved " + "zoom_in_" + new_filename)

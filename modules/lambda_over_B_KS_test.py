@@ -685,66 +685,66 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=0.04)
             elif (half_w_planet == "N"):
                 # frames with planets along western arm of strip
-                file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_N,
+                file_name_strip_0V_of_4V = pluck_interesting_file_name(file_names_strip_0V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=50.32)
+                image_stripe_0V = fits.getdata(file_name_strip_0V_of_4V,0,header=False)
+                img_processed_stripe_0V = shave_and_rotate(image_stripe_0V,angle=50.32)
 
-                file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1V_of_4V_N,
+                file_name_strip_1V_of_4V = pluck_interesting_file_name(file_names_strip_1V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=70.782)
+                image_stripe_1V = fits.getdata(file_name_strip_1V_of_4V,0,header=False)
+                img_processed_stripe_1V = shave_and_rotate(image_stripe_1V,angle=70.782)
 
-                file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2V_of_4V_N,
+                file_name_strip_2V_of_4V = pluck_interesting_file_name(file_names_strip_2V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=76.57)
+                image_stripe_2V = fits.getdata(file_name_strip_2V_of_4V,0,header=False)
+                img_processed_stripe_2V = shave_and_rotate(image_stripe_2V,angle=76.57)
 
-                file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3V_of_4V_N,
+                file_name_strip_3V_of_4V = pluck_interesting_file_name(file_names_strip_3V_of_4V_N,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=83.37)
+                image_stripe_3V = fits.getdata(file_name_strip_3V_of_4V,0,header=False)
+                img_processed_stripe_3V = shave_and_rotate(image_stripe_3V,angle=83.37)
 
-                file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4V_of_4V_N,
+                file_name_strip_4V_of_4V = pluck_interesting_file_name(file_names_strip_4V_of_4V_N,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=90.04)
+                image_stripe_4V = fits.getdata(file_name_strip_4V_of_4V,0,header=False)
+                img_processed_stripe_4V = shave_and_rotate(image_stripe_4V,angle=90.04)
             elif (half_w_planet == "S"):
                 # frames with planets along western arm of strip
-                file_name_strip_0_of_4 = pluck_interesting_file_name(file_names_strip_0V_of_4V_S,
+                file_name_strip_0V_of_4V = pluck_interesting_file_name(file_names_strip_0V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=50.32)
+                image_stripe_0V = fits.getdata(file_name_strip_0V_of_4V,0,header=False)
+                img_processed_stripe_0V = shave_and_rotate(image_stripe_0V,angle=50.32)
 
-                file_name_strip_1_of_4 = pluck_interesting_file_name(file_names_strip_1V_of_4V_S,
+                file_name_strip_1V_of_4V = pluck_interesting_file_name(file_names_strip_1V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=70.782)
+                image_stripe_1V = fits.getdata(file_name_strip_1V_of_4V,0,header=False)
+                img_processed_stripe_1V = shave_and_rotate(image_stripe_1V,angle=70.782)
 
-                file_name_strip_2_of_4 = pluck_interesting_file_name(file_names_strip_2V_of_4V_S,
+                file_name_strip_2V_of_4V = pluck_interesting_file_name(file_names_strip_2V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=76.57)
+                image_stripe_2V = fits.getdata(file_name_strip_2V_of_4V,0,header=False)
+                img_processed_stripe_2V = shave_and_rotate(image_stripe_2V,angle=76.57)
 
-                file_name_strip_3_of_4 = pluck_interesting_file_name(file_names_strip_3V_of_4V_S,
+                file_name_strip_3V_of_4V = pluck_interesting_file_name(file_names_strip_3V_of_4V_S,
                                                                      comp_ampl_pass=comp_ampl,
                                                                      dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=83.37)
+                image_stripe_3V = fits.getdata(file_name_strip_3V_of_4V,0,header=False)
+                img_processed_stripe_3V = shave_and_rotate(image_stripe_3V,angle=83.37)
 
-                file_name_strip_4_of_4 = pluck_interesting_file_name(file_names_strip_4V_of_4V_S,
+                file_name_strip_4V_of_4V = pluck_interesting_file_name(file_names_strip_4V_of_4V_S,
                                                                     comp_ampl_pass=comp_ampl,
                                                                     dist_asec_pass=dist_asec)
-                image_stripe_4 = fits.getdata(file_name_strip_4_of_4,0,header=False)
-                img_processed_stripe_4 = shave_and_rotate(image_stripe_4,angle=90.04)
+                image_stripe_4V = fits.getdata(file_name_strip_4V_of_4V,0,header=False)
+                img_processed_stripe_4V = shave_and_rotate(image_stripe_4V,angle=90.04)
 
             #import ipdb; ipdb.set_trace()
             ## read in and process the images with planets

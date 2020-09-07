@@ -931,6 +931,68 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
                 resids_1d_baseline = residuals_dict["baseline_strip_4_W"]
                 string_w_planet_indicator = "strip_4_W"
                 string_opposite_indicator = "strip_4_E"
+            elif np.logical_and((stripe_w_planet == "0V"),(half_w_planet == "N")):
+                # image of the injected stripe, with the planet to the right, for FYI plot
+                # (note flipping, since the planet is 'east')
+                image_injected_planet = np.flip(img_processed_stripe_0V, axis=1)
+                resids_1d_injected_planet = residuals_dict["strip_0V_N"]
+                resids_1d_baseline = residuals_dict["baseline_strip_0V_N"]
+                string_w_planet_indicator = "strip_0V_N"
+                string_opposite_indicator = "strip_0V_S"
+            elif np.logical_and((stripe_w_planet == "0V"),(half_w_planet == "S")):
+                image_injected_planet = img_processed_stripe_0V
+                resids_1d_injected_planet = residuals_dict["strip_0V_S"]
+                resids_1d_baseline = residuals_dict["baseline_strip_0V_S"]
+                string_w_planet_indicator = "strip_0V_S"
+                string_opposite_indicator = "strip_0V_N"
+            elif np.logical_and((stripe_w_planet == "1V"),(half_w_planet == "N")):
+                image_injected_planet = np.flip(img_processed_stripe_1V, axis=1) # note flipping of 'east' half
+                resids_1d_injected_planet = residuals_dict["strip_1V_N"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_1V_N"] # already flipped
+                string_w_planet_indicator = "strip_1V_N"
+                string_opposite_indicator = "strip_1V_S"
+            elif np.logical_and((stripe_w_planet == "1V"),(half_w_planet == "S")):
+                image_injected_planet = img_processed_stripe_1V
+                resids_1d_injected_planet = residuals_dict["strip_1V_S"]
+                resids_1d_baseline = residuals_dict["baseline_strip_1V_S"]
+                string_w_planet_indicator = "strip_1V_S"
+                string_opposite_indicator = "strip_1V_N"
+            elif np.logical_and((stripe_w_planet == "2V"),(half_w_planet == "N")):
+                image_injected_planet = np.flip(img_processed_stripe_2V, axis=1) # note flipping of 'east' half
+                resids_1d_injected_planet = residuals_dict["strip_2V_N"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_2V_N"] # already flipped
+                string_w_planet_indicator = "strip_2V_N"
+                string_opposite_indicator = "strip_2V_S"
+            elif np.logical_and((stripe_w_planet == "2V"),(half_w_planet == "S")):
+                image_injected_planet = img_processed_stripe_2V
+                resids_1d_injected_planet = residuals_dict["strip_2V_S"]
+                resids_1d_baseline = residuals_dict["baseline_strip_2V_S"]
+                string_w_planet_indicator = "strip_2V_S"
+                string_opposite_indicator = "strip_2V_N"
+            elif np.logical_and((stripe_w_planet == "3V"),(half_w_planet == "N")):
+                image_injected_planet = np.flip(img_processed_stripe_3V, axis=1) # note flipping of 'east' half
+                resids_1d_injected_planet = residuals_dict["strip_3V_N"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_3V_N"] # already flipped
+                string_w_planet_indicator = "strip_3V_N"
+                string_opposite_indicator = "strip_3V_S"
+            elif np.logical_and((stripe_w_planet == "3V"),(half_w_planet == "S")):
+                image_injected_planet = img_processed_stripe_3V
+                resids_1d_injected_planet = residuals_dict["strip_3V_S"]
+                resids_1d_baseline = residuals_dict["baseline_strip_3V_S"]
+                string_w_planet_indicator = "strip_3V_S"
+                string_opposite_indicator = "strip_3V_N"
+            elif np.logical_and((stripe_w_planet == "4V"),(half_w_planet == "N")):
+                image_injected_planet = np.flip(img_processed_stripe_4V, axis=1) # note flipping of 'east' half
+                resids_1d_injected_planet = residuals_dict["strip_4V_N"] # already flipped
+                resids_1d_baseline = residuals_dict["baseline_strip_4V_N"] # already flipped
+                string_w_planet_indicator = "strip_4V_N"
+                string_opposite_indicator = "strip_4V_S"
+            elif np.logical_and((stripe_w_planet == "4V"),(half_w_planet == "S")):
+                image_injected_planet = img_processed_stripe_4V
+                resids_1d_injected_planet = residuals_dict["strip_4V_S"]
+                resids_1d_baseline = residuals_dict["baseline_strip_4V_S"]
+                string_w_planet_indicator = "strip_4V_S"
+                string_opposite_indicator = "strip_4V_N"
             else:
                 print("No strip with planet specified!")
             #import ipdb; ipdb.set_trace()

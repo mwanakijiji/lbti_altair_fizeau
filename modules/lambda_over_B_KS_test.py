@@ -603,7 +603,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     baseline_processed_stripe_3V = shave_and_rotate(image_baseline_stripe_3V,angle=263.37)
     image_baseline_stripe_4V = fits.getdata(file_name_strip_4V_of_4V_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4V = shave_and_rotate(image_baseline_stripe_4V,angle=270.04)
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # loop over all pairs of (amplitude,radius); note that the half (E/W) of the
     # strips in which the planet with that (amplitude,radius) sits is set by
     # the half_w_planet

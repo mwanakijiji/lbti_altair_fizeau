@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 def shave_and_rotate(img, angle):
     '''
     Shave off edges of frames (to get rid of the NaNs) and rotate
-    such that E is on the left, W on the right
+    such that E (or N) is on the left, W (or S) on the right
     '''
 
     # shave off this much of the edges
@@ -580,7 +580,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
     dist_asec_array = np.multiply(dist_pix_array,float(config["instrum_params"]["LMIR_PS"]))
-    #import ipdb; ipdb.set_trace()
+    import ipdb; ipdb.set_trace()
     # read in the baseline images with no planets
     image_baseline_stripe_0 = fits.getdata(file_name_strip_0_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=-39.68)

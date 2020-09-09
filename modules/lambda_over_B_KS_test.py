@@ -580,7 +580,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)
     dist_asec_array = np.multiply(dist_pix_array,float(config["instrum_params"]["LMIR_PS"]))
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     # read in the baseline images with no planets
     image_baseline_stripe_0 = fits.getdata(file_name_strip_0_of_4_baseline_no_planet,0,header=False)
     baseline_processed_stripe_0 = shave_and_rotate(image_baseline_stripe_0,angle=-39.68)
@@ -603,7 +603,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     baseline_processed_stripe_3V = shave_and_rotate(image_baseline_stripe_3V,angle=83.37)
     image_baseline_stripe_4V = fits.getdata(file_name_strip_4V_of_4V_baseline_no_planet,0,header=False)
     baseline_processed_stripe_4V = shave_and_rotate(image_baseline_stripe_4V,angle=90.04)
-    #import ipdb; ipdb.set_trace()
+    import ipdb; ipdb.set_trace()
     # loop over all pairs of (amplitude,radius); note that the half (E/W) of the
     # strips in which the planet with that (amplitude,radius) sits is set by
     # the half_w_planet

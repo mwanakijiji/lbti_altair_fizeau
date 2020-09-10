@@ -149,7 +149,7 @@ def return_residuals(array_loaded):
         radial_max_array_E[rad_central] = max_E
         radial_max_array_W[rad_central] = max_W
 
-    return radial_max_array_E, radial_max_array_W
+    return radial_median_array_E, radial_median_array_W
 
 
 def do_KS(empirical_sample_1,empirical_sample_2):

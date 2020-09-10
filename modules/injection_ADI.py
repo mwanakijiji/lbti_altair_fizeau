@@ -905,7 +905,7 @@ def main(inject_iteration=None):
         flux_array = np.divide(1.,np.power(10.,np.multiply(0.4,(mag_array))))
         #flux_array = [0]
 
-        fake_params_pre_permute = {"angle_deg_EofN": [90.04,230.32],
+        fake_params_pre_permute = {"angle_deg_EofN": [250.782,256.57],
                                "rad_asec": list(B),
                                "ampl_linear_norm": flux_array}
 

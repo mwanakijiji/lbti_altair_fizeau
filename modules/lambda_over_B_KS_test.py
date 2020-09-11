@@ -1148,7 +1148,7 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
             # top row: 2D color plot and cross-sections
             # second row: CDFs
-
+            #import ipdb; ipdb.set_trace()
             # top left: 2D color plot (which has been flipped if the planet is in the E half)
             subplot1 = ax1.imshow(image_injected_planet, origin="lower", aspect="auto", vmin=-5000, vmax=5000)
             ax1.axvline(x=0.5*np.shape(image_injected_planet)[0]+planet_loc_pix,

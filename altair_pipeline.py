@@ -143,7 +143,7 @@ lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "N",write_csv_
 
 #lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "S",write_csv_basename = "test_4VS.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "4V",half_w_planet = "S",read_csv_basename = "test_4VS.csv")
-'''
+
 # lambda/D mass limits
 convert_contrast_limits_to_masses.main(regime = "lambda_over_B")
 '''

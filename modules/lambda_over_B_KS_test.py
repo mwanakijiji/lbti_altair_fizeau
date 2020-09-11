@@ -610,10 +610,10 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
     # the half_w_planet
     for comp_ampl_num in range(0,len(comp_ampl_array)):
         for dist_asec_num in range(0,len(dist_asec_array)):
-            import ipdb; ipdb.set_trace()
 
             comp_ampl = comp_ampl_array[comp_ampl_num]
             dist_asec = dist_asec_array[dist_asec_num]
+            import ipdb; ipdb.set_trace()
 
             # name of the FYI plot to write
             new_filename = plot_string + \

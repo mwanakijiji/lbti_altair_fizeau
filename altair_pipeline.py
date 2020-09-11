@@ -91,7 +91,7 @@ lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "E",rea
 lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "W",read_csvs_directory = local_stem+"0W.csv")
 '''
 #lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "N",write_csv_basename = "test01_20200910_0VN.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "0V",half_w_planet = "N",read_csvs_directory = local_stem+"0VN.csv")
+lambda_over_B_contrast_curves.main(stripe_w_planet = "0V",read_csvs_directory = local_stem+"0VN.csv")
 '''
 #lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "S",write_csv_basename = "test01_20200910_0VS.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = "0V",half_w_planet = "S",read_csv_basename = local_stem+"0VS.csv")

@@ -8,13 +8,11 @@ import matplotlib.tri as tri
 import os
 import glob
 
-def main(stripe_w_planet,half_w_planet,read_csvs_directory):
+def main(stripe_w_planet,read_csvs_directory):
     '''
     INPUTS:
     stripe_w_planet: integer which sets the strip with planets injected along the median angle
         (choices are [0,1,2,3,4])
-    half_w_planet: the East/West half of the stripe with the planet where the
-        planet actually lies (choices are [E/W])
     read_csvs_directory: directory in which the csv files to average reside (these
         csvs should correspond to one cardinal direction (for example, files
         corresponding to 0W, 1W, 2W, 3W, and 4W; but not non-W directions)
@@ -23,7 +21,22 @@ def main(stripe_w_planet,half_w_planet,read_csvs_directory):
     # get the names of all the csvs
     read_csv_file_names = list(glob.glob(read_csvs_directory))
 
-    # loop over all
+    # read in test file to initialize cube
+    df_test = pd.read_csv(read_csv_file_names[0])
+
+    # initialize meshgrid of (amplitude, radius) space
+    X_unique = np.sort(df_test.dist_asec.unique())
+    Y_unique = np.sort(df_test.comp_ampl.unique())
+    X, Y = np.meshgrid(X_unique, Y_unique)
+
+    # initialize master cube needed for making an average of averages
+    master_KS_cube = np.zeros((
+                        len(read_csv_file_names),
+                        len(contour_data["comp_ampl"].unique()),
+                        len(contour_data["dist_asec"].unique())
+                        ))
+
+    # loop over all CSVs
     for file_num in range(0,len(read_csv_file_names)):
 
         df = pd.read_csv(read_csv_file_names[file_num])
@@ -106,13 +119,14 @@ def main(stripe_w_planet,half_w_planet,read_csvs_directory):
                                         'D_strip_w_planets_rel_to_strip_2',
                                         'D_strip_w_planets_rel_to_strip_3']
 
-        # initialize meshgrid of (amplitude, radius) space
-        X_unique = np.sort(contour_data.dist_asec.unique())
-        Y_unique = np.sort(contour_data.comp_ampl.unique())
-        X, Y = np.meshgrid(X_unique, Y_unique)
-
-        # put the KS grids into the cube
+        # put the KS grids into the cube whose slices correspond to
+        # comparisons with this particular half-stripe
         for comparison_num in range(0,num_comparisons):
+
+            # initialize meshgrid of (amplitude, radius) space
+            X_unique = np.sort(contour_data.dist_asec.unique())
+            Y_unique = np.sort(contour_data.comp_ampl.unique())
+            X, Y = np.meshgrid(X_unique, Y_unique)
 
             # if the eastern half of the stripe is legitimate to compare to,
             # rearrange 1-D KS statistics of that eastern half into a matrix
@@ -127,31 +141,23 @@ def main(stripe_w_planet,half_w_planet,read_csvs_directory):
 
             # FYI contour plot of KS statistic, no interpolation, both E and W halves
             plt.clf()
-            fig, axs = plt.subplots(1, 2)
+            fig, axs = plt.subplots(1, 1)
             # underplot scatter plot of sampled points
             sp0 = axs[0].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
-            sp1 = axs[1].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
-            # plot contour plots
 
-            print(df.keys())
+            # plot contour plots
             cp1_E = axs[0].contour(X, Y, Z_E)
             # overplot the critical line (which is always the same, regardless of strip being compared)
-            #df_levels = df.drop_duplicates(subset=crit_contour_string,
-            #                               keep="first",
-            #                               inplace=False)
             levels = [df[crit_contour_string].iloc[0]]
             cp2_E = axs[0].contour(X, Y, Z_E, levels = levels, linewidths=8, alpha = 0.5)
             axs[0].clabel(cp2_E, inline=True, fontsize=10)
             title_E = axs[0].set_title("E or N")
-            title_EW = axs[0].set_title("W or S")
 
             axs[0].set_xlabel("dist_asec")
-            axs[1].set_xlabel("dist_asec")
             axs[0].set_ylabel("companion_ampl")
             plot_file_name = "fyi_comp_w_contours_comparison_stripe_w_planet_"+str(stripe_w_planet)+\
-                "_half_w_planet_"+str(half_w_planet)+\
                 "_comparison_with_"+str(array_comparison_strings[comparison_num])+".pdf"
-            plt.suptitle("Stripe w planet "+str(stripe_w_planet) + str(half_w_planet) + \
+            plt.suptitle("Stripe w planet "+str(stripe_w_planet) + \
                 "\nComparison with " + array_comparison_strings[comparison_num])
             plt.savefig(plot_file_name)
             print("Saved " + str(plot_file_name))
@@ -163,20 +169,43 @@ def main(stripe_w_planet,half_w_planet,read_csvs_directory):
         # take an average across the cube
         cube_stat_no_interp_avg = np.mean(cube_stat_no_interpolation, axis=0)
 
+        # add that average as a slice to the master cube
+        master_KS_cube[file_num,:,:] = cube_stat_no_interp_avg
+
+        # map contrast curve to magnitudes
+        Y_mag = -2.5*np.log10(Y)
+        comp_ampl_mag = -2.5*np.log10(df["comp_ampl"])
+
+        # now plot the average of the comparisons to this particular half-stripe
+        plt.clf()
+        #cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
+        #cp3.levels
+        cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
+        plt.clabel(cp3, inline=1, fontsize=10)
+        cp4 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, levels = levels, linewidths=5, color="k")
+        #plt.clabel(cp4, inline=1, fontsize=10)
+        plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
+        plt.gca().invert_yaxis()
+        plt.xlabel("R (arcsec)", fontsize=18)
+        plt.ylabel("$\Delta$m", fontsize=18)
+        plt.xlim([0,0.55])
+        plt.ylim([6,2])
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.tight_layout()
+        filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+".pdf"
+        #plt.show()
+        plt.savefig(filename4)
+        print("Wrote average of comparisons to this particular half-stripe " + filename4)
+
     # take an average across the cube of cubes
+    average_KS_2d_master = np.mean(master_KS_cube, axis=0)
 
-
-    # map contrast curve to magnitudes
-    Y_mag = -2.5*np.log10(Y)
-    comp_ampl_mag = -2.5*np.log10(df["comp_ampl"])
-
-    # now plot the average
+    # write out
     plt.clf()
-    #cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
-    #cp3.levels
-    cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
+    cp3 = plt.contour(X, Y_mag, average_KS_2d_master, alpha = 0.5)
     plt.clabel(cp3, inline=1, fontsize=10)
-    cp4 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, levels = levels, linewidths=5, color="k")
+    cp4 = plt.contour(X, Y_mag, average_KS_2d_master, levels = levels, linewidths=5, color="k")
     #plt.clabel(cp4, inline=1, fontsize=10)
     plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
     plt.gca().invert_yaxis()
@@ -186,12 +215,15 @@ def main(stripe_w_planet,half_w_planet,read_csvs_directory):
     plt.ylim([6,2])
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
+    plt.title("")
     plt.tight_layout()
-    filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".pdf"
+    filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+".pdf"
     #plt.show()
     plt.savefig(filename4)
-    print("Wrote " + filename4)
+    print("Wrote average of comparisons to this particular half-stripe " + filename4)
 
+
+    '''
     # extract the contour information
     p_info = cp4.collections[0].get_paths()[0]
     v = p_info.vertices
@@ -199,9 +231,10 @@ def main(stripe_w_planet,half_w_planet,read_csvs_directory):
     y = v[:,1] # delta_m (mag)
     dict_pre_df = {"x": x, "y": y}
     contour_info_df = pd.DataFrame(data=dict_pre_df)
-    csv_name = "lambda_B_cc_stripe_w_planet_"+str(stripe_w_planet)+"_half_w_planet_"+str(half_w_planet)+".csv"
+    csv_name = "lambda_B_cc_stripe_w_planet_"+str(stripe_w_planet)+".csv"
     contour_info_df.to_csv(csv_name)
     print("Wrote " + csv_name)
+    '''
 
     # FYI 2D color plot
     '''

@@ -32,8 +32,8 @@ def main(stripe_w_planet,read_csvs_directory):
     # initialize master cube needed for making an average of averages
     master_KS_cube = np.zeros((
                         len(read_csv_file_names),
-                        len(contour_data["comp_ampl"].unique()),
-                        len(contour_data["dist_asec"].unique())
+                        len(df_test["comp_ampl"].unique()),
+                        len(df_test["dist_asec"].unique())
                         ))
 
     # loop over all CSVs
@@ -143,18 +143,18 @@ def main(stripe_w_planet,read_csvs_directory):
             plt.clf()
             fig, axs = plt.subplots(1, 1)
             # underplot scatter plot of sampled points
-            sp0 = axs[0].scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
+            sp0 = axs.scatter(contour_data["dist_asec"],contour_data["comp_ampl"], s=1)
 
             # plot contour plots
-            cp1_E = axs[0].contour(X, Y, Z_E)
+            cp1_E = axs.contour(X, Y, Z_E)
             # overplot the critical line (which is always the same, regardless of strip being compared)
             levels = [df[crit_contour_string].iloc[0]]
-            cp2_E = axs[0].contour(X, Y, Z_E, levels = levels, linewidths=8, alpha = 0.5)
-            axs[0].clabel(cp2_E, inline=True, fontsize=10)
-            title_E = axs[0].set_title("E or N")
+            cp2_E = axs.contour(X, Y, Z_E, levels = levels, linewidths=8, alpha = 0.5)
+            axs.clabel(cp2_E, inline=True, fontsize=10)
+            title_E = axs.set_title("E or N")
 
-            axs[0].set_xlabel("dist_asec")
-            axs[0].set_ylabel("companion_ampl")
+            axs.set_xlabel("dist_asec")
+            axs.set_ylabel("companion_ampl")
             plot_file_name = "fyi_comp_w_contours_comparison_stripe_w_planet_"+str(stripe_w_planet)+\
                 "_comparison_with_"+str(array_comparison_strings[comparison_num])+".pdf"
             plt.suptitle("Stripe w planet "+str(stripe_w_planet) + \
@@ -217,10 +217,10 @@ def main(stripe_w_planet,read_csvs_directory):
     plt.yticks(fontsize=14)
     plt.title("")
     plt.tight_layout()
-    filename4 = "contour_avg_stripe_w_planet_"+str(stripe_w_planet)+".pdf"
+    filename4 = "avg_of_avgs_stripe_w_planet_"+str(stripe_w_planet)+".pdf"
     #plt.show()
     plt.savefig(filename4)
-    print("Wrote average of comparisons to this particular half-stripe " + filename4)
+    print("Wrote average of averages as " + filename4)
 
 
     '''

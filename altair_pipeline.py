@@ -88,7 +88,7 @@ sensitivity.main(small_angle_correction=True)
 
 # lambda/D mass limits
 convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
-'''
+
 # lambda/B tests
 lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "E",write_csv_basename = "read_data_run01_20200911_0E.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "E",read_csv_basename = "test_0E.csv")
@@ -127,10 +127,10 @@ lambda_over_B_KS_test.main(stripe_w_planet = "3",half_w_planet = "W",write_csv_b
 
 lambda_over_B_KS_test.main(stripe_w_planet = "3V",half_w_planet = "N",write_csv_basename = "read_data_run01_20200911_3VN.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "3V",half_w_planet = "N",read_csv_basename = "test_3VN.csv")
-
+'''
 #lambda_over_B_KS_test.main(stripe_w_planet = "3V",half_w_planet = "S",write_csv_basename = "test_3VS.csv")
-#lambda_over_B_contrast_curves.main(stripe_w_planet = "3V",half_w_planet = "S",read_csv_basename = "test_3VS.csv")
-
+lambda_over_B_contrast_curves.main(stripe_w_planet = "3V",half_w_planet = "S",read_csv_basename = "read_data_run01_20200911_3VS.csv")
+'''
 lambda_over_B_KS_test.main(stripe_w_planet = "4",half_w_planet = "E",write_csv_basename = "read_data_run01_20200911_4E.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "4",half_w_planet = "E",read_csv_basename = "test_4E.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = "4",half_w_planet = "W",write_csv_basename = "read_data_run01_20200911_4W.csv")
@@ -140,7 +140,7 @@ lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "N",write_csv_
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "4V",half_w_planet = "N",read_csv_basename = "test_4VN.csv")
 lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "S",write_csv_basename = "read_data_run01_20200911_4VS.csv")
 #lambda_over_B_contrast_curves.main(stripe_w_planet = "4V",half_w_planet = "S",read_csv_basename = "test_4VS.csv")
-'''
+
 # lambda/D mass limits
 convert_contrast_limits_to_masses.main(regime = "lambda_over_B")
 '''

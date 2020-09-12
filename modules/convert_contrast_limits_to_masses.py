@@ -229,19 +229,18 @@ def linear_2_mass(df_pass, star_abs_mag_pass, star_abs_mag_error_pass, regime):
             '''
 
         # central value
-        import ipdb; ipdb.set_trace() # stopgap to manually remove a datapoint from BT-Dusty curve
-        '''
+        #import ipdb; ipdb.set_trace() # stopgap to manually remove a datapoint from BT-Dusty curve
         ax.plot(df_new["asec"], df_new[key_masses_this_model],
             label=model_file_names_df["annotation"][model_num], color=CB_color_cycle[model_num])
-        '''
+
         # upper and lower bounds set by magnitude uncertainty
         #ax.plot(df_new["asec"], df_new[key_masses_this_model_upper], color=CB_color_cycle[model_num])
         #ax.plot(df_new["asec"], df_new[key_masses_this_model_lower], color=CB_color_cycle[model_num])
-        '''
+
         ax.fill_between(df_new["asec"], y1=df_new[key_masses_this_model_upper],
                                         y2=df_new[key_masses_this_model_lower],
                                         color=CB_color_cycle[model_num],alpha=0.4)
-        '''
+
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     ax.legend(fontsize=14)

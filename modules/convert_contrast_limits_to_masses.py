@@ -229,14 +229,19 @@ def linear_2_mass(df_pass, star_abs_mag_pass, star_abs_mag_error_pass, regime):
             '''
 
         # central value
+        import ipdb; ipdb.set_trace() # stopgap to manually remove a datapoint from BT-Dusty curve
+        '''
         ax.plot(df_new["asec"], df_new[key_masses_this_model],
             label=model_file_names_df["annotation"][model_num], color=CB_color_cycle[model_num])
+        '''
         # upper and lower bounds set by magnitude uncertainty
         #ax.plot(df_new["asec"], df_new[key_masses_this_model_upper], color=CB_color_cycle[model_num])
         #ax.plot(df_new["asec"], df_new[key_masses_this_model_lower], color=CB_color_cycle[model_num])
+        '''
         ax.fill_between(df_new["asec"], y1=df_new[key_masses_this_model_upper],
                                         y2=df_new[key_masses_this_model_lower],
                                         color=CB_color_cycle[model_num],alpha=0.4)
+        '''
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     ax.legend(fontsize=14)
@@ -245,7 +250,7 @@ def linear_2_mass(df_pass, star_abs_mag_pass, star_abs_mag_error_pass, regime):
     if (regime == "lambda_over_B"):
         ax.set_ylim([0.8,1.5]) # for lambda/B
     elif (regime == "lambda_over_D"):
-        ax.set_ylim([0.45,0.95]) # for lambda/D
+        ax.set_ylim([0.45,0.8]) # for lambda/D
     #ax.axvline(x=1, linewidth=4, linestyle=":", color="k", alpha=0.5)
     plt.tight_layout()
     file_name_cc_masses_plot_name = config["data_dirs"]["DIR_S2N"] + \
@@ -344,6 +349,7 @@ def main(regime,classical=False):
         contrast_df["contrast_lin"] = np.power(10,-0.4*contrast_df["y"])
         contrast_df["asec"] = contrast_df["x"]
     print(contrast_df)
+
     #import ipdb; ipdb.set_trace()
     df_w_masses = linear_2_mass(df_pass = contrast_df, star_abs_mag_pass = 1.70, star_abs_mag_error_pass = 0.10, regime = regime)
 

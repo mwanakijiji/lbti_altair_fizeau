@@ -21,7 +21,10 @@ psf_profiles = psf_profiles_all.iloc[:, 0:10]
 lambda_over_D = pd.read_csv("./data/modern_curve_20200713.csv")
 
 # for lambda/B, there are a number of curves; we will read them all in
-lambda_over_B = pd.read_csv("./data/lambda_B_cc_stripes_w_planets_avg_avg_20200714.csv")
+lambda_over_B_N = pd.read_csv("./data/lambda_B_cc_stripe_w_planet_20200912_allN.csv")
+lambda_over_B_E = pd.read_csv("./data/lambda_B_cc_stripe_w_planet_20200912_allE.csv")
+lambda_over_B_S = pd.read_csv("./data/lambda_B_cc_stripe_w_planet_20200912_allS.csv")
+lambda_over_B_W = pd.read_csv("./data/lambda_B_cc_stripe_w_planet_20200912_allW.csv")
 
 # read in PSF profiles
 psf_profiles_rad_asec = 0.0107*np.arange(-0.5*len(psf_profiles["x_xsec_1"]),0.5*len(psf_profiles["x_xsec_1"]),step=1)
@@ -37,8 +40,14 @@ for label, content in psf_profiles.items():
 plt.plot(lambda_over_D["rad_asec"],lambda_over_D["del_m_modern"],linewidth=4,
          label="$\lambda /D$ regime (fake planet injections)")
 # lambda/B data
-plt.plot(lambda_over_B["x"],lambda_over_B["y"],linewidth=4,color="red",
-        label="$\lambda /B$ regime (KS test)")
+plt.plot(lambda_over_B_N["x"],lambda_over_B_N["y"],linewidth=4,
+        label="$\lambda /B$ regime (KS test; N)")
+plt.plot(lambda_over_B_E["x"],lambda_over_B_E["y"],linewidth=4,
+        label="$\lambda /B$ regime (KS test; E)")
+plt.plot(lambda_over_B_S["x"],lambda_over_B_S["y"],linewidth=4,
+        label="$\lambda /B$ regime (KS test; S)")
+plt.plot(lambda_over_B_W["x"],lambda_over_B_W["y"],linewidth=4,
+        label="$\lambda /B$ regime (KS test; W)")
 
 plt.gca().invert_yaxis()
 plt.xticks(fontsize=17)

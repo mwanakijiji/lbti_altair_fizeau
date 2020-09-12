@@ -83,7 +83,7 @@ convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
 '''
 # lambda/B tests
 
-local_stem = "/Users/nyumbani/Downloads/20200911_0VS_test01/test01_20200911_" # string for writing/reading in KS data
+local_stem = "/Users/nyumbani/Downloads/20200911_2W_test01/fake_data_test01_20200911_" # string for writing/reading in KS data
 '''
 #lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "E",write_csv_basename = "test01_20200910_0E.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "E",read_csv_basename = local_stem+"0E.csv")
@@ -92,25 +92,26 @@ lambda_over_B_contrast_curves.main(stripe_w_planet = "0",half_w_planet = "W",rea
 
 #lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "N",write_csv_basename = "test01_20200910_0VN.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = "0V",read_csvs_directory = local_stem+"0VN.csv")
-'''
 #lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "S",write_csv_basename = "test01_20200910_0VS.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = "0V",read_csvs_directory = local_stem+"0VS.csv")
-'''
+
 #lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "E",write_csv_basename = "test01_20200910_1E.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "1",half_w_planet = "E",read_csv_basename = local_stem+"1E.csv")
+lambda_over_B_contrast_curves.main(stripe_w_planet = "1",read_csvs_directory = local_stem+"1E.csv")
 #lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "W",write_csv_basename = "test01_20200910_1W.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "1",half_w_planet = "W",read_csv_basename = local_stem+"1W.csv")
+lambda_over_B_contrast_curves.main(stripe_w_planet = "1",read_csvs_directory = local_stem+"1W.csv")
 
 #lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "N",write_csv_basename = "test01_20200910_1VN.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "1V",half_w_planet = "N",read_csv_basename = local_stem+"1VN.csv")
+
+lambda_over_B_contrast_curves.main(stripe_w_planet = "1V",read_csvs_directory = local_stem+"1VN.csv")
+
 #lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "S",write_csv_basename = "test01_20200910_1VS.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "1V",half_w_planet = "S",read_csv_basename = local_stem+"1VS.csv")
-
+lambda_over_B_contrast_curves.main(stripe_w_planet = "1V",read_csvs_directory = local_stem+"1VS.csv")
 #lambda_over_B_KS_test.main(stripe_w_planet = "2",half_w_planet = "E",write_csv_basename = "test01_20200910_2E.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "2",half_w_planet = "E",read_csv_basename = local_stem+"2E.csv")
+lambda_over_B_contrast_curves.main(stripe_w_planet = "2",read_csvs_directory = local_stem+"2E.csv")
+'''
 #lambda_over_B_KS_test.main(stripe_w_planet = "2",half_w_planet = "W",write_csv_basename = "test01_20200910_2W.csv")
-lambda_over_B_contrast_curves.main(stripe_w_planet = "2",half_w_planet = "W",read_csv_basename = local_stem+"2W.csv")
-
+lambda_over_B_contrast_curves.main(stripe_w_planet = "2",read_csvs_directory = local_stem+"2W.csv")
+'''
 #lambda_over_B_KS_test.main(stripe_w_planet = "2V",half_w_planet = "N",write_csv_basename = "test01_20200910_2VN.csv")
 lambda_over_B_contrast_curves.main(stripe_w_planet = "2V",half_w_planet = "N",read_csv_basename = local_stem+"2VN.csv")
 #lambda_over_B_KS_test.main(stripe_w_planet = "2V",half_w_planet = "S",write_csv_basename = "test01_20200910_2VS.csv")

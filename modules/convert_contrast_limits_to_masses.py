@@ -340,7 +340,7 @@ def main(regime,classical=False):
             contrast_df["asec"] = contrast_df["rad_asec"]
     elif (regime=="lambda_over_B"):
         # read in the average of averages
-        file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripes_w_planets_avg_avg_20200714.csv"
+        file_name_cc_lambda_B = "notebooks_for_development/data/lambda_B_cc_stripe_w_planet_20200912_allW.csv"
         contrast_df = pd.read_csv(file_name_cc_lambda_B, sep = ",")
         # put in some col names that are recognized downstream
         # (important! contrast_df["y"] is already in magnitudes, and the contrast_df["contrast_lin"]

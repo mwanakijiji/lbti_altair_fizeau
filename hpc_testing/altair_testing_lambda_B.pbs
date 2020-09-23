@@ -36,7 +36,7 @@ date
 export DATA_TARBALL=altair_20200822_good_frames_list_A_stripe_0_of_4.tar.gz
 export SING_FILE=lbti_altair_fizeau_latest.sif
 ### output files
-export RESULTS_TARBALL=recenter_76pt57_degEofN_ampl_0_list_A_stripe_0_of_4_0147.tar
+export RESULTS_TARBALL=recenter_83pt37_degEofN_ampl_0_list_A_stripe_0_of_4_0147.tar
 export OUTPUT_CSV_FILE_BASENAME=recenter_250pt782_256pt57_0degEofN_ampl_0_list_A_stripe_0_of_4_0132.csv
 
 ### load python 3.6.5

@@ -6,6 +6,7 @@
 import datetime
 from modules import *
 from modules import (convert_contrast_limits_to_masses,
+                    lambda_over_B_KS_test,
                      lambda_over_B_contrast_curves)
 
 ## ## READ IN HASHABLE CONFIG FILE FOR REDUCTION PARAMETERS: GO AHEAD

@@ -82,38 +82,39 @@ sensitivity.main(small_angle_correction=True)
 convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
 
 # lambda/B tests
-
-lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "E",write_csv_basename = "test01_20200910_0E.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "W",write_csv_basename = "test01_20200910_0W.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "N",write_csv_basename = "test01_20200910_0VN.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "S",write_csv_basename = "test01_20200910_0VS.csv")
-
-lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "E",write_csv_basename = "test01_20200910_1E.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "W",write_csv_basename = "test01_20200910_1W.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "N",write_csv_basename = "test01_20200910_1VN.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "S",write_csv_basename = "test01_20200910_1VS.csv")
-
-lambda_over_B_KS_test.main(stripe_w_planet = "2",half_w_planet = "E",write_csv_basename = "test01_20200910_2E.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "2",half_w_planet = "W",write_csv_basename = "test01_20200910_2W.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "2V",half_w_planet = "N",write_csv_basename = "test01_20200910_2VN.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "2V",half_w_planet = "S",write_csv_basename = "test01_20200910_2VS.csv")
-
-lambda_over_B_KS_test.main(stripe_w_planet = "3",half_w_planet = "E",write_csv_basename = "test01_20200910_3E.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "3",half_w_planet = "W",write_csv_basename = "test01_20200910_3W.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "3V",half_w_planet = "N",write_csv_basename = "test01_20200910_3VN.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "3V",half_w_planet = "S",write_csv_basename = "test_3VS.csv")
-
-lambda_over_B_KS_test.main(stripe_w_planet = "4",half_w_planet = "E",write_csv_basename = "test01_20200910_4E.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "4",half_w_planet = "W",write_csv_basename = "test01_20200910_4W.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "N",write_csv_basename = "test01_20200910_4VN.csv")
-lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "S",write_csv_basename = "test_4VS.csv")
 '''
+#lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "E",write_csv_basename = "test01_20201021_0E.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "W",write_csv_basename = "test01_20201021_0W.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "N",write_csv_basename = "test01_20201021_0VN.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "S",write_csv_basename = "test01_20201021_0VS.csv")
 
-local_stem = "/Users/nyumbani/Documents/git.repos/lbti_altair_fizeau/" # string for writing/reading in KS data
-lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20200912_allE_run01/", write_stem = "20200912_allE")
-lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20200912_allW_run01/", write_stem = "20200912_allW")
-lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20200912_allN_run01/", write_stem = "20200912_allN")
-lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20200912_allS_run01/", write_stem = "20200912_allS")
+#lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "E",write_csv_basename = "test01_20201021_1E.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "1",half_w_planet = "W",write_csv_basename = "test01_20201021_1W.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "N",write_csv_basename = "test01_20201021_1VN.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "1V",half_w_planet = "S",write_csv_basename = "test01_20201021_1VS.csv")
+
+#lambda_over_B_KS_test.main(stripe_w_planet = "2",half_w_planet = "E",write_csv_basename = "test01_20201021_2E.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "2",half_w_planet = "W",write_csv_basename = "test01_20201021_2W.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "2V",half_w_planet = "N",write_csv_basename = "test01_20201021_2VN.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "2V",half_w_planet = "S",write_csv_basename = "test01_20201021_2VS.csv")
+
+#lambda_over_B_KS_test.main(stripe_w_planet = "3",half_w_planet = "E",write_csv_basename = "test01_20201021_3E.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "3",half_w_planet = "W",write_csv_basename = "test01_20201021_3W.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "3V",half_w_planet = "N",write_csv_basename = "test01_20201021_3VN.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "3V",half_w_planet = "S",write_csv_basename = "test01_20201021_3VS.csv")
+
+#lambda_over_B_KS_test.main(stripe_w_planet = "4",half_w_planet = "E",write_csv_basename = "test01_20201021_4E.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "4",half_w_planet = "W",write_csv_basename = "test01_20201021_4W.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "N",write_csv_basename = "test01_20201021_4VN.csv")
+#lambda_over_B_KS_test.main(stripe_w_planet = "4V",half_w_planet = "S",write_csv_basename = "test01_20201021_4VS.csv")
+
+
+#local_stem = "/Users/nyumbani/Documents/git.repos/lbti_altair_fizeau/" # string for writing/reading in KS data
+local_stem = "./" # string for writing/reading in KS data
+lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allE_run01/", write_stem = "20201021_allE")
+#lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allW_run01/", write_stem = "20201021_allW")
+#lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allN_run01/", write_stem = "20201021_allN")
+#lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allS_run01/", write_stem = "20201021_allS")
 
 '''
 # lambda/D mass limits

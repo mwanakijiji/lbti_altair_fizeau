@@ -204,7 +204,7 @@ def main(read_csvs_directory, write_stem):
         plt.xlabel("R (arcsec)", fontsize=18)
         plt.ylabel("$\Delta$m", fontsize=18)
         plt.xlim([0,0.55])
-        plt.ylim([6,2])
+        plt.ylim([10,0])
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
         plt.tight_layout()

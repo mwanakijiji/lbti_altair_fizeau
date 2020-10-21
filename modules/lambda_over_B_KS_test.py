@@ -181,6 +181,11 @@ def do_KS(empirical_sample_1,empirical_sample_2):
     if np.logical_and(not np.isfinite(np.nanmin(empirical_sample_2)),not np.isfinite(np.nanmax(empirical_sample_2))):
         return np.nan, np.nan, np.nan
 
+    print("D, val_crit, p_val:")
+    print(D)
+    print(val_crit)
+    print(p_val)
+
     return D, val_crit, p_val
 
 

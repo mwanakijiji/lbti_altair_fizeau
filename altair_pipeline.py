@@ -84,7 +84,7 @@ convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
 # lambda/B tests
 '''
 #lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "E",write_csv_basename = "test01_20201021_0E.csv")
-#lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "W",write_csv_basename = "test01_20201021_0W.csv")
+lambda_over_B_KS_test.main(stripe_w_planet = "0",half_w_planet = "W",write_csv_basename = "test01_20201021_0W.csv")
 #lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "N",write_csv_basename = "test01_20201021_0VN.csv")
 #lambda_over_B_KS_test.main(stripe_w_planet = "0V",half_w_planet = "S",write_csv_basename = "test01_20201021_0VS.csv")
 
@@ -111,7 +111,7 @@ convert_contrast_limits_to_masses.main(regime = "lambda_over_D",classical=False)
 
 #local_stem = "/Users/nyumbani/Documents/git.repos/lbti_altair_fizeau/" # string for writing/reading in KS data
 local_stem = "./" # string for writing/reading in KS data
-lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allE_run01/", write_stem = "20201021_allE")
+#lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allE_run01/", write_stem = "20201021_allE")
 #lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allW_run01/", write_stem = "20201021_allW")
 #lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allN_run01/", write_stem = "20201021_allN")
 #lambda_over_B_contrast_curves.main(read_csvs_directory = local_stem+"20201021_allS_run01/", write_stem = "20201021_allS")

@@ -575,8 +575,8 @@ def main(stripe_w_planet, half_w_planet, write_csv_basename):
 
     # loop over each combination of injected companion amplitude and radial distance
     ## ## (THIS IS KIND OF CLUNKY; IMPROVE LATER IF TIME)
-    #comp_ampl_array = np.array([0.0001,0.000251188643,0.000630957344,0.00158489319,0.005,0.01,0.02,0.03,0.05,0.1,0.251188643,1.])
-    comp_ampl_array = np.array([0.005,0.01,0.02,0.03,0.05,0.1])
+    comp_ampl_array = np.array([0.0001,0.000251188643,0.000630957344,0.00158489319,0.005,0.01,0.02,0.03,0.05,0.1,0.251188643,1.])
+    #comp_ampl_array = np.array([0.005,0.01,0.02,0.03,0.05,0.1])
     dist_fwhm_array = np.array([0.1,0.4,0.7,1.,1.3,1.7,2.0,2.3,2.6,2.9,3.2,4.,5.])
     fwhm_pix = 9.728 # FWHM for 4.05um/8.25m, in pixels
     dist_pix_array = np.multiply(dist_fwhm_array,fwhm_pix)

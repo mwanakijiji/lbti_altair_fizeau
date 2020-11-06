@@ -113,13 +113,13 @@ strip4_avg = 0.04
 
 angles_array = [-39.68,-19.218,-13.43,-6.63,0.04]
 
-coords_x_0 = [0,0,0,0,0]
-coords_x_1 = [0,0,0,0,0]
+coords_dx_0 = [0,0,0,0,0]
+coords_dx_1 = [0,0,0,0,0]
 coords_y_0 = 10*np.tan(np.multiply(angles_array,np.pi/180.))
 #coords_y_1 = 10*np.tan(np.multiply(angles_array,np.pi/180.))
 
-string_array_E = ["4E","3E","2E","1E","0E"]
-string_array_W = ["4W","3W","2W","1W","0W"]
+string_array_E = ["0E","1E","2E","3E","4E"]
+string_array_W = ["0W","2W","2W","3W","4W"]
 
 axes.set_xlim([-7,7])
 axes.set_ylim([-7,7])
@@ -130,27 +130,43 @@ for i in range(0,5):
     plt.plot([0,-10],[0,-coords_y_0[i]],color="k",linewidth=3)
     axes.annotate(string_array_E[i],
                     xy=[0,0],
-                    xytext=[-6,-np.add(0.6*coords_y_0[i],0.2)],
+                    xytext=[np.add(-6,coords_dx_0[i]),-np.add(0.6*coords_y_0[i],0.2)],
                     textcoords="data",
                     ha='center', va='bottom',
-                  fontsize=7,
+                  fontsize=8,
                   bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.2'))
     axes.annotate(string_array_W[i],
                     xy=[0,0],
                     xytext=[6,np.subtract(0.6*coords_y_0[i],0.2)],
                     textcoords="data",
                     ha='center', va='bottom',
-                  fontsize=7,
+                  fontsize=8,
                   bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.2'))
 
 # add secondary axes
 secax = axes.secondary_xaxis('top', functions=(au_to_asec, asec_to_au))
-secax.set_xlabel('Arcsec')
+secax.set_xlabel('Arcsec', fontsize=18)
 secay = axes.secondary_yaxis('right', functions=(au_to_asec, asec_to_au))
-secay.set_ylabel('Arcsec')
+secay.set_ylabel('Arcsec', fontsize=18)
 
-plt.xlabel("AU (projected)")
-plt.ylabel("AU (projected)")
+# add central cross
+axes.plot([0], [0], '+', ms=10, color="red")
+
+## add arrows
+plt.arrow(x=-3, y=-6, dx=-1, dy=0, width=0.2, color="k")
+plt.arrow(x=-3, y=-6.1, dx=0, dy=1.1, width=0.2, color="k")
+plt.annotate("N", xy=(0,0), xytext=(-3.35,-3.8), fontsize=16)
+plt.annotate("E", xy=(0,0), xytext=(-5.7,-6.35), fontsize=16)
+
+plt.xlabel("AU (projected)",fontsize=18)
+plt.ylabel("AU (projected)",fontsize=18)
+
+plt.setp(axes.get_xticklabels(), Fontsize=14)
+plt.setp(axes.get_yticklabels(), Fontsize=14)
+plt.setp(secax.get_xticklabels(), Fontsize=14)
+plt.setp(secay.get_yticklabels(), Fontsize=14)
+
+plt.tight_layout()
 
 plt.savefig("junk.pdf")
 
@@ -201,41 +217,49 @@ df_good_frames_only_strip4 = df_good_frames_only.drop(
 )
 
 
-figure, axes = plt.subplots(nrows=1,ncols=5,figsize=(9, 4))
+figure, axes = plt.subplots(nrows=1,ncols=5,figsize=(6, 6))
 
 pal = sns.color_palette("Blues")
 pal.as_hex()
 
 sns.rugplot(y="long_baseline_E",
                     data=df_good_frames_only_strip0, color="k", alpha=1, height=1, ax=axes[0])
-axes[0].set_ylabel("Position angle of long baseline (E of True N)\n(deg (E half); deg-180$^{\circ}$ (W half))")
-axes[0].set_title("Strip 0")
+axes[0].set_ylabel("Position angle E of N of long baseline\n(deg for E half; deg-180$^{\circ}$ for W half)",
+                fontsize=14)
+axes[0].set_title("Strip 0", fontsize=16)
 axes[0].xaxis.set_visible(False)
 
 sns.rugplot(y="long_baseline_E",
                     data=df_good_frames_only_strip1, color="k", alpha=1, height=1, ax=axes[1])
-axes[1].set_title("Strip 1")
+axes[1].set_title("Strip 1", fontsize=16)
 axes[1].set_ylabel("")
 axes[1].set_xlim([0,0.1])
 axes[1].xaxis.set_visible(False)
 
 sns.rugplot(y="long_baseline_E",
                     data=df_good_frames_only_strip2, color="k", alpha=1, height=1, ax=axes[2])
-axes[2].set_title("Strip 2")
+axes[2].set_title("Strip 2", fontsize=16)
 axes[2].set_ylabel("")
 axes[2].xaxis.set_visible(False)
 
 sns.rugplot(y="long_baseline_E",
                     data=df_good_frames_only_strip3, color="k", alpha=1, height=1, ax=axes[3])
-axes[3].set_title("Strip 3")
+axes[3].set_title("Strip 3", fontsize=16)
 axes[3].set_ylabel("")
 axes[3].xaxis.set_visible(False)
 
 sns.rugplot(y="long_baseline_E",
                     data=df_good_frames_only_strip4, color="k", alpha=1, height=1, ax=axes[4])
-axes[4].set_title("Strip 4")
+axes[4].set_title("Strip 4", fontsize=16)
 axes[4].set_ylabel("")
 axes[4].xaxis.set_visible(False)
 
-plt.subplots_adjust(wspace=0.5, right=0.7)
+plt.setp(axes[0].get_yticklabels(), Fontsize=14)
+plt.setp(axes[1].get_yticklabels(), Fontsize=14)
+plt.setp(axes[2].get_yticklabels(), Fontsize=14)
+plt.setp(axes[3].get_yticklabels(), Fontsize=14)
+plt.setp(axes[4].get_yticklabels(), Fontsize=14)
+
+plt.subplots_adjust(wspace=0.9, right=0.7)
+plt.tight_layout()
 plt.savefig("junk2.pdf")

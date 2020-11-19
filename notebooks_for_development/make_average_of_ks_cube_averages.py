@@ -57,6 +57,7 @@ for file_name_num in range(0,len(file_name_array)):
     plt.clabel(cp4, inline=1, fontsize=10)
     plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
     plt.gca().invert_yaxis()
+    plt.title(file_name_array[file_name_num])
     plt.xlabel("Radius (arcsec)", fontsize=16)
     plt.ylabel("$\Delta$m", fontsize=16)
     plt.xlim([0,0.55])
@@ -65,7 +66,7 @@ for file_name_num in range(0,len(file_name_array)):
     plt.yticks(fontsize=13)
     plt.tight_layout()
 
-    #plt.show()
+    plt.show()
 
 # take the average
 cube_stat_no_interp_avg_avg = np.mean(cube_ks_slices, axis=0)
@@ -80,6 +81,7 @@ cp4 = plt.contour(X, Y_mag, cube_stat_no_interp_avg_avg, levels = crit_level, li
 plt.clabel(cp4, inline=1, fontsize=10)
 plt.scatter(df["dist_asec"],comp_ampl_mag, s=1)
 plt.gca().invert_yaxis()
+plt.title("AVG OF AVGS")
 plt.xlabel("Radius (arcsec)", fontsize=18)
 plt.ylabel("$\Delta$m", fontsize=18)
 plt.xlim([0,0.55])

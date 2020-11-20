@@ -13,16 +13,18 @@ import pandas as pd
 import pickle
 import glob
 
-file_name_array = glob.glob("data/ks_data_test_*.p")
+#file_name_array = glob.glob("data/ks_data_test_*.p")
 
 # the critical KS value
 crit_level = [0.2716]
 
 
 # load some other stats for plotting
-vital_stats = pickle.load( open( "data/vital_stats_test_0E.p" , "rb" ) )
-df = vital_stats["df_stuff"]
-comp_ampl_mag = vital_stats["comp_ampl_mag"]
+#vital_stats = pickle.load( open( "data/vital_stats_test_0E.p" , "rb" ) )
+#df = vital_stats["df_stuff"]
+#comp_ampl_mag = vital_stats["comp_ampl_mag"]
+
+csv_file_name_array = glob.glob("data/ks_data_test_*.p")
 
 # initialize cube
 # first read in one file to get shape

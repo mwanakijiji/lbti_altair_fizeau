@@ -16,7 +16,7 @@ import glob
 file_name_array = glob.glob("data/ks_data_test_*.p")
 
 # the critical KS value
-crit_level = [0.263801]
+crit_level = [0.2716]
 
 
 # load some other stats for plotting
@@ -32,7 +32,7 @@ cube_test = test_slice["cube_stat_no_interp_avg"]
 cube_ks_slices = np.ones((len(file_name_array),
                           np.shape(cube_test)[0],
                           np.shape(cube_test)[1]))
-
+import ipdb; ipdb.set_trace()
 # loop through files: display the data, put into cube, and finally take average
 for file_name_num in range(0,len(file_name_array)):
     print(file_name_num)
@@ -46,7 +46,7 @@ for file_name_num in range(0,len(file_name_array)):
 
     # put into cube
     cube_ks_slices[file_name_num,:,:] = cube_stat_no_interp_avg
-
+    import ipdb; ipdb.set_trace()
     # plot this one slice
     plt.clf()
     #cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)
@@ -67,10 +67,10 @@ for file_name_num in range(0,len(file_name_array)):
     plt.tight_layout()
 
     plt.show()
-
+import ipdb; ipdb.set_trace()
 # take the average
 cube_stat_no_interp_avg_avg = np.mean(cube_ks_slices, axis=0)
-
+import ipdb; ipdb.set_trace()
 # plot the average of averages
 plt.clf()
 #cp3 = plt.contour(X, Y_mag, cube_stat_no_interp_avg, alpha = 0.5)

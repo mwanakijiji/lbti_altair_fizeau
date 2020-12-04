@@ -111,20 +111,25 @@ strip3_avg = -6.63
 strip4_avg = 0.04
 '''
 
-angles_array = [-39.68,-19.218,-13.43,-6.63,0.04]
+# first five angles are for long baselines, last five for short baselines
+# (note they use different conventions for the zero)
+angles_array = [-39.68,-19.218,-13.43,-6.63,0.04,50.32,70.782,76.57,83.37,90.04]
 
-coords_dx_0 = [0,0,0,0,0]
-coords_dx_1 = [0,0,0,0,0]
+# baseline coords
+coords_dx_0 = [0,0,0,0,0,0,0,0,0,0]
+coords_dx_1 = [0,0,0,0,0,0,0,0,0,0]
 coords_y_0 = 10*np.tan(np.multiply(angles_array,np.pi/180.))
-#coords_y_1 = 10*np.tan(np.multiply(angles_array,np.pi/180.))
 
-string_array_E = ["0E","1E","2E","3E","4E"]
-string_array_W = ["0W","2W","2W","3W","4W"]
+string_array_E = ["0E","1E","2E","3E","4E","NaN","NaN","NaN","NaN","NaN"]
+string_array_W = ["0W","1W","2W","3W","4W","NaN","NaN","NaN","NaN","NaN"]
+string_array_N = ["NaN","NaN","NaN","NaN","NaN","0N","1N","2N","3N","4N"]
+string_array_S = ["NaN","NaN","NaN","NaN","NaN","0S","1S","2S","3S","4S"]
 
 axes.set_xlim([-7,7])
 axes.set_ylim([-7,7])
 axes.set_aspect(1)
 
+# overplot long baselines
 for i in range(0,5):
     plt.plot([0,10],[0,coords_y_0[i]],color="k",linewidth=3)
     plt.plot([0,-10],[0,-coords_y_0[i]],color="k",linewidth=3)
@@ -143,6 +148,26 @@ for i in range(0,5):
                   fontsize=8,
                   bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.2'))
 
+#import ipdb; ipdb.set_trace()
+# overplot short baselines
+for i in range(5,10):
+    plt.plot([0,10],[0,coords_y_0[i]],color="k",linestyle=":",linewidth=3)
+    plt.plot([0,-10],[0,-coords_y_0[i]],color="k",linestyle=":",linewidth=3)
+    axes.annotate(string_array_N[i],
+                    xy=[0,0],
+                    xytext=[np.divide(6,np.tan(np.multiply(angles_array[i],np.pi/180.))),6],
+                    textcoords="data",
+                    ha='center', va='bottom',
+                  fontsize=8,
+                  bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.2'))
+    axes.annotate(string_array_S[i],
+                    xy=[0,0],
+                    xytext=[-np.divide(6,np.tan(np.multiply(angles_array[i],np.pi/180.))),-6],
+                    textcoords="data",
+                    ha='center', va='bottom',
+                  fontsize=8,
+                  bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.2'))
+
 # add secondary axes
 secax = axes.secondary_xaxis('top', functions=(au_to_asec, asec_to_au))
 secax.set_xlabel('Arcsec', fontsize=18)
@@ -153,10 +178,10 @@ secay.set_ylabel('Arcsec', fontsize=18)
 axes.plot([0], [0], '+', ms=10, color="red")
 
 ## add arrows
-plt.arrow(x=-3, y=-6, dx=-1, dy=0, width=0.2, color="k")
-plt.arrow(x=-3, y=-6.1, dx=0, dy=1.1, width=0.2, color="k")
-plt.annotate("N", xy=(0,0), xytext=(-3.35,-3.8), fontsize=16)
-plt.annotate("E", xy=(0,0), xytext=(-5.7,-6.35), fontsize=16)
+plt.arrow(x=-4, y=-3.75, dx=-1, dy=0, width=0.2, color="k")
+plt.arrow(x=-4, y=-3.85, dx=0, dy=1.1, width=0.2, color="k")
+plt.annotate("N", xy=(0,0), xytext=(-4.35,-1.55), fontsize=16)
+plt.annotate("E", xy=(0,0), xytext=(-6.7,-4.2), fontsize=16)
 
 plt.xlabel("AU (projected)",fontsize=18)
 plt.ylabel("AU (projected)",fontsize=18)
@@ -169,6 +194,7 @@ plt.setp(secay.get_yticklabels(), Fontsize=14)
 plt.tight_layout()
 
 plt.savefig("junk.pdf")
+print("Saved fig as junk.pdf")
 
 
 ## PLOT DENSITY OF POSITION ANGLE SAMPLINGS

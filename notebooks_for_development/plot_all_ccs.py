@@ -10,6 +10,8 @@ from scipy import ndimage
 from scipy.ndimage import gaussian_filter
 import matplotlib.pyplot as plt
 from astropy.io import fits
+from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import ScalarFormatter
 
 # make list of all the files
 #lambda_over_D = pd.read_csv("./data/modern_contrast_curve.csv")
@@ -38,12 +40,12 @@ for label, content in psf_profiles.items():
              alpha = 0.2, color="gray", linewidth=2)
 # lambda/D data
 plt.plot(lambda_over_D["rad_asec"],lambda_over_D["del_m_modern"],linewidth=4,
-         label="$\lambda /D$ regime (fake planet injections)")
+         label="$\lambda /D$ regime\n(planet injection and S/N measurement)")
 
 # prune lambda/B data
 # r > 0.42 asec: KS test fails because PSF is within 1 lambda/D from edge
 # del_m < 3.722: the 4 models do not all simultaneously have a solution
-import ipdb; ipdb.set_trace()
+#import ipdb; ipdb.set_trace()
 
 # lambda/B data: all mags as dotted lines
 plt.plot(lambda_over_B_N["x"].where(lambda_over_B_N["x"] < 0.42),lambda_over_B_N["y"].where(lambda_over_B_N["x"] < 0.42),linewidth=4,
@@ -54,20 +56,42 @@ plt.plot(lambda_over_B_S["x"].where(lambda_over_B_S["x"] < 0.42),lambda_over_B_S
         linestyle = ":")
 plt.plot(lambda_over_B_W["x"].where(lambda_over_B_W["x"] < 0.42),lambda_over_B_W["y"].where(lambda_over_B_W["x"] < 0.42),linewidth=4,
         linestyle = ":")
-# lambda/B data: overplot solid lines where all 4 models are valid
-plt.plot(lambda_over_B_N["x"].where(np.logical_and(lambda_over_B_N["x"] < 0.42,lambda_over_B_N["y"] > 3.772)),
-        lambda_over_B_N["y"].where(np.logical_and(lambda_over_B_N["x"] < 0.42,lambda_over_B_N["y"] > 3.772)),linewidth=4,
-        color="#ff7f0e", label="$\lambda /B$ regime (KS test; N)")
-plt.plot(lambda_over_B_E["x"].where(np.logical_and(lambda_over_B_E["x"] < 0.42,lambda_over_B_E["y"] > 3.772)),
-        lambda_over_B_E["y"].where(np.logical_and(lambda_over_B_E["x"] < 0.42,lambda_over_B_E["y"] > 3.772)),linewidth=4,
-        color="#2ca02c", label="$\lambda /B$ regime (KS test; E)")
-plt.plot(lambda_over_B_S["x"].where(np.logical_and(lambda_over_B_S["x"] < 0.42,lambda_over_B_S["y"] > 3.772)),
-        lambda_over_B_S["y"].where(np.logical_and(lambda_over_B_S["x"] < 0.42,lambda_over_B_S["y"] > 3.772)),linewidth=4,
-        color="#d62728", label="$\lambda /B$ regime (KS test; S)")
-plt.plot(lambda_over_B_W["x"].where(np.logical_and(lambda_over_B_W["x"] < 0.42,lambda_over_B_W["y"] > 3.772)),
-        lambda_over_B_W["y"].where(np.logical_and(lambda_over_B_W["x"] < 0.42,lambda_over_B_W["y"] > 3.772)),linewidth=4,
-        color="#9467bd", label="$\lambda /B$ regime (KS test; W)")
+# lambda/B data: overplot solid lines where all 4 models are valid: i.e., where abs_mag > 3.772, and we need to subtract
+# off set point of 1.70 to get corresponding del_m (abs_mag = del_m + 1.70)
+plt.plot(lambda_over_B_N["x"].where(np.logical_and(lambda_over_B_N["x"] < 0.42,lambda_over_B_N["y"] > np.subtract(3.772,1.7))),
+        lambda_over_B_N["y"].where(np.logical_and(lambda_over_B_N["x"] < 0.42,lambda_over_B_N["y"] > np.subtract(3.772,1.7))),linewidth=4,
+        color="#ff7f0e", label="$\lambda /B$ regime, N\n(planet injection and KS test)")
+plt.plot(lambda_over_B_E["x"].where(np.logical_and(lambda_over_B_E["x"] < 0.42,lambda_over_B_E["y"] > np.subtract(3.772,1.7))),
+        lambda_over_B_E["y"].where(np.logical_and(lambda_over_B_E["x"] < 0.42,lambda_over_B_E["y"] > np.subtract(3.772,1.7))),linewidth=4,
+        color="#2ca02c", label="$\lambda /B$ regime, E")
+plt.plot(lambda_over_B_S["x"].where(np.logical_and(lambda_over_B_S["x"] < 0.42,lambda_over_B_S["y"] > np.subtract(3.772,1.7))),
+        lambda_over_B_S["y"].where(np.logical_and(lambda_over_B_S["x"] < 0.42,lambda_over_B_S["y"] > np.subtract(3.772,1.7))),linewidth=4,
+        color="#d62728", label="$\lambda /B$ regime, S")
+plt.plot(lambda_over_B_W["x"].where(np.logical_and(lambda_over_B_W["x"] < 0.42,lambda_over_B_W["y"] > np.subtract(3.772,1.7))),
+        lambda_over_B_W["y"].where(np.logical_and(lambda_over_B_W["x"] < 0.42,lambda_over_B_W["y"] > np.subtract(3.772,1.7))),linewidth=4,
+        color="#9467bd", label="$\lambda /B$ regime, W")
 
+# LOGARITHMIC X-AXIS
+plt.gca().invert_yaxis()
+plt.xticks(fontsize=17)
+plt.yticks(fontsize=17)
+plt.xlim([0.1,2.2])
+ax = plt.gca()
+ax.set_xscale('log')
+plt.tick_params(axis='x', which='minor', labelsize=17)
+ax.xaxis.set_minor_formatter(FormatStrFormatter("%.1f"))
+ax.xaxis.set_major_formatter(ScalarFormatter())
+ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+plt.ylim([11,0])
+plt.legend(fontsize=17)
+plt.ylabel("$\Delta$m", fontsize=23)
+plt.xlabel("Radius (arcsec)", fontsize=23)
+plt.tight_layout()
+plt.show()
+#plt.savefig("junk.pdf")
+
+'''
+# LINEAR X-AXIS
 plt.gca().invert_yaxis()
 plt.xticks(fontsize=17)
 plt.yticks(fontsize=17)
@@ -79,3 +103,4 @@ plt.xlabel("Radius (arcsec)", fontsize=23)
 plt.tight_layout()
 plt.show()
 #plt.savefig("junk.pdf")
+'''

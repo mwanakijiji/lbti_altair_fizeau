@@ -37,7 +37,7 @@ plt.show()
 plt.clf()
 fig, axs = plt.subplots(1, 3, figsize=(9, 3), sharey=True, constrained_layout=True)
 im0 = axs[0].imshow(hdul_wo_planet[0].data[low_pass:high_pass,low_pass:high_pass],
-              origin="upper",extent=[-0.428,0.428,0.428,-0.428], cmap="gray", vmin=-483, vmax=556)
+              origin="upper",extent=[-0.428,0.428,0.428,-0.428], cmap="gray", vmin=-483, vmax=556) # vmin=-483, vmax=556
 #im0 = axs[0].imshow(hdul_wo_planet[0].data[low_pass:high_pass,low_pass:high_pass],
 #              origin="upper",extent=[-0.428,-0.428,0.428,0.428], cmap="gray", vmin=-483, vmax=556)
 
